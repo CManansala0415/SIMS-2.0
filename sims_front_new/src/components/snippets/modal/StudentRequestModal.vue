@@ -94,7 +94,6 @@ const itemCost = () => {
             return hasDocStamp.value = e.acf_docstamp == 1 ? true : false
         }
     })
-    console.log(hasDocStamp.value)
 }
 
 </script>
@@ -111,10 +110,10 @@ const itemCost = () => {
                     <label for="searchstudent" class="form-label">Search Student</label>
                     <input type="text" class="form-control form-control-sm" id="searchstudent"
                         placeholder="Enter Name Here..." v-model="searchValue"
-                        onkeydown="return /[a-z, ]/i.test(event.key)" @keyup.enter="searchStudent()">
+                        onkeydown="return /[a-z, ]/i.test(event.key)">
                 </div>
                 <div class=" align-content-end">
-                    <button class="btn btn-sm btn-primary" @click="searchStudent()">Search</button>
+                    <button class="btn btn-sm btn-primary" type="button" @click="searchStudent()">Search</button>
                 </div>
             </div>
             <div class="mb-1 text-start">
@@ -129,7 +128,7 @@ const itemCost = () => {
                 <input type="number" class="form-control form-control-sm" id="stampno"
                     placeholder="Enter Name Here..." v-model="docStamp" required
                     onkeydown="return /[a-z, ]/i.test(event.key)" min="0"
-                    @keyup.enter="searchStudent()">
+                    >
             </div>
            
             <div class="card mt-3">

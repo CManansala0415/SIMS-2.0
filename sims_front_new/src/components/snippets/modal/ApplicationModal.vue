@@ -624,11 +624,12 @@ const refresh = () => {
                         <label for="exampleInputEmail1">Telephone No.</label>
                         <input class="form-control" type="email" name="email" id="email" placeholder="Email">
                     </div> -->
+                    <!-- onkeydown="return /[0-9]/i.test(event.key)" -->
                     <div class="form-group col">
                         <label for="cellphone">Cellphone No.</label>
-                        <input class="form-control" type="text" name="cellphone" id="cellphone"
+                        <input class="form-control" type="number" name="cellphone" id="cellphone"
                             placeholder="Cellphone No." v-model="personal.per_contact"
-                            onkeydown="return /[0-9]/i.test(event.key)" minlength="9" maxlength="9" required :disabled="saving?true:false">
+                            minlength="9" maxlength="9" required :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="peremail">Email</label>
@@ -843,13 +844,13 @@ const refresh = () => {
                     <div class="form-group col">
                         <label for="edyearfrom">Year From</label>
                         <input type="text" class="form-control" id="edyearfrom" aria-describedby="emailHelp"
-                            v-model="attainmentInfo.pered_from" onkeydown="return /[0-9]/i.test(event.key)"
+                            v-model="attainmentInfo.pered_from"
                             maxlength="4" minlength="4" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="edyearto">Year To</label>
                         <input type="text" class="form-control" id="edyearto" aria-describedby="emailHelp"
-                            v-model="attainmentInfo.pered_to" onkeydown="return /[0-9]/i.test(event.key)" maxlength="4"
+                            v-model="attainmentInfo.pered_to" maxlength="4"
                             minlength="4" :disabled="saving?true:false">
                     </div>
                 </div>
@@ -926,8 +927,8 @@ const refresh = () => {
                     </div>
                     <div class="form-group col">
                         <label for="famcontactno">Contact No.</label>
-                        <input type="text" class="form-control" id="famcontactno" aria-describedby="famcontactno"
-                            v-model="famMembersInfo.fam_contact" onkeydown="return /[0-9]/i.test(event.key)"
+                        <input type="number" class="form-control" id="famcontactno" aria-describedby="famcontactno"
+                            v-model="famMembersInfo.fam_contact"
                             minlength="9" maxlength="9" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
@@ -982,8 +983,8 @@ const refresh = () => {
                     </div>
                     <div class="form-group col">
                         <label for="awardyear">Year Acquired</label>
-                        <input type="text" class="form-control" id="awardyear" aria-describedby="awardyear"
-                            v-model="awardInfo.awr_year" onkeydown="return /[0-9]/i.test(event.key)" maxlength="4"
+                        <input type="number" class="form-control" id="awardyear" aria-describedby="awardyear"
+                            v-model="awardInfo.awr_year" maxlength="4"
                             minlength="4" :disabled="saving?true:false">
                     </div>
                 </div>

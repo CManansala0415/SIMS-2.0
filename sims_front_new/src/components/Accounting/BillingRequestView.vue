@@ -14,10 +14,10 @@ import {
 
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
-import StudentRequestModal from '../snippets/modal/StudentRequestModal.vue';
-// import RenderModal from '../snippets/modal/RenderItem.vue';
 import { getUserID } from "../../routes/user";
+import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
 
+const showDownloadModal = ref(false)
 const preLoading = ref(false)
 const quarter = ref([])
 const gradelvl = ref([])
@@ -31,12 +31,11 @@ const offset = ref(0)
 const requestedItemsCount = ref(0)
 const searchValue = ref('')
 const userID = ref('')
-const showRequestModal = ref(false)
-const showRenderModal = ref(false)
+const showPaymentModal = ref(false)
 const price = ref([])
 const fee = ref([])
 const requestedItems = ref([])
-const students = ref([])
+const studentsAccount = ref([])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -79,51 +78,52 @@ const booter = async () => {
         booting.value = 'Loading Fees...'
         bootingCount.value += 1
     })
+
 }
 
+const mapper = (results) => {
+    requestedItems.value = results.data.map((e) => {
+        let itemdesc = ''
+        let paystat = ''
+        let textcolor = ''
+        fee.value.forEach((f) => {
+            if (f.acf_id == e.acr_reqitem) {
+                itemdesc = f.acf_desc
+            }
+        })
+
+        if (e.acr_paystatus == 2) {
+            paystat = 'Paid'
+            textcolor = 'text-success fw-bold'
+        }
+        else if (e.acr_paystatus == 1) {
+            paystat = 'Partial'
+            textcolor = 'text-warning fw-bold'
+        }
+        else {
+            paystat = 'Unpaid'
+            textcolor = 'text-danger fw-bold'
+        }
+
+        return {
+            ...e,
+            acr_paystatusdesc: paystat,
+            paystat_color: textcolor,
+            acr_itemrequested: itemdesc
+        }
+
+    })
+
+    requestedItemsCount.value = results.count
+    preLoading.value = false
+}
 
 onMounted(async () => {
-    window.stop()
     try {
         preLoading.value = true
         await booter().then((results) => {
             getRequestDetails(limit.value, offset.value).then((results) => {
-                requestedItems.value = results.data.map((e) => {
-                    let itemdesc = ''
-                    let paystat = ''
-                    let textcolor = ''
-                    fee.value.forEach((f) => {
-                        if (f.acf_id == e.acr_reqitem) {
-                            itemdesc = f.acf_desc
-                        }
-                    })
-
-                    if (e.acr_paystatus == 2) {
-                        paystat = 'Paid'
-                        textcolor = 'text-success fw-bold'
-                    }
-                    else if (e.acr_paystatus == 1) {
-                        paystat = 'Partial'
-                        textcolor = 'text-warning fw-bold'
-                    }
-                    else {
-                        paystat = 'Unpaid'
-                        textcolor = 'text-danger fw-bold'
-                    }
-
-                    return {
-                        ...e,
-                        acr_paystatusdesc: paystat,
-                        paystat_color: textcolor,
-                        acr_itemrequested: itemdesc
-                    }
-
-                })
-
-
-                requestedItemsCount.value = results.count
-                preLoading.value = false
-
+                mapper(results)
             })
         })
 
@@ -147,9 +147,7 @@ const paginate = (mode) => {
                 requestedItemsCount.value = 0
                 preLoading.value = true
                 getRequestDetails(limit.value, offset.value).then((results) => {
-                    requestedItems.value = results.data
-                    requestedItemsCount.value = results.count
-                    preLoading.value = false
+                    mapper(results)
                 })
             }
             break;
@@ -163,9 +161,7 @@ const paginate = (mode) => {
                 requestedItemsCount.value = 0
                 preLoading.value = true
                 getRequestDetails(limit.value, offset.value, null).then((results) => {
-                    requestedItems.value = results.data
-                    requestedItemsCount.value = results.count
-                    preLoading.value = false
+                    mapper(results)
                 })
             }
             break;
@@ -177,9 +173,7 @@ const paginate = (mode) => {
                 requestedItemsCount.value = 0
                 preLoading.value = true
                 getRequestDetails(limit.value, offset.value, searchValue.value).then((results) => {
-                    requestedItems.value = results.data
-                    requestedItemsCount.value = results.count
-                    preLoading.value = false
+                    mapper(results)
                 }).catch((err) => {
                     // console.log(err)
                 })
@@ -205,64 +199,41 @@ const requestedItem = ref({
 })
 
 const settlement = (data, mode) => {
-    if (mode == 1) {
-        showRequestModal.value = true
-    } else if (mode == 2) {
-        showRenderModal.value = true
-    } else {
-        if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
-            let del = {
-                acr_id: data.acr_id,
-                acr_updatedby: userID.value,
-            }
-
-            // getRequestDetails(0,0, data.acr_id).then((results)=>{
-            //     if(results.data[0].acr_status == 1){
-            //       deleteItemRequest(del, 2).then((results)=>{
-            //           alert('Successfully Removed')
-            //           location.reload()
-            //       })
-            //     }else{
-            //         alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
-            //     }
-            // })
-            deleteItemRequest(del, 2).then((results) => {
-                alert('Successfully Removed')
-                location.reload()
-            })
-
-
-        } else {
-            return false;
-        }
+    if (mode == 2) {
+        studentsAccount.value = data
+        showPaymentModal.value = true
     }
 }
 
+
+const excelDownload = () => {
+    showDownloadModal.value = true
+}
 
 </script>
 <template>
     <div>
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Students Request</h5>
+            <h5 class=" text-uppercase fw-bold">Billing Tuition</h5>
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
             <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
-                        /></span>
+                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
+                    v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                    :disabled="preLoading ? true : false">
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addrequestmodal" @click="settlement('', 1)"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#downloadmodal" @click="excelDownload()"
+                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
+                    <font-awesome-icon icon="fa-solid fa-add" /> Download Excel
                 </button>
             </div>
         </div>
 
         <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
+            <table class="table table-hover table-fixed">
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">Request ID</th>
@@ -276,52 +247,53 @@ const settlement = (data, mode) => {
                 <tbody>
                     <tr v-if="!preLoading && Object.keys(requestedItems).length" v-for="(req, index) in requestedItems">
                         <td class="align-middle">
-                           {{ req.acr_id }}
+                            {{ req.acr_id }}
                         </td>
                         <td class="align-middle">
-                           {{ req.acr_personname }}
+                            {{ req.acr_personname }}
                         </td>
                         <td class="align-middle">
-                           {{ req.acr_itemrequested }}
+                            {{ req.acr_itemrequested }}
                         </td>
                         <td class="align-middle">
-                           {{ req.acr_dateadded }}
+                            {{ req.acr_dateadded }}
                         </td>
                         <td class="align-middle">
                             <span :class="req.paystat_color">{{ req.acr_paystatusdesc }}</span>
                         </td>
-                        <td class="align-middle">
-                            <div v-if="req.acr_status == 0" class="text-center">
-                                <p class="text-danger fw-bold">Cancelled</p>
-                            </div>
-                            <div v-else>
-                                <div v-if="req.acr_paystatus == 1 && req.acr_rendered == 1" class="text-center">
-                                    <p class="text-success fw-bold">Completed</p>
+                        <td class="align-middle p-2">
+                            <div class="d-flex gap-2 justify-content-center align-content-center">
+                                <div v-if="req.acr_status == 0" class="text-center">
+                                    <span class="text-red-500 text-xs font-bold">Cancelled</span>
                                 </div>
-                                <div v-else class="d-flex gap-1 align-content-center justify-content-center">
-                                    <button title="Render Request" @click="settlement(req, 2)"
-                                        :disabled="req.acr_paystatus != 2 ? true : false" class="btn btn-sm btn-primary">
-                                        Render
-                                    </button>
-                                    <button title="Delete Request" @click="settlement(req, 3)" class="btn btn-sm btn-danger">
-                                        Drop
-                                    </button>
+                                <div v-else>
+                                    <div v-if="req.acr_paystatus == 2" class="text-center">
+                                        <button class="btn btn-sm btn-secondary" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
+                                            Completed
+                                        </button>
+                                    </div>
+                                    <div v-else class="rounded-md flex gap-1 items-center">
+                                        <button class="btn btn-sm btn-secondary" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
+                                            Payment
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(requestedItems).length">
-                        <td class="align-middle" colspan="7">
+                        <td class="p-3 text-center" colspan="6">
                             No Records Found
                         </td>
                     </tr>
                     <tr v-if="preLoading && !Object.keys(requestedItems).length">
-                        <td class="align-middle" colspan="7">
+                        <td class="p-3 text-center" colspan="6">
                             <div class="m-3">
                                 <Loader />
                             </div>
                         </td>
                     </tr>
+
                 </tbody>
             </table>
             <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
@@ -331,24 +303,23 @@ const settlement = (data, mode) => {
                     <button :disabled="Object.keys(requestedItems).length < 10 ? true : false" @click="paginate('next')"
                         class="btn btn-sm btn-secondary">Next</button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ requestedItemsCount }})</span> items
-                </p>
+                <p class="">showing total of <span class="font-semibold">({{ requestedItemsCount }})</span> items</p>
             </div>
         </div>
     </div>
 
-     <!-- Add Request Modal -->
-     <div class="modal fade" id="addrequestmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <!-- Settlement Modal -->
+    <div class="modal fade" id="settlementmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Request</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Payment Settlement</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        @click="showRequestModal = false"></button>
+                        @click="showPaymentModal = false"></button>
                 </div>
                 <div class="modal-body">
-                    <StudentRequestModal v-if="showRequestModal" :feeData="fee"/>
+                    <AccountingPaymentModal v-if="showPaymentModal" :accountData="studentsAccount" :billTypeData="2" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -358,41 +329,11 @@ const settlement = (data, mode) => {
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="showRequestModal = false">Close</button>
+                            @click="showPaymentModal = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-     <!-- Render Request Modal -->
-     <div class="modal fade" id="renderrequestmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Request</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        @click="showRenderModal = false"></button>
-                </div>
-                <div class="modal-body">
-                    <StudentRequestModal v-if="showRenderModal" :feeData="fee"/>
-                </div>
-                <div class="modal-footer d-flex justify-content-between">
-                    <div class="form-group">
-                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
-                            with anyone
-                            else (Data Privacy Act of 2012)</small>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="showRenderModal = false">Close</button>
-                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </template>

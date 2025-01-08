@@ -190,21 +190,21 @@ const saveLoad = () => {
             addEmployeeLoad(x).then((results) => {
                 loadCount.value += 1
                 loadCount.value == Object.keys(addedSubject.value).length ? loadSaved.value = true : loadSaved.value = false
-                
+                if(loadSaved.value){
+                    alert('Successfully Saved')
+                    location.reload()
+                }
             })
        
             
         })
-        console.log(loadSaved.value)
-        console.log(Object.keys(addedSubject.value).length)
-        console.log(loadCount.value)
+        // console.log(loadSaved.value)
+        //console.log(Object.keys(addedSubject.value).length)
+        //console.log(loadCount.value)
 
-        // if(loadSaved.value){
-        //     alert('Successfully Saved')
-        //     location.reload()
-        // }
+       
         
-    }
+    } 
 }
 
 

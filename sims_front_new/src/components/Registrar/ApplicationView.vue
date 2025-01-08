@@ -351,7 +351,7 @@ const addID = (data) => {
                                     type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button>
                             </div>
-                        </td>
+                        </td> 
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(applicant).length">
                         <td class="p-3 text-center" colspan="7">

@@ -56,7 +56,6 @@ const registerSection = () => {
     addSection(editData.value).then((results) => {
         alert('Successfull Registered')
         location.reload()
-        saving.value = false
     })
 }
 

@@ -102,7 +102,6 @@ const registerCurriculum = () => {
     addCurriculum(editData.value).then((results) => {
         alert('Successfull Registered')
         location.reload()
-        saving.value = false
     })
 }
 
@@ -373,7 +372,7 @@ const saveData = () => {
                 <div class="modal-body">
                     <form @submit.prevent="registerCurriculum()" class="d-flex flex-column p-2 gap-2">
                         <div class="d-flex flex-wrap flex-column">
-                            <p class="text-success fw-bold">Section Settings</p>
+                            <p class="text-success fw-bold">Curriculum Settings</p>
                             <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span
                                     class="fw-bold">Note:
                                 </span><span class="italic">Ensure that the details of the following applicant are
@@ -405,12 +404,12 @@ const saveData = () => {
                             </select>
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">Curriculum Title</label>
+                            <label for="type">Year From</label>
                             <input v-model="editData.curr_from" required type="number" minlength="4" maxlength="4"
                                 class="form-control form-control-sm" />
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">Curriculum Title</label>
+                            <label for="type">Year To</label>
                             <input v-model="editData.curr_to" required type="number" minlength="4" maxlength="4"
                                 class="form-control form-control-sm" />
                         </div>
@@ -459,11 +458,7 @@ const saveData = () => {
                         </div>
                         <div class="container mb-3 shadow-sm">
                             <div class="row">
-                                <div class="col">
-                                    <label for="type">Curriculum Title</label>
-                                    <input v-model="searchValueSubject" @keyup="searchSubject" type="text"
-                                        :disabled="!loadItems ? true : false" class="form-control form-control-sm" />
-                                </div>
+                                
                                 <div class="col">
                                     <label for="type">Semester</label>
                                     <select class="form-control form-select-sm" v-model="activeQuarter">
@@ -491,12 +486,16 @@ const saveData = () => {
                             </div>
                         </div>
 
-
                         <div v-if="loadItems" class="container ">
                             <div class="row">
                                 <div class="col">
                                     <div class="d-flex flex-column gap-2 ">
                                         <div class="p-3 card">
+                                            <div class="border p-2 form-group">
+                                                <label for="type">Search Subject</label>
+                                                <input v-model="searchValueSubject" @keyup="searchSubject" type="text"
+                                                    :disabled="!loadItems ? true : false" class="form-control form-control-sm" />
+                                            </div>
                                             <div class="table-responsive border p-2 small-font" style="height: 300px;">
                                                 <table class="table table-hover">
                                                     <thead>
@@ -519,7 +518,6 @@ const saveData = () => {
                                                                 <p class=" fst-italic">{{ sj.subj_name }}</p>
                                                             </td>
                                                         </tr>
-
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -563,7 +561,6 @@ const saveData = () => {
                                                                 </div>
                                                             </td>
                                                         </tr>
-
                                                     </tbody>
                                                 </table>
                                             </div>

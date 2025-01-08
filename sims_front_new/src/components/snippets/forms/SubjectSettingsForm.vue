@@ -86,7 +86,6 @@ const registerSubject = () => {
     addSubject(editData.value).then((results) => {
         alert('Successfull Registered')
         location.reload()
-        saving.value = false
     })
 }
 
@@ -130,7 +129,7 @@ onMounted(async () => {
 <template>
     <div>
         <div class="p-3 d-flex align-content-center justify-content-center">
-            <p class="text-uppercase fw-bold green-mid text-white rounded-3 p-2 small-font">Section Settings</p>
+            <p class="text-uppercase fw-bold green-mid text-white rounded-3 p-2 small-font">Subject Settings</p>
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">

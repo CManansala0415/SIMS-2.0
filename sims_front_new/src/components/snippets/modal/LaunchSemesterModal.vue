@@ -177,7 +177,7 @@ const saveLaunch = async () => {
 
 </script>
 <template>
-    <div class="d-flex flex-column p-2 gap-2">
+    <form @submit.prevent="saveLaunch" class="d-flex flex-column p-2 gap-2">
         <div class="d-flex flex-wrap flex-column">
             <p class="text-success fw-bold">Initialize Semester</p>
             <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
@@ -232,8 +232,41 @@ const saveLaunch = async () => {
                 </option>
             </select>
         </div>
+        <div class="d-flex flex-wrap form-group">
+            <label for="gradelvl">Program / Strand</label>
+            <select @change="filterCurriculum(launch.ln_course)"
+                class="form-control form-select-sm"
+                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                v-model="launch.ln_course" :disabled="launch.ln_gradelvl ? false : true" required>
+                <option v-for="(c, index) in filteredCourse" :value="c.prog_id">
+                    {{ c.prog_name }}
+                </option>
+            </select>
+        </div>
+        <div class="d-flex flex-wrap form-group">
+            <label for="gradelvl">Curriculum</label>
+            <select 
+                class="form-control form-select-sm"
+                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                v-model="launch.ln_curriculum" :disabled="launch.ln_course ? false : true" required>
+                <option v-for="(curr, index) in filteredCurriculum" :value="curr.curr_id">
+                    {{ curr.curr_code }}
+                </option>
+            </select>
+        </div>
+        <div class="d-flex flex-wrap form-group">
+            <label for="gradelvl">Section</label>
+            <select @change="filterCourse()"
+                class="form-control form-select-sm"
+                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                v-model="launch.ln_section" :disabled="launch.ln_curriculum ? false : true" required>
+                <option v-for="(sc, index) in section" :value="sc.sec_id">
+                    {{ sc.sec_name }}
+                </option>
+            </select>
+        </div>
         <div class="d-flex flex-wrap form-group mt-3">
             <button :disabled="saving? true:false" type="submit" class="btn btn-sm btn-success w-100">Create launch</button>
         </div>
-    </div>
+    </form>
 </template>

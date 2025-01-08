@@ -80,7 +80,6 @@ const registerCourse = () => {
     addProgram(editData.value).then((results) => {
         alert('Successfull Registered')
         location.reload()
-        saving.value = false
     })
 }
 
@@ -226,7 +225,7 @@ onMounted(async () => {
                                 </span></p>
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">Type</label>
+                            <label for="type">Description</label>
                             <input v-model="editData.prog_name" required type="text"
                                 class="form-control form-control-sm" />
                         </div>

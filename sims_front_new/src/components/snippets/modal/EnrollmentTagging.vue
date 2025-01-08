@@ -92,6 +92,10 @@ onMounted(async () => {
 
                 getMilestone(studentData.value.enr_id).then((results) => {
                     milestone.value = results
+                    milestone.value.forEach((e) => {
+                        addedSubject.value.push(e)
+                        addedSubjectId.value.push(e.subj_id)
+                    })
                     preloading.value = false
                     milestoneLoading.value = false
                 })
@@ -299,7 +303,7 @@ const filterCurriculum = () => {
                             <div class="col-6">
                                 <div class="p-3 border shadow d-flex flex-column gap-2 card">
                                     <span class="fw-bold">Curriculum</span>
-                                    <select class="form-control w-100" v-model="enr_curriculum"
+                                    <select class="form-control form-select-sm w-100" v-model="enr_curriculum"
                                         @change="setData('curriculum', enr_curriculum)">
                                         <option>-- Select Here --</option>
                                         <option v-for="(c, index) in curriculumFilter" :value="c.curr_id">{{ c.curr_code
@@ -311,7 +315,7 @@ const filterCurriculum = () => {
                             <div class="col-6">
                                 <div class="p-3 border shadow d-flex flex-column gap-2 card">
                                     <span class="fw-bold">Section</span>
-                                    <select class="form-control w-100" v-model="enr_section"
+                                    <select class="form-control form-select-sm w-100" v-model="enr_section"
                                         @change="setData('section', enr_section)">
                                         <option>-- Select Here --</option>
                                         <option v-for="(s, index) in sectionFilter" :value="s.sec_id">{{ s.sec_name }}
@@ -335,7 +339,7 @@ const filterCurriculum = () => {
                             </div>
                             <div class="col-5">
                                 <div class="d-flex flex-column gap-2 ">
-                                    <input v-model="searchSubject" class="form-control" @keyup="filteredSubject"
+                                    <input v-model="searchSubject" class="form-control form-control-sm" @keyup="filteredSubject"
                                         placeholder="Search Subjects Here..." />
                                     <div class="p-3 card">
                                         <div class="table-responsive border p-2 small-font" style="height: 500px;">
@@ -394,15 +398,15 @@ const filterCurriculum = () => {
                                                                 </div>
                                                                 <div class="input-group input-group-sm mb-1">
                                                                     <span class=" input-group-text">Lecture Units</span>
-                                                                    <input v-model="a.subj_lec" type="text" class="form-control" disabled>
+                                                                    <input v-model="a.subj_lec" type="text" class="form-control form-control-sm" disabled>
                                                                 </div>
                                                                 <div class="input-group input-group-sm mb-1">
                                                                     <span class=" input-group-text">Laboratory Units</span>
-                                                                    <input v-model="a.subj_lab" type="text" class="form-control" disabled>
+                                                                    <input v-model="a.subj_lab" type="text" class="form-control form-control-sm" disabled>
                                                                 </div>
                                                                 <div class="input-group input-group-sm mb-3">
                                                                     <span class=" input-group-text">Total Units / Hours</span>
-                                                                    <input :value="a.subj_lab + a.subj_lec" type="text" class="form-control" disabled>
+                                                                    <input :value="a.subj_lab + a.subj_lec" type="text" class="form-control form-control-sm" disabled>
                                                                 </div>
                                                                 <div class="mb-1">
                                                                     <label for="cross" class="form-label">Cross Enrolled (School)</label>
@@ -521,7 +525,7 @@ const filterCurriculum = () => {
                                             <div class="input-group mb-1">
                                                 <span class="input-group-text"
                                                     id="inputGroup-sizing-default">Lecture</span>
-                                                <input type="text" class="form-control"
+                                                <input type="text" class="form-control form-control-sm"
                                                     aria-label="Sizing example input"
                                                     aria-describedby="inputGroup-sizing-default" :value="c.subj_lec"
                                                     disabled>
@@ -529,7 +533,7 @@ const filterCurriculum = () => {
                                             <div class="input-group mb-1">
                                                 <span class="input-group-text"
                                                     id="inputGroup-sizing-default">Laboratory</span>
-                                                <input type="text" class="form-control"
+                                                <input type="text" class="form-control form-control-sm"
                                                     aria-label="Sizing example input"
                                                     aria-describedby="inputGroup-sizing-default" :value="c.subj_lab"
                                                     disabled>
@@ -537,7 +541,7 @@ const filterCurriculum = () => {
                                             <div class="input-group mb-1">
                                                 <span class="input-group-text"
                                                     id="inputGroup-sizing-default">Total</span>
-                                                <input type="text" class="form-control"
+                                                <input type="text" class="form-control form-control-sm"
                                                     aria-label="Sizing example input"
                                                     aria-describedby="inputGroup-sizing-default"
                                                     :value="c.subj_lec + c.subj_lab" disabled>
@@ -545,17 +549,17 @@ const filterCurriculum = () => {
                                         </div>
                                         <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
                                             <p><span class="fw-bold">Per Week: </span>{{ c.subj_hrs_week }}</p>
-                                            <p v-if="c.mi_tag == 1" class="fs-6"><span class="fw-bold">Tags: </span>
+                                            <p v-if="c.mi_tag == 1"><span class="fw-bold">Tags: </span>
                                                 Taken</p>
-                                            <p v-else-if="c.mi_tag == 2" class="fs-6"><span class="fw-bold">Tags:
+                                            <p v-else-if="c.mi_tag == 2"><span class="fw-bold">Tags:
                                                 </span>Advance</p>
-                                            <p v-else-if="c.mi_tag == 3" class="fs-6"><span class="fw-bold">Tags:
+                                            <p v-else-if="c.mi_tag == 3"><span class="fw-bold">Tags:
                                                 </span>Re-take / Back Subject</p>
-                                            <p v-else="c.mi_tag == 3" class="fs-6"><span class="fw-bold">Tags:
+                                            <p v-else="c.mi_tag == 3"><span class="fw-bold">Tags:
                                                 </span>N/A</p>
-                                            <p class="fs-6"><span class="fw-bold">Pre-requisite: </span>{{
+                                            <p><span class="fw-bold">Pre-requisite: </span>{{
                                                 c.subj_preq_code ? c.subj_preq_code : 'N/A' }}</p>
-                                            <p class="fs-6"><span class="fw-bold">Grade: --</span></p>
+                                            <p><span class="fw-bold">Grade: --</span></p>
                                         </div>
                                         <div
                                             class="col-1 p-3 border bg-white shadow d-flex flex-column justify-content-center">
