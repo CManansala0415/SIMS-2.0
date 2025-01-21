@@ -843,15 +843,15 @@ const refresh = () => {
                     </div>
                     <div class="form-group col">
                         <label for="edyearfrom">Year From</label>
-                        <input type="text" class="form-control" id="edyearfrom" aria-describedby="emailHelp"
+                        <input type="number" class="form-control" id="edyearfrom" aria-describedby="emailHelp"
                             v-model="attainmentInfo.pered_from"
-                            maxlength="4" minlength="4" :disabled="saving?true:false">
+                            max="9999" min="1999"  :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="edyearto">Year To</label>
-                        <input type="text" class="form-control" id="edyearto" aria-describedby="emailHelp"
-                            v-model="attainmentInfo.pered_to" maxlength="4"
-                            minlength="4" :disabled="saving?true:false">
+                        <input type="number" class="form-control" id="edyearto" aria-describedby="emailHelp"
+                            v-model="attainmentInfo.pered_to" max="9999" 
+                            min="1999" :disabled="saving?true:false">
                     </div>
                 </div>
                 <div class="form-group d-flex justify-content-center mt-3  bg-secondary-subtle p-2">

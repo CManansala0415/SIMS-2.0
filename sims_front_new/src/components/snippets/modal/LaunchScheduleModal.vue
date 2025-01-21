@@ -1036,15 +1036,16 @@ const loadFaculty = () => {
                     Load Schedule
                 </button>
                 <button v-if="Object.keys(loadedSched).length" :disabled="saving || preLoading ? true : false"
-                    @click="loadOccupancy()" tabindex="-1" title="Load Schedule" type="button" data-bs-toggle="modal"
-                    data-bs-target="#occupancymodal" class="btn btn-sm btn-dark">
-                    View Occupancy
-                </button>
-                <button v-if="Object.keys(loadedSched).length" :disabled="saving || preLoading ? true : false"
                     @click="loadFaculty()" tabindex="-1" title="Load Faculties" type="button" data-bs-toggle="modal"
                     data-bs-target="#facultymodal" class="btn btn-sm btn-dark">
                     Assign Faculties
                 </button>
+                <button v-if="Object.keys(loadedSched).length" :disabled="saving || preLoading ? true : false"
+                    @click="loadOccupancy()" tabindex="-1" title="Load Schedule" type="button" data-bs-toggle="modal"
+                    data-bs-target="#occupancymodal" class="btn btn-sm btn-dark">
+                    View Occupancy
+                </button>
+               
             </div>
             <div v-if="!checking && !Object.keys(curriculum).length" class="w-100 mt-4 p-4">
                 <p class="text-danger fw-bold">No Curriculum Found</p>
@@ -1056,9 +1057,9 @@ const loadFaculty = () => {
             </div>
 
             <div v-if="!preLoading && !saving && showCalendar" class="w-100">
-                <div v-if="!allow" class="w-100 h-100 flex flex-col items-center justify-center">
-                    <p class="text 2xl font-semibold text-red-500">Restricted</p>
-                    <p class="">Please assign corresponding faculty for each subject first to access schedule
+                <div v-if="!allow" class="w-100 h-100 flex flex-col items-center justify-center mt-5">
+                    <p class="text-danger fw-bold">Restricted</p>
+                    <p class="small-font">Please assign corresponding faculty for each subject first to access schedule
                         editor.</p>
                 </div>
                 <table v-else class="w-100 table-fixed">

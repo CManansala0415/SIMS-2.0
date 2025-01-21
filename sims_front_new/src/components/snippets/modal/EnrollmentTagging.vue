@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "../../../routes/user";
-import { getCurriculumSubject, getEnrollment, getMilestone, addMilestone, updateEnrollment, updateMilestone } from "../../Fetchers.js";
+import { getCurriculumSubject, getEnrollment, getMilestone, addMilestone, updateEnrollment, updateMilestone, getCommandUpdateCurriculum } from "../../Fetchers.js";
 import Loader from '../loaders/Loader1.vue';
 import { useRouter, useRoute } from 'vue-router'
 
@@ -50,13 +50,12 @@ const milestone = ref([])
 const milestoneSubject = ref([])
 const enr_section = ref('')
 const enr_curriculum = ref('')
-const currSelect = ref('')
-
+const settingscurr = ref([])
 
 onMounted(async () => {
     window.stop()
     enr_section.value = studentData.value.enr_section
-    enr_curriculum.value = studentData.value.enr_curriculum
+    // enr_curriculum.value = studentData.value.enr_curriculum
     subjectFilter.value = subjectData.value
     sectionFilter.value = sectionData.value
     curriculumFilter.value = curriculumData.value
@@ -72,40 +71,53 @@ onMounted(async () => {
         getEnrollment(studentData.value.per_id).then((results) => {
             enrolleeData.value = results
             let curr = enrolleeData.value[0].enr_curriculum
-            getCurriculumSubject(curr, 0, 0).then((results) => {
-                currSubject.value = results
+            let prog = enrolleeData.value[0].enr_program
+            let grad = enrolleeData.value[0].enr_gradelvl
+            let cour = enrolleeData.value[0].enr_course
 
-                // para to dun sa required subjects list ng milestones page
-                milestoneSubject.value = currSubject.value.filter(e => {
-                    if (
-                        (e.currtag_gradelvl == enrolleeData.value[0].enr_gradelvl) &&
-                        (e.currtag_sem == enrolleeData.value[0].enr_quarter)
-                    ) {
-                        return e
-                    }
-                })
-                // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
-                milestoneSubject.value.forEach((e) => {
-                    addedSubject.value.push(e)
-                    addedSubjectId.value.push(e.subj_id)
-                })
+            getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
+                settingscurr.value=results
 
-                getMilestone(studentData.value.enr_id).then((results) => {
-                    milestone.value = results
-                    milestone.value.forEach((e) => {
+                //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
+                if(!enrolleeData.value[0].enr_curriculum){
+                   curr = settingscurr.value[0].sett_course_currid
+                }
+
+                enr_curriculum.value = curr
+                getCurriculumSubject(curr, 0, 0).then((results) => {
+                    currSubject.value = results
+
+                    // para to dun sa required subjects list ng milestones page
+                    milestoneSubject.value = currSubject.value.filter(e => {
+                        if (
+                            (e.currtag_gradelvl == enrolleeData.value[0].enr_gradelvl) &&
+                            (e.currtag_sem == enrolleeData.value[0].enr_quarter)
+                        ) {
+                            return e
+                        }
+                    })
+                    // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
+                    milestoneSubject.value.forEach((e) => {
                         addedSubject.value.push(e)
                         addedSubjectId.value.push(e.subj_id)
                     })
-                    preloading.value = false
-                    milestoneLoading.value = false
+
+                    getMilestone(studentData.value.enr_id).then((results) => {
+                        milestone.value = results
+                        milestone.value.forEach((e) => {
+                            addedSubject.value.push(e)
+                            addedSubjectId.value.push(e.subj_id)
+                        })
+
+                        preloading.value = false
+                        milestoneLoading.value = false
+                    
+                    
+                    })
+
                 })
-
-
             })
         })
-
-
-
 
     } catch (err) {
         alert('error loading the list default components')
@@ -383,7 +395,7 @@ const filterCurriculum = () => {
                                                </div>
                                             </div>
                                             <div v-if="!Object.keys(addedSubject).length && loadCurrItems" class="p-1">
-                                               <div class="shadow p-3 rounded-3 text-center border small-font fw-bold text-danger">
+                                               <div class="shadow p-3 rounded-3 text-center border small-font fw-bold">
                                                 <Loader/>
                                                </div>
                                             </div>

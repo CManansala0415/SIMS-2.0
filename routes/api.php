@@ -165,7 +165,9 @@ Route::middleware(['auth:sanctum'])->get('/get-enlistment', [DefaultsController:
 
 //command center
 Route::middleware(['auth:sanctum'])->get('/command-drop-applicant', [CommandController::class,'dropApplicant']);
-
+Route::middleware(['auth:sanctum'])->post('/add-command-update', [CommandController::class,'setCommandUpdate']);
+Route::middleware(['auth:sanctum'])->get('/get-command-update', [CommandController::class,'getCommandUpdate']);
+Route::middleware(['auth:sanctum'])->get('/get-command-update-curriculum/{prog}/{grad}/{course}', [CommandController::class,'getCommandUpdateCurriculum']);
 
 
 

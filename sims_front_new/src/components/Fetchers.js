@@ -2121,6 +2121,56 @@ const addStudentIdentification = async (data) => {
     }
 }
 
+let commandsettings = {}
+const setCommandUpdate = async (data) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/add-command-update',
+            data:data
+
+        }).then(async (results) => {
+            commandsettings = results.data
+        })
+        return commandsettings
+    }catch(err){
+        return 500
+    }
+}
+
+let commandsettingsdata = {}
+const getCommandUpdate = async () => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-command-update/',
+        }).then(async (results) => {
+            // console.log(results.data)
+            commandsettingsdata = results.data
+        })
+        return commandsettingsdata
+    }catch(err){
+        return 500
+    }
+}
+
+let commandsettingsdatacurr = {}
+const getCommandUpdateCurriculum = async (prog, grad, course) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-command-update-curriculum/'+prog+'/'+grad+'/'+course,
+        }).then(async (results) => {
+            // console.log(results.data)
+            commandsettingsdatacurr = results.data
+        })
+        return commandsettingsdatacurr
+    }catch(err){
+        return 500
+    }
+}
+
+
 export {
 
     getApplicant,
@@ -2251,6 +2301,9 @@ export {
     addGradingGrade,
     commandDropApplicant,
     getStudentIdentification,
-    addStudentIdentification
+    addStudentIdentification,
+    setCommandUpdate,
+    getCommandUpdate,
+    getCommandUpdateCurriculum
 }
 

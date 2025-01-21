@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { enrollApplicant, getEnrollment } from "../../Fetchers.js";
+import { enrollApplicant, getEnrollment, getCommandUpdate } from "../../Fetchers.js";
 import { getUserID } from "../../../routes/user";
 const userID = ref('')
 
@@ -46,6 +46,7 @@ const showItems = ref(false)
 const filteredCourse = ref([])
 const filteredQuarter = ref([])
 const filteredGradelvl = ref([])
+const settings = ref([])
 const enrollChecker = ref(false)
 const saving = ref(false)
 const search = ref('')
@@ -59,6 +60,18 @@ const enrollData = ref({
     course: '',
     lrn: ''
 })
+
+const booter = async () => {
+    getUserID().then((results) => {
+        userID.value = results.data.id
+    }).catch((err) => {
+        router.push("/");
+    })
+    getCommandUpdate().then((results) => {
+        settings.value=results
+    })
+  
+}
 const enrolleeData = ref([])
 onMounted(async () => {
     window.stop()
@@ -68,28 +81,24 @@ onMounted(async () => {
         filteredQuarter.value = quarter.value
 
         enrollChecker.value = true
-        getEnrollment(personID.value).then((results) => {
 
-            if (results.length != 0) {
-                enrolleeData.value = results[0]
-                detectCourse(enrolleeData.value.enr_course)
-                enrollData.value.gradelvl = enrolleeData.value.enr_gradelvl
-                enrollData.value.program = enrolleeData.value.enr_program
-                enrollData.value.quarter = enrolleeData.value.enr_quarter
-                enrollData.value.course = enrolleeData.value.enr_course
-                enrollData.value.lrn = enrolleeData.value.enr_lrn
-            } else {
-                enrolleeData.value = []
-            }
-
-            enrollChecker.value = false
+        await booter().then(() => {
+            getEnrollment(personID.value).then((results) => {
+                if (results.length != 0) {
+                    enrolleeData.value = results[0]
+                    detectCourse(enrolleeData.value.enr_course)
+                    enrollData.value.gradelvl = enrolleeData.value.enr_gradelvl
+                    enrollData.value.program = enrolleeData.value.enr_program
+                    enrollData.value.quarter = enrolleeData.value.enr_quarter
+                    enrollData.value.course = enrolleeData.value.enr_course
+                    enrollData.value.lrn = enrolleeData.value.enr_lrn
+                } else {
+                    enrolleeData.value = []
+                }
+                enrollChecker.value = false
+            })
         })
-        getUserID().then((results) => {
-            userID.value = results.data.id
-        }).catch((err) => {
-            router.push("/");
-        })
-
+        
     } catch (err) {
         alert('error loading the list default components')
     }
@@ -113,7 +122,7 @@ const detectCourse = (data) => {
 // for typing search input
 
 const filterQuarter = () => {
-    enrollData.value.quarter = ''
+    enrollData.value.quarter = settings.value[1].sett_semester
     // filteredQuarter.value = quarter.value.filter(e => {
     //   if(enrollData.value.program==e.quar_dtypeid){
     //       return e

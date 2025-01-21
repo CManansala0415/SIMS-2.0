@@ -5,6 +5,7 @@ import ProgramForms from '../snippets/forms/ProgramSettingsForm.vue';
 import SectionForms from '../snippets/forms/SectionSettingsForm.vue';
 import SubjectForms from '../snippets/forms/SubjectSettingsForm.vue';
 import CurriculumForms from '../snippets/forms/CurriculumSettingsForm.vue';
+import CommandSettings from '../snippets/forms/CommandSettings.vue';
 //import Form2 from './RegistrarSettingsForm2.vue';
 //import Form3 from './RegistrarSettingsForm3.vue';
 //import Form4 from './RegistrarSettingsForm4.vue';
@@ -193,9 +194,12 @@ const mode = (type) => {
                             course.value = results
                             getProgram().then((results) => {
                                 program.value = results
-                                settingsTitle.value = 'Command Center Settings'
-                                form.value = 7
-                                preLoading.value = false
+                                getCurriculumSett().then((results) => {
+                                    curriculum.value = results
+                                    settingsTitle.value = 'Command Center Settings'
+                                    form.value = 7
+                                    preLoading.value = false
+                                })
                             })
                         })
                     })
@@ -284,7 +288,7 @@ const mode = (type) => {
                             registration and disabling events.</p>
                     </div>
                     <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(6)" disabled>Take Action</button>
+                        <button class="btn btn-sm btn-dark w-100" @click="mode(6)">Take Action</button>
                     </div>
                 </div>
             </div>
@@ -295,7 +299,8 @@ const mode = (type) => {
         <Loader v-if="preLoading" />
         <div v-else>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm"/> Back</button>
+                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
             </div>
             <div class="">
                 <ProgramForms :degreeData="degree" :programData="program" :courseData="course" :userIdData="userID"
@@ -308,7 +313,8 @@ const mode = (type) => {
         <Loader v-if="preLoading" />
         <div v-else>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm"/> Back</button>
+                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
             </div>
             <div class="">
                 <SectionForms :sectionData="section" :userIdData="userID" :title="settingsTitle" />
@@ -319,7 +325,8 @@ const mode = (type) => {
         <Loader v-if="preLoading" />
         <div v-else>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm"/> Back</button>
+                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
             </div>
             <div class="">
                 <SubjectForms :subjectData="subject" :specializationData="specialization" :programData="program"
@@ -331,10 +338,25 @@ const mode = (type) => {
         <Loader v-if="preLoading" />
         <div v-else>
             <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm"/> Back</button>
+                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
             </div>
             <div class="">
                 <CurriculumForms :subjectData="subject" :curriculumData="curriculum" :programData="program"
+                    :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
+                    :title="settingsTitle" />
+            </div>
+        </div>
+    </div>
+    <div v-if="form == 7">
+        <Loader v-if="preLoading" />
+        <div v-else>
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+            </div>
+            <div class="">
+                <CommandSettings :subjectData="subject" :curriculumData="curriculum" :programData="program"
                     :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
                     :title="settingsTitle" />
             </div>

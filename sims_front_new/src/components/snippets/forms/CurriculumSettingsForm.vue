@@ -443,7 +443,7 @@ const saveData = () => {
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Settings</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        @click="tagForm = false"></button>
+                        @click="tagForm = false, reset()"></button>
                 </div>
                 <div class="modal-body">
                     <form @submit.prevent="registerCurriculum()" class="d-flex flex-column p-2 gap-1">
@@ -496,7 +496,7 @@ const saveData = () => {
                                                 <input v-model="searchValueSubject" @keyup="searchSubject" type="text"
                                                     :disabled="!loadItems ? true : false" class="form-control form-control-sm" />
                                             </div>
-                                            <div class="table-responsive border p-2 small-font" style="height: 300px;">
+                                            <div class="table-responsive border p-2 small-font" style="height: 227px;">
                                                 <table class="table table-hover">
                                                     <thead>
                                                         <tr>
@@ -584,7 +584,7 @@ const saveData = () => {
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="tagForm = false">Close</button>
+                            @click="tagForm = false, reset()">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>
