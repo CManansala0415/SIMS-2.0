@@ -261,8 +261,10 @@ const goTo = () => {
     router.push('/application')
 }
 
+const formMode = ref('')
 const editData = (id) => {
     editId.value = id
+    formMode.value = id
     showFormModal.value = !showFormModal.value
 }
 const enrollApplicant = (data) => {
@@ -294,10 +296,14 @@ const addID = (data) => {
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
                     v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
             </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData()"
+            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
+                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"
                     type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> Add New
+                    <font-awesome-icon icon="fa-solid fa-add"  /> Add New Record
+                </button>
+                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('old')"
+                    type="button" class="btn btn-sm btn-info" :disabled="preLoading? true:false">
+                    <font-awesome-icon icon="fa-solid fa-add"  /> Add Old Record
                 </button>
             </div>
         </div>
@@ -393,7 +399,7 @@ const addID = (data) => {
                 <div class="modal-body">
                     <ApplicationModal v-if="showFormModal" :genderData="gender" :civilstatusData="civilstatus"
                         :nationalityData="nationality" :regionData="region" :provinceData="province" :cityData="city"
-                        :barangayData="barangay" :formId="editId" />
+                        :barangayData="barangay" :formId="editId" :formMode="formMode" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

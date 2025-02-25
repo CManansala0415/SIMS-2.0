@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 Use DateTime;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class CommandController extends Controller
 {
@@ -104,4 +107,83 @@ class CommandController extends Controller
         return $settings; 
     }
 
+    public function getCommandUsers($userid){
+        if($userid == 204){
+            $users = DB::table('users')
+            ->get();
+            $count = DB::table('users')
+            ->count();
+            return $data = [
+                'data' => $users,
+                'count' => $count,
+            ];
+
+        }else{
+            return 200;
+        }
+    }
+
+    public function updateCommandUsers(Request $req){
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d h:i:s', time());
+        try{
+            if($req['mode'] == 1){
+                $s1 = DB::table('users')
+                ->where('id','=', $req['id'])
+                ->update([
+                    'name' => $req->input('name'),
+                    'email' => $req->input('email'),
+                    'updated_at' => $date,
+                    'updated_by' => $req->input('updated_by'),
+                ]);
+        
+                return $data = [
+                    'status' => 200,
+                ];
+            }else{
+                $s2 = DB::table('users')
+                ->where('id','=', $req['id'])
+                ->update([
+                    'status' => 0,
+                    'updated_at' => $date,
+                    'updated_by' => $req->input('updated_by'),
+                ]);
+        
+                return $data = [
+                    'status' => 200,
+                ];
+            }
+        }catch(Exception $ex) {
+            return $data = [
+                'status' => 500,
+            ];
+        }
+       
+    }
+
+    public function addCommandUsers(Request $req){
+        $req->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $user = User::create([
+            'name' => $req->name,
+            'email' => $req->email,
+            'password' => Hash::make($req->password),
+        ]);
+
+        if($user){
+            return $data = [
+                'status' => 200,
+            ];
+        }else{
+            return $data = [
+                'status' => 500,
+            ];
+        }
+
+        
+    }
 }

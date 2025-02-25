@@ -23,6 +23,8 @@ const props = defineProps({
     },
     formId: {
     },
+    formMode:{
+    }
 })
 
 const gender = computed(() => {
@@ -49,10 +51,13 @@ const barangay = computed(() => {
 const personID = computed(() => {
   return props.formId
 });
-
+const registrationMode = computed(() => {
+  return props.formMode
+});
 const router = useRouter();
 
 // for select box div absolute
+
 const userID = ref('');
 const sameAddress = ref(false);
 const familyMembers = ref([]);
@@ -200,7 +205,6 @@ const getAge = (bday) =>{
 
 const copyAddress = () =>{
     if(sameAddress.value){
-
 
         updateAddress('permanent-province', personal.value.per_curr_region)
         updateAddress('permanent-city', personal.value.per_curr_province)
@@ -429,6 +433,9 @@ const updateAddress =(type, code) =>{
     }
 }
 
+const fileAttachment = () =>{
+
+}
 
 const clearFields = () =>{
     personal.value = []
@@ -453,7 +460,8 @@ const registerApplicant = () =>{
 
     let pers = {
         ...personal.value,
-        per_user: userID.value
+        per_user: userID.value,
+        per_regtype: registrationMode.value=='old'? 0:1
     }
 
     let fam = JSON.parse(JSON.stringify(familyMembers.value))
@@ -639,7 +647,6 @@ const refresh = () => {
                 </div>
             </div>
         </div>
-
         <div class="form-group border p-4 rounded  d-flex flex-column gap-2">
             <div class="form-group border-bottom">
                 <p class="fw-bold text-white bg-dark p-1 rounded-3">Birth Information</p>
@@ -801,7 +808,6 @@ const refresh = () => {
                 </div>
             </div>
         </div>
-
         <div class="form-group border p-4 rounded  d-flex flex-column gap-2">
             <div class="form-group border-bottom">
                 <p class="fw-bold text-white bg-dark p-1 rounded-3">Educational Background Information</p>
@@ -942,7 +948,6 @@ const refresh = () => {
                         id="submit_data" name="submit_data" :disabled="saving?true:false">Add</button>
                 </div>
             </div>
-
         </div>
         <div class="form-group border p-4 rounded  d-flex flex-column gap-2">
             <div class="form-group border-bottom">
@@ -993,8 +998,8 @@ const refresh = () => {
                         id="submit_data" name="submit_data" :disabled="saving?true:false">Add</button>
                 </div>
             </div>
-
         </div>
+
         <div v-if="saving" class="bg-white w-100 h-100 d-flex justify-content-center align-content-center bg-opacity-75">
             <div v-if=" (percounter == 1) &&
                         (famcounter == Object.keys(familyMembers).length) &&
@@ -1009,10 +1014,10 @@ const refresh = () => {
             </div>
             <div v-else class="py-3 text-center">
                 <div class="alert alert-dark" role="alert">
-                    <Loader>
+                    <Loader1>
                         <p class="fw-bold">Registering Applicant Information</p>
                         <p class="fw-bold">Saving personal details, generating identity</p>
-                    </Loader>
+                    </Loader1>
                     <p class="fw-regular">Registering Person <span class="fw-bold">{{ percounter }} out of 1</span></p>
                     <p class="fw-regular">Updating Family <span class="fw-bold">{{ famcounter }} out of {{ Object.keys(familyMembers).length }}</span></p>
                     <p class="fw-regular">Listing Awards <span class="fw-bold">{{ awrcounter }} out of {{ Object.keys(awardList).length }}</span></p>
@@ -1038,8 +1043,6 @@ const refresh = () => {
                 </button>
             </div>
         </div>
-
-       
     </form>
     
 

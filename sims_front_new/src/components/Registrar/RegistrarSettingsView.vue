@@ -25,6 +25,7 @@ import {
     getStudent,
     getSpecialization
 } from "../Fetchers.js";
+import UserAccountSettings from '../snippets/forms/UserAccountSettings.vue';
 const booter = async () => {
 
     getGradelvl().then((results) => {
@@ -277,7 +278,7 @@ const mode = (type) => {
                             settings.</p>
                     </div>
                     <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(5)" disabled>Take Action</button>
+                        <button class="btn btn-sm btn-dark w-100" @click="mode(5)">Take Action</button>
                     </div>
                 </div>
                 <div class="col card shadow-sm mb-2">
@@ -345,6 +346,18 @@ const mode = (type) => {
                 <CurriculumForms :subjectData="subject" :curriculumData="curriculum" :programData="program"
                     :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
                     :title="settingsTitle" />
+            </div>
+        </div>
+    </div>
+    <div v-if="form == 6">
+        <Loader v-if="preLoading" />
+        <div v-else>
+            <!-- <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+            </div> -->
+            <div class="">
+                <UserAccountSettings :userIdData="userID" :title="settingsTitle" @close="form = 1"/>
             </div>
         </div>
     </div>

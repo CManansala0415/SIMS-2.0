@@ -311,7 +311,7 @@ const downloadImage = (folder, file) => {
                 </div>
                 <div v-else
                     class="border w-100 d-flex flex-column justify-content-center align-content-center p-3">
-                    <div v-if="fileName" class="flex flex-col justify-center items-center">
+                    <div v-if="fileName" class="flex flex-col justify-center items-center overflow-auto">
                         <img :src="fileName ? 'http://localhost:8000/storage/clinic/' + folderName + '/' + fileName : '/img/profile_default.png'"
                             class="h-100 object-contain border-2 border-gray-300" />
 

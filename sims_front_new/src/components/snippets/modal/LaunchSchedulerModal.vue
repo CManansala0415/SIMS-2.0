@@ -83,7 +83,7 @@ const launchId = computed(() => {
     return props.launchIdData
 });
 
-
+ 
 const emit = defineEmits(['close-modal', 'assign-sched'])
 const assign = (id, name, bldg, classr, remove) => {
     alert('Successful')

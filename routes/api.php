@@ -168,6 +168,10 @@ Route::middleware(['auth:sanctum'])->get('/command-drop-applicant', [CommandCont
 Route::middleware(['auth:sanctum'])->post('/add-command-update', [CommandController::class,'setCommandUpdate']);
 Route::middleware(['auth:sanctum'])->get('/get-command-update', [CommandController::class,'getCommandUpdate']);
 Route::middleware(['auth:sanctum'])->get('/get-command-update-curriculum/{prog}/{grad}/{course}', [CommandController::class,'getCommandUpdateCurriculum']);
+Route::middleware(['auth:sanctum'])->get('/get-command-users/{userid}', [CommandController::class,'getCommandUsers']);
+Route::middleware(['auth:sanctum'])->post('/update-command-user', [CommandController::class,'updateCommandUsers']);
+Route::middleware(['auth:sanctum'])->post('/add-command-user', [CommandController::class,'addCommandUsers']);
+
 
 
 
