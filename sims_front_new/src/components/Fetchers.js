@@ -2223,6 +2223,23 @@ const addCommandUsers = async (data) => {
     }
 }
 
+let commandsettingaccess = {}
+const saveCommandAccess = async (data) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/add-command-access',
+            data:data
+
+        }).then(async (results) => {
+            commandsettingaccess = results.data
+        })
+        return commandsettingaccess
+    }catch(err){
+        return 500
+    }
+}
+
 export {
 
     getApplicant,
@@ -2359,6 +2376,7 @@ export {
     getCommandUpdateCurriculum,
     getCommandUsers,
     updateCommandUsers,
-    addCommandUsers
+    addCommandUsers,
+    saveCommandAccess
 }
 

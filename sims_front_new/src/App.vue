@@ -9,14 +9,17 @@ const userID = ref('')
 const router = useRouter();
 const route = useRoute();
 const path = computed(() => route.path)
-
+const isLoading = ref(false)
 onMounted(async () => {
   //get user here
   await router.isReady()
+  isLoading.value = true
 
   getUserID().then((results) => {
     user.value = results.data.name
     userID.value = results.data.id
+    isLoading.value = false
+
   }).catch((err) => {
     alert('Unauthorized Session, Please Log In')
     router.push("/");
@@ -209,6 +212,9 @@ const active_class = ref("nav-static border p-2 active");
     </nav>
 
     <div>
+      <div class="d-flex align-content-center justify-content-end flex-wrap small-font">
+        <span class="fw-regular">Welcome <span class="fw-bold">{{ user }}</span></span> 
+      </div>
       <div v-if="path != '/'" class="container w-100 m-0 border mb-4 mt-2">
         <div class="row g-2">
           <div class="col-12 d-flex justify-content-between">
@@ -461,7 +467,7 @@ const active_class = ref("nav-static border p-2 active");
                 </nav>
               </div>
               <div class="d-flex align-content-center flex-wrap">
-                <button type="button" @click="handleLogout()" class="btn btn-sm btn-danger p-2" title="items"
+                <button type="button" @click="handleLogout()" class="btn btn-sm btn-danger p-2" title="items" :disabled="isLoading? true:false"
                   tabindex="-1"><font-awesome-icon icon="fa-solid fa-power-off" /> Logout
                 </button>
               </div>

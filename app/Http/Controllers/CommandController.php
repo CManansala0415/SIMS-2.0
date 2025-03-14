@@ -186,4 +186,43 @@ class CommandController extends Controller
 
         
     }
+
+    public function saveCommandAccess(Request $req){
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d h:i:s', time());
+        $data = $req->all();
+        try{
+            
+            $moduleindex = 0;
+            foreach ($data as $module) {
+                $moduleindex++;
+
+                // echo $module['module_access'][0]['access_description'];
+                foreach ($module['module_access'] as $access) {
+
+
+                    $s1 = DB::table('users_access') 
+                    ->insert([
+                        'useracc_accid' => $module['user_id'],
+                        'useracc_modulecode' => $module['module_id'],
+                        'useracc_accesscode' => $access['access_id'],
+                        'useracc_viewing' => isset($access['access_viewing'])? 'true':'false',
+                        'useracc_modifying' => isset($access['access_modifying'])? 'true':'false',
+                        'useracc_addedby' => $module['sett_addedby'],
+                        'useracc_dateadded' => $date,
+                    ]);
+                }
+
+            }
+    
+            return $data = [
+                'status' => 200,
+            ];
+
+        }catch(Exception $ex) {
+            return $data = [
+                'status' => 500,
+            ];
+        }
+    }
 }

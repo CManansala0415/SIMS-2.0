@@ -149,7 +149,7 @@ Route::middleware(['auth:sanctum'])->get('/get-library-books-borrowed-by/{cardid
 Route::middleware(['auth:sanctum'])->post('/deactivate-library-card', [LibraryController::class,'deactivateLibraryCard']);
 Route::middleware(['auth:sanctum'])->post('/add-library-card', [LibraryController::class,'addLibraryCard']);
 
-
+ 
 Route::middleware(['auth:sanctum'])->get('/get-faculty-class/{empid}', [FacultyController::class,'getFacultyClass']);
 Route::middleware(['auth:sanctum'])->get('/get-faculty-assignment/{empid}', [FacultyController::class,'getFacultyAssignment']);
 Route::middleware(['auth:sanctum'])->get('/get-faculty-student/{section}/{gradelvl}/{course}', [FacultyController::class,'getFacultyStudent']);
@@ -171,6 +171,7 @@ Route::middleware(['auth:sanctum'])->get('/get-command-update-curriculum/{prog}/
 Route::middleware(['auth:sanctum'])->get('/get-command-users/{userid}', [CommandController::class,'getCommandUsers']);
 Route::middleware(['auth:sanctum'])->post('/update-command-user', [CommandController::class,'updateCommandUsers']);
 Route::middleware(['auth:sanctum'])->post('/add-command-user', [CommandController::class,'addCommandUsers']);
+Route::middleware(['auth:sanctum'])->post('/add-command-access', [CommandController::class,'saveCommandAccess']);
 
 
 
