@@ -36,7 +36,7 @@ onMounted(async () => {
   <h2>Dashboard</h2>
   <div class="d-flex gap-2 mt-3 small-font ">
     <div class="card" style="width: 18rem;">
-      <img src="/public/src/bsmt.jpg" class="card-img-top" alt="...">
+      <img src="/src/bsmt.jpg" class="card-img-top" alt="...">
       <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
         <h6 class="card-title">Bachelor's of Science in Marine Transportation</h6>
         <p class="card-text">is a four-year degree program in the Philippines designed to train students to become
@@ -58,7 +58,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="card" style="width: 18rem;">
-      <img src="/public/src/ccje.jpg" class="card-img-top" alt="...">
+      <img src="/src/ccje.jpg" class="card-img-top" alt="...">
       <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
         <h6 class="card-title">Bachelor's of Science in Criminal Justice Education</h6>
         <p class="card-text">a four-year degree program that focuses on the study of crime, the justice system, and
@@ -80,7 +80,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="card" style="width: 18rem;">
-      <img src="/public/src/bsit.jpg" class="card-img-top" alt="...">
+      <img src="/src/bsit.jpg" class="card-img-top" alt="...">
       <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
         <h6 class="card-title">Bachelor's of Science in Information and Technology</h6>
         <p class="card-text">is a four-year degree program focusing on the study and application of computer utilization
@@ -102,7 +102,7 @@ onMounted(async () => {
       </div>
     </div>
     <div class="card" style="width: 18rem;">
-      <img src="/public/src/bshm.jpg" class="card-img-top" alt="...">
+      <img src="/src/bshm.jpg" class="card-img-top" alt="...">
       <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
         <h6 class="card-title">Bachelor of Science in Hospitality and Management</h6>
         <p class="card-text">is a four-year degree program that prepares students for careers in the hospitality
