@@ -14,12 +14,10 @@ use App\Http\Controllers\CommandController;
 Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::middleware(['auth:sanctum'])->get('/get-user-access/{userid}', [DefaultsController::class,'getUserAccess']);
 
 
 Route::middleware(['auth:sanctum'])->get('/get-applicant/{limit}/{offset}/{search}', [RegistrarController::class,'getApplicant']);
-
-
-
 Route::middleware(['auth:sanctum'])->get('/get-gender', [DefaultsController::class,'getGender']);
 Route::middleware(['auth:sanctum'])->get('/get-nationality', [DefaultsController::class,'getNationality']);
 Route::middleware(['auth:sanctum'])->get('/get-civilstatus', [DefaultsController::class,'getCivilStatus']);
@@ -172,6 +170,7 @@ Route::middleware(['auth:sanctum'])->get('/get-command-users/{userid}', [Command
 Route::middleware(['auth:sanctum'])->post('/update-command-user', [CommandController::class,'updateCommandUsers']);
 Route::middleware(['auth:sanctum'])->post('/add-command-user', [CommandController::class,'addCommandUsers']);
 Route::middleware(['auth:sanctum'])->post('/add-command-access', [CommandController::class,'saveCommandAccess']);
+Route::middleware(['auth:sanctum'])->get('/get-command-access/{userid}', [CommandController::class,'getCommandAccess']);
 
 
 

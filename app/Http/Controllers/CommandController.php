@@ -192,31 +192,54 @@ class CommandController extends Controller
         $date = date('Y-m-d h:i:s', time());
         $data = $req->all();
         try{
-            
+            $if = '';
             $moduleindex = 0;
             foreach ($data as $module) {
                 $moduleindex++;
 
                 // echo $module['module_access'][0]['access_description'];
                 foreach ($module['module_access'] as $access) {
+                    if($access['useracc_id'] == 0){
+                        $s1 = DB::table('users_access') 
+                        ->insert([
+                            'useracc_accid' => $module['user_id'],
+                            'useracc_modulecode' => $module['module_id'],
+                            'useracc_accesscode' => $access['access_id'],
+                            'useracc_category' => $module['module_category'],
+                            'useracc_category_desc' => $module['module_category_desc'],
+                            'useracc_viewing' => isset($access['access_viewing'])? $access['access_viewing']:0,
+                            'useracc_modifying' => isset($access['access_modifying'])? $access['access_modifying']:0,
+                            'useracc_grant' => isset($module['module_grant'])? $module['module_grant']:0,
+                            'useracc_addedby' => $module['sett_addedby'],
+                            'useracc_dateadded' => $date,
+                        ]);
+                        $if = 'insert';
 
-
-                    $s1 = DB::table('users_access') 
-                    ->insert([
-                        'useracc_accid' => $module['user_id'],
-                        'useracc_modulecode' => $module['module_id'],
-                        'useracc_accesscode' => $access['access_id'],
-                        'useracc_viewing' => isset($access['access_viewing'])? 'true':'false',
-                        'useracc_modifying' => isset($access['access_modifying'])? 'true':'false',
-                        'useracc_addedby' => $module['sett_addedby'],
-                        'useracc_dateadded' => $date,
-                    ]);
+                    }else{
+                        $s1 = DB::table('users_access') 
+                        ->where('useracc_id', '=' , $access['useracc_id'])
+                        ->update([
+                            'useracc_accid' => $module['user_id'],
+                            'useracc_modulecode' => $module['module_id'],
+                            'useracc_accesscode' => $access['access_id'],
+                            'useracc_category' => $module['module_category'],
+                            'useracc_category_desc' => $module['module_category_desc'],
+                            'useracc_viewing' => $access['access_viewing'],
+                            'useracc_modifying' => $access['access_modifying'],
+                            'useracc_grant' => $module['module_grant'],
+                            'useracc_addedby' => $module['sett_addedby'],
+                            'useracc_dateadded' => $date,
+                        ]);
+                        $if = 'update';
+                    }
+                    
                 }
 
             }
     
             return $data = [
                 'status' => 200,
+                'mode' =>  $if
             ];
 
         }catch(Exception $ex) {
@@ -224,5 +247,12 @@ class CommandController extends Controller
                 'status' => 500,
             ];
         }
+    }
+
+    public function getCommandAccess($id){
+        $access = DB::table('users_access')
+            ->where('useracc_accid', '=' , $id)
+            ->get();
+        return $access; 
     }
 }

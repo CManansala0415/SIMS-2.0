@@ -73,8 +73,8 @@ onMounted(async () => {
             booting.value = 'Loading Applicants...'
             bootingCount.value += 1
             getUserID().then((results) => {
-                userID.value = results.data.id
-                preLoading.value = false
+                userID.value = results.account.data.id
+                preLoading.account.value = false
             })
         })
 

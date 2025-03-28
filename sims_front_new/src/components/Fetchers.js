@@ -2240,6 +2240,26 @@ const saveCommandAccess = async (data) => {
     }
 }
 
+let commandaccess = {}
+const getCommandAccess = async (userid) => {
+    let search = userid
+    if(!userid){
+        search = 204
+    }
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-command-access/'+search,
+        }).then(async (results) => {
+            commandaccess = results.data
+        })
+        return commandaccess
+    }catch(err){
+        return err
+    }
+}
+
+
 export {
 
     getApplicant,
@@ -2377,6 +2397,7 @@ export {
     getCommandUsers,
     updateCommandUsers,
     addCommandUsers,
-    saveCommandAccess
+    saveCommandAccess,
+    getCommandAccess
 }
 

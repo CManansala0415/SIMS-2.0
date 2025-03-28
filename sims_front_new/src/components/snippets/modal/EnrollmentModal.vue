@@ -63,7 +63,7 @@ const enrollData = ref({
 
 const booter = async () => {
     getUserID().then((results) => {
-        userID.value = results.data.id
+        userID.value = results.account.data.id
     }).catch((err) => {
         router.push("/");
     })

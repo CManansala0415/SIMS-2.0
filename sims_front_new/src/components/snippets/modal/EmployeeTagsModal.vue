@@ -101,7 +101,7 @@ onMounted(async () => {
         checking.value = true
         await booter().then((results) => {
             getUserID().then((results) => {
-                userID.value = results.data.id
+                userID.value = results.account.data.id
                 checking.value = false
             })
         })

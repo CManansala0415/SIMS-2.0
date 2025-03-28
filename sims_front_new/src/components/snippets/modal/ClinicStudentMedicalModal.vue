@@ -160,8 +160,8 @@ onMounted(async () => {
     filteredPermRegion.value = region.value
 
     getUserID().then((results) => {
-        userID.value = results.data.id
-        userName.value = results.data.name
+        userID.value = results.account.data.id
+        userName.value = results.account.data.name
         clinicalRecords.value.clnc_nurse = userID.value
         clinicalRecords.value.clnc_personid = personID.value
     })

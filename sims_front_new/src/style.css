@@ -55,8 +55,14 @@ h1 {
   background-size: cover;
 }
 
-.bg-opaque{
+/* .bg-opaque{
   background-image: url('/img/clcstoc_transparent.png');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+} */
+.bg-opaque{
+  background-image: url('/img/bgkey.jpg');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

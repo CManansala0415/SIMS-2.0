@@ -1,12 +1,14 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Loader from '../loaders/Loading1.vue';
+import AccessForm from '../modal/UserAccountAccess.vue';
 
 import {
     getCommandUsers,
     updateCommandUsers,
     addCommandUsers,
-    saveCommandAccess
+    saveCommandAccess,
+    getCommandAccess
 
 } from "../../Fetchers.js";
 
@@ -37,6 +39,8 @@ const email = ref('')
 const password = ref('')
 const confirmpassword = ref('')
 const id = ref('')
+const loadingAccess = ref(false)
+
 
 onMounted(async () => {
 
@@ -125,35 +129,41 @@ const handleAccount = async () => {
 }
 
 const accessData = async (data) => {
+    // module indexes
     accessModuleData.value[0].user_id = data.id
     accessModuleData.value[1].user_id = data.id
     accessModuleData.value[2].user_id = data.id
     accessModuleData.value[3].user_id = data.id
     accessModuleData.value[4].user_id = data.id
-}
 
-const handleAccess = async () => {
-    saveCommandAccess(accessModuleData.value).then((results)=>{
-        if (results.status == 200) {
-            alert('Update Successful')
-            location.reload()
-        } else {
-            alert('Update Failed')
-            location.reload()
+    loadingAccess.value = true
+    getCommandAccess(data.id).then((results)=>{
+        if(results.length > 0){
+            Object.keys(accessModuleData.value).forEach(function(index1) {
+                Object.keys(accessModuleData.value[index1].module_access).forEach(function(index2) {
+                    let access_value = results.filter((e)=>{
+                        if( (accessModuleData.value[index1].module_id == e.useracc_modulecode)
+                            && 
+                            (accessModuleData.value[index1].module_access[index2].access_id == e.useracc_accesscode)){
+                            return{
+                                e
+                            }
+                        }
+                    })
+
+                    parseInt(access_value[0].useracc_viewing) == 1? accessModuleData.value[index1].module_access[index2].access_checked = true : accessModuleData.value[index1].module_access[index2].access_checked = false
+                    accessModuleData.value[index1].module_access[index2].access_viewing = parseInt(access_value[0].useracc_viewing)
+                    accessModuleData.value[index1].module_access[index2].access_modifying = parseInt(access_value[0].useracc_modifying)
+                    accessModuleData.value[index1].module_grant = parseInt(access_value[0].useracc_grant)
+                    accessModuleData.value[index1].module_access[index2].access_disabled = parseInt(access_value[0].useracc_grant)==1? 0:1 // if may grant na 1, mawawala disabled
+                    accessModuleData.value[index1].module_access[index2].useracc_id = access_value[0].useracc_id
+                }); 
+            }); 
         }
+        loadingAccess.value = false
     })
 }
-
-const modify = (moduleIndex, actionIndex) =>{
-   
-    accessModuleData.value[moduleIndex].module_access[actionIndex].access_checked = !accessModuleData.value[moduleIndex].module_access[actionIndex].access_checked
-    accessModuleData.value[moduleIndex].module_access[actionIndex].access_viewing = !accessModuleData.value[moduleIndex].module_access[actionIndex].access_viewing
-    accessModuleData.value[moduleIndex].module_access[actionIndex].access_modifying = !accessModuleData.value[moduleIndex].module_access[actionIndex].access_modifying
-   
-    // console.log(accessModuleData.value)
-}
-
-
+ 
 
 const accessModuleData = ref(
     {
@@ -162,62 +172,70 @@ const accessModuleData = ref(
             sett_addedby:userID.value,
             module_id: 1,
             module_value: 1,
+            module_category: 1,
+            module_category_desc: 'Administrative',
             module_description: 'Registrar Module',
+            module_grant: 0,
             module_access: {
                 0: {
+                    useracc_id:0,
                     access_id: 1,
                     access_value: 1,
                     access_description: 'Student Admission',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false,
-
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 1: {
+                    useracc_id:0,
                     access_id: 2,
                     access_value: 2,
                     access_description: 'Enrollment',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 2: {
+                    useracc_id:0,
                     access_id: 3,
                     access_value: 3,
                     access_description: 'Student Request',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 3: {
+                    useracc_id:0,
                     access_id: 4,
                     access_value: 4,
                     access_description: 'Semester Launch',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 4: {
+                    useracc_id:0,
                     access_id: 5,
                     access_value: 5,
                     access_description: 'Employee Management',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 5: {
+                    useracc_id:0,
                     access_id: 6,
                     access_value: 6,
                     access_description: 'Registrar Settings',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
             }
         },
@@ -226,43 +244,50 @@ const accessModuleData = ref(
             sett_addedby:userID.value,
             module_id: 2,
             module_value: 2,
+            module_category: 1,
+            module_category_desc: 'Administrative',
             module_description: 'Library Module',
+            module_grant: 0,
             module_access: {
                 0: {
+                    useracc_id:0,
                     access_id: 1,
                     access_value: 1,
                     access_description: 'Book Supplies',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 1: {
+                    useracc_id:0,
                     access_id: 2,
                     access_value: 2,
                     access_description: 'Book Borrowers',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 2: {
+                    useracc_id:0,
                     access_id: 3,
                     access_value: 3,
                     access_description: 'Book DDC',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 3: {
+                    useracc_id:0,
                     access_id: 4,
                     access_value: 4,
                     access_description: 'Library Cards',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
             }
         },
@@ -271,34 +296,40 @@ const accessModuleData = ref(
             sett_addedby:userID.value,
             module_id: 3,
             module_value: 3,
+            module_category: 1,
+            module_category_desc: 'Administrative',
             module_description: 'Clinic Module',
+            module_grant: 0,
             module_access: {
                 0: {
+                    useracc_id:0,
                     access_id: 1,
                     access_value: 1,
                     access_description: 'Student Records',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 1: {
+                    useracc_id:0,
                     access_id: 2,
                     access_value: 2,
                     access_description: 'Employee Records',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 2: {
+                    useracc_id:0,
                     access_id: 3,
                     access_value: 3,
                     access_description: 'Medical Supplies',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
             }
         },
@@ -307,25 +338,30 @@ const accessModuleData = ref(
             sett_addedby:userID.value,
             module_id: 4,
             module_value: 4,
+            module_category: 2,
+            module_category_desc: 'Transactions',
             module_description: 'Accounting Module',
+            module_grant: 0,
             module_access: {
                 0: {
+                    useracc_id:0,
                     access_id: 1,
                     access_value: 1,
                     access_description: 'Accounting',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
                 1: {
+                    useracc_id:0,
                     access_id: 2,
                     access_value: 2,
                     access_description: 'Billing & Cashier',
-                    access_checked: false,
-                    access_disabled: false,
-                    access_viewing:false,
-                    access_modifying:false
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
             }
         },
@@ -334,13 +370,19 @@ const accessModuleData = ref(
             sett_addedby:userID.value,
             module_id: 5,
             module_value: 5,
+            module_category: 3,
+            module_category_desc: 'Academics',
             module_description: 'Faculty Module',
+            module_grant: 0,
             module_access: {
                 0: {
+                    useracc_id:0,
                     access_id: 1,
                     access_description: 'Viewing / General Access',
-                    access_checked: true,
-                    access_disabled: true,
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
                 },
             }
         }
@@ -435,7 +477,7 @@ const accessModuleData = ref(
 
     <!-- Edit Modal -->
     <div class="modal fade" id="editdatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        aria-labelledby="staticBackdropLabel">
         <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -506,84 +548,8 @@ const accessModuleData = ref(
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
                 </div>
                 <div class="modal-body">
-                    <form @submit.prevent="handleAccess" class="d-flex flex-column align-items-start small-font">
-                        <div class="mb-3 w-100">
-                            <div class="accordion accordion-flush" id="accordionFlushExample">
-                                <div class="accordion-item" v-for="(mod, modindex) in accessModuleData">
-                                    <h2 class="accordion-header" id="flush-headingOne">
-                                        <button class="accordion-button collapsed" type="button"
-                                            data-bs-toggle="collapse" :data-bs-target="'#module' + mod.module_id"
-                                            aria-expanded="false" :aria-controls="'module' + mod.module_id">
-                                            {{ mod.module_description }}
-                                        </button>
-                                    </h2>
-                                    <div :id="'module' + mod.module_id" class="accordion-collapse collapse"
-                                        aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                                        <div class="accordion-body">
-                                            <ul class="list-group">
-                                                <li class="list-group-item" v-for="(acc, accindex) in mod.module_access">
-                                                    <div class="border p-3 ">
-                                                        <div class="form-check form-switch">
-                                                            <input class="form-check-input" type="checkbox" :checked="acc.access_checked"
-                                                                @change="modify(modindex, accindex)"
-                                                                :disabled="acc.access_disabled" :value="acc.access_value">
-                                                            <label class="form-check-label fw-bold">{{
-                                                                acc.access_description }}</label>
-                                                        </div>
-                                                    </div>
-                                                    <div class="border">
-                                                        <div class="accordion accordion-flush" id="crudaccordion">
-                                                            <div class="accordion-item">
-                                                                <p class="accordion-header" id="flush-crud">
-                                                                    <button class="accordion-button collapsed" type="button"
-                                                                        data-bs-toggle="collapse"
-                                                                        :data-bs-target="'#action'+acc.access_id"
-                                                                        aria-expanded="false"
-                                                                        :aria-controls="'action'+acc.access_id">
-                                                                        <span class="small-font">Actions Granted</span>
-                                                                        <code class="mx-3 text-danger" v-show="!acc.access_checked">(Enable Access First)</code>
-                                                                        <code class="mx-3 text-success" v-show="acc.access_checked">(Access Enabled)</code>
-                                                                    </button>
-                                                                </p>
-                                                                <div :id="'action'+acc.access_id"
-                                                                    class="accordion-collapse collapse"
-                                                                    aria-labelledby="flush-crud"
-                                                                    data-bs-parent="#crudaccordion">
-                                                                    <div class="p-3">
-                                                                        <div class="form-check form-switch">
-                                                                            <input class="form-check-input" type="checkbox" 
-                                                                            @change="acc.access_viewing = !acc.access_viewing"
-                                                                            :checked="acc.access_viewing"
-                                                                            :disabled="!acc.access_checked" :value="acc.access_viewing">
-                                                                            <label class="form-check-label">View / General Access</label>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="p-3">
-                                                                        <div class="form-check form-switch">
-                                                                            <input class="form-check-input" type="checkbox"
-                                                                            @change="acc.access_modifying = !acc.access_modifying"
-                                                                            :checked="acc.access_modifying"
-                                                                            :disabled="!acc.access_checked" :value="acc.access_modifying">
-                                                                            <label class="form-check-label">Add, Edit, Delete / Modifier Access</label>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-success w-100"
-                            :disabled="saving ? true : false">
-                            Save
-                        </button>
-                    </form>
+                    <Loader v-if="loadingAccess"/>
+                    <AccessForm  :accountData="accessModuleData" v-else/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

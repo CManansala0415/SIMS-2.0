@@ -39,7 +39,7 @@ const booter = async () => {
     })
 
     getUserID().then((results) => {
-        userID.value = results.data.id
+        userID.value = results.account.data.id
         booting.value = 'Loading User'
         bootingCount.value += 1
     })

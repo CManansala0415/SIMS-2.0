@@ -8,7 +8,15 @@ Use DateTime;
 
 class DefaultsController extends Controller
 {
-   
+    
+    public function getUserAccess($id)
+    {
+        $user_access = DB::table('users_access')->orderBy('useracc_id')
+        ->where('useracc_accid', '=' , $id)
+        ->get();
+        return $user_access; 
+    }
+
     public function getGender()
     {
         $gender = DB::table('sett_gender')->orderBy('gen_id')

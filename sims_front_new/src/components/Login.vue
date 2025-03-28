@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { getUserID } from "../routes/user";
 import { useRouter } from 'vue-router'
 const router = useRouter();
-
+const emit = defineEmits(['fetchUser'])
 const isLogging = ref(false)
 const form = ref({
     email: '',
@@ -26,10 +27,11 @@ const handleLogin = async () => {
                 password: form.value.password
             }
         }).then(async (results) => {
-            // console.log(results.config.headers)
-            isLogging.value = false
-            router.push("/home");
-
+            getUserID().then((results) => {
+                    emit('fetchUser', results)
+                    isLogging.value = false
+                    router.push("/home");
+                })
         });
     }catch(err){
         alert('Login Failed, Please Try Again')

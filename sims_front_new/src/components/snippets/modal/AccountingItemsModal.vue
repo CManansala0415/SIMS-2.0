@@ -22,7 +22,7 @@ const saving = ref(false)
 
 onMounted(() => {
     getUserID().then((results) => {
-        userID.value = results.data.id
+        userID.value = results.account.data.id
     }).catch((err) => {
         alert('Unauthorized Session, Please Log In')
         router.push("/");

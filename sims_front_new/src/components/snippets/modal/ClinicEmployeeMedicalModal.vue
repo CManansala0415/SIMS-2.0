@@ -91,8 +91,8 @@ onMounted(async () => {
     personal.value.per_birthday = date.toISOString().split('T')[0]
 
     getUserID().then((results) => {
-        userID.value = results.data.id
-        userName.value = results.data.name
+        userID.value = results.account.data.id
+        userName.value = results.account.data.name
         clinicalRecords.value.clne_nurse = userID.value
         clinicalRecords.value.clne_personid = personID.value
     })

@@ -279,7 +279,7 @@ onMounted(async () => {
         checking.value = true
         await booter().then((results) => {
             getUserID().then(async (results) => {
-                userID.value = results.data.id
+                userID.value = results.account.data.id
 
                 let empid = ''
                 curriculumSubject.value = curriculumSubject.value.map((e, index) => {

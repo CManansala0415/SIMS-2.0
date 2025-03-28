@@ -59,7 +59,7 @@ onMounted(() => {
     // amountPaid.value = account.value.acr_payment? account.value.acr_payment:''
 
     getUserID().then((results) => {
-        userID.value = results.data.id
+        userID.value = results.account.data.id
 
         // identify if tuition of not
         if (billType.value == 1) {

@@ -38,7 +38,7 @@ const booter = async () => {
 
 onMounted(async () => {
     getUserID().then((results) => {
-        userID.value = results.data.id
+        userID.value = results.account.data.id
     }).catch((err) => {
 
     })

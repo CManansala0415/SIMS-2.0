@@ -182,7 +182,7 @@ onMounted(async () => {
     filteredPermRegion.value = region.value
 
     getUserID().then((results) => {
-        userID.value = results.data.id
+        userID.value = results.account.data.id
     })
     
     checking.value = true

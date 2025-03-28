@@ -65,7 +65,7 @@ onMounted(async () => {
         milestoneLoading.value = true
 
         getUserID().then((results) => {
-            userID.value = results.data.id
+            userID.value = results.account.data.id
         })
 
         getEnrollment(studentData.value.per_id).then((results) => {

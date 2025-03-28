@@ -3,29 +3,75 @@ import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "./routes/user";
 import { useRouter, useRoute } from 'vue-router'
-
+import loader from './components/snippets/loaders/Loading1.vue'
 const user = ref('')
 const userID = ref('')
 const router = useRouter();
 const route = useRoute();
 const path = computed(() => route.path)
 const isLoading = ref(false)
+
 onMounted(async () => {
   //get user here
-  await router.isReady()
+
   isLoading.value = true
-
+  await router.isReady()
   getUserID().then((results) => {
-    user.value = results.data.name
-    userID.value = results.data.id
+    user.value = results.account.data.name
+    userID.value = results.account.data.id
+    linker()
     isLoading.value = false
-
   }).catch((err) => {
     alert('Unauthorized Session, Please Log In')
     router.push("/");
   })
 
+})
 
+const administrative = ref(0)
+const transactions = ref(0)
+const academics = ref(0)
+const userName = ref('')
+const fetchingUserAccess = ref(true)
+const getUser = (data) => {
+
+  // administrative
+  let x = data.access.data.filter((e) => {
+    return e.useracc_category == 1
+  })
+  // transactions
+  let y = data.access.data.filter((e) => {
+    return e.useracc_category == 2
+  })
+  // academics
+  let z = data.access.data.filter((e) => {
+    return e.useracc_category == 3
+  })
+
+  // administrative
+  let a = x.filter((e) => {
+    return e.useracc_grant == 1
+  })
+  // transactions
+  let b = y.filter((e) => {
+    return e.useracc_grant == 1
+  })
+  // academics
+  let c = z.filter((e) => {
+    return e.useracc_grant == 1
+  })
+
+  administrative.value = a.length
+  transactions.value = b.length
+  academics.value = c.length
+  userName.value = data.account.data.name
+
+  fetchingUserAccess.value = false
+  isLoading.value = false
+
+}
+
+const linker = () => {
   switch (true) {
     case [
       "/",
@@ -89,10 +135,8 @@ onMounted(async () => {
 
       switchItem(3, 1)
       break;
-
-
   }
-})
+}
 
 const handleLogout = async () => {
   if (confirm("Are you sure you want to logout") == true) {
@@ -178,7 +222,7 @@ const active_class = ref("nav-static border p-2 active");
 </script>
 <template>
   <div class="container border rounded-3 shadow p-5 flex-column bg-white">
-    
+
     <nav class="navbar navbar-light bg-light mb-5">
       <div class="container-fluid">
 
@@ -212,14 +256,25 @@ const active_class = ref("nav-static border p-2 active");
     </nav>
 
     <div>
-      <div class="d-flex align-content-center justify-content-end flex-wrap small-font">
-        <span class="fw-regular">Welcome <span class="fw-bold">{{ user }}</span></span> 
+      <div v-if="path != '/'" class="d-flex align-content-center justify-content-end flex-wrap small-font">
+        
+        <span v-if="fetchingUserAccess"class="fw-regular">Identifying User...</span>
+        <span v-else class="fw-regular">Welcome <span class="fw-bold">{{ userName }}</span></span>
       </div>
       <div v-if="path != '/'" class="container w-100 m-0 border mb-4 mt-2">
         <div class="row g-2">
           <div class="col-12 d-flex justify-content-between">
-
-            <div class="d-flex gap-2 align-content-center flex-wrap">
+            <div v-if="fetchingUserAccess" class="d-flex gap-2 align-content-center flex-wrap">
+              <nav class="nav gap-2 p-2">
+                <div class="dropdown">
+                  <button class="btn btn-sm" type="button" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    Loading Please Wait...
+                  </button>
+                </div>
+              </nav>
+            </div>
+            <div v-else class="d-flex gap-2 align-content-center flex-wrap">
               <nav class="nav gap-2 p-2">
                 <div class="dropdown">
                   <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
@@ -232,7 +287,7 @@ const active_class = ref("nav-static border p-2 active");
                 </div>
                 <div class="dropdown">
                   <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+                    v-if="administrative > 0" data-bs-toggle="dropdown" aria-expanded="false">
                     Administrative
                   </button>
                   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
@@ -246,7 +301,7 @@ const active_class = ref("nav-static border p-2 active");
                 </div>
                 <div class="dropdown">
                   <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                    data-bs-toggle="dropdown" aria-expanded="false">
+                    v-if="transactions > 0" data-bs-toggle="dropdown" aria-expanded="false">
                     Transactions
                   </button>
                   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
@@ -257,7 +312,7 @@ const active_class = ref("nav-static border p-2 active");
                   </ul>
                 </div>
                 <div class="dropdown">
-                  <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                  <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2" v-if="academics > 0"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     Academics
                   </button>
@@ -322,7 +377,6 @@ const active_class = ref("nav-static border p-2 active");
                           <p class="m-2">Registrar Settings</p>
                         </router-link>
                       </li>
-
                     </ul>
                   </div>
                 </nav>
@@ -467,12 +521,12 @@ const active_class = ref("nav-static border p-2 active");
                 </nav>
               </div>
               <div class="d-flex align-content-center flex-wrap">
-                <button type="button" @click="handleLogout()" class="btn btn-sm btn-danger p-2" title="items" :disabled="isLoading? true:false"
-                  tabindex="-1"><font-awesome-icon icon="fa-solid fa-power-off" /> Logout
+                <button type="button" @click="handleLogout()" class="btn btn-sm btn-danger p-2" title="items"
+                  :disabled="isLoading ? true : false" tabindex="-1"><font-awesome-icon icon="fa-solid fa-power-off" />
+                  Logout
                 </button>
               </div>
             </div>
-
 
           </div>
         </div>
@@ -489,7 +543,8 @@ const active_class = ref("nav-static border p-2 active");
             </div>
           </div>
           <div class="col-12">
-            <RouterView></RouterView>
+            <loader v-if="isLoading" />
+            <RouterView v-else @fetchUser="getUser"></RouterView>
           </div>
         </div>
       </div>
