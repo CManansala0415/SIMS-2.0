@@ -36,6 +36,7 @@ const price = ref([])
 const fee = ref([])
 const requestedItems = ref([])
 const studentsAccount = ref([])
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -64,7 +65,9 @@ const booter = async () => {
         bootingCount.value += 1
     })
     getUserID().then((results) => {
+        // user.value = results.account.data.name
         userID.value = results.account.data.id
+        emit('fetchUser', results)
         booting.value = 'Loading Users...'
         bootingCount.value += 1
     })
@@ -221,7 +224,7 @@ const excelDownload = () => {
             <div class="input-group w-50">
                 <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                     v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
                     :disabled="preLoading ? true : false">
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end">

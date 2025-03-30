@@ -45,6 +45,7 @@ const billLoading = ref([])
 const price = ref([])
 const grandTotal = ref(0)
 const showPaymentModal = ref(false)
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -79,6 +80,7 @@ const booter = async () => {
     })
     getUserID().then((results) => {
         userID.value = results.account.data.id
+        emit('fetchUser', results)
         booting.value = 'Loading Users...'
         bootingCount.value += 1
     })
@@ -282,7 +284,7 @@ const settlePayments = () => {
             <div class="input-group w-50">
                 <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
                     :disabled="preLoading ? true : false">
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end">
@@ -323,7 +325,7 @@ const settlePayments = () => {
                                             class="img-size" />
                                     </label>
                                 </div>
-                                <div v-if="showLink"
+                                <!-- <div v-if="showLink"
                                     class="d-flex flex-column justify-content-center align-content-center p-2 w-100">
                                     <form v-if="showLink && index == linkId" @submit.prevent="upload(stud.per_id)"
                                         method="post" enctype="multipart/form-data">
@@ -332,7 +334,7 @@ const settlePayments = () => {
                                             :disabled="holdSubmit ? true : false">Upload Photo</button>
                                     </form>
                                     <p v-if="showLink && index == linkId" class="fw-regular">{{ image.name }}</p>
-                                </div>
+                                </div> -->
                             </div>
                         </td>
                         <td class="align-middle p-2">

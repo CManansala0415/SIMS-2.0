@@ -23,12 +23,15 @@ const booting = ref('')
 const bootingCount = ref(0)
 const medicalItem = ref([])
 const saving = ref(false)
+const emit = defineEmits(['fetchUser'])
+
 const booter = async () => {
 
     getUserID().then((results) => {
         booting.value = 'Loading Users...'
         bootingCount.value += 1
         userID.value = results.account.data.id
+        emit('fetchUser', results)
     })
 
 }

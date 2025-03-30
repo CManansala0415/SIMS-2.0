@@ -69,7 +69,6 @@ const getUser = (data) => {
 
   fetchingUserAccess.value = false
   isLoading.value = false
-
 }
 
 const linker = () => {

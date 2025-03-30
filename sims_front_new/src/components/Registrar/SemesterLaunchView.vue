@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import { getUserID } from "../../routes/user";
 import {
     getBuilding,
     getClassroom,
@@ -11,9 +12,10 @@ import {
     getGradelvl,
     getCurriculum,
     getCurriculumStudent,
-    getCurriculumSubject
+    getCurriculumSubject,
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
+
 import LaunchSemesterModal from '../snippets/modal/LaunchSemesterModal.vue';
 import LaunchScheduleModal from '../snippets/modal/LaunchScheduleModal.vue';
 
@@ -40,6 +42,7 @@ const launchCount = ref([])
 const sched = ref(false)
 const launchData = ref([])
 const curriculum = ref([])
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
@@ -157,11 +160,22 @@ onMounted(async () => {
         await booter().then((results) => {
             booting.value = 'Loading Launched Semesters...'
             bootingCount.value += 1
-            getLaunch(limit.value, offset.value).then((results) => {
-                launch.value = results.data
-                launchCount.value = results.count
-                preLoading.value = false
+
+            getUserID().then((results1) => {
+                // user.value = results.account.data.name
+                // userID.value = results.account.data.id
+                getLaunch(limit.value, offset.value).then((results2) => {
+                    launch.value = results2.data
+                    launchCount.value = results2.count
+                    emit('fetchUser', results1)
+                    preLoading.value = false
+                })
+
+            }).catch((err) => {
+                // alert('Unauthorized Session, Please Log In')
+                // router.push("/");
             })
+           
 
         })
 

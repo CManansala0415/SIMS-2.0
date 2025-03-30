@@ -28,7 +28,7 @@ const borrowedBooks = ref([])
 const modeData = ref('')
 const showModal = ref(false)
 const showBorrow = ref(false)
-
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
@@ -40,6 +40,7 @@ const booter = async () => {
 
     getUserID().then((results) => {
         userID.value = results.account.data.id
+        emit('fetchUser', results)
         booting.value = 'Loading User'
         bootingCount.value += 1
     })

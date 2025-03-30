@@ -26,6 +26,8 @@ import {
     getSpecialization
 } from "../Fetchers.js";
 import UserAccountSettings from '../snippets/forms/UserAccountSettings.vue';
+const emit = defineEmits(['fetchUser'])
+
 const booter = async () => {
 
     getGradelvl().then((results) => {
@@ -73,8 +75,14 @@ onMounted(async () => {
             booting.value = 'Loading Applicants...'
             bootingCount.value += 1
             getUserID().then((results) => {
+                // user.value = results.account.data.name
                 userID.value = results.account.data.id
-                preLoading.account.value = false
+                preLoading.value = false
+                emit('fetchUser', results)
+
+            }).catch((err) => {
+                // alert('Unauthorized Session, Please Log In')
+                // router.push("/");
             })
         })
 

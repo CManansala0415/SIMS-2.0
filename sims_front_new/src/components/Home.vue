@@ -25,8 +25,8 @@ onMounted(async () => {
     emit('fetchUser', results)
 
   }).catch((err) => {
-    alert('Unauthorized Session, Please Log In')
-    router.push("/");
+    // alert('Unauthorized Session, Please Log In')
+    // router.push("/");
   })
 })
 
@@ -34,92 +34,112 @@ onMounted(async () => {
 </script>
 <template>
   <h2>Dashboard</h2>
-  <div class="d-flex gap-2 mt-3 small-font ">
-    <div class="card" style="width: 18rem;">
-      <img src="/src/bsmt.jpg" class="card-img-top" alt="...">
-      <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
-        <h6 class="card-title">Bachelor's of Science in Marine Transportation</h6>
-        <p class="card-text">is a four-year degree program in the Philippines designed to train students to become
-          marine deck officers, equipping them with the knowledge and skills for navigation, ship handling, and maritime
-          operations.</p>
+  <div class="container mt-3 small-font">
+    <div class="row mb-2">
+      <div class="col-6 p-1">
+        <div class="card w-100 h-100" style="width: 18rem;">
+          <img src="/src/bsmt.jpg" class="card-img-top" alt="...">
+          <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
+            <h6 class="card-title">Bachelor's of Science in Marine Transportation</h6>
+            <p class="card-text">is a four-year degree program in the Philippines designed to train students to become
+              marine deck officers, equipping them with the knowledge and skills for navigation, ship handling, and
+              maritime
+              operations.</p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item text-success fw-bold">BSMT</li>
+            <li class="list-group-item">Bachelor's Degree</li>
+            <li class="list-group-item">4 Year Term</li>
+          </ul>
+          <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">
+              View Track
+            </button>
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Enroll Now
+            </button>
+          </div>
+        </div>
       </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item text-success fw-bold">BSMT</li>
-        <li class="list-group-item">Bachelor's Degree</li>
-        <li class="list-group-item">4 Year Term</li>
-      </ul>
-      <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          View Track
-        </button>
-        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Enroll Now
-        </button>
-      </div>
-    </div>
-    <div class="card" style="width: 18rem;">
-      <img src="/src/ccje.jpg" class="card-img-top" alt="...">
-      <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
-        <h6 class="card-title">Bachelor's of Science in Criminal Justice Education</h6>
-        <p class="card-text">a four-year degree program that focuses on the study of crime, the justice system, and
-          related fields, preparing graduates for careers in law enforcement, corrections, and other areas of criminal
-          justice. </p>
-      </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item text-primary fw-bold">BSCJE</li>
-        <li class="list-group-item">Bachelor's Degree</li>
-        <li class="list-group-item">4 Year Term</li>
-      </ul>
-      <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          View Track
-        </button>
-        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Enroll Now
-        </button>
-      </div>
-    </div>
-    <div class="card" style="width: 18rem;">
-      <img src="/src/bsit.jpg" class="card-img-top" alt="...">
-      <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
-        <h6 class="card-title">Bachelor's of Science in Information and Technology</h6>
-        <p class="card-text">is a four-year degree program focusing on the study and application of computer utilization
-          and software to plan, install, customize, operate, manage, administer, and maintain information technology
-          infrastructure, with the goal of developing IT professionals.</p>
-      </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item text-info fw-bold">BSIT</li>
-        <li class="list-group-item">Bachelor's Degree</li>
-        <li class="list-group-item">4 Year Term</li>
-      </ul>
-      <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          View Track
-        </button>
-        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Enroll Now
-        </button>
+      <div class="col-6 p-1">
+        <div class="card w-100 h-100" style="width: 18rem;">
+          <img src="/src/ccje.jpg" class="card-img-top" alt="...">
+          <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
+            <h6 class="card-title">Bachelor's of Science in Criminal Justice Education</h6>
+            <p class="card-text">a four-year degree program that focuses on the study of crime, the justice system, and
+              related fields, preparing graduates for careers in law enforcement, corrections, and other areas of
+              criminal
+              justice. </p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item text-primary fw-bold">BSCJE</li>
+            <li class="list-group-item">Bachelor's Degree</li>
+            <li class="list-group-item">4 Year Term</li>
+          </ul>
+          <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">
+              View Track
+            </button>
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Enroll Now
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="card" style="width: 18rem;">
-      <img src="/src/bshm.jpg" class="card-img-top" alt="...">
-      <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
-        <h6 class="card-title">Bachelor of Science in Hospitality and Management</h6>
-        <p class="card-text">is a four-year degree program that prepares students for careers in the hospitality
-          industry, focusing on areas like hotel, restaurant, resort, and event management. </p>
+
+    <div class="row">
+      <div class="col-6 p-1">
+        <div class="card w-100" style="width: 18rem;">
+          <img src="/src/bsit.jpg" class="card-img-top" alt="...">
+          <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
+            <h6 class="card-title">Bachelor's of Science in Information and Technology</h6>
+            <p class="card-text">is a four-year degree program focusing on the study and application of computer
+              utilization
+              and software to plan, install, customize, operate, manage, administer, and maintain information technology
+              infrastructure, with the goal of developing IT professionals.</p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item text-info fw-bold">BSIT</li>
+            <li class="list-group-item">Bachelor's Degree</li>
+            <li class="list-group-item">4 Year Term</li>
+          </ul>
+          <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">
+              View Track
+            </button>
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Enroll Now
+            </button>
+          </div>
+        </div>
       </div>
-      <ul class="list-group list-group-flush">
-        <li class="list-group-item text-warning fw-bold">BSHM</li>
-        <li class="list-group-item">Bachelor's Degree</li>
-        <li class="list-group-item">4 Year Term</li>
-      </ul>
-      <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
-        <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          View Track
-        </button>
-        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Enroll Now
-        </button>
+      <div class="col-6 p-1">
+        <div class="card w-100 h-100" style="width: 18rem;">
+          <img src="/src/bshm.jpg" class="card-img-top" alt="...">
+          <div class="card-body h-50 overflow-auto text-start d-flex flex-column justify-content-around">
+            <h6 class="card-title">Bachelor of Science in Hospitality and Management</h6>
+            <p class="card-text">is a four-year degree program that prepares students for careers in the hospitality
+              industry, focusing on areas like hotel, restaurant, resort, and event management. </p>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item text-warning fw-bold">BSHM</li>
+            <li class="list-group-item">Bachelor's Degree</li>
+            <li class="list-group-item">4 Year Term</li>
+          </ul>
+          <div class="card-body  d-flex gap-2 align-content-around justify-content-center">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">
+              View Track
+            </button>
+            <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Enroll Now
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

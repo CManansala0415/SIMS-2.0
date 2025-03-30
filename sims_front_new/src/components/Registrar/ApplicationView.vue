@@ -66,6 +66,8 @@ const editId = ref('')
 const fullName = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
+const emit = defineEmits(['fetchUser'])
+
 const booter = async () => {
 
     getGender().then((results) => {
@@ -151,24 +153,26 @@ const booter = async () => {
         booting.value = 'Loading Barangays'
         bootingCount.value += 1
     })
+    getUserID().then((results) => {
+        userID.value = results.account.data.id
+        booting.value = 'Loading Users'
+        bootingCount.value += 1
+        emit('fetchUser', results)
+    })
 }
 
 onMounted(async () => {
     window.stop()
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-    }).catch((err) => {
-
-    })
-
     try {
         preLoading.value = true
         await booter().then((results) => {
             booting.value = 'Loading Applicants...'
             bootingCount.value += 1
+           
             getApplicant(limit.value, offset.value).then((results) => {
                 applicant.value = results.data
                 applicantCount.value = results.count
+                
                 preLoading.value = false
             })
         })

@@ -24,7 +24,7 @@ const bootingCount = ref(0)
 const editId = ref('')
 const ddcData = ref([])
 const modeData = ref('')
-
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
@@ -39,8 +39,7 @@ const booter = async () => {
 onMounted(async () => {
     getUserID().then((results) => {
         userID.value = results.account.data.id
-    }).catch((err) => {
-
+        emit('fetchUser', results)
     })
 
     try {

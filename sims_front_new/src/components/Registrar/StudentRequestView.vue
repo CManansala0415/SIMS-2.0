@@ -37,6 +37,7 @@ const price = ref([])
 const fee = ref([])
 const requestedItems = ref([])
 const students = ref([])
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -66,6 +67,7 @@ const booter = async () => {
     })
     getUserID().then((results) => {
         userID.value = results.account.data.id
+        emit('fetchUser', results)
         booting.value = 'Loading Users...'
         bootingCount.value += 1
     })

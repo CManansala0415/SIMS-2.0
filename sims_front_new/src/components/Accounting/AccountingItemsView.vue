@@ -18,14 +18,15 @@ const showAddItemModal = ref(false)
 
 const booting = ref('')
 const bootingCount = ref(0)
+const emit = defineEmits(['fetchUser'])
+
 const booter = async () => {
     getUserID().then((results) => {
         booting.value = 'Loading Items...'
         bootingCount.value += 1
-        userID.value = results.data.id
+        userID.value = results.account.data.id
+        emit('fetchUser', results)
     })
-
-
 }
 
 onMounted(async () => {

@@ -34,6 +34,7 @@ const userID = ref('')
 const router = useRouter();
 const booting = ref('')
 const bootingCount = ref(0)
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
     getGender().then((results) => {
@@ -59,6 +60,7 @@ const booter = async () => {
 onMounted(async () => {
     getUserID().then((results) => {
         userID.value = results.account.data.id
+        emit('fetchUser', results)
     })
 
     try {

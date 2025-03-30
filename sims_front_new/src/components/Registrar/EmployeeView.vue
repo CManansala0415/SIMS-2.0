@@ -33,6 +33,7 @@ const employeeToUpdate = ref([])
 const subject = ref([])
 const subjectAll = ref([])
 const userID = ref('')
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
@@ -59,8 +60,12 @@ const booter = async () => {
         booting.value = 'Loading Subjects...'
         bootingCount.value += 1
     })
+    // await router.isReady()
     getUserID().then((results) => {
         userID.value = results.account.data.id
+        booting.value = 'Loading Users...'
+        bootingCount.value += 1
+        emit('fetchUser', results)
     })
 }
 

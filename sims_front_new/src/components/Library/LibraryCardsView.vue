@@ -27,6 +27,7 @@ const linkId = ref('')
 const holdSubmit = ref(false)
 const image = ref('')
 const userID = ref('')
+const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -61,6 +62,9 @@ const booter = async () => {
     })
     getUserID().then((results) => {
         userID.value = results.account.data.id
+        emit('fetchUser', results)
+        booting.value = 'Loading Users...'
+        bootingCount.value += 1
     })
 
 }

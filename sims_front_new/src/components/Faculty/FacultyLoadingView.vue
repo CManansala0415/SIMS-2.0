@@ -36,6 +36,8 @@ const semester = ref([])
 const section = ref([])
 const booting = ref('')
 const bootingCount = ref(0)
+const emit = defineEmits(['fetchUser'])
+
 const booter = async () => {
 
     getGradelvl().then((results) => {
@@ -85,8 +87,7 @@ const booter = async () => {
 onMounted(async () => {
     getUserID().then((results) => {
         userID.value = results.account.data.id
-    }).catch((err) => {
-
+        emit('fetchUser', results)
     })
 
 
