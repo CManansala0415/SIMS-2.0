@@ -18,9 +18,10 @@ import Loader from '../snippets/loaders/Loading1.vue';
 
 import LaunchSemesterModal from '../snippets/modal/LaunchSemesterModal.vue';
 import LaunchScheduleModal from '../snippets/modal/LaunchScheduleModal.vue';
+import { useRouter, useRoute } from 'vue-router'
 
-
-const preLoading = ref(false)
+const router = useRouter();
+const preLoading = ref(true)
 const bootingCount = ref(0)
 const booting = ref('')
 const limit = ref(10)
@@ -28,6 +29,7 @@ const offset = ref(0)
 const classroomCount = ref(0)
 const searchValue = ref('')
 const showForm = ref(false)
+const userID = ref('')
 
 
 const building = ref([])
@@ -43,7 +45,7 @@ const sched = ref(false)
 const launchData = ref([])
 const curriculum = ref([])
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
 
     getCurriculum(0, 0).then((results) => {
@@ -155,35 +157,34 @@ const search = () => {
 }
 
 onMounted(async () => {
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Launched Semesters...'
-            bootingCount.value += 1
-
-            getUserID().then((results1) => {
-                // user.value = results.account.data.name
-                // userID.value = results.account.data.id
+    window.stop()
+    getUserID().then(async(results1) => {
+        // user.value = results1.account.data.name
+        userID.value = results1.account.data.id
+        emit('fetchUser', results1)
+        accessData.value = results1.access.data
+        try {
+            preLoading.value = true
+            await booter().then((results) => {
+                booting.value = 'Loading Launched Semesters...'
+                bootingCount.value += 1
                 getLaunch(limit.value, offset.value).then((results2) => {
                     launch.value = results2.data
                     launchCount.value = results2.count
-                    emit('fetchUser', results1)
                     preLoading.value = false
                 })
-
-            }).catch((err) => {
-                // alert('Unauthorized Session, Please Log In')
-                // router.push("/");
             })
-           
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
 
-        })
-
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
+    
 })
 </script>
 <template>
@@ -249,13 +250,16 @@ onMounted(async () => {
                         <td class="align-middle">
                             {{ ln.ln_slots }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[3].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button 
                                     @click="showSched(launch[index])" type="button" title="Edit Record"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen" /></button>
                             </div>
+                        </td>
+                        <td v-else class="align-middle">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(launch).length">

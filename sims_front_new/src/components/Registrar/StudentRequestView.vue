@@ -17,8 +17,10 @@ import Loader from '../snippets/loaders/Loading1.vue';
 import StudentRequestModal from '../snippets/modal/StudentRequestModal.vue';
 // import RenderModal from '../snippets/modal/RenderItem.vue';
 import { getUserID } from "../../routes/user";
+import { useRouter, useRoute } from 'vue-router'
 
-const preLoading = ref(false)
+const router = useRouter();
+const preLoading = ref(true)
 const quarter = ref([])
 const gradelvl = ref([])
 const program = ref([])
@@ -38,6 +40,7 @@ const fee = ref([])
 const requestedItems = ref([])
 const students = ref([])
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -65,12 +68,6 @@ const booter = async () => {
         booting.value = 'Loading Sections...'
         bootingCount.value += 1
     })
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-        booting.value = 'Loading Users...'
-        bootingCount.value += 1
-    })
     getPriceDetails().then((results) => {
         price.value = results
         booting.value = 'Loading Prices...'
@@ -81,59 +78,75 @@ const booter = async () => {
         booting.value = 'Loading Fees...'
         bootingCount.value += 1
     })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    //     booting.value = 'Loading Users...'
+    //     bootingCount.value += 1
+    // })
 }
 
 
 onMounted(async () => {
     window.stop()
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            getRequestDetails(limit.value, offset.value).then((results) => {
-                requestedItems.value = results.data.map((e) => {
-                    let itemdesc = ''
-                    let paystat = ''
-                    let textcolor = ''
-                    fee.value.forEach((f) => {
-                        if (f.acf_id == e.acr_reqitem) {
-                            itemdesc = f.acf_desc
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        emit('fetchUser', results1)
+        accessData.value = results1.access.data
+        try {
+            preLoading.value = true
+            await booter().then(() => {
+                getRequestDetails(limit.value, offset.value).then((results2) => {
+                    requestedItems.value = results2.data.map((e) => {
+                        let itemdesc = ''
+                        let paystat = ''
+                        let textcolor = ''
+                        fee.value.forEach((f) => {
+                            if (f.acf_id == e.acr_reqitem) {
+                                itemdesc = f.acf_desc
+                            }
+                        })
+
+                        if (e.acr_paystatus == 2) {
+                            paystat = 'Paid'
+                            textcolor = 'text-success fw-bold'
                         }
+                        else if (e.acr_paystatus == 1) {
+                            paystat = 'Partial'
+                            textcolor = 'text-warning fw-bold'
+                        }
+                        else {
+                            paystat = 'Unpaid'
+                            textcolor = 'text-danger fw-bold'
+                        }
+
+                        return {
+                            ...e,
+                            acr_paystatusdesc: paystat,
+                            paystat_color: textcolor,
+                            acr_itemrequested: itemdesc
+                        }
+
                     })
 
-                    if (e.acr_paystatus == 2) {
-                        paystat = 'Paid'
-                        textcolor = 'text-success fw-bold'
-                    }
-                    else if (e.acr_paystatus == 1) {
-                        paystat = 'Partial'
-                        textcolor = 'text-warning fw-bold'
-                    }
-                    else {
-                        paystat = 'Unpaid'
-                        textcolor = 'text-danger fw-bold'
-                    }
 
-                    return {
-                        ...e,
-                        acr_paystatusdesc: paystat,
-                        paystat_color: textcolor,
-                        acr_itemrequested: itemdesc
-                    }
+                    requestedItemsCount.value = results2.count
+                    preLoading.value = false
 
                 })
-
-
-                requestedItemsCount.value = results.count
-                preLoading.value = false
-
             })
-        })
 
 
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
+
 
 })
 
@@ -292,7 +305,7 @@ const settlement = (data, mode) => {
                         <td class="align-middle">
                             <span :class="req.paystat_color">{{ req.acr_paystatusdesc }}</span>
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[2].useracc_modifying == 1" class="align-middle">
                             <div v-if="req.acr_status == 0" class="text-center">
                                 <p class="text-danger fw-bold">Cancelled</p>
                             </div>
@@ -310,6 +323,9 @@ const settlement = (data, mode) => {
                                     </button>
                                 </div>
                             </div>
+                        </td>
+                        <td v-else class="align-middle">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(requestedItems).length">

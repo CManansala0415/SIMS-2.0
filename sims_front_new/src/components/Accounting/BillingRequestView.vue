@@ -16,9 +16,11 @@ import {
 import Loader from '../snippets/loaders/Loading1.vue';
 import { getUserID } from "../../routes/user";
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
+import { useRouter, useRoute } from 'vue-router'
 
+const router = useRouter();
 const showDownloadModal = ref(false)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const quarter = ref([])
 const gradelvl = ref([])
 const program = ref([])
@@ -37,6 +39,7 @@ const fee = ref([])
 const requestedItems = ref([])
 const studentsAccount = ref([])
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -64,13 +67,6 @@ const booter = async () => {
         booting.value = 'Loading Sections...'
         bootingCount.value += 1
     })
-    getUserID().then((results) => {
-        // user.value = results.account.data.name
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-        booting.value = 'Loading Users...'
-        bootingCount.value += 1
-    })
     getPriceDetails().then((results) => {
         price.value = results
         booting.value = 'Loading Prices...'
@@ -81,6 +77,13 @@ const booter = async () => {
         booting.value = 'Loading Fees...'
         bootingCount.value += 1
     })
+    // getUserID().then((results) => {
+    //     // user.value = results.account.data.name
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    //     booting.value = 'Loading Users...'
+    //     bootingCount.value += 1
+    // })
 
 }
 
@@ -122,19 +125,30 @@ const mapper = (results) => {
 }
 
 onMounted(async () => {
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            getRequestDetails(limit.value, offset.value).then((results) => {
-                mapper(results)
+    getUserID().then(async(results1) => {
+        // user.value = results.account.data.name
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            await booter().then(() => {
+                getRequestDetails(limit.value, offset.value).then((results2) => {
+                    mapper(results2)
+                })
             })
-        })
 
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        // router.push("/");
+        window.stop()
+    })
+    
 
 })
 
@@ -264,7 +278,7 @@ const excelDownload = () => {
                         <td class="align-middle">
                             <span :class="req.paystat_color">{{ req.acr_paystatusdesc }}</span>
                         </td>
-                        <td class="align-middle p-2">
+                        <td v-if="accessData[14].useracc_modifying == 1" class="align-middle p-2">
                             <div class="d-flex gap-2 justify-content-center align-content-center">
                                 <div v-if="req.acr_status == 0" class="text-center">
                                     <span class="text-red-500 text-xs font-bold">Cancelled</span>
@@ -282,6 +296,9 @@ const excelDownload = () => {
                                     </div>
                                 </div>
                             </div>
+                        </td>
+                        <td v-else class="align-middle p-2">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(requestedItems).length">

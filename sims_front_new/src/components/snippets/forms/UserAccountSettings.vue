@@ -347,7 +347,7 @@ const accessModuleData = ref(
                     useracc_id:0,
                     access_id: 1,
                     access_value: 1,
-                    access_description: 'Accounting',
+                    access_description: 'Miscellaneous',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,
@@ -357,7 +357,17 @@ const accessModuleData = ref(
                     useracc_id:0,
                     access_id: 2,
                     access_value: 2,
-                    access_description: 'Billing & Cashier',
+                    access_description: 'Billing & Cashier Tuition',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                },
+                2: {
+                    useracc_id:0,
+                    access_id: 3,
+                    access_value: 3,
+                    access_description: 'Billing & Cashier Request',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,
@@ -540,7 +550,7 @@ const accessModuleData = ref(
 
     <!-- access Modal -->
     <div class="modal fade" id="accessdatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        aria-labelledby="staticBackdropLabel">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">

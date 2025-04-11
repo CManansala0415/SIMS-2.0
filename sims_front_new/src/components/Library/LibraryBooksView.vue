@@ -15,7 +15,7 @@ const limit = ref(10)
 const offset = ref(0)
 const books = ref([])
 const booksCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -29,7 +29,7 @@ const modeData = ref('')
 const showModal = ref(false)
 const showBorrow = ref(false)
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
 
     getBorrowedBooks(0, 0, 200).then((results) => {
@@ -38,35 +38,44 @@ const booter = async () => {
         bootingCount.value += 1
     })
 
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-        booting.value = 'Loading User'
-        bootingCount.value += 1
-    })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    //     booting.value = 'Loading User'
+    //     bootingCount.value += 1
+    // })
 
 }
 
 onMounted(async () => {
 
-
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Books...'
-            bootingCount.value += 1
-            getBooksAccession(limit.value, offset.value).then((results) => {
-                books.value = results.data
-                booksCount.value = results.count
-                checkAvailability()
-                preLoading.value = false
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            await booter().then((results) => {
+                booting.value = 'Loading Books...'
+                bootingCount.value += 1
+                getBooksAccession(limit.value, offset.value).then((results2) => {
+                    books.value = results2.data
+                    booksCount.value = results2.count
+                    checkAvailability()
+                    preLoading.value = false
+                })
             })
-        })
 
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
+    
 
 
 })
@@ -229,13 +238,16 @@ const checkAvailability = () => {
 
 
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[6].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
                                     @click="editData(app.lbrb_id, app, 1)" type="button" title="Edit Record"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-gear"/> Modify Book</button>
                             </div>
+                        </td>
+                        <td v-else class="align-middle">
+                            N/A
                         </td>
 
                     </tr>

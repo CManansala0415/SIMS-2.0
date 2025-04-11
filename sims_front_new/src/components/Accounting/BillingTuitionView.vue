@@ -19,9 +19,11 @@ import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue
 import AccountingDownloadModal from '../snippets/modal/AccountingDownloadModal.vue';
 
 import { getUserID } from "../../routes/user";
+import { useRouter, useRoute } from 'vue-router'
 
-const preLoading = ref(false)
-const milestoneChecking = ref(false)
+const router = useRouter();
+const preLoading = ref(true)
+const milestoneLoading = ref(false)
 const student = ref([])
 const quarter = ref([])
 const gradelvl = ref([])
@@ -46,6 +48,7 @@ const price = ref([])
 const grandTotal = ref(0)
 const showPaymentModal = ref(false)
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
 
 const booter = async () => {
     getProgram().then((results) => {
@@ -78,12 +81,6 @@ const booter = async () => {
         booting.value = 'Loading Subject...'
         bootingCount.value += 1
     })
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-        booting.value = 'Loading Users...'
-        bootingCount.value += 1
-    })
     getAccountsDetails().then((results) => {
         accounts.value = results
         booting.value = 'Loading Accounts...'
@@ -94,31 +91,43 @@ const booter = async () => {
         booting.value = 'Loading Prices...'
         bootingCount.value += 1
     })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    //     booting.value = 'Loading Users...'
+    //     bootingCount.value += 1
+    // })
 
 
 }
 
 
 onMounted(async () => {
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            await booter().then((results) => {
 
-            booting.value = 'Loading Students...'
-            bootingCount.value += 1
-            getStudent(limit.value, offset.value).then((results) => {
-                student.value = results.data
-                studentCount.value = results.count
-                preLoading.value = false
+                booting.value = 'Loading Students...'
+                bootingCount.value += 1
+                getStudent(limit.value, offset.value).then((results2) => {
+                    student.value = results2.data
+                    studentCount.value = results2.count
+                    preLoading.value = false
+                })
             })
-        })
-
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
-
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
 })
 
 
@@ -368,13 +377,16 @@ const settlePayments = () => {
                         <td class="align-middle p-2">
                             {{ stud.acs_payment > 0 ? 'Yes' : 'No' }}
                         </td>
-                        <td class="align-middle p-2">
-                            <div class="d-flex gap-2 justify-content-center">
+                        <td v-if="accessData[13].useracc_modifying == 1" class="align-middle p-2">
+                            <div  class="d-flex gap-2 justify-content-center">
                                 <button tabindex="-1" title="Balance" @click="settlement(stud)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-gear" />
                                 </button>
                             </div>
+                        </td>
+                        <td v-else class="align-middle p-2">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(student).length">

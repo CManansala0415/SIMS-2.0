@@ -21,9 +21,7 @@ onMounted(async () => {
     user.value = results.account.data.name
     userID.value = results.account.data.id
     isLoading.value = false
-
     emit('fetchUser', results)
-
   }).catch((err) => {
     // alert('Unauthorized Session, Please Log In')
     // router.push("/");

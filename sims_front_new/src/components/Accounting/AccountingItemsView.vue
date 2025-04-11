@@ -7,11 +7,12 @@ import { useRouter, useRoute } from 'vue-router';
 import { getFeeDetails, addAccountingItem } from '../Fetchers.js';
 import AccountingItemsModal from '../snippets/modal/AccountingItemsModal.vue';
 
+const router = useRouter();
 const limit = ref(10)
 const offset = ref(0)
 const fee = ref([])
 const feeCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const showAddItemModal = ref(false)
@@ -19,36 +20,43 @@ const showAddItemModal = ref(false)
 const booting = ref('')
 const bootingCount = ref(0)
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
 
 const booter = async () => {
-    getUserID().then((results) => {
-        booting.value = 'Loading Items...'
-        bootingCount.value += 1
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-    })
+    // getUserID().then((results) => {
+    //     booting.value = 'Loading Items...'
+    //     bootingCount.value += 1
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    // })
 }
 
 onMounted(async () => {
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        emit('fetchUser', results1)
+        accessData.value = results1.access.data
+        try {
+            preLoading.value = true
+            // await booter().then((results) => {
+                booting.value = 'Loading Items...'
+                bootingCount.value += 1
+                getFeeDetails(limit.value, offset.value).then((results2) => {
+                    fee.value = results2.data
+                    feeCount.value = results2.count
+                    preLoading.value = false
+                })
+            // })
 
-
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Items...'
-            bootingCount.value += 1
-            getFeeDetails(limit.value, offset.value).then((results) => {
-                fee.value = results.data
-                feeCount.value = results.count
-                preLoading.value = false
-            })
-        })
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
-
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
 })
 
 const paginate = (mode) => {
@@ -187,7 +195,7 @@ const itemModal = (type, data) => {
                         <td class="align-middle">
                             {{ f.acf_price }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[15].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                     data-bs-target="#editdatamodal" title="Edit Data"
@@ -201,7 +209,9 @@ const itemModal = (type, data) => {
                                 </button>
                             </div>
                         </td>
-
+                        <td v-else class="align-middle">
+                            N/A
+                        </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(fee).length">
                         <td class="p-3 text-center" colspan="4">

@@ -14,7 +14,7 @@ const limit = ref(10)
 const offset = ref(0)
 const medicalSupplies = ref([])
 const medicalSuppliesCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -24,36 +24,44 @@ const bootingCount = ref(0)
 const medicalItem = ref([])
 const saving = ref(false)
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
+// const booter = async () => {
 
-const booter = async () => {
+//     getUserID().then((results) => {
+//         booting.value = 'Loading Users...'
+//         bootingCount.value += 1
+//         userID.value = results.account.data.id
+//         emit('fetchUser', results)
+//     })
 
-    getUserID().then((results) => {
-        booting.value = 'Loading Users...'
-        bootingCount.value += 1
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-    })
-
-}
+// }
 
 onMounted(async () => {
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            // await booter().then((results) => {
+                getMedicalSupplies(limit.value, offset.value).then((results2) => {
+                    medicalSupplies.value = results2.data
+                    medicalSuppliesCount.value = results2.count
+                    booting.value = 'Loading Medical Supplies'
+                    bootingCount.value += 1
+                    preLoading.value = false
+                })
+            // })
 
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            getMedicalSupplies(limit.value, offset.value).then((results) => {
-                medicalSupplies.value = results.data
-                medicalSuppliesCount.value = results.count
-                booting.value = 'Loading Medical Supplies'
-                bootingCount.value += 1
-                preLoading.value = false
-            })
-        })
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
 
 })
 
@@ -197,7 +205,7 @@ const editData = (mode, data) => {
                         <td class="p-3 border border-mid-gray">
                             {{ meds.clms_stocks }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[12].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
                                     @click="editData(1, meds)" :disabled="saving ? true : false" type="button"
@@ -208,6 +216,9 @@ const editData = (mode, data) => {
                                     title="Replenish Stocks" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pills" /></button>
                             </div>
+                        </td>
+                        <td v-else class="align-middle">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(medicalSupplies).length">

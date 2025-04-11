@@ -14,7 +14,6 @@ import {
     getEmployee
 } from "../Fetchers.js";
 
-
 const employeeCount = ref(0)
 const employee = ref([])
 const showForm = ref(false)
@@ -28,14 +27,14 @@ const editEmployee = ref([])
 
 const limit = ref(10)
 const offset = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
 const booting = ref('')
 const bootingCount = ref(0)
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
     getGender().then((results) => {
         gender.value = results
@@ -58,28 +57,32 @@ const booter = async () => {
 }
 
 onMounted(async () => {
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            await booter().then(() => {
+                booting.value = 'Loading Applicants...'
+                bootingCount.value += 1
+                getEmployee(limit.value, offset.value).then((results2) => {
+                    employee.value = results2.data
+                    employeeCount.value = results2.count
+                    preLoading.value = false
+                })
+            })
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
     })
 
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Applicants...'
-            bootingCount.value += 1
-            getEmployee(limit.value, offset.value).then((results) => {
-                employee.value = results.data
-                employeeCount.value = results.count
-                preLoading.value = false
-            })
-
-        })
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+   
 
 })
 
@@ -209,7 +212,7 @@ const fileUpload = (id) => {
                         <td class="align-middle">
                             {{ app.emp_suffixname ? app.emp_suffixname : 'N/A' }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[11].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                     data-bs-target="#editdatamodal" title="Medical Form / Checkup"
@@ -227,7 +230,9 @@ const fileUpload = (id) => {
                                 </button>
                             </div>
                         </td>
-
+                        <td v-else class="align-middle">
+                            N/A
+                        </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(employee).length">
                         <td class="p-3 text-center" colspan="7">

@@ -12,7 +12,7 @@ const limit = ref(10)
 const offset = ref(0)
 const borrower = ref([])
 const borrowerCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -24,7 +24,7 @@ const editId = ref('')
 const borrowerData = ref([])
 const modeData = ref('')
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
 
     // getBookType().then((results)=>{
@@ -33,34 +33,41 @@ const booter = async () => {
     //     bootingCount.value += 1
     // })
 
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-        booting.value = 'Loading Users'
-        bootingCount.value += 1
-    })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    //     booting.value = 'Loading Users'
+    //     bootingCount.value += 1
+    // })
 
 }
 
 onMounted(async () => {
-
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Books...'
-            bootingCount.value += 1
-            getBorrowedBooks(limit.value, offset.value).then((results) => {
-                borrower.value = results.data
-                borrowerCount.value = results.count
-                preLoading.value = false
-            })
-        })
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
-
+    window.stop()
+    getUserID().then((results1) => {
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            // await booter().then(() => {
+                booting.value = 'Loading Books...'
+                bootingCount.value += 1
+                getBorrowedBooks(limit.value, offset.value).then((results2) => {
+                    borrower.value = results2.data
+                    borrowerCount.value = results2.count
+                    preLoading.value = false
+                })
+            // })
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
 })
 
 const deleteDdc = (id) => {
@@ -189,7 +196,7 @@ const editData = (id, data, mode) => {
                             {{ app.per_firstname }} {{ app.per_middlename }} {{ app.per_lastname }} {{
                                 app.per_suffixname }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[7].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button v-if="app.lbrr_returned == 0" data-bs-toggle="modal"
                                     data-bs-target="#returnbookmodal" @click="editData(app.lbrr_id, app, 1)"
@@ -198,6 +205,9 @@ const editData = (id, data, mode) => {
                                 <p v-else class="fw-bold text-success">Returned <span class="text-dark">({{
                                         app.lbrr_datereturned }})</span></p>
                             </div>
+                        </td>
+                        <td v-else class="align-middle">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(borrower).length">

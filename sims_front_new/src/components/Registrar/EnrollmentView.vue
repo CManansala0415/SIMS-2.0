@@ -22,7 +22,7 @@ import Loader from '../snippets/loaders/Loading1.vue';
 import Taggings from '../snippets/modal/EnrollmentTagging.vue';
 import { getUserID } from "../../routes/user.js";
 
-const preLoading = ref(false)
+const preLoading = ref(true)
 const student = ref([])
 const quarter = ref([])
 const gradelvl = ref([])
@@ -48,6 +48,8 @@ const holdSubmit = ref(false)
 const image = ref('')
 const userID = ref('')
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
+
 const booter = async () => {
     getProgram().then((results) => {
         program.value = results
@@ -84,54 +86,59 @@ const booter = async () => {
         booting.value = 'Loading Subjects...'
         bootingCount.value += 1
     })
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-        booting.value = 'Loading Users...'
-        bootingCount.value += 1
-    })
     getAccountsDetails().then((results) => {
         accounts.value = results
         booting.value = 'Loading Accounts...'
         bootingCount.value += 1
     })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     emit('fetchUser', results)
+    //     booting.value = 'Loading Users...'
+    //     bootingCount.value += 1
+    // })
 }
 
 
 onMounted(async () => {
     window.stop()
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
+    getUserID().then(async(results) => {
+        userID.value = results.account.data.id
+        accessData.value = results.access.data
+        emit('fetchUser', results)
+        try {
+            await booter().then((results) => {
+                booting.value = 'Loading Students...'
+                bootingCount.value += 1
+                getStudentFiltering(limit.value, offset.value, 0, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                    student.value = results.data
+                    console.log(student.value)
+                    studentCount.value = results.count
+                    preLoading.value = false
 
-            booting.value = 'Loading Students...'
-            bootingCount.value += 1
-            getStudentFiltering(limit.value, offset.value, 0, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
-                student.value = results.data
-                console.log(student.value)
-                studentCount.value = results.count
-                preLoading.value = false
-
-                let x = student.value.map((e) => {
-                    let y = accounts.value.findIndex((f) => {
-                        return f.acs_enrid === e.enr_id
+                    let x = student.value.map((e) => {
+                        let y = accounts.value.findIndex((f) => {
+                            return f.acs_enrid === e.enr_id
+                        })
+                        return {
+                            ...e,
+                            ...accounts.value[y],
+                        }
                     })
-                    return {
-                        ...e,
-                        ...accounts.value[y],
-                    }
+
+                    student.value = x
                 })
-
-                student.value = x
             })
-        })
 
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
-
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
 })
 
 
@@ -407,7 +414,7 @@ const validate = () => {
                         <td class="align-middle p-2">
                             {{ stud.acs_payment > 0 ? 'Yes' : 'No' }}
                         </td>
-                        <td class="align-middle p-2">
+                        <td v-if="accessData[1].useracc_modifying == 1" class="align-middle p-2">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
                                     data-bs-toggle="modal" data-bs-target="#taggingmodal"
@@ -423,6 +430,9 @@ const validate = () => {
                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                 </button>
                             </div>
+                        </td>
+                        <td v-else class="align-middle p-2">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(student).length">

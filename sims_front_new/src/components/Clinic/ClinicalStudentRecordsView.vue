@@ -37,7 +37,7 @@ const limit = ref(10)
 const offset = ref(0)
 const applicant = ref([])
 const applicantCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -65,7 +65,7 @@ const editId = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
 
     getGender().then((results) => {
@@ -161,27 +161,33 @@ const booter = async () => {
 }
 
 onMounted(async () => {
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        accessData.value = results1.access.data
+        emit('fetchUser', results1)
+        try {
+        preLoading.value = true
+            await booter().then(() => {
+                booting.value = 'Loading Applicants...'
+                bootingCount.value += 1
+                getApplicant(limit.value, offset.value).then((results2) => {
+                    applicant.value = results2.data
+                    applicantCount.value = results2.count
+                    preLoading.value = false
+                })
+            })
+
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
     })
 
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Applicants...'
-            bootingCount.value += 1
-            getApplicant(limit.value, offset.value).then((results) => {
-                applicant.value = results.data
-                applicantCount.value = results.count
-                preLoading.value = false
-            })
-        })
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+   
 
 })
 
@@ -320,7 +326,7 @@ const fileUpload = (id) => {
                         <td class="align-middle">
                             {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[10].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                     data-bs-target="#editdatamodal" title="Medical Form / Checkup"
@@ -348,7 +354,9 @@ const fileUpload = (id) => {
                                 </button>
                             </div>
                         </td>
-
+                        <td v-else class="align-middle">
+                            N/A
+                        </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(applicant).length">
                         <td class="p-3 text-center" colspan="7">

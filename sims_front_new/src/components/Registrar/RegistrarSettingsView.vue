@@ -6,6 +6,7 @@ import SectionForms from '../snippets/forms/SectionSettingsForm.vue';
 import SubjectForms from '../snippets/forms/SubjectSettingsForm.vue';
 import CurriculumForms from '../snippets/forms/CurriculumSettingsForm.vue';
 import CommandSettings from '../snippets/forms/CommandSettings.vue';
+import { useRouter, useRoute } from 'vue-router'
 //import Form2 from './RegistrarSettingsForm2.vue';
 //import Form3 from './RegistrarSettingsForm3.vue';
 //import Form4 from './RegistrarSettingsForm4.vue';
@@ -27,6 +28,8 @@ import {
 } from "../Fetchers.js";
 import UserAccountSettings from '../snippets/forms/UserAccountSettings.vue';
 const emit = defineEmits(['fetchUser'])
+const accessData = ref([])
+const router = useRouter();
 
 const booter = async () => {
 
@@ -77,12 +80,13 @@ onMounted(async () => {
             getUserID().then((results) => {
                 // user.value = results.account.data.name
                 userID.value = results.account.data.id
+                accessData.value = results.access.data[5].useracc_modifying
                 preLoading.value = false
                 emit('fetchUser', results)
 
             }).catch((err) => {
-                // alert('Unauthorized Session, Please Log In')
-                // router.push("/");
+                alert('Unauthorized Session, Please Log In')
+                router.push("/");
             })
         })
 
@@ -225,163 +229,186 @@ const mode = (type) => {
     <div class="p-3 mb-4 border-bottom">
         <h5 class=" text-uppercase fw-bold">Registrar Settings</h5>
     </div>
-    <div v-if="form == 1">
-        <Loader v-if="preLoading" />
-        <div v-else class="container">
-            <div class="row gap-2">
-                <div class="col card shadow-sm mb-2">
-                    <div class="card-header">Settings</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Programs</h5>
-                        <p class="card-text justify-text small-font">Contains Program (Courses & Strands) list for
-                            academic tracks, to modify settings click action to access settings.</p>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(1)">Take Action</button>
-                    </div>
-                </div>
-                <div class="col card shadow-sm mb-2">
-                    <div class="card-header">Settings</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Sections</h5>
-                        <p class="card-text justify-text small-font">Contains Sections list for students class grouping,
-                            to modify settings click action to access settings.</p>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(2)">Take Action</button>
-                    </div>
-                </div>
-                <div class="col card shadow-sm mb-2">
-                    <div class="card-header">Settings</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Subject</h5>
-                        <p class="card-text justify-text small-font">Contains Subject list for students & faculties to
-                            be taken and to be grouped to create a curriculum, to modify settings click action to access
-                            settings.</p>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(3)">Take Action</button>
-                    </div>
-                </div>
-            </div>
-            <div class="row gap-2">
-                <div class="col card shadow-sm mb-2">
-                    <div class="card-header">Settings</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Curriculum</h5>
-                        <p class="card-text justify-text small-font">Contains Curriculum list to make a course pack that
-                            contains all the units and subjects needed for the semester, to modify settings click action
-                            to access settings.</p>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(4)">Take Action</button>
-                    </div>
-                </div>
-                <div class="col card shadow-sm mb-2">
-                    <div class="card-header">Settings</div>
-                    <div class="card-body">
-                        <h5 class="card-title">User Account</h5>
-                        <p class="card-text justify-text small-font">Contains User accounts for system access, manage
-                            level of restrictions and update credentials, to modify settings click action to access
-                            settings.</p>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(5)">Take Action</button>
-                    </div>
-                </div>
-                <div class="col card shadow-sm mb-2">
-                    <div class="card-header">Settings</div>
-                    <div class="card-body">
-                        <h5 class="card-title">Command Center</h5>
-                        <p class="card-text justify-text small-font">Take control over academic activity, such as
-                            registration and disabling events.</p>
-                    </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-dark w-100" @click="mode(6)">Take Action</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div v-if="form == 2">
-        <Loader v-if="preLoading" />
-        <div v-else>
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-            </div>
-            <div class="">
-                <ProgramForms :degreeData="degree" :programData="program" :courseData="course" :userIdData="userID"
-                    :title="settingsTitle" :semesterData="semester" />
-            </div>
-        </div>
-    </div>
-    <div v-if="form == 3">
+    <Loader v-if="preLoading" />
+    <div v-else>
+        <div v-if="accessData == 1">
+            <div v-if="form == 1">
+                <div class="container">
+                    <div class="row gap-2">
 
-        <Loader v-if="preLoading" />
-        <div v-else>
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                        <div class="col card shadow-sm mb-2">
+                            <div class="card-header">Settings</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Programs</h5>
+                                <p class="card-text justify-text small-font">Contains Program (Courses & Strands) list
+                                    for
+                                    academic tracks, to modify settings click action to access settings.</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-dark w-100" @click="mode(1)">Take Action</button>
+                            </div>
+                        </div>
+                        <div class="col card shadow-sm mb-2">
+                            <div class="card-header">Settings</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Sections</h5>
+                                <p class="card-text justify-text small-font">Contains Sections list for students class
+                                    grouping,
+                                    to modify settings click action to access settings.</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-dark w-100" @click="mode(2)">Take Action</button>
+                            </div>
+                        </div>
+                        <div class="col card shadow-sm mb-2">
+                            <div class="card-header">Settings</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Subject</h5>
+                                <p class="card-text justify-text small-font">Contains Subject list for students &
+                                    faculties
+                                    to
+                                    be taken and to be grouped to create a curriculum, to modify settings click action
+                                    to
+                                    access
+                                    settings.</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-dark w-100" @click="mode(3)">Take Action</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row gap-2">
+                        <div class="col card shadow-sm mb-2">
+                            <div class="card-header">Settings</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Curriculum</h5>
+                                <p class="card-text justify-text small-font">Contains Curriculum list to make a course
+                                    pack
+                                    that
+                                    contains all the units and subjects needed for the semester, to modify settings
+                                    click
+                                    action
+                                    to access settings.</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-dark w-100" @click="mode(4)">Take Action</button>
+                            </div>
+                        </div>
+                        <div class="col card shadow-sm mb-2">
+                            <div class="card-header">Settings</div>
+                            <div class="card-body">
+                                <h5 class="card-title">User Account</h5>
+                                <p class="card-text justify-text small-font">Contains User accounts for system access,
+                                    manage
+                                    level of restrictions and update credentials, to modify settings click action to
+                                    access
+                                    settings.</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-dark w-100" @click="mode(5)">Take Action</button>
+                            </div>
+                        </div>
+                        <div class="col card shadow-sm mb-2">
+                            <div class="card-header">Settings</div>
+                            <div class="card-body">
+                                <h5 class="card-title">Command Center</h5>
+                                <p class="card-text justify-text small-font">Take control over academic activity, such
+                                    as
+                                    registration and disabling events.</p>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-sm btn-dark w-100" @click="mode(6)">Take Action</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="">
-                <SectionForms :sectionData="section" :userIdData="userID" :title="settingsTitle" />
+
+            <div v-if="form == 2">
+                <Loader v-if="preLoading" />
+                <div v-else>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                    </div>
+                    <div class="">
+                        <ProgramForms :degreeData="degree" :programData="program" :courseData="course"
+                            :userIdData="userID" :title="settingsTitle" :semesterData="semester" />
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div v-if="form == 4">
-        <Loader v-if="preLoading" />
-        <div v-else>
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+            <div v-if="form == 3">
+
+                <Loader v-if="preLoading" />
+                <div v-else>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                    </div>
+                    <div class="">
+                        <SectionForms :sectionData="section" :userIdData="userID" :title="settingsTitle" />
+                    </div>
+                </div>
             </div>
-            <div class="">
-                <SubjectForms :subjectData="subject" :specializationData="specialization" :programData="program"
-                    :userIdData="userID" :title="settingsTitle" />
+            <div v-if="form == 4">
+                <Loader v-if="preLoading" />
+                <div v-else>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                    </div>
+                    <div class="">
+                        <SubjectForms :subjectData="subject" :specializationData="specialization" :programData="program"
+                            :userIdData="userID" :title="settingsTitle" />
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div v-if="form == 5">
-        <Loader v-if="preLoading" />
-        <div v-else>
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+            <div v-if="form == 5">
+                <Loader v-if="preLoading" />
+                <div v-else>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                    </div>
+                    <div class="">
+                        <CurriculumForms :subjectData="subject" :curriculumData="curriculum" :programData="program"
+                            :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
+                            :title="settingsTitle" />
+                    </div>
+                </div>
             </div>
-            <div class="">
-                <CurriculumForms :subjectData="subject" :curriculumData="curriculum" :programData="program"
-                    :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
-                    :title="settingsTitle" />
-            </div>
-        </div>
-    </div>
-    <div v-if="form == 6">
-        <Loader v-if="preLoading" />
-        <div v-else>
-            <!-- <div class="d-flex justify-content-end mb-3">
+            <div v-if="form == 6">
+                <Loader v-if="preLoading" />
+                <div v-else>
+                    <!-- <div class="d-flex justify-content-end mb-3">
                 <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
                         icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
             </div> -->
-            <div class="">
-                <UserAccountSettings :userIdData="userID" :title="settingsTitle" @close="form = 1"/>
+                    <div class="">
+                        <UserAccountSettings :userIdData="userID" :title="settingsTitle" @close="form = 1" />
+                    </div>
+                </div>
+            </div>
+            <div v-if="form == 7">
+                <Loader v-if="preLoading" />
+                <div v-else>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                    </div>
+                    <div class="">
+                        <CommandSettings :subjectData="subject" :curriculumData="curriculum" :programData="program"
+                            :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
+                            :title="settingsTitle" />
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div v-if="form == 7">
-        <Loader v-if="preLoading" />
         <div v-else>
-            <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                        icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-            </div>
-            <div class="">
-                <CommandSettings :subjectData="subject" :curriculumData="curriculum" :programData="program"
-                    :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
-                    :title="settingsTitle" />
-            </div>
+            <p class="fw-bold text-danger">Access Denied</p>
         </div>
     </div>
+
 
 </template>

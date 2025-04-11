@@ -40,7 +40,7 @@ const limit = ref(10)
 const offset = ref(0)
 const applicant = ref([])
 const applicantCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -66,7 +66,9 @@ const editId = ref('')
 const fullName = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
+const accessData = ref([])
 const emit = defineEmits(['fetchUser'])
+
 
 const booter = async () => {
 
@@ -153,34 +155,44 @@ const booter = async () => {
         booting.value = 'Loading Barangays'
         bootingCount.value += 1
     })
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        booting.value = 'Loading Users'
-        bootingCount.value += 1
-        emit('fetchUser', results)
-    })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     booting.value = 'Loading Users'
+    //     bootingCount.value += 1
+    //     emit('fetchUser', results)
+    // })
 }
 
 onMounted(async () => {
     window.stop()
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Applicants...'
-            bootingCount.value += 1
-           
-            getApplicant(limit.value, offset.value).then((results) => {
-                applicant.value = results.data
-                applicantCount.value = results.count
-                
-                preLoading.value = false
+    getUserID().then(async(results) => {
+        userID.value = results.account.data.id
+        accessData.value = results.access.data
+        console.log(accessData.value)
+        emit('fetchUser', results)
+        try {
+            await booter().then((results) => {
+                booting.value = 'Loading Applicants...'
+                bootingCount.value += 1
+            
+                getApplicant(limit.value, offset.value).then((results) => {
+                    applicant.value = results.data
+                    applicantCount.value = results.count
+                    
+                    preLoading.value = false
+                })
             })
-        })
 
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
+    
 
 })
 
@@ -344,7 +356,7 @@ const addID = (data) => {
                         <td class="align-middle">
                             {{ app.per_dateapplied }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id)"
                                     type="button" title="Edit Record" class="btn btn-secondary btn-sm">
@@ -362,6 +374,9 @@ const addID = (data) => {
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button>
                             </div>
                         </td> 
+                        <td v-else class="align-middle">
+                            N/A
+                        </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(applicant).length">
                         <td class="p-3 text-center" colspan="7">

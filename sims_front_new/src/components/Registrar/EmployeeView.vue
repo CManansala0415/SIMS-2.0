@@ -13,8 +13,10 @@ import Loader from '../snippets/loaders/Loading1.vue';
 // import EmployeeForm from './EmployeeForm.vue'
 import Employee from '../snippets/modal/EmployeeModal.vue';
 import EmployeeTags from '../snippets/modal/EmployeeTagsModal.vue';
+import { useRouter, useRoute } from 'vue-router'
 
-const preLoading = ref(false)
+const router = useRouter();
+const preLoading = ref(true)
 const newEmployeeModal = ref(false)
 const updateEmployeeModal = ref(false)
 const tagEmployeeModal = ref(false)
@@ -34,7 +36,7 @@ const subject = ref([])
 const subjectAll = ref([])
 const userID = ref('')
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
 
     getSubject().then((results) => {
@@ -61,12 +63,12 @@ const booter = async () => {
         bootingCount.value += 1
     })
     // await router.isReady()
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        booting.value = 'Loading Users...'
-        bootingCount.value += 1
-        emit('fetchUser', results)
-    })
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    //     booting.value = 'Loading Users...'
+    //     bootingCount.value += 1
+    //     emit('fetchUser', results)
+    // })
 }
 
 const paginate = (mode) => {
@@ -154,23 +156,33 @@ const removeEmployee = (id) => {
 
 onMounted(async () => {
     window.stop()
-    try {
-        preLoading.value = true
-        booting.value = 'Loading Employees...'
-        bootingCount.value += 1
-        await booter().then((results) => {
-            getEmployee(limit.value, offset.value).then((results) => {
-                employee.value = results.data
-                employeeCount.value = results.count
-                preLoading.value = false
+    getUserID().then(async(results) => {
+        userID.value = results.account.data.id
+        emit('fetchUser', results)
+        accessData.value = results.access.data
+        try {
+            preLoading.value = true
+            booting.value = 'Loading Employees...'
+            bootingCount.value += 1
+            await booter().then((results1) => {
+                getEmployee(limit.value, offset.value).then((results2) => {
+                    employee.value = results2.data
+                    employeeCount.value = results2.count
+                    preLoading.value = false
+                })
             })
-        })
 
 
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
+   
 })
 </script>
 <template>
@@ -228,7 +240,7 @@ onMounted(async () => {
                         <td class="align-middle">
                             {{ emp.emp_status == 1 ? 'Acitve' : 'Inactive' }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[4].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button data-bs-toggle="modal" data-bs-target="#editemployeemodal"
                                     @click="updateEmployee(emp)" type="button" title="Edit Record"
@@ -242,6 +254,9 @@ onMounted(async () => {
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-tag"
                                     /></button>
                             </div>
+                        </td>
+                        <td v-else class="align-middle">
+                            N/A
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(employee).length">

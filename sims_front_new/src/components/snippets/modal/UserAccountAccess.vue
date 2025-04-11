@@ -32,6 +32,7 @@ const emit = defineEmits(['close'])
 const saving = ref(false)
 
 onMounted(async () => {
+    console.log(accessModuleData.value)
 })
 
 const handleAccess = async () => {
@@ -75,7 +76,6 @@ const mode = (index)=>{
     }
 
     
-    console.log(accessModuleData.value[index].module_access)
 }
 
 </script>

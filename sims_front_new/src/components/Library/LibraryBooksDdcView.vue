@@ -13,7 +13,7 @@ const limit = ref(10)
 const offset = ref(0)
 const booksDdc = ref([])
 const booksDdcCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -25,7 +25,7 @@ const editId = ref('')
 const ddcData = ref([])
 const modeData = ref('')
 const emit = defineEmits(['fetchUser'])
-
+const accessData = ref([])
 const booter = async () => {
 
     // getBookType().then((results)=>{
@@ -37,28 +37,34 @@ const booter = async () => {
 }
 
 onMounted(async () => {
-    getUserID().then((results) => {
+    getUserID().then(async(results) => {
         userID.value = results.account.data.id
+        accessData.value = results.access.data
         emit('fetchUser', results)
+        try {
+            preLoading.value = true
+            await booter().then((results) => {
+                booting.value = 'Loading Books...'
+                bootingCount.value += 1
+                getBooksDdc(limit.value, offset.value).then((results) => {
+                    // console.log(results)
+                    booksDdc.value = results.data
+                    booksDdcCount.value = results.count
+                    preLoading.value = false
+                })
+            })
+
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
     })
 
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading Books...'
-            bootingCount.value += 1
-            getBooksDdc(limit.value, offset.value).then((results) => {
-                // console.log(results)
-                booksDdc.value = results.data
-                booksDdcCount.value = results.count
-                preLoading.value = false
-            })
-        })
-
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
+    
 
 })
 
@@ -192,7 +198,7 @@ const editData = (id, data, mode) => {
                         <td class="align-middle">
                             {{ app.lbrc_status == 1 ? 'Active' : 'Inactive' }}
                         </td>
-                        <td class="align-middle">
+                        <td v-if="accessData[8].useracc_modifying == 1"class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
                                     @click="editData(app.lbrc_id, app, 1)" type="button" title="Edit Record"
@@ -203,7 +209,9 @@ const editData = (id, data, mode) => {
                                     <font-awesome-icon icon="fa-solid fa-trash" /></button>
                             </div>
                         </td>
-
+                        <td v-else class="align-middle">
+                            N/A
+                        </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(booksDdc).length">
                         <td class="p-3 text-center" colspan="7">

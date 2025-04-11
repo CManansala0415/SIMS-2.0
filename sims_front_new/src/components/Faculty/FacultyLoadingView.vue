@@ -4,7 +4,6 @@ import Loader from '../snippets/loaders/Loading1.vue';
 // import Enroll from '../snippets/modal/Enrollment.vue';
 // import ApplicationForm from './ApplicationForm.vue';
 import { getUserID } from "../../routes/user";
-import { useRouter, useRoute } from 'vue-router';
 import {
     getFacultyAssignment,
     getGradelvl,
@@ -16,12 +15,13 @@ import {
     getSection,
 } from "../Fetchers.js";
 
+import { useRouter, useRoute } from 'vue-router'
 
+const router = useRouter();
 const assignment = ref([])
 const assignmentCount = ref(0)
-const preLoading = ref(false)
+const preLoading = ref(true)
 const userID = ref('')
-const router = useRouter();
 const showForm = ref(false)
 const showEnroll = ref(false)
 const groupedAssignmentSection = ref([])
@@ -85,38 +85,39 @@ const booter = async () => {
 }
 
 onMounted(async () => {
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-        emit('fetchUser', results)
-    })
+    getUserID().then(async(results1) => {
+        userID.value = results1.account.data.id
+        emit('fetchUser', results1)
+        try {
+            preLoading.value = true
+            await booter().then(() => {
+                booting.value = 'Loading assignments...'
+                bootingCount.value += 1
+                getFacultyAssignment(2).then((results2) => {
+                    assignment.value = results2.data
+                    assignmentCount.value = results2.count
+                    preLoading.value = false
 
+                    let groupBySection = Object.groupBy(assignment.value, assignments => assignments.lf_lnid);
+                    let groupBySubject = Object.groupBy(assignment.value, assignments => assignments.lf_subjid);
+                    // console.log(groupBySection[2])
+                    // console.log(groupBySection)
+                    groupedAssignmentSection.value = groupBySection
+                    groupedAssignmentSubject.value = groupBySubject
+                    // console.log(groupBySection)
 
-    try {
-        preLoading.value = true
-        await booter().then((results) => {
-            booting.value = 'Loading assignments...'
-            bootingCount.value += 1
-            getFacultyAssignment(2).then((results) => {
-                assignment.value = results.data
-                assignmentCount.value = results.count
-                preLoading.value = false
-
-                let groupBySection = Object.groupBy(assignment.value, assignments => assignments.lf_lnid);
-                let groupBySubject = Object.groupBy(assignment.value, assignments => assignments.lf_subjid);
-                // console.log(groupBySection[2])
-                // console.log(groupBySection)
-                groupedAssignmentSection.value = groupBySection
-                groupedAssignmentSubject.value = groupBySubject
-                // console.log(groupBySection)
-
+                })
             })
-        })
 
-    } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
-    }
-
+        } catch (err) {
+            preLoading.value = false
+            alert('error loading the list default components')
+        }
+    }).catch((err) => {
+        alert('Unauthorized Session, Please Log In')
+        router.push("/");
+        window.stop()
+    })
 })
 
 
