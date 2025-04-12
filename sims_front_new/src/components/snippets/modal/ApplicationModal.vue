@@ -21,6 +21,8 @@ const props = defineProps({
     },
     barangayData: {
     },
+    countryData: {
+    },
     formId: {
     },
     formMode:{
@@ -35,6 +37,9 @@ const civilstatus = computed(() => {
 });
 const nationality = computed(() => {
   return props.nationalityData
+});
+const country = computed(() => {
+  return props.countryData
 });
 const region = computed(() => {
   return props.regionData
@@ -69,6 +74,7 @@ const saving = ref(false);
 const checking = ref(false);
 const forUpdate = ref(false) 
 
+const filteredBirthCountry = ref([])
 const filteredBirthProvince = ref([])
 const filteredBirthCity = ref([])
 
@@ -95,6 +101,7 @@ const personal = ref({
     per_contact:'',
     per_email:'',
     per_birthday: '',
+    per_birth_country:'',
     per_birth_province:'',
     per_birth_city:'',
     per_birth_zipcode:'',
@@ -135,7 +142,7 @@ const attainmentInfo = ref({
     pered_from:'',
     pered_to:'',
 })
-
+ 
 const booter = async() =>{
     await getPerson(personID.value).then(async(results) => {
         if(results){
@@ -176,7 +183,7 @@ onMounted(async () => {
     yearToday.value = date.getFullYear();
     personal.value.per_birthday = date.toISOString().split('T')[0]
 
-
+    filteredBirthCountry.value = country.value
     filteredBirthProvince.value = province.value
     filteredCurrRegion.value = region.value
     filteredPermRegion.value = region.value
@@ -356,6 +363,7 @@ const addAttainment = (type, data, index) =>{
 
 const updateAddress =(type, code) =>{
     switch(type){
+        
         case 'birth-city':
         filteredBirthCity.value = city.value
         filteredBirthCity.value = city.value.filter(e => {
@@ -666,10 +674,20 @@ const refresh = () => {
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col">
+                        <label for="birthprovince">Birth Country</label>
+                        <select class="form-control" id="birthprovince"
+                            @change="personal.per_birth_province ='', personal.per_birth_city=''"
+                            v-model="personal.per_birth_country" required :disabled="saving?true:false">
+                            <option>- Select Here -</option>
+                            <option v-for="(country, index) in filteredBirthCountry" :value="country.countryID">{{
+                                country.name }}</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
                         <label for="birthprovince">Birth Province</label>
                         <select class="form-control" id="birthprovince"
                             @change="updateAddress('birth-city', personal.per_birth_province)"
-                            v-model="personal.per_birth_province" required :disabled="saving?true:false">
+                            v-model="personal.per_birth_province" required :disabled="personal.per_birth_country != 163 || saving?true:false">
                             <option>- Select Here -</option>
                             <option v-for="(prov, index) in filteredBirthProvince" :value="prov.provCode">{{
                                 prov.provDesc }}</option>
@@ -678,7 +696,7 @@ const refresh = () => {
                     <div class="form-group col">
                         <label for="birthcity">Birth City</label>
                         <select class="form-control" id="birthcity" v-model="personal.per_birth_city"
-                            :disabled="personal.per_birth_province || saving ? false : true" required>
+                            :disabled="((personal.per_birth_province || saving)&& personal.per_birth_country == 163) ? false : true" required>
                             <option>- Select Here -</option>
                             <option v-for="(ct, index) in filteredBirthCity" :value="ct.citymunCode">{{ ct.citymunDesc
                                 }}</option>

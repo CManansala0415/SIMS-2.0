@@ -28,6 +28,7 @@ Route::middleware(['auth:sanctum'])->get('/get-quarter', [DefaultsController::cl
 Route::middleware(['auth:sanctum'])->get('/get-degree/{type?}', [DefaultsController::class,'getDegree']);
 Route::middleware(['auth:sanctum'])->get('/get-semester', [DefaultsController::class,'getSemester']);
 Route::middleware(['auth:sanctum'])->get('/get-section', [DefaultsController::class,'getSection']);
+Route::middleware(['auth:sanctum'])->get('/get-country', [DefaultsController::class,'getCountry']);
 Route::middleware(['auth:sanctum'])->get('/get-region', [DefaultsController::class,'getRegion']);
 Route::middleware(['auth:sanctum'])->get('/get-province', [DefaultsController::class,'getProvince']);
 Route::middleware(['auth:sanctum'])->get('/get-city', [DefaultsController::class,'getCity']);

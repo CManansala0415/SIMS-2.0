@@ -29,6 +29,7 @@ import {
     getProgramList,
     getSemester,
     getSection,
+    getCountry,
     getRegion,
     getProvince,
     getCity,
@@ -51,6 +52,7 @@ const showIdentification = ref(false)
 
 const gender = ref([])
 const nationality = ref([])
+const country = ref([])
 const region = ref([])
 const city = ref([])
 const province = ref([])
@@ -129,6 +131,12 @@ const booter = async () => {
     getSection().then((results) => {
         section.value = results
         booting.value = 'Loading Sections'
+        bootingCount.value += 1
+    })
+    
+    getCountry().then((results) => {
+        country.value = results
+        booting.value = 'Loading Countries'
         bootingCount.value += 1
     })
 
@@ -418,7 +426,7 @@ const addID = (data) => {
                 <div class="modal-body">
                     <ApplicationModal v-if="showFormModal" :genderData="gender" :civilstatusData="civilstatus"
                         :nationalityData="nationality" :regionData="region" :provinceData="province" :cityData="city"
-                        :barangayData="barangay" :formId="editId" :formMode="formMode" />
+                        :barangayData="barangay" :formId="editId" :formMode="formMode" :countryData="country"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

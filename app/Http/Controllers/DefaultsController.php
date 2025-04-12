@@ -119,6 +119,13 @@ class DefaultsController extends Controller
         ->get();
         return $section;
     }
+    
+    public function getCountry()
+    {
+        $country = DB::table('sett_ph_country')->orderBy('name')
+        ->get();
+        return $country; 
+    }
 
     public function getRegion()
     {

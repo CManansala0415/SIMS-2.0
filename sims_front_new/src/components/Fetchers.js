@@ -152,6 +152,23 @@ const getRegion = async () => {
     }
 }
 
+let country = {}
+const getCountry = async () => {
+
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-country/',
+        }).then(async (results) => {
+            // console.log(results.data)
+            country = results.data
+        })
+        return country
+    }catch(err){
+        return err
+    }
+}
+
 let province = {}
 const getProvince = async () => {
 
@@ -2273,6 +2290,7 @@ export {
     getProgramList,
     getSemester,
     getSection,
+    getCountry,
     getRegion,
     getProvince,
     getCity,
