@@ -599,9 +599,10 @@ class RegistrarController extends Controller
         ];
     }
 
-    public function getStudentFiltering($limit, $offset, $search, $program, $gradelvl, $course)
-    {
-        if($search==204){
+    public function getStudentFiltering($limit, $offset, $fname, $mname, $lname, $program, $gradelvl, $course)
+    {   
+        // kapag newly refresh no params for search
+        if(($fname == 404)&&($mname == 404)&&($lname == 404)&&($program == 0)&&($gradelvl == 0)&&($course == 0)){
 
             if($limit == 0 && $offset == 0){
                 $student = DB::table('def_enrollment')
@@ -611,14 +612,8 @@ class RegistrarController extends Controller
                     'def_person.*',
                 )
                 ->orderBy('def_enrollment.enr_course')
-                ->orderByDesc('def_person.per_lastname')
+                ->orderByDesc('def_enrollment.enr_dateenrolled')
                 ->where('def_enrollment.enr_status', '=' , 1)
-                // ->where(function($query) use ($program, $gradelvl, $course) {
-                //     $query->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                //     ->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                //     ->where('def_enrollment.enr_program', '=',  $program)
-                //     ->where('def_enrollment.enr_course', '=',  $course);
-                // })
                 ->get();
             }else{
                 $student = DB::table('def_enrollment')
@@ -628,14 +623,8 @@ class RegistrarController extends Controller
                     'def_person.*',
                 )
                 ->orderBy('def_enrollment.enr_dateenrolled')
-                ->orderByDesc('def_person.per_lastname')
-                // ->where('def_enrollment.enr_status', '=' , 1)
-                // ->where(function($query) use ($program, $gradelvl, $course) {
-                //     $query->orWhere('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                //     ->orWhere('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                //     ->orWhere('def_enrollment.enr_program', '=',  $program)
-                //     ->orWhere('def_enrollment.enr_course', '=',  $course);
-                // })
+                ->orderByDesc('def_enrollment.enr_dateenrolled')
+                ->where('def_enrollment.enr_status', '=' , 1)
                 ->limit($limit)
                 ->offset($offset)
                 ->get();
@@ -648,17 +637,13 @@ class RegistrarController extends Controller
                 'def_person.*',
             )                        
             ->orderBy('def_enrollment.enr_course')
-            ->orderByDesc('def_person.per_lastname')
+            ->orderByDesc('def_enrollment.enr_dateenrolled')
             ->where('def_enrollment.enr_status', '=' , 1)
-            // ->where(function($query) use ($program, $gradelvl, $course) {
-            //     $query->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-            //     ->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-            //     ->where('def_enrollment.enr_program', '=',  $program)
-            //     ->where('def_enrollment.enr_course', '=',  $course);
-            // })
             ->count();
         }
-        else if ($search != 204 && ($limit == 1 && $offset == 1)){
+        // kapag may params for search
+        // ($fname != 404)||($mname != 404)||($lname != 404) && ($limit == 1 && $offset == 1)
+        else if (($fname == 404)&&($mname == 404)&&($lname == 404)){
             $student = DB::table('def_enrollment')
                         ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
                         ->select(  
@@ -666,21 +651,12 @@ class RegistrarController extends Controller
                             'def_person.*',
                         )                        
                         ->orderBy('def_enrollment.enr_course')
-                        ->orderByDesc('def_person.per_lastname')
+                        ->orderByDesc('def_enrollment.enr_dateenrolled')
                         ->where('def_person.per_status', '=',  1)
                         ->where('def_enrollment.enr_status', '=' , 1)
-                        ->where(function($query) use ($search) {
-                            $query->where('def_person.per_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_dateapplied', 'like',  '%' . $search .'%');
-                        })
-                        ->where(function($query) use ($program, $gradelvl, $course) {
-                            $query->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                            ->where('def_enrollment.enr_program', '=',  $program)
-                            ->where('def_enrollment.enr_course', '=',  $course);
-                        })
+                        ->orWhere('def_enrollment.enr_gradelvl', '=' , $gradelvl)
+                        ->orWhere('def_enrollment.enr_program', '=' , $program)
+                        ->orWhere('def_enrollment.enr_course', '=' , $course)
                         ->get();
             $count =  DB::table('def_enrollment')
                         ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
@@ -689,21 +665,12 @@ class RegistrarController extends Controller
                             'def_person.*',
                         )                        
                         ->orderBy('def_enrollment.enr_course')
-                        ->orderByDesc('def_person.per_lastname')
+                        ->orderByDesc('def_enrollment.enr_dateenrolled')
                         ->where('def_person.per_status', '=',  1)
                         ->where('def_enrollment.enr_status', '=' , 1)
-                        ->where(function($query) use ($search) {
-                            $query->where('def_person.per_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_dateapplied', 'like',  '%' . $search .'%');
-                        })
-                        ->where(function($query) use ($program, $gradelvl, $course) {
-                            $query->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                            ->where('def_enrollment.enr_program', '=',  $program)
-                            ->where('def_enrollment.enr_course', '=',  $course);
-                        })
+                        ->orWhere('def_enrollment.enr_gradelvl', '=' , $gradelvl)
+                        ->orWhere('def_enrollment.enr_program', '=' , $program)
+                        ->orWhere('def_enrollment.enr_course', '=' , $course)
                         ->count();       
         }
         else{
@@ -713,22 +680,18 @@ class RegistrarController extends Controller
                             'def_enrollment.*',
                             'def_person.*',
                         )                        
-                        ->orderBy('def_enrollment.enr_course')
-                        ->orderByDesc('def_person.per_lastname')
                         ->where('def_person.per_status', '=',  1)
                         ->where('def_enrollment.enr_status', '=' , 1)
-                        ->where(function($query) use ($search) {
-                            $query->where('def_person.per_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_dateapplied', 'like',  '%' . $search .'%');
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->orWhere('def_person.per_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('def_person.per_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('def_person.per_lastname', 'like',  '%' . $lname .'%');
                         })
-                        ->where(function($query) use ($program, $gradelvl, $course) {
-                            $query->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                            ->where('def_enrollment.enr_program', '=',  $program)
-                            ->where('def_enrollment.enr_course', '=',  $course);
-                        })
+                        // ->where(function($query) use ($program, $gradelvl, $course) {
+                        //     $query->orWhere('def_enrollment.enr_gradelvl', '=', $gradelvl)
+                        //     ->orWhere('def_enrollment.enr_program', '=',  $program)
+                        //     ->orWhere('def_enrollment.enr_course', '=',  $course);
+                        // })
                         ->limit($limit)->offset($offset)
                         ->get();
             $count =  DB::table('def_enrollment')
@@ -737,22 +700,18 @@ class RegistrarController extends Controller
                             'def_enrollment.*',
                             'def_person.*',
                         )
-                        ->orderBy('def_enrollment.enr_course')
-                        ->orderByDesc('def_person.per_lastname')
                         ->where('def_person.per_status', '=',  1)
                         ->where('def_enrollment.enr_status', '=' , 1)
-                        ->where(function($query) use ($search) {
-                            $query->where('def_person.per_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('def_person.per_dateapplied', 'like',  '%' . $search .'%');
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->orWhere('def_person.per_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('def_person.per_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('def_person.per_lastname', 'like',  '%' . $lname .'%');
                         })
-                        ->where(function($query) use ($program, $gradelvl, $course) {
-                            $query->where('def_enrollment.enr_gradelvl', '=', $gradelvl)
-                            ->where('def_enrollment.enr_program', '=',  $program)
-                            ->where('def_enrollment.enr_course', '=',  $course);
-                        })
+                        // ->where(function($query) use ($program, $gradelvl, $course) {
+                        //     $query->orWhere('def_enrollment.enr_gradelvl', '=', $gradelvl)
+                        //     ->orWhere('def_enrollment.enr_program', '=',  $program)
+                        //     ->orWhere('def_enrollment.enr_course', '=',  $course);
+                        // })
                         ->limit($limit)->offset($offset)
                         ->count();       
         }

@@ -491,15 +491,14 @@ const getStudent = async (limit, offset, id) => {
 }
 
 let studentfiltering = {}
-const getStudentFiltering = async (limit, offset, id, program, gradelvl, course) => {
-    let search = id
-    if(!id){
-        search = 204
-    }
+const getStudentFiltering = async (limit, offset, fname, mname, lname, program, gradelvl, course) => {
+    let firstname = !fname?'404':fname
+    let middlename = !mname?'404':mname
+    let lastname = !lname?'404':lname
     try{
         await axios({
             method: "GET",
-            url: 'api/get-student-filtering/'+limit+'/'+offset+'/'+search+'/'+program+'/'+gradelvl+'/'+course,
+            url: 'api/get-student-filtering/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+program+'/'+gradelvl+'/'+course,
         }).then(async (results) => {
             // console.log(results.data)
             studentfiltering = results.data

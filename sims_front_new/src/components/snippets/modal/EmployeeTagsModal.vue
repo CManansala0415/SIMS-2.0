@@ -95,7 +95,7 @@ const booter = async () => {
     })
 }
 onMounted(async () => {
-
+    console.log(subject.value)
     try {
         subjectFilter.value = subject.value
         checking.value = true

@@ -41,7 +41,10 @@ const activeForm = ref(1)
 const limit = ref(10)
 const offset = ref(0)
 const studentCount = ref(0)
-const searchValue = ref('')
+const searchValue = ref([])
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
 const showLink = ref(false)
 const linkId = ref('')
 const holdSubmit = ref(false)
@@ -110,7 +113,7 @@ onMounted(async () => {
             await booter().then((results) => {
                 booting.value = 'Loading Students...'
                 bootingCount.value += 1
-                getStudentFiltering(limit.value, offset.value, 0, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
                     student.value = results.data
                     console.log(student.value)
                     studentCount.value = results.count
@@ -143,6 +146,10 @@ onMounted(async () => {
 
 
 const paginate = (mode) => {
+    searchFname.value = searchFname.value.trim()
+    searchMname.value = searchMname.value.trim()
+    searchLname.value = searchLname.value.trim()
+
     switch (mode) {
         case 'prev':
             if (offset.value <= 0) {
@@ -152,7 +159,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, null, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -160,7 +167,7 @@ const paginate = (mode) => {
             }
             break;
         case 'next':
-
+ 
             if (offset.value >= studentCount.value) {
                 offset.value = studentCount.value
             } else {
@@ -168,7 +175,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, null, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -176,13 +183,13 @@ const paginate = (mode) => {
             }
             break;
         case 'search':
-            searchValue.value = searchValue.value.trim()
+            // searchValue.value = searchValue.value.trim()
             if (searchValue.value || searchValue.value == '') {
                 student.value = []
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchValue.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -194,20 +201,20 @@ const paginate = (mode) => {
                 preLoading.value = false
             }
             break;
-        case 'course':
-            student.value = []
-            offset.value = 0
-            studentCount.value = 0
-            preLoading.value = true
-            getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
-                student.value = results.data
-                studentCount.value = results.count
-                preLoading.value = false
-            }).catch((err) => {
-                // console.log(err)
-            })
+        // case 'course':
+        //     student.value = []
+        //     offset.value = 0
+        //     studentCount.value = 0
+        //     preLoading.value = true
+        //     getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
+        //         student.value = results.data
+        //         studentCount.value = results.count
+        //         preLoading.value = false
+        //     }).catch((err) => {
+        //         // console.log(err)
+        //     })
 
-            break;
+        //     break;
 
     }
 }
@@ -299,12 +306,6 @@ const paramsProgram = ref(0)
 const paramsGradelvl = ref(0)
 const paramsCourse = ref(0)
 
-const detectParams = () => {
-    console.log(paramsProgram.value)
-    console.log(paramsGradelvl.value)
-    console.log(paramsCourse.value)
-}
-
 const validate = () => {
     const regEx1 = /[^a-zA-Z\s]+/;
     searchValue.value = searchValue.value.replace(regEx1, '');
@@ -318,33 +319,37 @@ const validate = () => {
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="d-flex gap-2">
+            <div class="d-flex gap-2 w-100">
                 <div class="d-flex gap-2">
-                    <div class="d-flex justify-content-center align-content-center">
-                        <input type="text" @keyup="validate()" v-model="searchValue" @keyup.enter="search()"
-                            class="form-control" placeholder="Search Here..."  :disabled="preLoading?true:false"/>
-                    </div>
-                    <div class="d-flex justify-content-center align-content-center">
-                        <button @click="search()" type="button" class="btn btn-sm btn-info text-white" tabindex="-1" :disabled="preLoading?true:false">
-                            Search
-                        </button>
+                    <div class="d-flex gap-2 justify-content-center align-content-center">
+                        <input type="text" @keyup="validate()" v-model="searchFname" @keyup.enter="search()"
+                            class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                        <input type="text" @keyup="validate()" v-model="searchMname" @keyup.enter="search()"
+                            class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                        <input type="text" @keyup="validate()" v-model="searchLname" @keyup.enter="search()"
+                            class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
-                <div class="d-flex gap-2">
-                    <select class="form-control w-100 form-control-sm" tabindex="-1" @change="detectParams()" v-model="paramsProgram" :disabled="preLoading?true:false">
-                        <option value="0">-- Select Program --</option>
+            <div class="d-flex gap-2 w-100">
+                <div class="d-flex gap-2 w-100">
+                    <!-- <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
+                        <option value="0">Select Program</option>
                         <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
                     </select>
-                    <select class="form-control w-100 form-control-sm" tabindex="-1" v-model="paramsGradelvl" :disabled="preLoading?true:false">
-                        <option value="0">-- Select Grade Level --</option>
+                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsGradelvl" :disabled="preLoading?true:false">
+                        <option value="0">Select Grade Level</option>
                         <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}</option>
                     </select>
-                    <select class="form-control w-100 form-control-sm" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
-                        <option value="0">-- Select Course --</option>
+                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
+                        <option value="0">Select Course</option>
                         <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}</option>
-                    </select>
+                    </select> -->
+                    <div class="d-flex justify-content-center align-content-center">
+                        <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                            Search
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

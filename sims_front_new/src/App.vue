@@ -55,7 +55,7 @@ const getUser = (data) => {
   let z = data.access.data.filter((e) => {
     return e.useracc_category == 3
   })
-
+  
   // find filtered categories if meron silang atleast 1 grant or viewing and modifying is 1
   // administrative
   let a = x.filter((e) => {
@@ -140,7 +140,15 @@ const getUser = (data) => {
     let desc = ''
     if((e.useracc_modulecode == 5)&&(e.useracc_accesscode==1)){
       link = '/faculty-classes'
-      desc = 'Faculty'
+      desc = 'Class'
+    }
+    if((e.useracc_modulecode == 5)&&(e.useracc_accesscode==2)){
+      link = '/faculty-student'
+      desc = 'Grades'
+    }
+    if((e.useracc_modulecode == 5)&&(e.useracc_accesscode==3)){
+      link = '/faculty-grading-sheet'
+      desc = 'Masterlist'
     }
     return{
       ...e,
@@ -216,7 +224,6 @@ const linker = () => {
 
     case [
       "/faculty-classes",
-      "/faculty-assignment",
       "/faculty-student",
       "/faculty-grading-sheet",
     ].includes(path.value):
@@ -377,7 +384,7 @@ const active_class = ref("nav-static border p-2 active");
                   </button>
                   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                     <li v-for="(admin, index) in administrativeAccess">
-                      <router-link :to="admin.link" @click="accessSelected = admin.useracc_category, itemSelected = admin.useracc_modulecode" class="dropdown-item">
+                      <router-link :to="admin.link" @click="switchItem(admin.useracc_category,admin.useracc_modulecode) " class="dropdown-item">
                         {{ admin.description }}
                       </router-link>
                     </li>
@@ -395,7 +402,7 @@ const active_class = ref("nav-static border p-2 active");
                     Transactions
                   </button>
                   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                    <li v-for="(transac, index) in transactionsAccess"><router-link :to="transac.link" @click="accessSelected = transac.useracc_category, itemSelected = transac.useracc_modulecode" class="dropdown-item"
+                    <li v-for="(transac, index) in transactionsAccess"><router-link :to="transac.link" @click="switchItem(transac.useracc_category,transac.useracc_modulecode) " class="dropdown-item"
                         href="#">{{ transac.description }}</router-link></li>
                     <!-- <li><router-link to="/accounting-items" @click="switchItem(2, 1)" class="dropdown-item"
                         href="#">Accounting</router-link></li>
@@ -409,7 +416,7 @@ const active_class = ref("nav-static border p-2 active");
                     Academics
                   </button>
                   <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
-                    <li v-for="(academe, index) in academicsAccess"><router-link :to="academe.link" @click="accessSelected = academe.useracc_category, itemSelected = academe.useracc_modulecode" class="dropdown-item"
+                    <li v-for="(academe, index) in academicsAccess"><router-link :to="academe.link" @click="switchItem(academe.useracc_category,academe.useracc_modulecode) " class="dropdown-item"
                       href="#">{{ academe.description }}</router-link></li>
                     <!-- <li><router-link to="/faculty-classes" @click="switchItem(3, 1)" class="dropdown-item"
                         href="#">Faculty</router-link></li>
@@ -599,17 +606,22 @@ const active_class = ref("nav-static border p-2 active");
                         <router-link to="/faculty-assignment" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Assignments</p>
                         </router-link>
+                      </li> -->
+                      <li>
+                        <router-link v-if="accessData[16].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
+                          <p class="m-2">Faculty Loadings</p>
+                        </router-link>
                       </li>
                       <li>
-                        <router-link to="/faculty-student" class="dropdown-item" tabindex="-1">
+                        <router-link v-if="accessData[17].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Students</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
+                        <router-link v-if="accessData[18].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Grading Sheet</p>
                         </router-link>
-                      </li> -->
+                      </li>
                     </ul>
                   </div>
                 </nav>

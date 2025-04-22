@@ -82,9 +82,12 @@ class FacultyController extends Controller
         ->leftJoin('sett_quarter as quarter', 'enroll.enr_quarter', '=', 'quarter.quar_id') 
         ->leftJoin('sett_degree_types as degree', 'enroll.enr_program', '=', 'degree.dtype_id') 
         ->leftJoin('def_curriculum as curriculum', 'enroll.enr_curriculum', '=', 'curriculum.curr_id') 
+        ->leftJoin('def_student_identification as studentid', 'enroll.enr_personid', '=', 'studentid.ident_personid') 
         ->select(  
             'enroll.*',
+            'studentid.ident_identification',
             'gradelvl.grad_id',
+            'gradelvl.grad_dtypeid',
             'program.prog_id',
             'section.sec_name as section',
             'program.prog_name as course',

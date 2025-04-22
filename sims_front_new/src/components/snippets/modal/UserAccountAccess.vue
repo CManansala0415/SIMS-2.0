@@ -19,7 +19,7 @@ const props = defineProps({
     title: {
     }
 })
-
+ 
 const userID = computed(() => {
     return props.userIdData
 });

@@ -191,11 +191,11 @@ const fileUpload = (id) => {
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Action</th>
+                        <th style="background-color: #237a5b;" class="text-white">No</th>
+                        <th style="background-color: #237a5b;" class="text-white">Year</th>
+                        <th style="background-color: #237a5b;" class="text-white">Course</th>
+                        <th style="background-color: #237a5b;" class="text-white">Section Name</th>
+                        <th style="background-color: #237a5b;" class="text-white">Section Subjects</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -18,10 +18,9 @@ import LibraryBooksView from '../components/Library/LibraryBooksView.vue';
 import LibraryBooksDdcView from '../components/Library/LibraryBooksDdcView.vue';
 import LibraryBooksBorrowersView from '../components/Library/LibraryBooksBorrowersView.vue';
 import LibraryCardsView from '../components/Library/LibraryCardsView.vue';
-import FacultyLoadingView from '../components/Faculty/FacultyLoadingView.vue';
-// import FacultyAssignment from '../components/Faculty/FacultyAssignment.vue';
-// import FacultyStudents from '../components/Faculty/FacultyStudents.vue';
-// import FacultyGradingSheet from '../components/Faculty/FacultyGradingSheet.vue';
+import FacultyClassView from '../components/Faculty/FacultyClassView.vue';
+import FacultyGradesView from '../components/Faculty/FacultyGradesView.vue';
+import FacultyMasterlist from '../components/Faculty/FacultyMasterlist.vue';
 
 const routes = [
      
@@ -86,17 +85,14 @@ const routes = [
     //     path: '/accounting-package', name:'/accounting-package', component: AccountingPackage
     // },
     {
-        path: '/faculty-classes', name:'/faculty-classes', component: FacultyLoadingView
+        path: '/faculty-classes', name:'/faculty-classes', component: FacultyClassView
     },
-    // {
-    //     path: '/faculty-assignment', name:'/faculty-assignment', component: FacultyAssignment
-    // },
-    // {
-    //     path: '/faculty-student', name:'/faculty-student', component: FacultyStudents
-    // },
-    // {
-    //     path: '/faculty-grading-sheet', name:'/faculty-grading-sheet', component: FacultyGradingSheet
-    // },
+    {
+        path: '/faculty-grading-sheet', name:'/faculty-grading-sheet', component: FacultyGradesView
+    },
+    {
+        path: '/faculty-student', name:'/faculty-student', component: FacultyMasterlist
+    },
     
     
 ];

@@ -388,12 +388,32 @@ const accessModuleData = ref(
                 0: {
                     useracc_id:0,
                     access_id: 1,
-                    access_description: 'Viewing / General Access',
+                    access_description: 'Faculty Loadings & Preparations',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,
                     access_modifying:0
                 },
+                1: {
+                    useracc_id:0,
+                    access_id: 2,
+                    access_value: 2,
+                    access_description: 'Faculty Grading Sheet',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                },
+                2: {
+                    useracc_id:0,
+                    access_id: 3,
+                    access_value: 3,
+                    access_description: 'Faculty Student Masterlist',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                }
             }
         }
     }

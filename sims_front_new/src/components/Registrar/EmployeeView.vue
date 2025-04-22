@@ -56,8 +56,8 @@ const booter = async () => {
         booting.value = 'Loading Civil Status'
         bootingCount.value += 1
     })
-
-    getTaggedSubject().then((results) => {
+    // getTaggedSubject
+    getSubject().then((results) => {
         subject.value = results
         booting.value = 'Loading Subjects...'
         bootingCount.value += 1
