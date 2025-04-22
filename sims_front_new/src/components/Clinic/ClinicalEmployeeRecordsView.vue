@@ -29,6 +29,9 @@ const limit = ref(10)
 const offset = ref(0)
 const preLoading = ref(true)
 const searchValue = ref('')
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
 const userID = ref('')
 const router = useRouter();
 const booting = ref('')
@@ -66,7 +69,7 @@ onMounted(async () => {
             await booter().then(() => {
                 booting.value = 'Loading Applicants...'
                 bootingCount.value += 1
-                getEmployee(limit.value, offset.value).then((results2) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results2) => {
                     employee.value = results2.data
                     employeeCount.value = results2.count
                     preLoading.value = false
@@ -87,6 +90,10 @@ onMounted(async () => {
 })
 
 const paginate = (mode) => {
+    searchFname.value = searchFname.value.trim()
+    searchMname.value = searchMname.value.trim()
+    searchLname.value = searchLname.value.trim()
+
     switch (mode) {
         case 'prev':
             if (offset.value <= 0) {
@@ -96,7 +103,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 employeeCount.value = 0
                 preLoading.value = true
-                getEmployee(limit.value, offset.value).then((results) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     employee.value = results.data
                     employeeCount.value = results.count
                     preLoading.value = false
@@ -112,7 +119,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 employeeCount.value = 0
                 preLoading.value = true
-                getEmployee(limit.value, offset.value, null).then((results) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     employee.value = results.data
                     employeeCount.value = results.count
                     preLoading.value = false
@@ -126,7 +133,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 employeeCount.value = 0
                 preLoading.value = true
-                getEmployee(limit.value, offset.value, searchValue.value).then((results) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     employee.value = results.data
                     employeeCount.value = results.count
                     preLoading.value = false
@@ -173,11 +180,22 @@ const fileUpload = (id) => {
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
+            <!-- <div class="input-group w-50">
                 <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
                     v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
                     :disabled="preLoading ? true : false">
+            </div> -->
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
@@ -192,14 +210,18 @@ const fileUpload = (id) => {
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">No</th>
-                        <th style="background-color: #237a5b;" class="text-white">Year</th>
-                        <th style="background-color: #237a5b;" class="text-white">Course</th>
-                        <th style="background-color: #237a5b;" class="text-white">Section Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Section Subjects</th>
+                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
+                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
+                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
+                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
+                        <th style="background-color: #237a5b;" class="text-white">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-if="!preLoading && Object.keys(employee).length" v-for="(app, index) in employee">
+                        <td class="align-middle">
+                            {{ app.emp_id }}
+                        </td>
                         <td class="align-middle">
                             {{ app.emp_firstname }}
                         </td>

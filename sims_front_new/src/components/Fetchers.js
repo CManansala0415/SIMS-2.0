@@ -1,15 +1,14 @@
 import axios from 'axios';
 
 let applicant = {}
-const getApplicant = async (limit, offset, id) => {
-    let search = id
-    if(!id){
-        search = 204
-    }
+const getApplicant = async (limit, offset, fname, mname, lname) => {
+    let firstname = !fname?'404':fname
+    let middlename = !mname?'404':mname
+    let lastname = !lname?'404':lname
     try{
         await axios({
             method: "GET",
-            url: 'api/get-applicant/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-applicant/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname,
         }).then(async (results) => {
             // console.log(results.data)
             applicant = results.data
@@ -912,15 +911,14 @@ const getOccupancyOthers = async (othersid) => {
 }
 
 let employee = {}
-const getEmployee = async (limit, offset, id) => {
-    let search = id
-    if(!id){
-        search = 204
-    }
+const getEmployee = async (limit, offset, fname, mname, lname) => {
+    let firstname = !fname?'404':fname
+    let middlename = !mname?'404':mname
+    let lastname = !lname?'404':lname
     try{
         await axios({
             method: "GET",
-            url: 'api/get-employee/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-employee/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname,
         }).then(async (results) => {
             // console.log(results.data)
             employee = results.data

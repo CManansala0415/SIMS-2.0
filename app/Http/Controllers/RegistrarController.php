@@ -44,71 +44,46 @@ class RegistrarController extends Controller
         return $award;
     }
 
-    public function getApplicant($limit, $offset, $search)
+    public function getApplicant($limit, $offset, $fname, $mname, $lname)
     {   
-        if($limit == 0 && $offset == 0){
+        if(($fname == 404)&&($mname == 404)&&($lname == 404)){
             $applicant = DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('per_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('per_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('per_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('per_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('per_dateapplied', 'like',  '%' . $search .'%');
-                        })
+                        ->limit($limit)->offset($offset)
                         ->get();
             $count =  DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('per_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('per_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('per_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('per_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('per_dateapplied', 'like',  '%' . $search .'%');
-                        })
+                        ->limit($limit)->offset($offset)
                         ->count();       
-
             return $data = [
                 'data' => $applicant,
                 'count' => $count,
             ];
 
         }else{
-            if($search==204){
-                $applicant = DB::table('def_person')->where('per_status', '=',  1)->orderBy('per_id','DESC')->limit($limit)->offset($offset)->get();
-                $count = DB::table('def_person')->count();
-            }
-            else{
-                $applicant = DB::table('def_person')->orderBy('per_id','DESC')
-                            ->where('per_status', '=',  1)
-                            ->where(function($query) use ($search) {
-                                $query->where('per_firstname', 'like',  '%' . $search .'%')
-                                ->orWhere('per_middlename', 'like',  '%' . $search .'%')
-                                ->orWhere('per_lastname', 'like',  '%' . $search .'%')
-                                ->orWhere('per_suffixname', 'like',  '%' . $search .'%')
-                                ->orWhere('per_dateapplied', 'like',  '%' . $search .'%');
-                            })
-                            ->limit($limit)->offset($offset)
-                            ->get();
-                $count =  DB::table('def_person')->orderBy('per_id','DESC')
-                            ->where('per_status', '=',  1)
-                            ->where(function($query) use ($search) {
-                                $query->where('per_firstname', 'like',  '%' . $search .'%')
-                                ->orWhere('per_middlename', 'like',  '%' . $search .'%')
-                                ->orWhere('per_lastname', 'like',  '%' . $search .'%')
-                                ->orWhere('per_suffixname', 'like',  '%' . $search .'%')
-                                ->orWhere('per_dateapplied', 'like',  '%' . $search .'%');
-                            })
-                            ->limit($limit)->offset($offset)
-                            ->count();       
-            }
-    
-            return $data = [
-                'data' => $applicant,
-                'count' => $count,
-            ];
+            $applicant = DB::table('def_person')->orderBy('per_id','DESC')
+                        ->where('per_status', '=',  1)
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->where('per_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('per_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('per_lastname', 'like',  '%' . $lname .'%');
+                        })
+                        ->limit($limit)->offset($offset)
+                        ->get();
+            $count =  DB::table('def_person')->orderBy('per_id','DESC')
+                        ->where('per_status', '=',  1)
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->where('per_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('per_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('per_lastname', 'like',  '%' . $lname .'%');
+                        })
+                        ->limit($limit)->offset($offset)
+                        ->count();       
         }
-        
+        return $data = [
+            'data' => $applicant,
+            'count' => $count,
+        ];
         
     }
 
@@ -1856,9 +1831,9 @@ class RegistrarController extends Controller
             ];
         }
     }
-    public function getEmployee($limit, $offset, $search)
+    public function getEmployee($limit, $offset, $fname, $mname, $lname)
     {
-        if($search==204){
+        if(($fname == 404)&&($mname == 404)&&($lname == 404)){
 
             if($limit == 0 && $offset == 0){
                 $employee = DB::table('def_employee')
@@ -1897,12 +1872,10 @@ class RegistrarController extends Controller
                             'def_department.*',
                         )->orderBy('def_employee.emp_depid','DESC')
                         ->where('emp_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('emp_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_dateadded', 'like',  '%' . $search .'%');
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->where('emp_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('emp_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('emp_lastname', 'like',  '%' . $lname .'%');
                         })
                         ->get();
             }else{
@@ -1913,12 +1886,10 @@ class RegistrarController extends Controller
                             'def_department.*',
                         )->orderBy('def_employee.emp_depid','DESC')
                         ->where('emp_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('emp_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_dateadded', 'like',  '%' . $search .'%');
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->where('emp_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('emp_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('emp_lastname', 'like',  '%' . $lname .'%');
                         })
                         ->limit($limit)->offset($offset)
                         ->get();
@@ -1931,12 +1902,10 @@ class RegistrarController extends Controller
                             'def_department.*',
                         )->orderBy('def_employee.emp_depid','DESC')
                         ->where('emp_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('emp_firstname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_middlename', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_lastname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_suffixname', 'like',  '%' . $search .'%')
-                            ->orWhere('emp_dateadded', 'like',  '%' . $search .'%');
+                        ->where(function($query) use ($fname, $mname, $lname) {
+                            $query->where('emp_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('emp_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('emp_lastname', 'like',  '%' . $lname .'%');
                         })
                         ->limit($limit)->offset($offset)
                         ->count();       

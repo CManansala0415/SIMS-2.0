@@ -17,7 +17,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->get('/get-user-access/{userid}', [DefaultsController::class,'getUserAccess']);
 
 
-Route::middleware(['auth:sanctum'])->get('/get-applicant/{limit}/{offset}/{search}', [RegistrarController::class,'getApplicant']);
+Route::middleware(['auth:sanctum'])->get('/get-applicant/{limit}/{offset}/{fname}/{mname}/{lname}', [RegistrarController::class,'getApplicant']);
 Route::middleware(['auth:sanctum'])->get('/get-gender', [DefaultsController::class,'getGender']);
 Route::middleware(['auth:sanctum'])->get('/get-nationality', [DefaultsController::class,'getNationality']);
 Route::middleware(['auth:sanctum'])->get('/get-civilstatus', [DefaultsController::class,'getCivilStatus']);
@@ -84,7 +84,7 @@ Route::middleware(['auth:sanctum'])->get('/get-schedule/{launchid}', [RegistrarC
 Route::middleware(['auth:sanctum'])->get('/get-occupancy/{bird}/{classrid}', [RegistrarController::class,'getOccupancy']);
 Route::middleware(['auth:sanctum'])->get('/get-occupancy-others/{othersid}', [RegistrarController::class,'getOccupancyOthers']);
 
-Route::middleware(['auth:sanctum'])->get('/get-employee/{limit}/{offset}/{search}', [RegistrarController::class,'getEmployee']);
+Route::middleware(['auth:sanctum'])->get('/get-employee/{limit}/{offset}/{fname}/{mname}/{lname}', [RegistrarController::class,'getEmployee']);
 Route::middleware(['auth:sanctum'])->post('/update-employee', [RegistrarController::class,'updateEmployee']);
 Route::middleware(['auth:sanctum'])->post('/add-employee', [RegistrarController::class,'addEmployee']);
 Route::middleware(['auth:sanctum'])->post('/add-employee-load', [RegistrarController::class,'addEmployeeLoad']);

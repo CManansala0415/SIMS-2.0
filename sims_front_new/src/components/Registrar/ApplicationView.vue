@@ -43,6 +43,9 @@ const applicant = ref([])
 const applicantCount = ref(0)
 const preLoading = ref(true)
 const searchValue = ref('')
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
 const userID = ref('')
 const router = useRouter();
 const showForm = ref(false)
@@ -183,7 +186,7 @@ onMounted(async () => {
                 booting.value = 'Loading Applicants...'
                 bootingCount.value += 1
             
-                getApplicant(limit.value, offset.value).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     
@@ -222,6 +225,10 @@ const deletePerson = (id) => {
 }
 
 const paginate = (mode) => {
+    searchFname.value = searchFname.value.trim()
+    searchMname.value = searchMname.value.trim()
+    searchLname.value = searchLname.value.trim()
+    
     switch (mode) {
         case 'prev':
             if (offset.value <= 0) {
@@ -231,7 +238,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -247,7 +254,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, null).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -255,13 +262,12 @@ const paginate = (mode) => {
             }
             break;
         case 'search':
-            searchValue.value = searchValue.value.trim()
             if (searchValue.value || searchValue.value == '') {
                 applicant.value = []
                 offset.value = 0
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchValue.value).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -314,11 +320,22 @@ const addID = (data) => {
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
+            <!-- <div class="input-group w-50">
                 <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
                          /></span>
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
                     v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
+            </div> -->
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"

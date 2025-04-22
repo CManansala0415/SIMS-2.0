@@ -231,7 +231,7 @@ const excelDownload = () => {
 <template>
     <div>
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Billing Tuition</h5>
+            <h5 class=" text-uppercase fw-bold">Billing Request</h5>
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">

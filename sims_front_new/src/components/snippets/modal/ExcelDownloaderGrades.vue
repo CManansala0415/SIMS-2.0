@@ -34,16 +34,18 @@ const downloadExcel = () => {
   <div class="table-responsive small-font overflow-auto border p-2 rounded-2 shadow" style="height:40rem;">
     <table class="table table-hover" id="main-table">
       <thead>
-        <th class="fw-bold p-3 bg-secondary-subtle">Student ID</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Student Type</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Last Name</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">First Name</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Middle Name</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Suffix Name</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Preliminary</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Midterms</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Pre-finals</th>
-        <th class="fw-bold p-3 bg-secondary-subtle">Finals</th>
+        <tr>
+          <th class="fw-bold p-3 bg-secondary-subtle">Student ID</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Student Type</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Last Name</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">First Name</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Middle Name</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Suffix Name</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Preliminary</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Midterms</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Pre-finals</th>
+          <th class="fw-bold p-3 bg-secondary-subtle">Finals</th>
+        </tr>
       </thead>
       <tbody>
         <!-- index-1 dahil yung index na galing sa section ay nag start sa 1 -->

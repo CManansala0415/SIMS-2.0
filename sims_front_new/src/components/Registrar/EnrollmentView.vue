@@ -306,10 +306,10 @@ const paramsProgram = ref(0)
 const paramsGradelvl = ref(0)
 const paramsCourse = ref(0)
 
-const validate = () => {
-    const regEx1 = /[^a-zA-Z\s]+/;
-    searchValue.value = searchValue.value.replace(regEx1, '');
-}
+// const validate = () => {
+//     const regEx1 = /[^a-zA-Z\s]+/;
+//     searchValue.value = searchValue.value.replace(regEx1, '');
+// }
 
 </script>
 <template>
@@ -322,11 +322,11 @@ const validate = () => {
             <div class="d-flex gap-2 w-100">
                 <div class="d-flex gap-2">
                     <div class="d-flex gap-2 justify-content-center align-content-center">
-                        <input type="text" @keyup="validate()" v-model="searchFname" @keyup.enter="search()"
+                        <input type="text" v-model="searchFname" @keyup.enter="search()"
                             class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                        <input type="text" @keyup="validate()" v-model="searchMname" @keyup.enter="search()"
+                        <input type="text" v-model="searchMname" @keyup.enter="search()"
                             class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                        <input type="text" @keyup="validate()" v-model="searchLname" @keyup.enter="search()"
+                        <input type="text" v-model="searchLname" @keyup.enter="search()"
                             class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
                     </div>
                 </div>
