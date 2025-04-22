@@ -300,11 +300,11 @@ const fileUpload = (id) => {
                     <!-- <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
                         v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
                         :disabled="preLoading ? true : false"> -->
-                    <input type="text" @keyup="validate()" v-model="searchFname"
+                    <input type="text" v-model="searchFname"
                         class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                    <input type="text" @keyup="validate()" v-model="searchMname"
+                    <input type="text" v-model="searchMname"
                         class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                    <input type="text" @keyup="validate()" v-model="searchLname"
+                    <input type="text" v-model="searchLname"
                         class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
                     <div class="d-flex justify-content-center align-content-center">
                         <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">

@@ -77,12 +77,15 @@ onMounted(async () => {
 
             getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
                 settingscurr.value=results
-
                 //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
-                if(!enrolleeData.value[0].enr_curriculum){
-                   curr = settingscurr.value[0].sett_course_currid
+                if(Object.keys(results).length == 0){
+                    curr = 0
+                }else{
+                    curr = settingscurr.value[0].sett_course_currid
                 }
-
+                // if(!enrolleeData.value[0].enr_curriculum){
+                //    curr = settingscurr.value[0].sett_course_currid
+                // }
                 enr_curriculum.value = curr
                 getCurriculumSubject(curr, 0, 0).then((results) => {
                     currSubject.value = results
