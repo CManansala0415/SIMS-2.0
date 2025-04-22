@@ -563,7 +563,7 @@ const settlePayments = () => {
                 </div>
             </div>
             <Loader v-else>
-                <p class="text-xs font-semibold">Loading Please Wait...</p>
+                <p class="fw-semibold">Loading Please Wait...</p>
             </Loader>
         </div>
     </div>

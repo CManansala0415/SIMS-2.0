@@ -353,20 +353,20 @@ const openTip = () => {
                     <td class="align-middle">
                         <select class="form-select form-select-sm w-100" v-model="filterLnid">
                             <option value="0">
-                                <p class="text-xs font-semibold">-- Select Section --</p>
+                                Select Section
                             </option>
                             <option v-for="(gps, index1, index2) in groupedAssignmentSection" :value="gps[0].lf_lnid">
-                                <p class="text-xs font-semibold">{{ gps[0].prog_code }} ({{ gps[0].sec_name }})</p>
+                                {{ gps[0].prog_code }} ({{ gps[0].sec_name }})
                             </option>
                         </select>
                     </td>
                     <td class="align-middle">
                         <select class="form-select form-select-sm w-100" v-model="filterSubjectId">
                             <option value="0">
-                                <p class="text-xs font-semibold">-- Select Subject --</p>
+                                Select Subject
                             </option>
                             <option v-for="(gpa, indexer) in groupedAssignmentSubject" :value="gpa[0].subj_id">
-                                <p class="text-xs font-semibold">{{ gpa[0].subj_name }} {{ gpa[0].subj_code }}</p>
+                                {{ gpa[0].subj_name }} {{ gpa[0].subj_code }}
                             </option>
                         </select>
                     </td>
@@ -400,17 +400,19 @@ const openTip = () => {
         <div class="table-responsive border p-3 small-font">
             <table v-if="!preLoading && switcher == 0" class="table table-hover">
                 <thead>
-                    <!-- <th class="text-xs bg-light-gray p-3">No.</th> -->
-                    <th class="fw-bold p-3 bg-secondary-subtle">Student ID</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Student Type</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Last Name</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">First Name</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Middle Name</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Suffix Name</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Preliminary</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Midterms</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Pre-finals</th>
-                    <th class="fw-bold p-3 bg-secondary-subtle">Finals</th>
+                    <tr>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Student ID</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Student Type</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Last Name</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">First Name</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Middle Name</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Suffix Name</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Preliminary</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Midterms</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Pre-finals</th>
+                        <th class="fw-bold p-3 bg-secondary-subtle">Finals</th> 
+                        <!-- <th class="text-xs bg-light-gray p-3">No.</th> -->
+                    </tr>
                 </thead>
                 <tbody>
                     <tr v-if="(!preLoading && Object.keys(finalStudentList).length) && (!filteringData)"
