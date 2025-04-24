@@ -15,12 +15,13 @@ let data = {}
                 method: "get",
                 url: '/api/get-user-access/'+account.data.id,
             }).then(async (res2) => {
-                access = res2
                 data = {
                     account: account,
-                    access: access,
+                    access: res2.data.access,
+                    employee: res2.data.employee,
                     status: 200
                 }
+
             })
         })
     }catch(err){

@@ -40,19 +40,19 @@ const userName = ref('')
 const fetchingUserAccess = ref(true)
 
 const getUser = (data) => {
-  accessData.value = data.access.data
+  accessData.value = data.access
   // console.log(accessData.value)
   // filter muna sa 3 categories
   // administrative
-  let x = data.access.data.filter((e) => {
+  let x = data.access.filter((e) => {
     return e.useracc_category == 1
   })
   // transactions
-  let y = data.access.data.filter((e) => {
+  let y = data.access.filter((e) => {
     return e.useracc_category == 2
   })
   // academics
-  let z = data.access.data.filter((e) => {
+  let z = data.access.filter((e) => {
     return e.useracc_category == 3
   })
   
@@ -73,7 +73,7 @@ const getUser = (data) => {
   administrative.value = a.length
   transactions.value = b.length
   academics.value = c.length
-  userName.value = data.account.data.name
+  userName.value = data.employee.emp_firstname + ' ' + data.employee.emp_lastname
 
 
   let adminPrep = a.map((e)=>{

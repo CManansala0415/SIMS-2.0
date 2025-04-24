@@ -80,7 +80,7 @@ onMounted(async () => {
             getUserID().then((results) => {
                 // user.value = results.account.data.name
                 userID.value = results.account.data.id
-                accessData.value = results.access.data[5].useracc_modifying
+                accessData.value = results.access[5].useracc_modifying
                 preLoading.value = false
                 emit('fetchUser', results)
 

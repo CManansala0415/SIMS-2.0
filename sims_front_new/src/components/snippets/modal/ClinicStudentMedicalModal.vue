@@ -675,7 +675,7 @@ const updateMedicalRecords = () => {
                                     </div>
                                     <div class="card shadow w-100">
                                         <div class="align-content-center bg-dark-subtle p-2 fw-bold">
-                                            Medical Examniations Conducted
+                                            Medical Examinations Conducted
                                         </div>
                                         <div v-if="!Object.keys(clinicalRecordsList).length"
                                             class="border p-2 align-content-center">

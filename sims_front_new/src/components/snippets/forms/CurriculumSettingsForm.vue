@@ -242,7 +242,7 @@ const removeTag = (data, index) => {
         alert('Successfull Deactivated')
         addedSubject.value.splice(index, 1)
         addedSubjectId.value.splice(index, 1)
-        location.reload()
+        // location.reload()
         saving.value = false
     })
 

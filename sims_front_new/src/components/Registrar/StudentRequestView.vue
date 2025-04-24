@@ -92,7 +92,7 @@ onMounted(async () => {
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
         emit('fetchUser', results1)
-        accessData.value = results1.access.data
+        accessData.value = results1.access
         try {
             preLoading.value = true
             await booter().then(() => {

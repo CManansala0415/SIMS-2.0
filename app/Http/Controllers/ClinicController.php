@@ -533,10 +533,12 @@ class ClinicController extends Controller
 
     public function getMedicalIshihara($id, $headerid){
         $clinicaldata = DB::table('def_clinic_examination_ishihara as cli')
-            ->leftJoin('def_employee as emp', 'cli.cler_addedby', '=', 'emp.emp_id')
+            ->leftJoin('users as usc', 'usc.id', '=', 'clh.cler_addedby')
+            ->leftJoin('def_employee as emp', 'emp.emp_accid', '=', 'usc.id')
             ->select(  
                 'cli.*',
-                'emp.*'
+                'emp.*',
+                'usc.*'
             )
             ->where('cli.cler_status', '=',  1)
             ->where('cli.cler_personid', '=',  $id)
@@ -548,10 +550,12 @@ class ClinicController extends Controller
 
     public function getMedicalHearing($id, $headerid){
         $clinicaldata = DB::table('def_clinic_examination_hearing as clh')
-            ->leftJoin('def_employee as emp', 'clh.cleh_addedby', '=', 'emp.emp_id')
+            ->leftJoin('users as usc', 'usc.id', '=', 'clh.cleh_addedby')
+            ->leftJoin('def_employee as emp', 'emp.emp_accid', '=', 'usc.id')
             ->select(  
                 'clh.*',
-                'emp.*'
+                'emp.*',
+                'usc.*'
             )
             ->where('clh.cleh_status', '=',  1)
             ->where('clh.cleh_personid', '=',  $id)
@@ -563,10 +567,12 @@ class ClinicController extends Controller
 
     public function getMedicalHeader($id, $type){
         $clinicaldata = DB::table('def_clinic_examination_header as cli')
-            ->leftJoin('def_employee as emp', 'cli.clhd_addedby', '=', 'emp.emp_id')
+            ->leftJoin('users as usc', 'usc.id', '=', 'cli.clhd_addedby')
+            ->leftJoin('def_employee as emp', 'emp.emp_accid', '=', 'usc.id')
             ->select(  
                 'cli.*',
-                'emp.*'
+                'emp.*',
+                'usc.*'
             )
             ->where('cli.clhd_status', '=',  1)
             ->where('cli.clhd_examtype', '=',  $type)
@@ -578,10 +584,12 @@ class ClinicController extends Controller
 
     public function getMedicalFiles($id, $folder){
         $medicalfiles = DB::table('def_clinic_medical_files as clf')
-            ->leftJoin('def_employee as emp', 'clf.clmf_addedby', '=', 'emp.emp_id')
+            ->leftJoin('users as usc', 'usc.id', '=', 'clf.clmf_addedby')
+            ->leftJoin('def_employee as emp', 'emp.emp_accid', '=', 'usc.id')
             ->select(  
                 'clf.*',
-                'emp.*'
+                'emp.*',
+                'usc.*'
             )
             ->where('clf.clmf_status', '=',  1)
             ->where('clf.clmf_resulttype', '=',    $folder)
@@ -593,10 +601,12 @@ class ClinicController extends Controller
 
     public function getMedicalFileHeaders($id){
         $medicalfiles = DB::table('def_clinic_medical_files_header as clh')
-            ->leftJoin('def_employee as emp', 'clh.clfh_addedby', '=', 'emp.emp_id')
+            ->leftJoin('users as usc', 'usc.id', '=', 'clh.clfh_addedby')
+            ->leftJoin('def_employee as emp', 'emp.emp_accid', '=', 'usc.id')
             ->select(  
                 'clh.*',
-                'emp.*'
+                'emp.*',
+                'usc.*'
             )
             ->where('clh.clfh_status', '=',  1)
             ->where('clh.clfh_personid', '=',  $id)

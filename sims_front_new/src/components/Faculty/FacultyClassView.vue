@@ -93,7 +93,7 @@ onMounted(async () => {
             await booter().then(() => {
                 booting.value = 'Loading assignments...'
                 bootingCount.value += 1
-                getFacultyAssignment(userID.value).then((results2) => {
+                getFacultyAssignment(results1.employee.emp_id).then((results2) => {
                     assignment.value = results2.data
                     assignmentCount.value = results2.count
                     let groupBySection = Object.groupBy(assignment.value, assignments => assignments.lf_lnid);

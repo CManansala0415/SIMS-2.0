@@ -255,4 +255,62 @@ class CommandController extends Controller
             ->get();
         return $access; 
     }
+
+    public function tagEmployeeAccount(Request $req){
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d h:i:s', time());
+        try{
+            if($req['mode'] == 1){
+                $s1 = DB::table('def_employee')
+                ->where('emp_id','=', $req['emp_id'])
+                ->update([
+                    'emp_accid' => $req->input('acc_id'),
+                    'emp_dateupdated' => $date,
+                    'emp_updatedby' => $req->input('updated_by'),
+                ]);
+        
+                return $data = [
+                    'mode' => $req['mode'],
+                    'status' => 200,
+                ];
+            }else{
+                $s2 = DB::table('def_employee')
+                ->where('emp_id','=', $req['emp_id'])
+                ->update([
+                    'emp_accid' => 0,
+                    'emp_dateupdated' => $date,
+                    'emp_updatedby' => $req->input('updated_by'),
+                ]);
+        
+                return $data = [
+                    'mode' => $req['mode'],
+                    'status' => 200,
+                ];
+            }
+        }catch(Exception $ex) {
+            return $data = [
+                'status' => 500,
+            ];
+        }
+    }
+
+    public function getEmployeeAccount($id){
+       if($id == 204){
+        $accounts = DB::table('def_employee')
+            ->select(  
+                'emp_id',
+                'emp_accid',)
+            ->where('emp_status', '=' , 1)
+            ->get();
+       }else{
+         $accounts = DB::table('def_employee')
+            ->select(  
+                'emp_id',
+                'emp_accid',)
+            ->where('emp_id', '=' , $id)
+            ->where('emp_status', '=' , 1)
+            ->get();
+       }
+        return $accounts; 
+    }
 }

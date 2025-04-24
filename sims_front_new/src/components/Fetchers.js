@@ -2273,6 +2273,41 @@ const getCommandAccess = async (userid) => {
     }
 }
 
+let tagempacc = {}
+const employeeAccountTag = async (data) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/tag-employee-account',
+            data:data
+
+        }).then(async (results) => {
+            tagempacc = results.data
+        })
+        return tagempacc
+    }catch(err){
+        return 500
+    }
+}
+
+let employeeaccount = {}
+const getEmployeeAccount = async (userid) => {
+    let search = userid
+    if(!userid){
+        search = 204
+    }
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-employee-account/'+search,
+        }).then(async (results) => {
+            employeeaccount = results.data
+        })
+        return employeeaccount
+    }catch(err){
+        return err
+    }
+}
 
 export {
 
@@ -2413,6 +2448,8 @@ export {
     updateCommandUsers,
     addCommandUsers,
     saveCommandAccess,
-    getCommandAccess
+    getCommandAccess,
+    employeeAccountTag,
+    getEmployeeAccount
 }
 

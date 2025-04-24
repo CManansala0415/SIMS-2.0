@@ -39,7 +39,7 @@ const accessData = ref([])
 onMounted(async () => {
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
-        accessData.value = results1.access.data
+        accessData.value = results1.access
         emit('fetchUser', results1)
         try {
             preLoading.value = true

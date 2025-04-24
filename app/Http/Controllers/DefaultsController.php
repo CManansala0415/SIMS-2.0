@@ -14,7 +14,17 @@ class DefaultsController extends Controller
         $user_access = DB::table('users_access')->orderBy('useracc_id')
         ->where('useracc_accid', '=' , $id)
         ->get();
-        return $user_access; 
+
+        $tagged_user = DB::table('def_employee')
+        ->where('emp_accid', '=' , $id)
+        ->first();
+
+        // return $user_access; 
+        return $data = [
+            'access' => $user_access,
+            'employee' => $tagged_user,
+            'status' => 500,
+        ];
     }
 
     public function getGender()

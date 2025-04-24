@@ -172,6 +172,9 @@ Route::middleware(['auth:sanctum'])->post('/update-command-user', [CommandContro
 Route::middleware(['auth:sanctum'])->post('/add-command-user', [CommandController::class,'addCommandUsers']);
 Route::middleware(['auth:sanctum'])->post('/add-command-access', [CommandController::class,'saveCommandAccess']);
 Route::middleware(['auth:sanctum'])->get('/get-command-access/{userid}', [CommandController::class,'getCommandAccess']);
+Route::middleware(['auth:sanctum'])->post('/tag-employee-account', [CommandController::class,'tagEmployeeAccount']);
+Route::middleware(['auth:sanctum'])->get('/get-employee-account/{userid}', [CommandController::class,'getEmployeeAccount']);
+
 
 
 

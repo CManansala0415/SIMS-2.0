@@ -111,7 +111,7 @@ onMounted(async () => {
             await booter().then(() => {
                 booting.value = 'Loading assignments...'
                 bootingCount.value += 1
-                getFacultyAssignment(userID.value).then((results2) => {
+                getFacultyAssignment(results1.employee.emp_id).then((results2) => {
                     assignment.value = results2.data
                     assignmentCount.value = results2.count
 
@@ -338,7 +338,6 @@ const openTip = () => {
         <table v-if="switcher == 0" class="table table-hover">
             <thead>
                 <tr>
-                    <th style="background-color: #237a5b;" class="text-white">No.</th>
                     <th style="background-color: #237a5b;" class="text-white">Course/Section</th>
                     <th style="background-color: #237a5b;" class="text-white">Subject</th>
                     <th style="background-color: #237a5b;" class="text-white">Action</th>
@@ -346,10 +345,8 @@ const openTip = () => {
             </thead>
             <tbody>
                 <tr v-if="!preLoading && Object.keys(groupedAssignmentSection).length"
-                    v-for="(app, index) in groupedAssignmentSection">
-                    <td class="align-middle">
-                        {{ index }}
-                    </td>
+                    >
+                   
                     <td class="align-middle">
                         <select class="form-select form-select-sm w-100" v-model="filterLnid">
                             <option value="0">
@@ -376,10 +373,10 @@ const openTip = () => {
                                 tabindex="-1" type="button" class="btn btn-sm btn-secondary w-100">
                                 <i class="mr-2 fa-solid fa-eye"></i>Open Grading Sheet
                             </button>
-                            <button :disabled="filteringData || savingData ? true : false" @click="openTip()"
+                            <!-- <button :disabled="filteringData || savingData ? true : false" @click="openTip()"
                                 tabindex="-1" type="button" class="btn btn-sm btn-secondary w-100">
                                 <i class="mr-2 fa-solid fa-question"></i>Open Help Tips
-                            </button>
+                            </button> -->
                         </div>
                     </td>
                 </tr>
@@ -471,11 +468,16 @@ const openTip = () => {
                             Loading Please Wait...
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="10">
+                            <div class="text-end" v-if="!preLoading">
+                                <span>showing total of <span class="font-semibold">({{ Object.keys(finalStudentList).length
+                                    }})</span> items</span>
+                            </div>
+                        </td>
+                    </tr>
                 </tbody>
-                <div class="mt-5 flex items-center justify-between" v-if="!preLoading">
-                    showing total of <span class="font-semibold">({{ Object.keys(finalStudentList).length
-                        }})</span> items
-                </div>
+                
             </table>
         </div>
         <div v-if="!preLoading && Object.keys(finalStudentList).length" class="w-100 mt-2">

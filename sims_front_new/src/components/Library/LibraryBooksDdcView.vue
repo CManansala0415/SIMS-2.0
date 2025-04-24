@@ -39,7 +39,7 @@ const booter = async () => {
 onMounted(async () => {
     getUserID().then(async(results) => {
         userID.value = results.account.data.id
-        accessData.value = results.access.data
+        accessData.value = results.access
         emit('fetchUser', results)
         try {
             preLoading.value = true

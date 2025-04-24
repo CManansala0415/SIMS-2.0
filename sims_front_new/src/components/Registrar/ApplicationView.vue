@@ -178,7 +178,7 @@ onMounted(async () => {
     window.stop()
     getUserID().then(async(results) => {
         userID.value = results.account.data.id
-        accessData.value = results.access.data
+        accessData.value = results.access
         // console.log(accessData.value)
         emit('fetchUser', results)
         try {

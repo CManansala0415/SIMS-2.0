@@ -13,7 +13,7 @@ const props = defineProps({
     userIdData: {
     },
     personIdData: {
-    }
+    },
 })
 const medicalItems = computed(() => {
     return props.medicicalItemsData
@@ -24,6 +24,7 @@ const userId = computed(() => {
 const personId = computed(() => {
     return props.personIdData
 });
+
 
 const saving = ref(false)
 onMounted(() => {

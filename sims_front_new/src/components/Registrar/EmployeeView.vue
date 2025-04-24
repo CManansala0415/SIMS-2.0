@@ -11,6 +11,7 @@ import {
 import { getUserID } from "../../routes/user";
 import Loader from '../snippets/loaders/Loading1.vue';
 // import EmployeeForm from './EmployeeForm.vue'
+import EmployeeAccountTagging from '../snippets/modal/EmployeeAccountTagging.vue';
 import Employee from '../snippets/modal/EmployeeModal.vue';
 import EmployeeTags from '../snippets/modal/EmployeeTagsModal.vue';
 import { useRouter, useRoute } from 'vue-router'
@@ -25,7 +26,9 @@ const booting = ref('')
 const limit = ref(10)
 const offset = ref(0)
 const searchValue = ref('')
-
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
 const employeeCount = ref(0)
 const employee = ref([])
 const gender = ref([])
@@ -37,6 +40,7 @@ const subjectAll = ref([])
 const userID = ref('')
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
+const accountEmployeeModal = ref(false)
 const booter = async () => {
 
     getSubject().then((results) => {
@@ -72,6 +76,10 @@ const booter = async () => {
 }
 
 const paginate = (mode) => {
+    searchFname.value = searchFname.value.trim()
+    searchMname.value = searchMname.value.trim()
+    searchLname.value = searchLname.value.trim()
+    
     switch (mode) {
         case 'prev':
             if (offset.value <= 0) {
@@ -81,7 +89,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 employeeCount.value = 0
                 preLoading.value = true
-                getEmployee(limit.value, offset.value).then((results) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     employee.value = results.data
                     employeeCount.value = results.count
                     preLoading.value = false
@@ -97,7 +105,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 employeeCount.value = 0
                 preLoading.value = true
-                getEmployee(limit.value, offset.value, null).then((results) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     employee.value = results.data
                     employeeCount.value = results.count
                     preLoading.value = false
@@ -111,7 +119,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 employeeCount.value = 0
                 preLoading.value = true
-                getEmployee(limit.value, offset.value, searchValue.value).then((results) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
                     employee.value = results.data
                     employeeCount.value = results.count
                     preLoading.value = false
@@ -141,6 +149,11 @@ const tagEmployee = (data) => {
     tagEmployeeModal.value = !tagEmployeeModal.value
 }
 
+const AccountEmployee = (data) => {
+    employeeToUpdate.value = data
+    accountEmployeeModal.value = !accountEmployeeModal.value
+}
+
 const removeEmployee = (id) => {
     let x = {
         emp_id: id
@@ -159,13 +172,13 @@ onMounted(async () => {
     getUserID().then(async(results) => {
         userID.value = results.account.data.id
         emit('fetchUser', results)
-        accessData.value = results.access.data
+        accessData.value = results.access
         try {
             preLoading.value = true
             booting.value = 'Loading Employees...'
             bootingCount.value += 1
             await booter().then((results1) => {
-                getEmployee(limit.value, offset.value).then((results2) => {
+                getEmployee(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results2) => {
                     employee.value = results2.data
                     employeeCount.value = results2.count
                     preLoading.value = false
@@ -192,12 +205,23 @@ onMounted(async () => {
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
+            <!-- <div class="input-group w-50">
                 <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
                          /></span>
                 <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
                     v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
                     :disabled="preLoading ? true : false">
+            </div> -->
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addemployeemodal"
@@ -253,6 +277,10 @@ onMounted(async () => {
                                     @click="tagEmployee(emp)" type="button" title="Tag Subjects"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-tag"
                                     /></button>
+                                <button data-bs-toggle="modal" data-bs-target="#accountemployeemodal"
+                                    @click="AccountEmployee(emp)" type="button" title="Tag Subjects"
+                                    class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-tag"
+                                    /></button>    
                             </div>
                         </td>
                         <td v-else class="align-middle">
@@ -367,6 +395,35 @@ onMounted(async () => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="tagEmployeeModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Tag Modal -->
+     <div class="modal fade" id="accountemployeemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Tag Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="accountEmployeeModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <EmployeeAccountTagging v-if="accountEmployeeModal" :employeeData="employeeToUpdate" :userId="userID"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="accountEmployeeModal = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

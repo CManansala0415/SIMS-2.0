@@ -107,7 +107,7 @@ onMounted(async () => {
     window.stop()
     getUserID().then(async(results) => {
         userID.value = results.account.data.id
-        accessData.value = results.access.data
+        accessData.value = results.access
         emit('fetchUser', results)
         try {
             await booter().then((results) => {
