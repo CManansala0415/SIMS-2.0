@@ -163,7 +163,6 @@ const getUser = (data) => {
 
 
   linker()
-  router.push("/home");
   fetchingUserAccess.value = false
   isLoading.value = false
 }
@@ -173,7 +172,7 @@ const linker = () => {
     case [
       "/",
     ].includes(path.value):
-
+      router.push("/home");
       switchItem(0, 0)
       break;
 

@@ -28,7 +28,6 @@ const handleLogin = async () => {
             }
         }).then(async (results) => {
             await getUserID().then((results) => {
-                console.log(results)
                 if(!results.employee){
                     alert('This account does not belong to any employee, contact the administrator')
                     axios.post('/logout');
@@ -42,7 +41,11 @@ const handleLogin = async () => {
             })
         });
     }catch(err){
-        alert('Login Failed, Please Try Again')
+        if(err.status == 422){
+            alert('Incorrect creadentials, please try again')
+        }else{
+            alert('Login Failed, Please Try Again')
+        }
         isLogging.value = false
         // location.reload()
     }
