@@ -27,11 +27,19 @@ const handleLogin = async () => {
                 password: form.value.password
             }
         }).then(async (results) => {
-            getUserID().then((results) => {
+            await getUserID().then((results) => {
+                console.log(results)
+                if(!results.employee){
+                    alert('This account does not belong to any employee, contact the administrator')
+                    axios.post('/logout');
+                    isLogging.value = false
+                }else{
+                    alert('Welcome ' + results.employee.emp_firstname)
                     emit('fetchUser', results)
                     isLogging.value = false
-                    router.push("/home");
-                })
+                    // router.push("/home");
+                }
+            })
         });
     }catch(err){
         alert('Login Failed, Please Try Again')

@@ -12,21 +12,20 @@ const path = computed(() => route.path)
 const isLoading = ref(true)
 const accessData = ref([])
 onMounted(async () => {
-
+  window.stop()
   //get user here
-  // isLoading.value = true
-  // await router.isReady()
-  // getUserID().then((results) => {
-  //   user.value = results.account.data.name
-  //   userID.value = results.account.data.id
-  //   linker()
-  //   // isLoading.value = false
-  // }).catch((err) => {
-  //   alert('Unauthorized Session, Please Log In')
-  //   router.push("/");
-  //   isLoading.value = false
-  //   window.stop()
-  // })
+  isLoading.value = true
+  await router.isReady()
+  getUserID().then((results) => {
+    user.value = results.account.data.name
+    userID.value = results.account.data.id
+    linker()
+    // isLoading.value = false
+  }).catch((err) => {
+    alert('Unauthorized Session, Please Log In')
+    router.push("/");
+    isLoading.value = false
+  })
 
 })
 
@@ -40,6 +39,7 @@ const userName = ref('')
 const fetchingUserAccess = ref(true)
 
 const getUser = (data) => {
+ 
   accessData.value = data.access
   // console.log(accessData.value)
   // filter muna sa 3 categories
@@ -163,6 +163,7 @@ const getUser = (data) => {
 
 
   linker()
+  router.push("/home");
   fetchingUserAccess.value = false
   isLoading.value = false
 }
