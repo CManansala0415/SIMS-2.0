@@ -206,7 +206,7 @@ const fileUpload = (id) => {
             </div>
         </div>
         <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
+            <table class="table table-hover" style="text-transform:uppercase">
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">No</th>

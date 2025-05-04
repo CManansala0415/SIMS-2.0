@@ -22,7 +22,7 @@ onMounted(async () => {
     linker()
     // isLoading.value = false
   }).catch((err) => {
-    alert('Unauthorized Session, Please Log In')
+    //alert('Unauthorized Session, Please Log In')
     router.push("/");
     isLoading.value = false
   })

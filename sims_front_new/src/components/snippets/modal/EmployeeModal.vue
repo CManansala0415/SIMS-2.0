@@ -128,24 +128,24 @@ const save = () => {
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="firstname">First Name</label>
-                        <input type="text" class="form-control" id="firstname" aria-describedby="firstname"
+                        <input type="text" style="text-transform:uppercase" class="form-control" id="firstname" aria-describedby="firstname"
                             v-model="personal.emp_firstname" required :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="middlename">Middle Name</label>
-                        <input type="text" class="form-control" id="middlename" aria-describedby="middlename"
+                        <input type="text" style="text-transform:uppercase" class="form-control" id="middlename" aria-describedby="middlename"
                             v-model="personal.emp_middlename" :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="lastname">Last Name</label>
-                        <input type="text" class="form-control" id="lastname" aria-describedby="lastname"
+                        <input type="text" style="text-transform:uppercase" class="form-control" id="lastname" aria-describedby="lastname"
                             v-model="personal.emp_lastname" required :disabled="saving ? true : false">
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="suffixname">Suffix Name</label>
-                        <input type="text" class="form-control" id="suffixname" aria-describedby="suffixname"
+                        <input type="text" style="text-transform:uppercase" class="form-control" id="suffixname" aria-describedby="suffixname"
                             maxlength="3" v-model="personal.emp_suffixname" :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
