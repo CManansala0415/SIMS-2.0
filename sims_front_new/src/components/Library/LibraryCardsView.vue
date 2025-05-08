@@ -1,6 +1,18 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { getStudent, getQuarter, getProgram, getGradelvl, getProgramList, uploadProfile, uploadLink, getStudentByCourse, getCurriculumStudent, getSection, getTaggedSubject, deleteEnrollment } from "../Fetchers.js";
+import { getStudent, 
+         getQuarter, 
+         getProgram, 
+         getGradelvl, 
+         getProgramList, 
+         uploadProfile, 
+         uploadLink, 
+         getStudentByCourse, 
+         getCurriculumStudent, 
+         getSection, 
+         getTaggedSubject, 
+         deleteEnrollment,
+         getAcademicDefaults } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 import LibraryCard from '../snippets/modal/LibraryCardModal.vue';
 import { getUserID } from "../../routes/user";
@@ -32,29 +44,38 @@ const userID = ref('')
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
 const booter = async () => {
-    getProgram().then((results) => {
-        program.value = results
-        booting.value = 'Loading Program...'
-        bootingCount.value += 1
-    })
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses...'
-        bootingCount.value += 1
-    })
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Levels...'
-        bootingCount.value += 1
-    })
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters...'
-        bootingCount.value += 1
-    })
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections...'
+    // getProgram().then((results) => {
+    //     program.value = results
+    //     booting.value = 'Loading Program...'
+    //     bootingCount.value += 1
+    // })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses...'
+    //     bootingCount.value += 1
+    // })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Levels...'
+    //     bootingCount.value += 1
+    // })
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters...'
+    //     bootingCount.value += 1
+    // })
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections...'
+    //     bootingCount.value += 1
+    // })
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        program.value = results.program
+        quarter.value = results.quarter
+        course.value = results.course
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
     getTaggedSubject().then((results) => {
@@ -91,13 +112,27 @@ onMounted(async () => {
                 })
             })
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
 })
 
@@ -150,8 +185,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
         case 'course':
@@ -188,17 +230,39 @@ const upload = (personID) => {
             }
             uploadLink(data).then((results) => {
                 if (results.status == 200) {
-                    alert('Upload Successful')
-                    location.reload()
-                    holdSubmit.value = false
+                    // alert('Upload Successful')
+                    // location.reload()
+                    // holdSubmit.value = false
+                    Swal.fire({
+                        title: "Upload Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                        holdSubmit.value = false
+                    });
                 } else {
-                    alert('Upload Successful but Linking Failed')
-                    holdSubmit.value = false
+                    // alert('Upload Successful but Linking Failed')
+                    // holdSubmit.value = false
+                    Swal.fire({
+                        title: "Upload Notice",
+                        text: "Upload Successful but Linking Failed, try again later",
+                        icon: "question"
+                    }).then(()=>{
+                        holdSubmit.value = false
+                    });
                 }
             })
         } else {
-            alert('Upload Failed')
-            holdSubmit.value = false
+            // alert('Upload Failed')
+            // holdSubmit.value = false
+            Swal.fire({
+                title: "Upload Error",
+                text: "Upload failed, try again later",
+                icon: "error"
+            }).then(()=>{
+                holdSubmit.value = false
+            });
         }
     }).catch((err) => {
         // console.log(err)

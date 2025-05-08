@@ -64,11 +64,25 @@ const registerDdc = () => {
     }
     addBooksDdc(x).then((results) => {
         if (results.status != 200) {
-            alert('Update Failed')
+            // alert('Update Failed')
             // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Configuration Successful')
-            location.reload()
+            // alert('Configuration Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }

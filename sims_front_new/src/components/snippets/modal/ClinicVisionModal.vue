@@ -437,11 +437,25 @@ const save = () => {
     saving.value = true;
     addClinicIshihara(items.value, 1, userId.value, personId.value).then((results) => {
         if (results.status == 200) {
-            alert('Examination Successful')
-            location.reload()
+            // alert('Examination Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Examination Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Examination Failed')
-            location.reload()
+            // alert('Examination Failed')
+            // location.reload()
+            Swal.fire({
+                title: "Examination Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }

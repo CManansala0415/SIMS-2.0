@@ -12,6 +12,7 @@ const path = computed(() => route.path)
 const isLoading = ref(true)
 const accessData = ref([])
 onMounted(async () => {
+
   window.stop()
   //get user here
   isLoading.value = true
@@ -234,13 +235,35 @@ const linker = () => {
 }
 
 const handleLogout = async () => {
-  if (confirm("Are you sure you want to logout") == true) {
-    await axios.post('/logout');
-    alert('Logged Out')
-    router.push("/");
-  } else {
-    return false;
-  }
+  Swal.fire({
+    title: "Log Out",
+    text: "Are you sure you want to logout",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, Im Going Out!"
+  }).then(async(result) => {
+    if (result.isConfirmed) {
+      await axios.post('/logout').then(()=>{
+        Swal.fire({
+          title: "Logged Out!",
+          text: "You Have Been Logged Out",
+          icon: "success"
+        }).then(()=>{
+          router.push("/");
+        });
+      });
+    }
+  });
+
+  // if (confirm("Are you sure you want to logout") == true) {
+  //   await axios.post('/logout');
+  //   alert('Logged Out')
+  //   router.push("/");
+  // } else {
+  //   return false;
+  // }
 
 }
 

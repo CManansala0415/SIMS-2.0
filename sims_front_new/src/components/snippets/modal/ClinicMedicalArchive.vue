@@ -119,32 +119,67 @@ const folderSwitch = (index) => {
 }
 
 const addNew = () => {
-    if (confirm("Are you sure you want to create this archive?") == true) {
-        // await axios.post('/logout');
-        // alert('Logged Out')
-        // router.push("/");
-        uploading.value=true
-        let x = {
-            clfh_personid: personId.value,
-            clfh_desc: archiveDesc.value,
-            clfh_user: userId.value
-        }
+    // if (confirm("Are you sure you want to create this archive?") == true) {
+    //     // await axios.post('/logout');
+    //     // alert('Logged Out')
+    //     // router.push("/");
+    //     uploading.value=true
+    //     let x = {
+    //         clfh_personid: personId.value,
+    //         clfh_desc: archiveDesc.value,
+    //         clfh_user: userId.value
+    //     }
 
-        addMedicalFileHeader(x).then((results) => {
-            if (results.status == 200) {
-                alert('Update Successful')
-                location.reload()
-            } else {
-                alert('Update Failed')
-                // location.reload()
+    //     addMedicalFileHeader(x).then((results) => {
+    //         if (results.status == 200) {
+    //             alert('Update Successful')
+    //             location.reload()
+    //         } else {
+    //             alert('Update Failed')
+    //             // location.reload()
+    //         }
+    //     })
+    // } else {
+    //     return false;
+    // }
+
+    Swal.fire({
+        title: "Generate Record",
+        text: "Are you sure you want to create this archive?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im going to create it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            let x = {
+                clfh_personid: personId.value,
+                clfh_desc: archiveDesc.value,
+                clfh_user: userId.value
             }
-        })
-
-
-
-    } else {
-        return false;
-    }
+            addMedicalFileHeader(x).then((results) => {
+                if (results.status == 200) {
+                    Swal.fire({
+                        title: "Generate Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Generate Failed",
+                        text: "Error occured, contact your administrator",
+                        icon: "error"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                }
+                
+            })
+        }
+    });
 }
 
 
@@ -174,11 +209,23 @@ const upload = () => {
                 clmf_user: userId.value
             }
             uploadMedicalFileLink(x).then((results) => {
-                alert('Upload Successful')
-                location.reload()
+                // alert('Upload Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Upload Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
             })
         } else {
-            alert('Upload Failed')
+            // alert('Upload Failed')
+            Swal.fire({
+                title: "Upload Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            })
         }
     })
 

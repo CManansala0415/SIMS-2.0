@@ -76,17 +76,28 @@ onMounted(async () => {
                 })
             })
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-
-   
-
 })
 
 const paginate = (mode) => {
@@ -141,8 +152,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 

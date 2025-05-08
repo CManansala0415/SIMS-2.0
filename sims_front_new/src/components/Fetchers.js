@@ -151,6 +151,40 @@ const getRegion = async () => {
     }
 }
 
+let demograph = {}
+const getDemograph = async () => {
+
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-demograph/',
+        }).then(async (results) => {
+            // console.log(results.data)
+            demograph = results.data
+        })
+        return demograph
+    }catch(err){
+        return err
+    }
+}
+
+let academicdefaults = {}
+const getAcademicDefaults = async () => {
+
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-academicdefaults/',
+        }).then(async (results) => {
+            // console.log(results.data)
+            academicdefaults = results.data
+        })
+        return academicdefaults
+    }catch(err){
+        return err
+    }
+}
+
 let country = {}
 const getCountry = async () => {
 
@@ -2322,6 +2356,8 @@ export {
     getProgramList,
     getSemester,
     getSection,
+    getDemograph,
+    getAcademicDefaults,
     getCountry,
     getRegion,
     getProvince,

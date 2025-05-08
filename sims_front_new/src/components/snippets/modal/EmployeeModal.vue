@@ -84,7 +84,12 @@ const getAge = (bday) => {
 
 const clearFields = () => {
     personal.value = []
-    alert('Sheet Cleared')
+    // alert('Sheet Cleared')
+    Swal.fire({
+        title: "Cleared",
+        text: "Sheet Cleared",
+        icon: "success"
+    })
 }
 
 const registerApplicant = () => {
@@ -96,14 +101,28 @@ const registerApplicant = () => {
     saving.value = true
     if(update.value == false){
         addEmployee(pers, 1).then((results) => {
-            alert('Employee Registered')
-            location.reload()
+            // alert('Employee Registered')
+            // location.reload()
+            Swal.fire({
+                title: "Employee Registered",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         })
     }else{
 
         updateEmployee(pers, 1).then((results)=>{
-            alert('Employee Updated')
-            location.reload()
+            // alert('Employee Updated')
+            // location.reload()
+            Swal.fire({
+                title: "Employee Updated",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         })
     }
    

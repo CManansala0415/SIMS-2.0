@@ -29,11 +29,23 @@ const handleLogin = async () => {
         }).then(async (results) => {
             await getUserID().then((results) => {
                 if(!results.employee){
-                    alert('This account does not belong to any employee, contact the administrator')
+                    // alert('This account does not belong to any employee, contact the administrator')
+                    Swal.fire({
+                        title: "Account Restricted",
+                        text: "This account does not belong to any employee, contact the administrator",
+                        icon: "error"
+                    });
+
                     axios.post('/logout');
                     isLogging.value = false
                 }else{
-                    alert('Welcome ' + results.employee.emp_firstname)
+                    // alert('Welcome ' + results.employee.emp_firstname)
+                    Swal.fire({
+                        title: "Welcome Back!",
+                        text: results.employee.emp_firstname,
+                        icon: "success"
+                    });
+
                     emit('fetchUser', results)
                     isLogging.value = false
                     // router.push("/home");
@@ -42,9 +54,19 @@ const handleLogin = async () => {
         });
     }catch(err){
         if(err.status == 422){
-            alert('Incorrect creadentials, please try again')
+            // alert('Incorrect creadentials, please try again')
+            Swal.fire({
+                title: "Account Mismatch",
+                text: "Incorrect creadentials, please try again",
+                icon: "error"
+            });
         }else{
-            alert('Login Failed, Please Try Again')
+            // alert('Login Failed, Please Try Again')
+            Swal.fire({
+                title: "Error Occured Somewhere",
+                text: "Server Error, Try Again Later",
+                icon: "question"
+            });
         }
         isLogging.value = false
         // location.reload()

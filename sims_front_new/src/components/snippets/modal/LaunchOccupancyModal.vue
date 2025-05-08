@@ -77,7 +77,12 @@ const filterOccupancy = () => {
             mapSchedule()
         })
     } else {
-        alert('Please select building and classroom or others')
+        // alert('Please select building and classroom or others')
+        Swal.fire({
+            title: "Requirement",
+            text: "Please select building and classroom or others",
+            icon: "question"
+        })
     }
 
 

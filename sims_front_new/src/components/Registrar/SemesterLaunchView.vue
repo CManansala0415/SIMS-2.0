@@ -13,6 +13,7 @@ import {
     getCurriculum,
     getCurriculumStudent,
     getCurriculumSubject,
+    getAcademicDefaults
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 
@@ -53,40 +54,53 @@ const booter = async () => {
         booting.value = 'Loading Curriculums...'
         bootingCount.value += 1
     })
-    getBuilding().then((results) => {
-        building.value = results
-        booting.value = 'Loading Buildings...'
-        bootingCount.value += 1
+    // getBuilding().then((results) => {
+    //     building.value = results
+    //     booting.value = 'Loading Buildings...'
+    //     bootingCount.value += 1
 
-    })
-    getClassroom().then((results) => {
-        classroom.value = results
-        booting.value = 'Loading Classrooms...'
-        bootingCount.value += 1
-    })
-    getProgram().then((results) => {
-        degree.value = results
-        booting.value = 'Loading Degrees...'
-        bootingCount.value += 1
-    })
-    getQuarter().then((results) => {
-        semester.value = results
-        booting.value = 'Loading Degrees...'
-        bootingCount.value += 1
-    })
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Degrees...'
-        bootingCount.value += 1
-    })
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Degrees...'
-        bootingCount.value += 1
-    })
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Degrees...'
+    // })
+    // getClassroom().then((results) => {
+    //     classroom.value = results
+    //     booting.value = 'Loading Classrooms...'
+    //     bootingCount.value += 1
+    // })
+    // getProgram().then((results) => {
+    //     degree.value = results
+    //     booting.value = 'Loading Degrees...'
+    //     bootingCount.value += 1
+    // })
+    // getQuarter().then((results) => {
+    //     semester.value = results
+    //     booting.value = 'Loading Degrees...'
+    //     bootingCount.value += 1
+    // })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Degrees...'
+    //     bootingCount.value += 1
+    // })
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Degrees...'
+    //     bootingCount.value += 1
+    // })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Degrees...'
+    //     bootingCount.value += 1
+    // })
+
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        degree.value = results.program
+        // quarter.value = results.quarter
+        course.value = results.course
+        semester.value = results.quarter
+        section.value = results.section
+        building.value = results.building
+        classroom.value = results.classroom
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
 
@@ -144,8 +158,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 
@@ -175,16 +196,28 @@ onMounted(async () => {
                 })
             })
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
-
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-    
 })
 </script>
 <template>

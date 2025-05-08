@@ -100,7 +100,15 @@ onMounted(async () => {
         })
         
     } catch (err) {
-        alert('error loading the list default components')
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            // preLoading.value = false
+        });
     }
 
 })
@@ -161,15 +169,34 @@ const enroll = () => {
         enrollApplicant(enrollData.value).then((results) => {
 
             if (results.data == 500) {
-                alert('error enrolling applicant')
+                // alert('error enrolling applicant')
+                Swal.fire({
+                    title: "Update Failed",
+                    text: "Unknown error occured, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    // location.reload()
+                });
             } else {
-                alert('Applicant Enrolled')
-                location.reload()
+                // alert('Applicant Enrolled')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
             }
         })
 
     } else {
-        alert('Please Fillout all the Fields')
+        // alert('Please Fillout all the Fields')
+        Swal.fire({
+            title: "Requirement",
+            text: "Please Fillout all the Fields",
+            icon: "question"
+        })
     }
 }
 </script>

@@ -33,6 +33,8 @@ Route::middleware(['auth:sanctum'])->get('/get-region', [DefaultsController::cla
 Route::middleware(['auth:sanctum'])->get('/get-province', [DefaultsController::class,'getProvince']);
 Route::middleware(['auth:sanctum'])->get('/get-city', [DefaultsController::class,'getCity']);
 Route::middleware(['auth:sanctum'])->get('/get-barangay', [DefaultsController::class,'getBarangay']);
+Route::middleware(['auth:sanctum'])->get('/get-demograph', [DefaultsController::class,'getDemograph']);
+Route::middleware(['auth:sanctum'])->get('/get-academicdefaults', [DefaultsController::class,'getAcademicDefaults']);
 Route::middleware(['auth:sanctum'])->get('/get-tagged-subject', [DefaultsController::class,'getTaggedSubject']);
 Route::middleware(['auth:sanctum'])->get('/get-subject', [DefaultsController::class,'getSubject']);
 Route::middleware(['auth:sanctum'])->post('/add-program', [DefaultsController::class,'addProgram']);

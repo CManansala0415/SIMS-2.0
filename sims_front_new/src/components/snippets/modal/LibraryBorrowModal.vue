@@ -76,9 +76,17 @@ const filterStudent = () => {
             loadingStudents.value = false
         })
     } else {
-        alert('Please input a valid search.')
-        filteredStudent.value = []
-        loadingStudents.value = false
+        // alert('Please input a valid search.')
+        // filteredStudent.value = []
+        // loadingStudents.value = false
+        Swal.fire({
+            title: "Requirement",
+            text: "Please input a valid search",
+            icon: "question"
+        }).then(()=>{
+            filteredStudent.value = []
+            loadingStudents.value = false
+        });
     }
 }
 
@@ -103,8 +111,15 @@ const filterBook = () => {
             loadingBooks.value = false
         })
     } else {
-        alert('Please input a valid search.')
-        filteredBook.value = []
+        // alert('Please input a valid search.')
+        // filteredBook.value = []
+        Swal.fire({
+            title: "Requirement",
+            text: "Please input a valid search",
+            icon: "question"
+        }).then(()=>{
+            filteredBook.value = []
+        });
     }
 
 }
@@ -117,7 +132,12 @@ const addToCart = (mode, item, index) => {
             }
         })
 
-        Object.keys(exist).length ? alert('Already Included') : bookCart.value.push(item)
+        Object.keys(exist).length ? 
+        Swal.fire({
+            title: "Duplicate Detected",
+            text: "Already included, try selecting another",
+            icon: "question"
+        }) : bookCart.value.push(item)
         Object.keys(exist).length ? false : bookCartId.value.push(item.lbrb_id)
 
     } else {
@@ -139,7 +159,12 @@ const setBorrower = (perid, enrid, fname, lname) => {
         } else {
             cardId.value = ''
             cardIdNo.value = ''
-            alert('This person does not have any active issued library card, in order to borrow a book, the person must have at least one active library card.')
+            // alert('This person does not have any active issued library card, in order to borrow a book, the person must have at least one active library card.')
+            Swal.fire({
+                title: "Notice",
+                text: "This person does not have any active issued library card, in order to borrow a book, the person must have at least one active library card",
+                icon: "warning"
+            })
         }
         checkingLibraryCard.value = false
     })
@@ -166,16 +191,37 @@ const borrowBook = () => {
 
         addBorrowedBooks(x).then((results) => {
             if (results.status != 200) {
-                alert('Borrow Failed')
-                location.reload()
+                // alert('Borrow Failed')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Failed",
+                    text: "Unknown error occured, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    location.reload()
+                });
             } else {
-                alert('Borrow Successful')
-                location.reload()
+                // alert('Borrow Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
             }
         })
 
     } else {
-        alert('Please select borrower and books to borrow.')
+        // alert('Please select borrower and books to borrow.')
+        Swal.fire({
+            title: "Requirement",
+            text: "Please select borrower and books to borrow",
+            icon: "question"
+        }).then(()=>{
+            // location.reload()
+        });
     }
 }
 

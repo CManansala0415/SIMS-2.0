@@ -10,7 +10,8 @@ import {
     getFeeDetails,
     getRequestDetails,
     deleteItemRequest,
-    getApplicant
+    getApplicant,
+    getAcademicDefaults
 
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
@@ -42,31 +43,40 @@ const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
 
 const booter = async () => {
-    getProgram().then((results) => {
-        program.value = results
-        booting.value = 'Loading Program...'
+    // getProgram().then((results) => {
+    //     program.value = results
+    //     booting.value = 'Loading Program...'
+    //     bootingCount.value += 1
+    // })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses...'
+    //     bootingCount.value += 1
+    // })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Levels...'
+    //     bootingCount.value += 1
+    // })
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters...'
+    //     bootingCount.value += 1
+    // })
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections...'
+    //     bootingCount.value += 1
+    // })
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        quarter.value = results.quarter
+        course.value = results.course
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses...'
-        bootingCount.value += 1
-    })
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Levels...'
-        bootingCount.value += 1
-    })
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters...'
-        bootingCount.value += 1
-    })
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections...'
-        bootingCount.value += 1
-    })
+
     getPriceDetails().then((results) => {
         price.value = results
         booting.value = 'Loading Prices...'
@@ -140,13 +150,29 @@ onMounted(async () => {
             })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
+        // alert('Unauthorized Session, Please Log In')
         // router.push("/");
-        window.stop()
+        // window.stop()
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
     
 
@@ -195,8 +221,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
     }

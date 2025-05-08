@@ -10,7 +10,8 @@ import {
     getFeeDetails,
     getRequestDetails,
     deleteItemRequest,
-    getApplicant
+    getApplicant,
+    getAcademicDefaults
 
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
@@ -43,29 +44,37 @@ const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
 
 const booter = async () => {
-    getProgram().then((results) => {
-        program.value = results
-        booting.value = 'Loading Program...'
-        bootingCount.value += 1
-    })
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses...'
-        bootingCount.value += 1
-    })
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Levels...'
-        bootingCount.value += 1
-    })
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters...'
-        bootingCount.value += 1
-    })
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections...'
+    // getProgram().then((results) => {
+    //     program.value = results
+    //     booting.value = 'Loading Program...'
+    //     bootingCount.value += 1
+    // })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses...'
+    //     bootingCount.value += 1
+    // })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Levels...'
+    //     bootingCount.value += 1
+    // })
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters...'
+    //     bootingCount.value += 1
+    // })
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections...'
+    //     bootingCount.value += 1
+    // })
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        quarter.value = results.quarter
+        course.value = results.course
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
     getPriceDetails().then((results) => {
@@ -138,16 +147,28 @@ onMounted(async () => {
 
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-
-
 })
 
 
@@ -199,8 +220,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
     }
@@ -225,31 +253,63 @@ const settlement = (data, mode) => {
     } else if (mode == 2) {
         showRenderModal.value = true
     } else {
-        if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
-            let del = {
-                acr_id: data.acr_id,
-                acr_updatedby: userID.value,
+        // if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
+        //     let del = {
+        //         acr_id: data.acr_id,
+        //         acr_updatedby: userID.value,
+        //     }
+
+        //     // getRequestDetails(0,0, data.acr_id).then((results)=>{
+        //     //     if(results.data[0].acr_status == 1){
+        //     //       deleteItemRequest(del, 2).then((results)=>{
+        //     //           alert('Successfully Removed')
+        //     //           location.reload()
+        //     //       })
+        //     //     }else{
+        //     //         alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
+        //     //     }
+        //     // })
+        //     deleteItemRequest(del, 2).then((results) => {
+        //         // alert('Successfully Removed')
+        //         Swal.fire({
+        //             title: "Update Success",
+        //             text: "Successfully removed, refreshing the page",
+        //             icon: "success"
+        //         }).then(()=>{
+        //             location.reload()
+        //         });
+        //     })
+        // } else {
+        //     return false;
+        // }
+
+        Swal.fire({
+            title: "Delete Record",
+            text: "Are you sure you want to delete this item? this action cannot be reverted.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                preloading.value = true
+                let del = {
+                    acr_id: data.acr_id,
+                    acr_updatedby: userID.value,
+                }
+                deleteItemRequest(del, 2).then((results) => {
+                    // alert('Successfully Removed')
+                    Swal.fire({
+                        title: "Update Success",
+                        text: "Successfully removed, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                })
             }
-
-            // getRequestDetails(0,0, data.acr_id).then((results)=>{
-            //     if(results.data[0].acr_status == 1){
-            //       deleteItemRequest(del, 2).then((results)=>{
-            //           alert('Successfully Removed')
-            //           location.reload()
-            //       })
-            //     }else{
-            //         alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
-            //     }
-            // })
-            deleteItemRequest(del, 2).then((results) => {
-                alert('Successfully Removed')
-                location.reload()
-            })
-
-
-        } else {
-            return false;
-        }
+        });
     }
 }
 

@@ -117,13 +117,26 @@ const saveFaculty = (index, subjid, mode) => {
                     lf_lnid: launchId.value
                 }
                 addScheduledFaculty(x).then((results) => {
-                    checking.value = false
-                    alert('Successfully Saved')
-                    close()
+                    // checking.value = false
+                    // alert('Successfully Saved')
+                    // close()
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied",
+                        icon: "success"
+                    }).then(()=>{
+                        checking.value = false
+                        close()
+                    });
                 })
                 // console.log(x)
             } else {
-                alert('Please Select faculty')
+                // alert('Please Select faculty')
+                Swal.fire({
+                    title: "Requirement",
+                    text: "Please Select faculty",
+                    icon: "question"
+                })
             }
         } else if ((lfid_detector === -1) && (subjid_detector !== -1)) {
             if (facultyId) {
@@ -138,13 +151,26 @@ const saveFaculty = (index, subjid, mode) => {
                     lf_lnid: launchId.value
                 }
                 addScheduledFaculty(x).then((results) => {
-                    checking.value = false
-                    alert('Successfully Saved')
-                    close()
+                    // checking.value = false
+                    // alert('Successfully Saved')
+                    // close()
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied",
+                        icon: "success"
+                    }).then(()=>{
+                        checking.value = false
+                        close()
+                    });
                 })
                 // console.log(x)
             } else {
-                alert('Please Select faculty')
+                // alert('Please Select faculty')
+                Swal.fire({
+                    title: "Requirement",
+                    text: "Please Select faculty",
+                    icon: "question"
+                })
             }
         } else {
             if (facultyId) {
@@ -158,40 +184,110 @@ const saveFaculty = (index, subjid, mode) => {
                     lf_lnid: launchId.value
                 }
                 addScheduledFaculty(x).then((results) => {
-                    checking.value = false
-                    alert('Successfully Saved')
-                    close()
+                    // checking.value = false
+                    // alert('Successfully Saved')
+                    // close()
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied",
+                        icon: "success"
+                    }).then(()=>{
+                        checking.value = false
+                        close()
+                    });
                 })
                 // console.log(x)
             } else {
-                alert('Please Select faculty')
+                // alert('Please Select faculty')
+                Swal.fire({
+                    title: "Requirement",
+                    text: "Please Select faculty",
+                    icon: "question"
+                })
             }
         }
 
     } else {
-        if (confirm("Are you sure you want to remove assign faculty?") == true) {
-            if (facultyId) {
-                checking.value = true
-                let x = {
-                    lf_id: lfid,
-                    lf_empid: facultyId,
-                    lf_lnid: launchId.value,
-                    lf_updatedby: userID.value,
+        // if (confirm("Are you sure you want to remove assign faculty?") == true) {
+        //     if (facultyId) {
+        //         checking.value = true
+        //         let x = {
+        //             lf_id: lfid,
+        //             lf_empid: facultyId,
+        //             lf_lnid: launchId.value,
+        //             lf_updatedby: userID.value,
+        //         }
+
+        //         deleteScheduledFaculty(x).then((results) => {
+        //             // checking.value = false
+        //             // console.log(results)
+        //             // alert('Successfully Removed')
+        //             // close()
+        //             Swal.fire({
+        //                 title: "Successfully Removed",
+        //                 text: "Changes applied",
+        //                 icon: "success"
+        //             }).then(()=>{
+        //                 checking.value = false
+        //                 close()
+        //             });
+        //         })
+        //     } else {
+        //         // alert('No faculty assigned.')
+        //         Swal.fire({
+        //             title: "Requirement",
+        //             text: "No faculty assigned",
+        //             icon: "question"
+        //         })
+        //     }
+
+        // } else {
+        //     return false;
+        // }
+
+        Swal.fire({
+            title: "Delete Record",
+            text: "Are you sure you want to remove assign faculty?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                if (facultyId) {
+                    checking.value = true
+                    let x = {
+                        lf_id: lfid,
+                        lf_empid: facultyId,
+                        lf_lnid: launchId.value,
+                        lf_updatedby: userID.value,
+                    }
+
+                    deleteScheduledFaculty(x).then((results) => {
+                        // checking.value = false
+                        // console.log(results)
+                        // alert('Successfully Removed')
+                        // close()
+                        Swal.fire({
+                            title: "Successfully Removed",
+                            text: "Changes applied",
+                            icon: "success"
+                        }).then(()=>{
+                            checking.value = false
+                            close()
+                        });
+                    })
+                } else {
+                    // alert('No faculty assigned.')
+                    Swal.fire({
+                        title: "Requirement",
+                        text: "No faculty assigned",
+                        icon: "question"
+                    })
                 }
-
-                deleteScheduledFaculty(x).then((results) => {
-                    checking.value = false
-                    // console.log(results)
-                    alert('Successfully Removed')
-                    close()
-                })
-            } else {
-                alert('No faculty assigned.')
             }
-
-        } else {
-            return false;
-        }
+        });
 
     }
 
@@ -212,7 +308,12 @@ const detectLoad = (index, subjid, lock) => {
             // console.log(facultyId)
         } else {
             selectbox.value = ''
-            alert('This faculty is not allowed to teach the subject because it is not included in his/her faculty loading.')
+            // alert('This faculty is not allowed to teach the subject because it is not included in his/her faculty loading.')
+            Swal.fire({
+                title: "Requirement",
+                text: "This faculty is not allowed to teach the subject because it is not included in his/her faculty loading",
+                icon: "question"
+            })
         }
     }
 }
@@ -279,8 +380,16 @@ onMounted(async () => {
 
 
     } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
+        // preLoading.value = false
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            preLoading.value = false
+        });
     }
 })
 

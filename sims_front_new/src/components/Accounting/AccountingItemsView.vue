@@ -49,13 +49,27 @@ onMounted(async () => {
             // })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
 })
 
@@ -107,8 +121,14 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 
@@ -131,25 +151,79 @@ const itemModal = (type, data) => {
         itemValue.value = data
         showAddItemModal.value = !showAddItemModal.value
     } else {
-        if (confirm("Are you sure you want to delete this item") == true) {
-            preloading.value = true
-            let x = {
-                acf_id: data.acf_id,
-                acf_user: userID.value,
-                acf_delete: true
-            }
-            addAccountingItem(x).then((results) => {
-                if (results.status != 204) {
-                    alert('Delete Failed')
-                    // location.reload()
-                } else {
-                    alert('Delete Successful')
-                    location.reload()
+        // if (confirm("Are you sure you want to delete this item") == true) {
+        //     preloading.value = true
+        //     let x = {
+        //         acf_id: data.acf_id,
+        //         acf_user: userID.value,
+        //         acf_delete: true
+        //     }
+        //     addAccountingItem(x).then((results) => {
+        //         if (results.status != 204) {
+        //             // alert('Delete Failed')
+        //             Swal.fire({
+        //                 title: "Action Failed",
+        //                 text: "Delete failed, please try again later or contact the administrator",
+        //                 icon: "error"
+        //             }).then(()=>{
+        //                 preLoading.value = false
+        //             });
+        //             // location.reload()
+        //         } else {
+        //             // alert('Delete Successful')
+        //             Swal.fire({
+        //                 title: "Action Completed",
+        //                 text: "Successfully Deleted",
+        //                 icon: "success"
+        //             }).then(()=>{
+        //                 location.reload()
+        //             });
+        //         }
+        //     })
+        // } else {
+        //     return false;
+        // }
+
+        Swal.fire({
+            title: "Delete Record",
+            text: "Are you sure you want to deactivate this record?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                preloading.value = true
+                let x = {
+                    acf_id: data.acf_id,
+                    acf_user: userID.value,
+                    acf_delete: true
                 }
-            })
-        } else {
-            return false;
-        }
+                addAccountingItem(x).then((results) => {
+                    if (results.status != 204) {
+                        // alert('Delete Failed')
+                        Swal.fire({
+                            title: "Action Failed",
+                            text: "Delete failed, please try again later or contact the administrator",
+                            icon: "error"
+                        }).then(()=>{
+                            preLoading.value = false
+                        });
+                        // location.reload()
+                    } else {
+                        // alert('Delete Successful')
+                        Swal.fire({
+                            title: "Action Completed",
+                            text: "Successfully Deleted",
+                            icon: "success"
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    }
+                })
+            }
+        });
     }
 }
 

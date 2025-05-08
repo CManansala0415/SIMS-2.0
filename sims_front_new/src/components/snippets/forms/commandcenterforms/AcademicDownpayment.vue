@@ -29,11 +29,25 @@ const save = ()=>{
     }
     setCommandUpdate(x).then((results)=>{
         if (results.status == 200) {
-            alert('Update Successful')
-            location.reload()
-        } else {
-            alert('Update Failed')
+            // alert('Update Successful')
             // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
+        } else {
+            // alert('Update Failed')
+            // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }

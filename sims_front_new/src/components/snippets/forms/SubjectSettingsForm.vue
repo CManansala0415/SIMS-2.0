@@ -84,28 +84,60 @@ const edit = (data) => {
 const registerSubject = () => {
     saving.value = true
     addSubject(editData.value).then((results) => {
-        alert('Successfull Registered')
-        location.reload()
+        // alert('Successfull Registered')
+        // location.reload()
+        Swal.fire({
+            title: "Success",
+            text: "Successfull registered, refreshing the page",
+            icon: "success"
+        }).then(()=>{
+            location.reload()
+        })
     })
 }
 
 const deactivate = (id) => {
-    let x = {
-        subj_id: id,
-        subj_updatedby: userID.value,
-        deactivate: true
-    }
-    if (confirm("Are you sure you want to deactivate this record?") == true) {
-        addSubject(x).then((results) => {
-            alert('Successfull Deactivated')
-            location.reload()
-            saving.value = false
-        })
-    } else {
-        return false;
-    }
+    // let x = {
+    //     subj_id: id,
+    //     subj_updatedby: userID.value,
+    //     deactivate: true
+    // }
+    // if (confirm("Are you sure you want to deactivate this record?") == true) {
+    //     addSubject(x).then((results) => {
+    //         alert('Successfull Deactivated')
+    //         location.reload()
+    //         saving.value = false
+    //     })
+    // } else {
+    //     return false;
+    // }
 
-
+    Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to deactivate this record?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im Delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            let x = {
+                subj_id: id,
+                subj_updatedby: userID.value,
+                deactivate: true
+            }
+            addSubject(x).then((results) => {
+                Swal.fire({
+                    title: "Delete Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
+            })
+        }
+    });
 }
 
 const search = () => {

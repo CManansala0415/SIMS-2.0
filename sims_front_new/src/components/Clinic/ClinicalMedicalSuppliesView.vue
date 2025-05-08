@@ -54,15 +54,28 @@ onMounted(async () => {
             // })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-
 })
 
 const paginate = (mode) => {
@@ -113,8 +126,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 
@@ -139,20 +159,71 @@ const editData = (mode, data) => {
         }
         showForm.value = !showForm.value
     } else {
-        if (confirm("Are you sure you want to delete this item?") == true) {
-            saving.value = true
-            updateMedicalSupply(data).then((results) => {
-                if (results.status == 200) {
-                    alert('Update Successful')
-                    location.reload()
-                } else {
-                    alert('Update Failed')
-                    location.reload()
-                }
-            })
-        } else {
-            return false;
-        }
+        // if (confirm("Are you sure you want to delete this item?") == true) {
+        //     saving.value = true
+        //     updateMedicalSupply(data).then((results) => {
+        //         if (results.status == 200) {
+        //             // alert('Update Successful')
+        //             // location.reload()
+        //             Swal.fire({
+        //                 title: "Update Successful",
+        //                 text: "Changes applied, refreshing the page",
+        //                 icon: "success"
+        //             }).then(()=>{
+        //                 location.reload()
+        //             });
+        //         } else {
+        //             // alert('Update Failed')
+        //             // location.reload()
+        //             Swal.fire({
+        //                 title: "Update Failed",
+        //                 text: "Unknown error occured, try again later",
+        //                 icon: "error"
+        //             }).then(()=>{
+        //                 location.reload()
+        //             });
+        //         }
+        //     })
+        // } else {
+        //     return false;
+        // }
+
+        Swal.fire({
+            title: "Delete Record",
+            text: "Are you sure you want to deactivate this record?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                saving.value = true
+                updateMedicalSupply(data).then((results) => {
+                    if (results.status == 200) {
+                        // alert('Update Successful')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Update Successful",
+                            text: "Changes applied, refreshing the page",
+                            icon: "success"
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    } else {
+                        // alert('Update Failed')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Update Failed",
+                            text: "Unknown error occured, try again later",
+                            icon: "error"
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    }
+                })
+            }
+        });
     }
 }
 

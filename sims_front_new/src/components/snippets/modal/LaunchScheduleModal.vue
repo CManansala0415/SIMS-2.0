@@ -314,8 +314,16 @@ onMounted(async () => {
             })
         })
     } catch (err) {
-        checking.value = false
-        alert('error loading the list default components')
+        // checking.value = false
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            checking.value = false
+        });
     }
 })
 
@@ -785,21 +793,34 @@ const getSched = (subjid, subjname, building, classroom, remove, facultyid) => {
 }
 
 const clearSched = () => {
-    if (confirm("Are you sure you want to revert values?") == true) {
-        // var elements = document.getElementsByTagName("input");
-        // for (var ii=0; ii < elements.length; ii++) {
-        //     if (elements[ii].type == "text") {
-        //         elements[ii].value = "";
-        //     }
-        //     if (elements[ii].type == "hidden") {
-        //         elements[ii].value = "";
-        //     }
-        //     scheduleList.value = []
-        // }
-        loadSched()
-    } else {
-        return false;
-    }
+    // if (confirm("Are you sure you want to revert values?") == true) {
+    //     // var elements = document.getElementsByTagName("input");
+    //     // for (var ii=0; ii < elements.length; ii++) {
+    //     //     if (elements[ii].type == "text") {
+    //     //         elements[ii].value = "";
+    //     //     }
+    //     //     if (elements[ii].type == "hidden") {
+    //     //         elements[ii].value = "";
+    //     //     }
+    //     //     scheduleList.value = []
+    //     // }
+    //     loadSched()
+    // } else {
+    //     return false;
+    // }
+    Swal.fire({
+        title: "Refresh Record",
+        text: "Are you sure you want to revert values?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im refresh it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            loadSched()
+        }
+    });
 }
 
 const saveSched = () => {
@@ -808,12 +829,23 @@ const saveSched = () => {
         addSchedule(e).then((results) => {
             savingCount.value += 1
             if (Object.keys(scheduleList.value).length == savingCount.value) {
-                alert('Successfull Saved')
-                saving.value = false
-                savingCount.value = 0
-                scheduleList.value = []
-                loadedSched.value = []
-                loadSched()
+                // alert('Successfull Saved')
+                // saving.value = false
+                // savingCount.value = 0
+                // scheduleList.value = []
+                // loadedSched.value = []
+                // loadSched()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied",
+                    icon: "success"
+                }).then(()=>{
+                    saving.value = false
+                    savingCount.value = 0
+                    scheduleList.value = []
+                    loadedSched.value = []
+                    loadSched()
+                });
             }
         })
     })

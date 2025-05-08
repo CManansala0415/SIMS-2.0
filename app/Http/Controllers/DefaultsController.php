@@ -157,12 +157,102 @@ class DefaultsController extends Controller
         ->get();
         return $city; 
     }
-
     public function getBarangay()
     {
         $barangay = DB::table('sett_ph_barangay')->orderBy('brgyDesc')
         ->get();
         return $barangay; 
+    }
+
+    public function getDemograph()
+    {
+        $country = DB::table('sett_ph_country')->orderBy('name')
+        ->get();
+        $region = DB::table('sett_ph_region')->orderBy('regDesc')
+        ->get();
+        $province = DB::table('sett_ph_province')->orderBy('provDesc')
+        ->get();
+        $city = DB::table('sett_ph_city')->orderBy('citymunDesc')
+        ->get();
+        $barangay = DB::table('sett_ph_barangay')->orderBy('brgyDesc')
+        ->get();
+        $gender = DB::table('sett_gender')->orderBy('gen_id')
+        ->where('gen_status', '=' , 1)
+        ->get();
+        $nationality = DB::table('sett_nationality')->orderBy('nat_desc')
+        ->where('nat_status', '=' , 1)
+        ->get();
+        $civilstatus = DB::table('sett_civil_status')->orderBy('cv_id')
+        ->where('cv_status', '=' , 1)
+        ->get();
+
+        return $demograph = [
+            'country' => $country,
+            'region' => $region,
+            'province' => $province,
+            'city' => $city,
+            'barangay' => $barangay,
+            'gender' => $gender,
+            'nationality' => $nationality,
+            'civilstatus' => $civilstatus,
+            'status' => 200,
+        ];
+
+    }
+
+    public function getAcademicDefaults()
+    {
+       
+        $gradelvl = DB::table('def_gradelvl')->orderBy('grad_dtypeid')
+                    ->get();
+        $program = DB::table('sett_degree_types')->orderBy('dtype_id')
+                    ->get();
+        $specialization = DB::table('sett_specialization')->orderBy('spec_id')
+                    ->get();
+        $quarter = DB::table('sett_quarter')->orderBy('quar_id')
+                    ->where('sett_quarter.quar_status','=',1)
+                    ->get();
+        $semester = DB::table('sett_semester')->orderBy('sem_id')
+                    ->get();
+        $section = DB::table('def_section')->orderBy('sec_id')
+                    ->get();
+
+        $degree = DB::table('sett_degree')->orderBy('deg_id')
+                    ->get();
+        $course = DB::table('def_program')
+                    ->where('prog_status', '=' , 1)
+                    ->get();
+        $subject = DB::table('def_subject as a')
+                    ->leftJoin('def_subject as b', 'a.subj_preq', '=', 'b.subj_id') 
+                    ->select(  
+                        'a.*',
+                        'b.subj_code as subj_preq_code',
+                    )
+                    ->where('a.subj_status', '=' , 1)
+                    ->orderBy('a.subj_id','ASC')
+                    ->get();
+        $building = DB::table('sett_building')->orderBy('buil_id')
+                    ->where('buil_status', '=' , 1)
+                    ->get();
+        $classroom = DB::table('def_classroom')->orderBy('classr_id')
+                    ->where('classr_status', '=' , 1)
+                    ->get();
+
+        return $defaults = [
+            'gradelvl' => $gradelvl,
+            'program' => $program,
+            'specialization' => $specialization,
+            'quarter' => $quarter,
+            'semester' => $semester,
+            'section' => $section,
+            'degree' => $degree,
+            'course' => $course,
+            'subject' => $subject,
+            'building' => $building,
+            'classroom' => $classroom,
+            'status' => 200,
+        ];
+
     }
 
     public function getCurriculumSett()

@@ -51,39 +51,89 @@ onMounted(async () => {
         try {
             preLoading.value = true
             // await booter().then(() => {
-                booting.value = 'Loading Books...'
-                bootingCount.value += 1
-                getBorrowedBooks(limit.value, offset.value).then((results2) => {
-                    borrower.value = results2.data
-                    borrowerCount.value = results2.count
-                    preLoading.value = false
-                })
+            booting.value = 'Loading Books...'
+            bootingCount.value += 1
+            getBorrowedBooks(limit.value, offset.value).then((results2) => {
+                borrower.value = results2.data
+                borrowerCount.value = results2.count
+                preLoading.value = false
+            })
             // })
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(() => {
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(() => {
+            router.push("/");
+            window.stop()
+        });
     })
 })
 
 const deleteDdc = (id) => {
-    if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
-        let x = {
-            lbrc_id: id,
-            lbrc_updatedby: userID.value,
-            lbrc_mode: 3 // means delete
-        }
-        addborrower(x).then((results) => {
-            alert('Delete Successful')
-            location.reload()
-        })
-    } else {
-        return false;
+    // if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
+    //     let x = {
+    //         lbrc_id: id,
+    //         lbrc_updatedby: userID.value,
+    //         lbrc_mode: 3 // means delete
+    //     }
+    //     addborrower(x).then((results) => {
+    //         // alert('Delete Successful')
+    //         // location.reload()
+    //         Swal.fire({
+    //             title: "Delete Successful",
+    //             text: "Changes applied, refreshing the page",
+    //             icon: "success"
+    //         }).then(() => {
+    //             location.reload()
+    //         });
+    //     })
+    // } else {
+    //     return false;
+    // }
+
+    let x = {
+        lbrc_id: id,
+        lbrc_updatedby: userID.value,
+        lbrc_mode: 3 // means delete
     }
+    Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to delete this record",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im Delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            addborrower(x).then((results) => {
+                // alert('Delete Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Delete Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(() => {
+                    location.reload()
+                });
+            })
+        }
+    });
 }
 
 const paginate = (mode) => {
@@ -134,8 +184,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(() => {
+                    preLoading.value = false
+                });
             }
             break;
 
@@ -203,7 +260,7 @@ const editData = (id, data, mode) => {
                                     type="button" title="Edit Record" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-gear" /> Return Book</button>
                                 <p v-else class="fw-bold text-success">Returned <span class="text-dark">({{
-                                        app.lbrr_datereturned }})</span></p>
+                                    app.lbrr_datereturned }})</span></p>
                             </div>
                         </td>
                         <td v-else class="align-middle">

@@ -66,15 +66,34 @@ const saveRequest = () => {
 
         addItemRequest(x).then((results) => {
             if (results.status != 204) {
-                alert('Saving Failed')
-                location.reload()
+                // alert('Saving Failed')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Failed",
+                    text: "Unknown error occured, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    location.reload()
+                });
             } else {
-                alert('Saving Successful')
-                location.reload()
+                // alert('Saving Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
             }
         })
     } else {
-        alert('Please fillout all fields')
+        // alert('Please fillout all fields')
+        Swal.fire({
+            title: "Requirement",
+            text: "Please fillout all fields",
+            icon: "question"
+        })
     }
 
 }

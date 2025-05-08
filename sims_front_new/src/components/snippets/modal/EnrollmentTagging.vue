@@ -123,7 +123,15 @@ onMounted(async () => {
         })
 
     } catch (err) {
-        alert('error loading the list default components')
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            // preLoading.value = false
+        });
     }
 })
 
@@ -174,7 +182,12 @@ const addSubject = (data) => {
         }
     })
 
-    Object.keys(exist).length ? alert('Already Included') : addedSubject.value.push(data)
+    Object.keys(exist).length ? 
+    Swal.fire({
+        title: "Duplicate Detected",
+        text: "Already included, try selecting another",
+        icon: "question"
+    }) : addedSubject.value.push(data)
     Object.keys(exist).length ? false : addedSubjectId.value.push(data.subj_id)
 
 }
@@ -232,10 +245,17 @@ const saveData = async () => {
     }
     if (counter == Object.keys(addedSubject.value).length) {
         updateEnrollment(x).then((results) => {
-            alert('Tagging Successful')
-            // router.replace({ name: 'Academics', params: { id: 2}});
-            location.reload()
-            saving.value = false
+            // alert('Tagging Successful')
+            // //router.replace({ name: 'Academics', params: { id: 2}});
+            // location.reload()
+            // saving.value = false
+            Swal.fire({
+                title: "Tagging Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         })
     }
 
@@ -250,9 +270,18 @@ const deleteSubject = (id, index) => {
         mi_updatedby: userID.value
     }
     updateMilestone(x).then((results) => {
-        alert('Delete Successful')
-        milestone.value.splice(index, 1)
-        location.reload()
+        // alert('Delete Successful')
+        // milestone.value.splice(index, 1)
+        // location.reload()
+
+        Swal.fire({
+            title: "Delete Successful",
+            text: "Changes applied, refreshing the page",
+            icon: "success"
+        }).then(()=>{
+            milestone.value.splice(index, 1)
+            location.reload()
+        });
     })
 }
 

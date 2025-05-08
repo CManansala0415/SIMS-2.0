@@ -25,7 +25,10 @@ import {
     getProvince,
     getCity,
     getBarangay,
-    getMedicalSupplies
+    getMedicalSupplies,
+    getDemograph,
+    getAcademicDefaults
+    
 } from "../Fetchers.js";
 import ClinicMedicalForm from '../snippets/modal/ClinicStudentMedicalModal.vue';
 import ClinicDispenseModal from '../snippets/modal/ClinicDispenseModal.vue';
@@ -53,6 +56,7 @@ const showFile = ref(false)
 const gender = ref([])
 const nationality = ref([])
 const region = ref([])
+const country = ref([])
 const city = ref([])
 const province = ref([])
 const barangay = ref([])
@@ -71,87 +75,109 @@ const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
 const booter = async () => {
 
-    getGender().then((results) => {
-        gender.value = results
-        booting.value = 'Loading Genders'
+    // getGender().then((results) => {
+    //     gender.value = results
+    //     booting.value = 'Loading Genders'
+    //     bootingCount.value += 1
+    // })
+
+    // getNationality().then((results) => {
+    //     nationality.value = results
+    //     booting.value = 'Loading Nationalities'
+    //     bootingCount.value += 1
+    // })
+
+    // getCivilStatus().then((results) => {
+    //     civilstatus.value = results
+    //     booting.value = 'Loading Civil Status'
+    //     bootingCount.value += 1
+    // })
+
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Grade Levels'
+    //     bootingCount.value += 1
+    // })
+
+    // getProgram().then((results) => {
+    //     degree.value = results
+    //     booting.value = 'Loading Degrees'
+    //     bootingCount.value += 1
+    // })
+
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters'
+    //     bootingCount.value += 1
+    // })
+
+    // getDegree().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses'
+    //     bootingCount.value += 1
+    // })
+
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses'
+    //     bootingCount.value += 1
+    // })
+
+    // getSemester().then((results) => {
+    //     semester.value = results
+    //     booting.value = 'Loading Semesters'
+    //     bootingCount.value += 1
+    // })
+
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections'
+    //     bootingCount.value += 1
+    // })
+
+    // getRegion().then((results) => {
+    //     region.value = results
+    //     booting.value = 'Loading Regions'
+    //     bootingCount.value += 1
+    // })
+
+    // getProvince().then((results) => {
+    //     province.value = results
+    //     booting.value = 'Loading Provinces'
+    //     bootingCount.value += 1
+    // })
+
+    // getCity().then((results) => {
+    //     city.value = results
+    //     booting.value = 'Loading Cities'
+    //     bootingCount.value += 1
+    // })
+
+    // getBarangay().then((results) => {
+    //     barangay.value = results
+    //     booting.value = 'Loading Barangays'
+    //     bootingCount.value += 1
+    // })
+    getDemograph().then((results) => {
+        country.value = results.country
+        region.value = results.region
+        province.value = results.province
+        city.value = results.city
+        barangay.value = results.barangay
+        gender.value = results.gender
+        nationality.value = results.nationality
+        civilstatus.value = results.civilstatus
+        booting.value = 'Loading Demographic Information'
         bootingCount.value += 1
     })
-
-    getNationality().then((results) => {
-        nationality.value = results
-        booting.value = 'Loading Nationalities'
-        bootingCount.value += 1
-    })
-
-    getCivilStatus().then((results) => {
-        civilstatus.value = results
-        booting.value = 'Loading Civil Status'
-        bootingCount.value += 1
-    })
-
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Grade Levels'
-        bootingCount.value += 1
-    })
-
-    getProgram().then((results) => {
-        degree.value = results
-        booting.value = 'Loading Degrees'
-        bootingCount.value += 1
-    })
-
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters'
-        bootingCount.value += 1
-    })
-
-    getDegree().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses'
-        bootingCount.value += 1
-    })
-
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses'
-        bootingCount.value += 1
-    })
-
-    getSemester().then((results) => {
-        semester.value = results
-        booting.value = 'Loading Semesters'
-        bootingCount.value += 1
-    })
-
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections'
-        bootingCount.value += 1
-    })
-
-    getRegion().then((results) => {
-        region.value = results
-        booting.value = 'Loading Regions'
-        bootingCount.value += 1
-    })
-
-    getProvince().then((results) => {
-        province.value = results
-        booting.value = 'Loading Provinces'
-        bootingCount.value += 1
-    })
-
-    getCity().then((results) => {
-        city.value = results
-        booting.value = 'Loading Cities'
-        bootingCount.value += 1
-    })
-
-    getBarangay().then((results) => {
-        barangay.value = results
-        booting.value = 'Loading Barangays'
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        degree.value = results.program
+        quarter.value = results.quarter
+        course.value = results.course
+        semester.value = results.semester
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
 
@@ -181,17 +207,28 @@ onMounted(async () => {
             })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-
-   
-
 })
 
 const paginate = (mode) => {
@@ -246,8 +283,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 

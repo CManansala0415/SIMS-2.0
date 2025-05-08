@@ -133,44 +133,117 @@ const filterCurriculum = (id) => {
 
 
 const saveLaunch = async () => {
-    saving.value = true
-    if (confirm("Are you sure you want to create a launch? this is ireversible.") == true) {
-        getLaunchChecker(
-            launch.value.ln_dtype,
-            launch.value.ln_quarter,
-            launch.value.ln_course,
-            launch.value.ln_gradelvl,
-            launch.value.ln_curriculum,
-            launch.value.ln_section,
-            launch.value.ln_year
-        ).then(async (results) => {
+    // saving.value = true
+    // if (confirm("Are you sure you want to create a launch? this is ireversible.") == true) {
+    //     getLaunchChecker(
+    //         launch.value.ln_dtype,
+    //         launch.value.ln_quarter,
+    //         launch.value.ln_course,
+    //         launch.value.ln_gradelvl,
+    //         launch.value.ln_curriculum,
+    //         launch.value.ln_section,
+    //         launch.value.ln_year
+    //     ).then(async (results) => {
 
-            if (
-                (launch.value.ln_dtype == results.ln_dtype) &&
-                (launch.value.ln_quarter == results.ln_quarter) &&
-                (launch.value.ln_course == results.ln_course) &&
-                (launch.value.ln_gradelvl == results.ln_gradelvl) &&
-                (launch.value.ln_curriculum == results.ln_curriculum) &&
-                (launch.value.ln_section == results.ln_section) &&
-                (launch.value.ln_year == results.ln_year)
-            ) {
-                alert("Already existing.")
-                saving.value = false
-            } else {
-                let data = {
-                    ...launch.value,
-                    ln_addedby: userID.value
+    //         if (
+    //             (launch.value.ln_dtype == results.ln_dtype) &&
+    //             (launch.value.ln_quarter == results.ln_quarter) &&
+    //             (launch.value.ln_course == results.ln_course) &&
+    //             (launch.value.ln_gradelvl == results.ln_gradelvl) &&
+    //             (launch.value.ln_curriculum == results.ln_curriculum) &&
+    //             (launch.value.ln_section == results.ln_section) &&
+    //             (launch.value.ln_year == results.ln_year)
+    //         ) {
+    //             // alert("Already existing.")
+    //             // saving.value = false
+    //             Swal.fire({
+    //                 title: "Notice",
+    //                 text: "Already existing",
+    //                 icon: "question"
+    //             }).then(()=>{
+    //                 saving.value = false
+    //             })
+    //         } else {
+    //             let data = {
+    //                 ...launch.value,
+    //                 ln_addedby: userID.value
+    //             }
+    //             await addLaunch(data).then((results) => {
+    //                 // alert('Successfull Registered')
+    //                 // location.reload()
+    //                 Swal.fire({
+    //                     title: "Update Successful",
+    //                     text: "Changes applied, refreshing the page",
+    //                     icon: "success"
+    //                 }).then(()=>{
+    //                     location.reload()
+    //                 });
+    //             })
+    //         }
+    //     })
+
+    // } else {
+    //     return false;
+    // }
+
+    Swal.fire({
+        title: "Initialize Launch",
+        text: "Are you sure you want to create a launch? this is ireversible?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im going to create it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            saving.value = true
+            getLaunchChecker(
+                launch.value.ln_dtype,
+                launch.value.ln_quarter,
+                launch.value.ln_course,
+                launch.value.ln_gradelvl,
+                launch.value.ln_curriculum,
+                launch.value.ln_section,
+                launch.value.ln_year
+            ).then(async (results) => {
+                if (
+                    (launch.value.ln_dtype == results.ln_dtype) &&
+                    (launch.value.ln_quarter == results.ln_quarter) &&
+                    (launch.value.ln_course == results.ln_course) &&
+                    (launch.value.ln_gradelvl == results.ln_gradelvl) &&
+                    (launch.value.ln_curriculum == results.ln_curriculum) &&
+                    (launch.value.ln_section == results.ln_section) &&
+                    (launch.value.ln_year == results.ln_year)
+                ) {
+                    // alert("Already existing.")
+                    // saving.value = false
+                    Swal.fire({
+                        title: "Notice",
+                        text: "Already existing",
+                        icon: "question"
+                    }).then(()=>{
+                        saving.value = false
+                    })
+                } else {
+                    let data = {
+                        ...launch.value,
+                        ln_addedby: userID.value
+                    }
+                    await addLaunch(data).then((results) => {
+                        // alert('Successfull Registered')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Update Successful",
+                            text: "Changes applied, refreshing the page",
+                            icon: "success"
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    })
                 }
-                await addLaunch(data).then((results) => {
-                    alert('Successfull Registered')
-                    location.reload()
-                })
-            }
-        })
-
-    } else {
-        return false;
-    }
+            })
+        }
+    });
 
 
 }

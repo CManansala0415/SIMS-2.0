@@ -53,8 +53,16 @@ onMounted(async () => {
         })
 
     } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
+        // preLoading.value = false
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            preLoading.value = false
+        });
     }
 })
 
@@ -66,11 +74,25 @@ const banAccount = (id) => {
     }
     updateCommandUsers(x).then((results) => {
         if (results.status != 200) {
-            alert('Update Failed')
+            // alert('Update Failed')
             // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Update Successful')
+            // alert('Update Successful')
             // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }
@@ -101,11 +123,25 @@ const handleAccount = async () => {
         }
         addCommandUsers(x).then((results) => {
             if (results.status != 200) {
-                alert('Update Failed')
+                // alert('Update Failed')
                 // location.reload()
+                Swal.fire({
+                    title: "Update Failed",
+                    text: "Unknown error occured, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    location.reload()
+                });
             } else {
-                alert('Update Successful')
-                location.reload()
+                // alert('Update Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
             }
         })
     } else {
@@ -118,11 +154,25 @@ const handleAccount = async () => {
         }
         updateCommandUsers(x).then((results) => {
             if (results.status != 200) {
-                alert('Update Failed')
+                // alert('Update Failed')
                 // location.reload()
+                Swal.fire({
+                    title: "Update Failed",
+                    text: "Unknown error occured, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    location.reload()
+                });
             } else {
-                alert('Update Successful')
-                location.reload()
+                // alert('Update Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
             }
         })
     }

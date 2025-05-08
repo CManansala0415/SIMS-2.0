@@ -29,6 +29,8 @@ import {
     getProgramList,
     getSemester,
     getSection,
+    getDemograph,
+    getAcademicDefaults,
     getCountry,
     getRegion,
     getProvince,
@@ -65,6 +67,7 @@ const quarter = ref([])
 const gradelvl = ref([])
 const degree = ref([])
 const course = ref([])
+const dtype = ref([])
 const semester = ref([])
 const section = ref([])
 const editId = ref('')
@@ -77,95 +80,117 @@ const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
-    getGender().then((results) => {
-        gender.value = results
-        booting.value = 'Loading Genders'
-        bootingCount.value += 1
-    })
+    // getGender().then((results) => {
+    //     gender.value = results
+    //     booting.value = 'Loading Genders'
+    //     bootingCount.value += 1
+    // })
 
-    getNationality().then((results) => {
-        nationality.value = results
-        booting.value = 'Loading Nationalities'
-        bootingCount.value += 1
-    })
+    // getNationality().then((results) => {
+    //     nationality.value = results
+    //     booting.value = 'Loading Nationalities'
+    //     bootingCount.value += 1
+    // })
 
-    getCivilStatus().then((results) => {
-        civilstatus.value = results
-        booting.value = 'Loading Civil Status'
-        bootingCount.value += 1
-    })
+    // getCivilStatus().then((results) => {
+    //     civilstatus.value = results
+    //     booting.value = 'Loading Civil Status'
+    //     bootingCount.value += 1
+    // })
 
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Grade Levels'
-        bootingCount.value += 1
-    })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Grade Levels'
+    //     bootingCount.value += 1
+    // })
 
-    getProgram().then((results) => {
-        degree.value = results
-        booting.value = 'Loading Degrees'
-        bootingCount.value += 1
-    })
+    // getProgram().then((results) => {
+    //     degree.value = results
+    //     booting.value = 'Loading Degrees'
+    //     bootingCount.value += 1
+    // })
 
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters'
-        bootingCount.value += 1
-    })
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters'
+    //     bootingCount.value += 1
+    // })
 
     getDegree().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses'
+        dtype.value = results
+        booting.value = 'Loading Degree Types'
         bootingCount.value += 1
     })
 
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses'
-        bootingCount.value += 1
-    })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses'
+    //     bootingCount.value += 1
+    // })
 
-    getSemester().then((results) => {
-        semester.value = results
-        booting.value = 'Loading Semesters'
-        bootingCount.value += 1
-    })
+    // getSemester().then((results) => {
+    //     semester.value = results
+    //     booting.value = 'Loading Semesters'
+    //     bootingCount.value += 1
+    // })
 
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections'
-        bootingCount.value += 1
-    })
-    
-    getCountry().then((results) => {
-        country.value = results
-        booting.value = 'Loading Countries'
-        bootingCount.value += 1
-    })
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections'
+    //     bootingCount.value += 1
+    // })
 
-    getRegion().then((results) => {
-        region.value = results
-        booting.value = 'Loading Regions'
+    getDemograph().then((results) => {
+        country.value = results.country
+        region.value = results.region
+        province.value = results.province
+        city.value = results.city
+        barangay.value = results.barangay
+        gender.value = results.gender
+        nationality.value = results.nationality
+        civilstatus.value = results.civilstatus
+        booting.value = 'Loading Demographic Information'
         bootingCount.value += 1
     })
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        degree.value = results.program
+        quarter.value = results.quarter
+        course.value = results.course
+        semester.value = results.semester
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
+        bootingCount.value += 1
+    })
+    // getCountry().then((results) => {
+    //     country.value = results
+    //     booting.value = 'Loading Countries'
+    //     bootingCount.value += 1
+    // })
 
-    getProvince().then((results) => {
-        province.value = results
-        booting.value = 'Loading Provinces'
-        bootingCount.value += 1
-    })
+    // getRegion().then((results) => {
+    //     region.value = results
+    //     booting.value = 'Loading Regions'
+    //     bootingCount.value += 1
+    // })
 
-    getCity().then((results) => {
-        city.value = results
-        booting.value = 'Loading Cities'
-        bootingCount.value += 1
-    })
+    // getProvince().then((results) => {
+    //     province.value = results
+    //     booting.value = 'Loading Provinces'
+    //     bootingCount.value += 1
+    // })
 
-    getBarangay().then((results) => {
-        barangay.value = results
-        booting.value = 'Loading Barangays'
-        bootingCount.value += 1
-    })
+    // getCity().then((results) => {
+    //     city.value = results
+    //     booting.value = 'Loading Cities'
+    //     bootingCount.value += 1
+    // })
+
+    // getBarangay().then((results) => {
+    //     barangay.value = results
+    //     booting.value = 'Loading Barangays'
+    //     bootingCount.value += 1
+    // })
     // getUserID().then((results) => {
     //     userID.value = results.account.data.id
     //     booting.value = 'Loading Users'
@@ -195,32 +220,70 @@ onMounted(async () => {
             })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-    
-
 })
-
 const deletePerson = (id) => {
-    if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
-        let pers = {
-            per_updatedby: userID.value,
-            per_id: id
-        }
-        updateApplicant(pers, 2).then((results) => {
-            alert('Delete Successful')
-            location.reload()
-        })
-    } else {
-        return false;
-    }
+    // if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
+    //     let pers = {
+    //         per_updatedby: userID.value,
+    //         per_id: id
+    //     }
+    //     updateApplicant(pers, 2).then((results) => {
+    //         alert('Delete Successful')
+    //         location.reload()
+    //     })
+    // } else {
+    //     return false;
+    // }
 
+    Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to delete this record",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im Delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            let pers = {
+                per_updatedby: userID.value,
+                per_id: id
+            }
+            updateApplicant(pers, 2).then((results) => {
+                // alert('Delete Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Delete Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
+            })
+        }
+    });
 
 }
 
@@ -275,8 +338,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 

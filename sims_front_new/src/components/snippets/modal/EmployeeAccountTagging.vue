@@ -51,29 +51,91 @@ onMounted(async () => {
 
 const saveTag = (mode) =>{
     if(accountId.value){
-        if (confirm("Are you sure you want to tag this account") == true) {
-            preLoading.value = true
-            let x = {
-                emp_id:empId.value,
-                acc_id:accountId.value,
-                updated_by:userID.value,
-                mode:mode,
-            }
+        // if (confirm("Are you sure you want to tag this account") == true) {
+        //     preLoading.value = true
+        //     let x = {
+        //         emp_id:empId.value,
+        //         acc_id:accountId.value,
+        //         updated_by:userID.value,
+        //         mode:mode,
+        //     }
 
-            employeeAccountTag(x).then((res)=>{
-                if(res.status == 200){
-                    alert('Successful')
-                    location.reload()
-                }else{
-                    alert('failed')
-                    location.reload()
+        //     employeeAccountTag(x).then((res)=>{
+        //         if(res.status == 200){
+        //             // alert('Successful')
+        //             // location.reload()
+        //             Swal.fire({
+        //                 title: "Update Successful",
+        //                 text: "Changes applied, refreshing the page",
+        //                 icon: "success"
+        //             }).then(()=>{
+        //                 location.reload()
+        //             });
+        //         }else{
+        //             // alert('failed')
+        //             // location.reload()
+        //             Swal.fire({
+        //                 title: "Update Failed",
+        //                 text: "Unknown error occured, try again later",
+        //                 icon: "error"
+        //             }).then(()=>{
+        //                 location.reload()
+        //             });
+        //         }
+        //     })
+        // } else {
+        //     return false;
+        // }
+        Swal.fire({
+            title: "Delete Record",
+            text: "Are you sure you want to deactivate this record?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                preLoading.value = true
+                let x = {
+                    emp_id:empId.value,
+                    acc_id:accountId.value,
+                    updated_by:userID.value,
+                    mode:mode,
                 }
-            })
-        } else {
-            return false;
-        }
+
+                employeeAccountTag(x).then((res)=>{
+                    if(res.status == 200){
+                        // alert('Successful')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Update Successful",
+                            text: "Changes applied, refreshing the page",
+                            icon: "success"
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    }else{
+                        // alert('failed')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Update Failed",
+                            text: "Unknown error occured, try again later",
+                            icon: "error"
+                        }).then(()=>{
+                            location.reload()
+                        });
+                    }
+                })
+            }
+        });
     }else{
-        alert('Please Select an Account')
+        // alert('Please Select an Account')
+        Swal.fire({
+            title: "Requirements",
+            text: "Please Select an Account",
+            icon: "question"
+        })
     }
     
 }

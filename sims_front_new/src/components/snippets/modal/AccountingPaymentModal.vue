@@ -112,11 +112,25 @@ const initPayment = () => {
         if (billType.value == 1) {
             addPayment(x).then((results) => {
                 if (results.status != 204) {
-                    alert('Saving Failed')
-                    location.reload()
+                    // alert('Saving Failed')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Update Failed",
+                        text: "Unknown error occured, try again later",
+                        icon: "error"
+                    }).then(()=>{
+                        location.reload()
+                    });
                 } else {
-                    alert('Saving Successful')
-                    location.reload()
+                    // alert('Saving Successful')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
                 }
             })
         } else {
@@ -124,21 +138,49 @@ const initPayment = () => {
                 if (results.data[0].acr_status == 1) {
                     addPayment(x).then((results) => {
                         if (results.status != 204) {
-                            alert('Saving Failed')
-                            location.reload()
+                            // alert('Saving Failed')
+                            // location.reload()
+                            Swal.fire({
+                                title: "Update Failed",
+                                text: "Unknown error occured, try again later",
+                                icon: "error"
+                            }).then(()=>{
+                                location.reload()
+                            });
                         } else {
-                            alert('Saving Successful')
-                            location.reload()
+                            // alert('Saving Successful')
+                            // location.reload()
+                            Swal.fire({
+                                title: "Update Successful",
+                                text: "Changes applied, refreshing the page",
+                                icon: "success"
+                            }).then(()=>{
+                                location.reload()
+                            });
                         }
                     })
                 } else {
-                    alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
+                    // alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
+                    Swal.fire({
+                        title: "Changes in the system detected",
+                        text: "Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page",
+                        icon: "question"
+                    }).then(()=>{
+                        location.reload()
+                    });
                 }
             })
         }
     } else {
-        alert('Please fill out all the fields')
-        disabler.value = false
+        // alert('Please fill out all the fields')
+        Swal.fire({
+            title: "Requirements",
+            text: "Please fill out all the fields",
+            icon: "question"
+        }).then(()=>{
+            // location.reload()
+            disabler.value = false
+        });
     }
 }
 

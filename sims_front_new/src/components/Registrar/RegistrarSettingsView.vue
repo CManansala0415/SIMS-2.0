@@ -85,14 +85,26 @@ onMounted(async () => {
                 emit('fetchUser', results)
 
             }).catch((err) => {
-                alert('Unauthorized Session, Please Log In')
-                router.push("/");
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Session expired, log in again",
+                }).then(()=>{
+                    router.push("/");
+                    window.stop()
+                });
             })
         })
 
     } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            preLoading.value = false
+        });
     }
 })
 

@@ -51,34 +51,113 @@ onMounted(() => {
 })
 
 const deactivateCard = (card) => {
-    if (confirm("Are you sure you want to deactivate this card") == true) {
-        verifying.value = true
-        getBorrowedBooksBy(card, student.value.per_id, student.value.enr_id).then((results) => {
-            let x = {
-                lbrd_id: card,
-                lbrd_enrid: student.value.per_id,
-                lbrd_personid: student.value.enr_id,
-                lbrd_user: userId.value,
-            }
-            console.log(results)
-            if (Object.keys(results).length) {
-                alert('This card has an active borrowed books, to deactivate this card return all the books currently borrowed')
-                verifying.value = false
-            } else {
-                deactivateLibraryCard(x).then((results) => {
-                    if (results.status == 200) {
-                        alert('Update Successful')
-                        location.reload()
-                    } else {
-                        alert('Update Failed')
-                        location.reload()
-                    }
-                })
-            }
-        })
-    } else {
-        return false;
-    }
+    // if (confirm("Are you sure you want to deactivate this card") == true) {
+    //     verifying.value = true
+    //     getBorrowedBooksBy(card, student.value.per_id, student.value.enr_id).then((results) => {
+    //         let x = {
+    //             lbrd_id: card,
+    //             lbrd_enrid: student.value.per_id,
+    //             lbrd_personid: student.value.enr_id,
+    //             lbrd_user: userId.value,
+    //         }
+    //         console.log(results)
+    //         if (Object.keys(results).length) {
+    //             // alert('This card has an active borrowed books, to deactivate this card return all the books currently borrowed')
+    //             // verifying.value = false
+    //             Swal.fire({
+    //                 title: "Notice",
+    //                 text: "This card has an active borrowed books, to deactivate this card return all the books currently borrowed",
+    //                 icon: "warning"
+    //             }).then(()=>{
+    //                 verifying.value = false
+    //             });
+    //         } else {
+    //             deactivateLibraryCard(x).then((results) => {
+    //                 if (results.status == 200) {
+    //                     // alert('Update Successful')
+    //                     // location.reload()
+    //                     Swal.fire({
+    //                         title: "Update Successful",
+    //                         text: "Changes applied, refreshing the page",
+    //                         icon: "success"
+    //                     }).then(()=>{
+    //                         location.reload()
+    //                     });
+    //                 } else {
+    //                     // alert('Update Failed')
+    //                     // location.reload()
+    //                     Swal.fire({
+    //                         title: "Update Failed",
+    //                         text: "Unknown error occured, try again later",
+    //                         icon: "error"
+    //                     }).then(()=>{
+    //                         location.reload()
+    //                     });
+    //                 }
+    //             })
+    //         }
+    //     })
+    // } else {
+    //     return false;
+    // }
+
+    Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to deactivate this card?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im deactivate it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            verifying.value = true
+            getBorrowedBooksBy(card, student.value.per_id, student.value.enr_id).then((results) => {
+                let x = {
+                    lbrd_id: card,
+                    lbrd_enrid: student.value.per_id,
+                    lbrd_personid: student.value.enr_id,
+                    lbrd_user: userId.value,
+                }
+                console.log(results)
+                if (Object.keys(results).length) {
+                    // alert('This card has an active borrowed books, to deactivate this card return all the books currently borrowed')
+                    // verifying.value = false
+                    Swal.fire({
+                        title: "Notice",
+                        text: "This card has an active borrowed books, to deactivate this card return all the books currently borrowed",
+                        icon: "warning"
+                    }).then(()=>{
+                        verifying.value = false
+                    });
+                } else {
+                    deactivateLibraryCard(x).then((results) => {
+                        if (results.status == 200) {
+                            // alert('Update Successful')
+                            // location.reload()
+                            Swal.fire({
+                                title: "Update Successful",
+                                text: "Changes applied, refreshing the page",
+                                icon: "success"
+                            }).then(()=>{
+                                location.reload()
+                            });
+                        } else {
+                            // alert('Update Failed')
+                            // location.reload()
+                            Swal.fire({
+                                title: "Update Failed",
+                                text: "Unknown error occured, try again later",
+                                icon: "error"
+                            }).then(()=>{
+                                location.reload()
+                            });
+                        }
+                    })
+                }
+            })
+        }
+    });
 }
 
 const registerNewCard = () => {
@@ -93,11 +172,25 @@ const registerNewCard = () => {
 
     addLibraryCard(x).then((results) => {
         if (results.status == 200) {
-            alert('Update Successful')
-            location.reload()
+            // alert('Update Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Update Failed')
-            location.reload()
+            // alert('Update Failed')
+            // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 

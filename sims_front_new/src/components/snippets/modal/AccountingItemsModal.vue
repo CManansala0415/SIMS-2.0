@@ -24,8 +24,16 @@ onMounted(() => {
     getUserID().then((results) => {
         userID.value = results.account.data.id
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
+        // alert('Unauthorized Session, Please Log In')
+        // router.push("/");
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
 
     if (Object.keys(item.value).length) {
@@ -53,11 +61,25 @@ const save = () => {
     }
     addAccountingItem(x).then((results) => {
         if (results.status != 204) {
-            alert('Saving Failed')
-            location.reload()
+            // alert('Saving Failed')
+            // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Saving Successful')
-            location.reload()
+            // alert('Saving Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }

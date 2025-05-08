@@ -246,7 +246,12 @@ const addFamMembers = (type, data, index) =>{
             (!convert.fam_lastname)||
             (!convert.fam_relationship)||
             (!convert.fam_contact) ){
-                alert('Please fillout fields of a family member')
+                // alert('Please fillout fields of a family member')
+                Swal.fire({
+                    title: "Requirements",
+                    text: "Please fillout fields of a family member",
+                    icon: "question"
+                })
         }else{
             familyMembers.value.push(convert)
             famMembersInfo.value = {
@@ -262,18 +267,44 @@ const addFamMembers = (type, data, index) =>{
     }
     if(type == 'remove'){
         if(data.fam_id){
-            if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
-                let del = {
-                    id:data.fam_id
-                }
-                deleteFamAwrAtt(del, 1).then((results)=>{
-                    alert('Successfully Removed')
-                    familyMembers.value.splice(index,1)
-                })
+            // if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
+            //     let del = {
+            //         id:data.fam_id
+            //     }
+            //     deleteFamAwrAtt(del, 1).then((results)=>{
+            //         alert('Successfully Removed')
+            //         familyMembers.value.splice(index,1)
+            //     })
 
-            } else {
-                return false;
-            }
+            // } else {
+            //     return false;
+            // }
+            Swal.fire({
+                title: "Delete Record",
+                text: "Are you sure you want to delete this record",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Im Delete it!"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    let del = {
+                        id:data.fam_id
+                    }
+                    deleteFamAwrAtt(del, 1).then((results) => {
+                        // alert('Delete Successful')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Delete Successful",
+                            text: "Changes applied",
+                            icon: "success"
+                        }).then(()=>{
+                            familyMembers.value.splice(index,1)
+                        });
+                    })
+                }
+            });
             
         }else{
             familyMembers.value.splice(index,1)
@@ -288,7 +319,12 @@ const addAwards = (type, data, index) =>{
             (!convert.awr_desc)||
             (!convert.awr_year)
           ){
-                alert('Please fillout fields for the award')
+                // alert('Please fillout fields for the award')
+                Swal.fire({
+                    title: "Requirements",
+                    text: "Please fillout fields for the award",
+                    icon: "question"
+                })
         }else{
             awardList.value.push(convert)
             awardInfo.value = {
@@ -300,18 +336,45 @@ const addAwards = (type, data, index) =>{
     }
     if(type == 'remove'){
         if(data.awr_id){
-            if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
-                let del = {
-                    id:data.awr_id
-                }
-                deleteFamAwrAtt(del, 2).then((results)=>{
-                    alert('Successfully Removed')
-                    awardList.value.splice(index,1)
-                })
+            // if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
+            //     let del = {
+            //         id:data.awr_id
+            //     }
+            //     deleteFamAwrAtt(del, 2).then((results)=>{
+            //         alert('Successfully Removed')
+            //         awardList.value.splice(index,1)
+            //     })
 
-            } else {
-                return false;
-            }
+            // } else {
+            //     return false;
+            // }
+
+            Swal.fire({
+                title: "Delete Record",
+                text: "Are you sure you want to delete this record",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Im Delete it!"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    let del = {
+                        id:data.awr_id
+                    }
+                    deleteFamAwrAtt(del, 2).then((results) => {
+                        // alert('Delete Successful')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Delete Successful",
+                            text: "Changes applied",
+                            icon: "success"
+                        }).then(()=>{
+                            awardList.value.splice(index,1)
+                        });
+                    })
+                }
+            });
             
         }else{
             awardList.value.splice(index,1)
@@ -328,7 +391,12 @@ const addAttainment = (type, data, index) =>{
             (!convert.pered_from)||
             (!convert.pered_to)
           ){
-                alert('Please fillout fields for educational background')
+                // alert('Please fillout fields for educational background')
+                Swal.fire({
+                    title: "Requirements",
+                    text: "Please fillout fields for educational background",
+                    icon: "question"
+                })
         }else{
             attainmentList.value.push(convert)
             attainmentInfo.value = {
@@ -339,21 +407,46 @@ const addAttainment = (type, data, index) =>{
         }
     }
     if(type == 'remove'){
-        console.log(data)
+        // console.log(data)
         if(data.pered_id){
-            if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
-                let del = {
-                    id:data.pered_id
-                }
-                deleteFamAwrAtt(del, 3).then((results)=>{
-                    alert('Successfully Removed')
-                    attainmentList.value.splice(index,1)
-                })
+            // if (confirm("Are you sure you want to delete this item? this action cannot be reverted.") == true) {
+            //     let del = {
+            //         id:data.pered_id
+            //     }
+            //     deleteFamAwrAtt(del, 3).then((results)=>{
+            //         alert('Successfully Removed')
+            //         attainmentList.value.splice(index,1)
+            //     })
 
-            } else {
-                return false;
-            }
-            
+            // } else {
+            //     return false;
+            // }
+            Swal.fire({
+                title: "Delete Record",
+                text: "Are you sure you want to delete this record",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Im Delete it!"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    let del = {
+                        id:data.pered_id
+                    }
+                    deleteFamAwrAtt(del, 3).then((results) => {
+                        // alert('Delete Successful')
+                        // location.reload()
+                        Swal.fire({
+                            title: "Delete Successful",
+                            text: "Changes applied",
+                            icon: "success"
+                        }).then(()=>{
+                            attainmentList.value.splice(index,1)
+                        });
+                    })
+                }
+            });
         }else{
             attainmentList.value.splice(index,1)
         }   
@@ -454,18 +547,21 @@ const clearFields = () =>{
     awardInfo.value = []
     attainmentInfo.value = []
     sameAddress.value=false
-    alert('Sheet Cleared')
+    // alert('Sheet Cleared')
+    Swal.fire({
+        title: "Refresh",
+        text: "Sheet Cleared, you can now continue filling",
+        icon: "success"
+    })
 }
-
 
 
 const percounter = ref(0)
 const famcounter = ref(0)
 const awrcounter = ref(0)
 const attcounter = ref(0)
-const registerApplicant = () =>{
+const registerApplicant = async() =>{
     
-
     let pers = {
         ...personal.value,
         per_user: userID.value,
@@ -480,7 +576,7 @@ const registerApplicant = () =>{
 
         saving.value=true
         //person update
-        updateApplicant(pers, 1).then((results)=>{
+        await updateApplicant(pers, 1).then((results)=>{
             percounter.value+=1
 
              //family update
@@ -518,13 +614,20 @@ const registerApplicant = () =>{
             })
         })
 
-
+        saving.value = false
+        Swal.fire({
+            title: "Update Successful",
+            text: "You have successfully made changes to this record. Click now refresh to retrieve changes.",
+            icon: "success"
+        }).then(()=>{
+            location.reload()
+        });
 
     }else{
 
         saving.value=true
         //person registry
-        addApplicant(pers, 1).then((results)=>{
+        await addApplicant(pers, 1).then((results)=>{
             percounter.value+=1
 
             //family registry
@@ -561,8 +664,16 @@ const registerApplicant = () =>{
                     attcounter.value+=1
                 })
             })
-            
         })
+
+        saving.value = false
+        Swal.fire({
+            title: "Registration Successful",
+            text: "You have successfully registered this record. Click now refresh to retrieve changes.",
+            icon: "success"
+        }).then(()=>{
+            location.reload()
+        });
     }
 }
 
@@ -585,24 +696,24 @@ const refresh = () => {
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="firstname">First Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="firstname" aria-describedby="firstname"
+                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="firstname" aria-describedby="firstname"
                             v-model="personal.per_firstname" required :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="middlename">Middle Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="middlename" aria-describedby="middlename"
+                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="middlename" aria-describedby="middlename"
                             v-model="personal.per_middlename" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="lastname">Last Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="lastname" aria-describedby="lastname"
+                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="lastname" aria-describedby="lastname"
                             v-model="personal.per_lastname" required :disabled="saving?true:false">
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="suffixname">Suffix Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="suffixname" aria-describedby="suffixname"
+                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="suffixname" aria-describedby="suffixname"
                             maxlength="3" v-model="personal.per_suffixname" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
@@ -831,7 +942,7 @@ const refresh = () => {
                 <p class="fw-bold text-white bg-dark p-1 rounded-3">Educational Background Information</p>
             </div>
             <div class="form-group d-flex flex-wrap">
-                <table class="table table-bordered">
+                <table class="table table-bordered" style="text-transform:uppercase">
                     <thead>
                         <tr>
                             <th scope="col">School</th>
@@ -890,7 +1001,7 @@ const refresh = () => {
                 <p class="fw-bold text-white bg-dark p-1 rounded-3">Family Background Information</p>
             </div>
             <div class="form-group d-flex flex-wrap">
-                <table class="table table-bordered">
+                <table class="table table-bordered" style="text-transform:uppercase">
                     <thead>
                         <tr>
                             <th scope="col">Name</th>
@@ -906,7 +1017,7 @@ const refresh = () => {
                                 fam.fam_suffixname }}</th>
                             <td>{{ fam.fam_relationship }}</td>
                             <td>{{ fam.fam_contact }}</td>
-                            <td>{{ fam.fam_email }}</td>
+                            <td style="text-transform:none">{{ fam.fam_email }}</td>
                             <td>
                                 <button @click="addFamMembers('remove', fam, index)" type="button"
                                     class="btn btn-sm btn-danger" :disabled="saving?true:false">
@@ -925,29 +1036,29 @@ const refresh = () => {
                     <div class="form-group col">
                         <label for="famfirstname">First Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famfirstname" aria-describedby="famfirstname"
-                            v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z, ]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="fammiddlename">Middle Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="fammiddlename" aria-describedby="fammiddlename"
-                            v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z, ]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="famlastname">Last Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famlastname" aria-describedby="famlastname"
-                            v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z, ]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="famsuffixname">Suffix Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famsuffixname" aria-describedby="famsuffixname"
-                            v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z, ]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col">
                         <label for="famrelationship">Relationship</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famrelationship" aria-describedby="famrelationship"
-                            v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z, ]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="famcontactno">Contact No.</label>
@@ -972,7 +1083,7 @@ const refresh = () => {
                 <p class="fw-bold text-white bg-dark p-1 rounded-3">School Awards Information</p>
             </div>
             <div class="form-group d-flex flex-wrap">
-                <table class="table table-bordered">
+                <table class="table table-bordered" style="text-transform:uppercase">
                     <thead>
                         <tr>
                             <th scope="col">Title</th>
@@ -1019,7 +1130,7 @@ const refresh = () => {
         </div>
 
         <div v-if="saving" class="bg-white w-100 h-100 d-flex justify-content-center align-content-center bg-opacity-75">
-            <div v-if=" (percounter == 1) &&
+            <!-- <div v-if=" (percounter == 1) &&
                         (famcounter == Object.keys(familyMembers).length) &&
                         (awrcounter == Object.keys(awardList).length) &&
                         (attcounter == Object.keys(attainmentList).length)" class="py-3 text-center">
@@ -1029,8 +1140,8 @@ const refresh = () => {
                             <hr>
                             <button class="btn btn-sm btn-success" @click="refresh()">Refresh</button>
                         </div>
-            </div>
-            <div v-else class="py-3 text-center">
+            </div> -->
+            <div class="py-3 text-center">
                 <div class="alert alert-dark" role="alert">
                     <Loader1>
                         <p class="fw-bold">Registering Applicant Information</p>
@@ -1043,6 +1154,7 @@ const refresh = () => {
                 </div>
             </div>
         </div>
+
         <div class="form-group border p-4 rounded d-flex flex-column justify-content-center gap-2 bg-secondary-subtle">
            <div class="form-group border rounded d-flex justify-content-center gap-2">
                 <input type="checkbox" class="form-check-input" required :disabled="saving?true:false">

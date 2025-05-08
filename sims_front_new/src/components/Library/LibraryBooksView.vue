@@ -67,33 +67,73 @@ onMounted(async () => {
             })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-    
-
-
 })
 
 const deleteBook = (id) => {
-    if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
-        let x = {
-            lbrb_id: id,
-            lbrb_updatedby: userID.value,
-            lbrb_mode: 3 // means delete
+    // if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
+    //     let x = {
+    //         lbrb_id: id,
+    //         lbrb_updatedby: userID.value,
+    //         lbrb_mode: 3 // means delete
+    //     }
+    //     addBookInformation(x).then((results) => {
+    //         alert('Delete Successful')
+    //         location.reload()
+    //     })
+    // } else {
+    //     return false;
+    // }
+
+    Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to delete this record",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im Delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            let x = {
+                lbrb_id: id,
+                lbrb_updatedby: userID.value,
+                lbrb_mode: 3 // means delete
+            }
+            addBookInformation(x).then((results) => {
+                // alert('Delete Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Delete Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
+            })
         }
-        addBookInformation(x).then((results) => {
-            alert('Delete Successful')
-            location.reload()
-        })
-    } else {
-        return false;
-    }
+    });
 }
 
 const paginate = (mode) => {
@@ -144,8 +184,15 @@ const paginate = (mode) => {
                     // console.log(err)
                 })
             } else {
-                alert('Please search a valid record')
-                preLoading.value = false
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(()=>{
+                    preLoading.value = false
+                });
             }
             break;
 

@@ -41,9 +41,16 @@ onMounted(() => {
 
 const computeDays = () => {
     if (borrowerData.value.lbrr_dateborrowed > dayReturned.value) {
-        alert("Can't compute less than the day of borrowing")
-        daysBorrowed.value = 0
-        dayReturned.value = ''
+        // alert("Can't compute less than the day of borrowing")
+        Swal.fire({
+            title: "Notice",
+            text: "Can't compute less than the day of borrowing",
+            icon: "warning"
+        }).then(()=>{
+            daysBorrowed.value = 0
+            dayReturned.value = ''
+        });
+
     } else {
         var day1 = new Date(borrowerData.value.lbrr_dateborrowed);
         var day2 = new Date(dayReturned.value);
@@ -65,11 +72,25 @@ const updateData = () => {
     saving.value = true
     updateBorrowedBooks(x).then((results) => {
         if (results.status != 200) {
-            alert('Return Failed')
-            location.reload()
+            // alert('Return Failed')
+            // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Return Successful')
-            location.reload()
+            // alert('Return Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 

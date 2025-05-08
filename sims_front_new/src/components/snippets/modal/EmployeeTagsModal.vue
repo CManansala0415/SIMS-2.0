@@ -108,14 +108,27 @@ onMounted(async () => {
 
 
     } catch (err) {
-        preLoading.value = false
-        alert('error loading the list default components')
+        // preLoading.value = false
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            preLoading.value = false
+        });
     }
 })
 
 const clearFields = () => {
     personal.value = []
-    alert('Sheet Cleared')
+    // alert('Sheet Cleared')
+    Swal.fire({
+        title: "Cleared",
+        text: "Sheet Cleared",
+        icon: "success"
+    })
 }
 
 const filteredSubject = () => {
@@ -149,25 +162,58 @@ const addSubject = (data) => {
         }
     })
 
-    Object.keys(exist).length ? alert('Already Included') : addedSubject.value.push(data), filteredAddedSubject()
+    Object.keys(exist).length ?
+    Swal.fire({
+        title: "Duplicate",
+        text: "Already Included",
+        icon: "question"
+    }) : addedSubject.value.push(data), filteredAddedSubject()
     Object.keys(exist).length ? false : addedSubjectId.value.push(data.subj_id)
 
 
 }
 const removeSubject = (index, id) => {
     if (id) {
-        let x = {
-            ld_id: id
-        }
-        if (confirm("This load is already saved, are you sure you want to delete load? this cannot be reverted") == true) {
-            deleteEmployeeLoad(x).then(() => {
-                addedSubject.value.splice(index, 1)
-                addedSubjectId.value.splice(index, 1)
-                filteredAddedSubject()
-            })
-        } else {
-            return false;
-        }
+        // let x = {
+        //     ld_id: id
+        // }
+        // if (confirm("This load is already saved, are you sure you want to delete load? this cannot be reverted") == true) {
+        //     deleteEmployeeLoad(x).then(() => {
+        //         addedSubject.value.splice(index, 1)
+        //         addedSubjectId.value.splice(index, 1)
+        //         filteredAddedSubject()
+        //     })
+        // } else {
+        //     return false;
+        // }
+        Swal.fire({
+            title: "Delete Record",
+            text: "This load is already saved, are you sure you want to delete load? this cannot be reverted",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                let x = {
+                    ld_id: id
+                }
+                deleteEmployeeLoad(x).then((results) => {
+                    // alert('Delete Successful')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Delete Successful",
+                        text: "Changes applied",
+                        icon: "success"
+                    }).then(()=>{
+                        addedSubject.value.splice(index, 1)
+                        addedSubjectId.value.splice(index, 1)
+                        filteredAddedSubject()
+                    });
+                })
+            }
+        });
     } else {
         addedSubject.value.splice(index, 1)
         addedSubjectId.value.splice(index, 1)
@@ -177,7 +223,12 @@ const removeSubject = (index, id) => {
 
 const saveLoad = () => {
     if (!addedSubject.value.length) {
-        alert('Please add subjects first')
+        // alert('Please add subjects first')
+        Swal.fire({
+            title: "Requirement",
+            text: "Please add subjects first",
+            icon: "question"
+        })
     } else {
         savingLoads.value = true
         addedSubject.value.forEach(async (e) => {
@@ -191,8 +242,15 @@ const saveLoad = () => {
                 loadCount.value += 1
                 loadCount.value == Object.keys(addedSubject.value).length ? loadSaved.value = true : loadSaved.value = false
                 if(loadSaved.value){
-                    alert('Successfully Saved')
-                    location.reload()
+                    // alert('Successfully Saved')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
                 }
             })
        

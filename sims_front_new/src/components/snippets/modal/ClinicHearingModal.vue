@@ -95,11 +95,25 @@ const save = () =>{
     saving.value = true;
     addClinicHearing(items.value, 2, userId.value, personId.value).then((results)=>{
         if(results.status == 200){
-           alert('Examination Successful')
-           location.reload()
+        //    alert('Examination Successful')
+        //    location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         }else{
-           alert('Examination Failed')
-           location.reload()
+        //    alert('Examination Failed')
+        //    location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }

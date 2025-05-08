@@ -100,8 +100,15 @@ const registerCurriculum = () => {
     saving.value = true
     // console.log(editData.value)
     addCurriculum(editData.value).then((results) => {
-        alert('Successfull Registered')
-        location.reload()
+        // alert('Successfull Registered')
+        // location.reload()
+        Swal.fire({
+            title: "Update Success",
+            text: "Successfully registered, refreshing the page",
+            icon: "success"
+        }).then(()=>{
+            location.reload()
+        });
     })
 }
 
@@ -154,7 +161,12 @@ const addSubject = (type, data, index) => {
             }
         })
 
-        Object.keys(exist).length ? alert('Already Included') : addedSubject.value.push(data)
+        Object.keys(exist).length ?  Swal.fire({
+            title: "Duplicate Detected",
+            text: "Already Included on the list, try another",
+            icon:"question"
+        }): addedSubject.value.push(data)
+
         Object.keys(exist).length ? false : addedSubjectId.value.push(data.subj_id)
 
     } else {
@@ -169,7 +181,12 @@ const showItems = () => {
     addedSubjectId.value = [] //reset bago iload ulit
 
     if (!activeGradelvl.value || !activeQuarter.value) {
-        alert('Please select semester and grade / year level')
+        // alert('Please select semester and grade / year level')
+        Swal.fire({
+            title: "Notice",
+            text: "Please select semester and grade / year level",
+            icon: "question"
+        })
     } else {
         loadItems.value = true
 
@@ -221,11 +238,25 @@ const deactivate = (id, type) => {
         data = id
     }
 
-    if (confirm("Are you sure you want to deactivate this record?") == true) {
-        removeTag(data)
-    } else {
-        return false;
-    }
+    // if (confirm("Are you sure you want to deactivate this record?") == true) {
+    //     removeTag(data)
+    // } else {
+    //     return false;
+    // }
+
+    Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to deactivate this record?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im Delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            removeTag(data)
+        }
+    });
 
 
 }
@@ -239,11 +270,17 @@ const removeTag = (data, index) => {
 
     console.log(data)
     addCurriculumTagging(x).then((results) => {
-        alert('Successfull Deactivated')
-        addedSubject.value.splice(index, 1)
-        addedSubjectId.value.splice(index, 1)
-        // location.reload()
-        saving.value = false
+        // alert('Successfull Deactivated')
+        Swal.fire({
+            title: "Success",
+            text: "Successfull Deactivated",
+            icon: "success"
+        }).then(()=>{
+            addedSubject.value.splice(index, 1)
+            addedSubjectId.value.splice(index, 1)
+            // location.reload()
+            saving.value = false
+        })
     })
 
 }
@@ -251,7 +288,12 @@ const removeTag = (data, index) => {
 
 const saveData = () => {
     if (!activeGradelvl.value || !activeQuarter.value || !Object.keys(addedSubject.value).length) {
-        alert('Please select semester and grade / year level and add subjects in the list')
+        // alert('Please select semester and grade / year level and add subjects in the list')
+        Swal.fire({
+            title: "Notice",
+            text: "Please select semester and grade / year level and add subjects in the list",
+            icon: "question"
+        })
     } else {
         let x = JSON.parse(JSON.stringify(addedSubject.value))
         savingTag.value = true
@@ -267,8 +309,15 @@ const saveData = () => {
                 console.log(results)
                 savingCount.value += 1
                 if (savingCount.value == Object.keys(addedSubject.value).length) {
-                    alert('Taggings Saved, refresh the page')
-                    location.reload()
+                    // alert('Taggings Saved, refresh the page')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Success",
+                        text: "Taggings saved, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    })
                 }
             })
         })

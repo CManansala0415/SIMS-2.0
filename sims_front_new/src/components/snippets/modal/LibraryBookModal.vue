@@ -88,29 +88,78 @@ const registerBook = () =>{
 
     addBookInformation(x).then((results)=>{
         if(results.status != 200){
-            alert('Update Failed')
+            // alert('Update Failed')
             // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }else{
-            alert('Update Successful')
-            location.reload()
+            // alert('Update Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 }
 
 const deleteBook = () =>{
-  if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
-    let x = {
-          lbrb_id:bookId.value,
-          lbrb_updatedby: userId.value,
-          lbrb_mode: 3 // means delete
-    }
-    addBookInformation(x).then((results)=>{
-        alert('Delete Successful')
-        location.reload()
-    })
-  } else {
-      return false;
-  }
+//   if (confirm("Are you sure you want to delete this registry? this action cannot be reverted.") == true) {
+//     let x = {
+//           lbrb_id:bookId.value,
+//           lbrb_updatedby: userId.value,
+//           lbrb_mode: 3 // means delete
+//     }
+//     addBookInformation(x).then((results)=>{
+//         // alert('Delete Successful')
+//         // location.reload()
+//         Swal.fire({
+//             title: "Update Successful",
+//             text: "Changes applied, refreshing the page",
+//             icon: "success"
+//         }).then(()=>{
+//             location.reload()
+//         });
+//     })
+//   } else {
+//       return false;
+//   }
+  Swal.fire({
+        title: "Delete Record",
+        text: "Are you sure you want to delete this registry? this action cannot be reverted?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im Delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            let x = {
+                lbrb_id:bookId.value,
+                lbrb_updatedby: userId.value,
+                lbrb_mode: 3 // means delete
+            }
+            addBookInformation(x).then((results)=>{
+                // alert('Delete Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
+            })
+        }
+    });
 }
 
 const formType = ref(0)

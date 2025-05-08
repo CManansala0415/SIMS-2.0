@@ -86,8 +86,15 @@ const launchId = computed(() => {
  
 const emit = defineEmits(['close-modal', 'assign-sched'])
 const assign = (id, name, bldg, classr, remove) => {
-    alert('Successful')
-    emit('assign-sched', id, name, bldg, classr, remove, facultyId.value)
+    // alert('Successful')
+    // emit('assign-sched', id, name, bldg, classr, remove, facultyId.value)
+    Swal.fire({
+        title: "Update Successful",
+        text: "Changes applied",
+        icon: "success"
+    }).then(()=>{
+        emit('assign-sched', id, name, bldg, classr, remove, facultyId.value)
+    });
 }
 
 const activeID = ref('')
@@ -290,7 +297,12 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
     switch (timeDay.value) {
         case 'Monday':
             if (Object.keys(data).length > 0) {
-                alert(msg)
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
             } else {
                 activeID.value = subj_id
                 activeName.value = subj_code
@@ -299,7 +311,12 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
             break;
         case 'Tuesday':
             if (Object.keys(data).length > 0) {
-                alert(msg)
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
             } else {
                 activeID.value = subj_id
                 activeName.value = subj_code
@@ -308,7 +325,12 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
             break;
         case 'Wednesday':
             if (Object.keys(data).length > 0) {
-                alert(msg)
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
             } else {
                 activeID.value = subj_id
                 activeName.value = subj_code
@@ -317,7 +339,12 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
             break;
         case 'Thursday':
             if (Object.keys(data).length > 0) {
-                alert(msg)
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
             } else {
                 activeID.value = subj_id
                 activeName.value = subj_code
@@ -326,7 +353,12 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
             break;
         case 'Friday':
             if (Object.keys(data).length > 0) {
-                alert(msg)
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
             } else {
                 activeID.value = subj_id
                 activeName.value = subj_code
@@ -335,7 +367,12 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
             break;
         case 'Saturday':
             if (Object.keys(data).length > 0) {
-                alert(msg)
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
             } else {
                 activeID.value = subj_id
                 activeName.value = subj_code

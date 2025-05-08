@@ -56,11 +56,25 @@ const updateMedicalInventory = () => {
 
     updateMedicalSupply(x[0]).then((results) => {
         if (results.status == 200) {
-            alert('Update Successful')
-            location.reload()
+            // alert('Update Successful')
+            // location.reload()
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
         } else {
-            alert('Update Failed')
-            location.reload()
+            // alert('Update Failed')
+            // location.reload()
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(()=>{
+                location.reload()
+            });
         }
     })
 

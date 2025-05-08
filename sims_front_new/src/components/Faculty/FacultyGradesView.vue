@@ -21,6 +21,7 @@ import {
     getGradingSheetGrade,
     addGradingSheet,
     addGradingGrade,
+    getAcademicDefaults
 } from "../Fetchers.js";
 
 
@@ -50,6 +51,7 @@ const quarter = ref([])
 const gradelvl = ref([])
 const degree = ref([])
 const course = ref([])
+const dtype = ref([])
 const semester = ref([])
 const section = ref([])
 const booting = ref('')
@@ -58,45 +60,56 @@ const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Grade Levels'
-        bootingCount.value += 1
-    })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Grade Levels'
+    //     bootingCount.value += 1
+    // })
 
-    getProgram().then((results) => {
-        degree.value = results
-        booting.value = 'Loading Degrees'
-        bootingCount.value += 1
-    })
+    // getProgram().then((results) => {
+    //     degree.value = results
+    //     booting.value = 'Loading Degrees'
+    //     bootingCount.value += 1
+    // })
 
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters'
-        bootingCount.value += 1
-    })
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters'
+    //     bootingCount.value += 1
+    // })
 
     getDegree().then((results) => {
-        course.value = results
+        dtype.value = results
         booting.value = 'Loading Courses'
         bootingCount.value += 1
     })
 
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses'
-        bootingCount.value += 1
-    })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses'
+    //     bootingCount.value += 1
+    // })
 
-    getSemester().then((results) => {
-        semester.value = results
-        booting.value = 'Loading Semesters'
-        bootingCount.value += 1
-    })
+    // getSemester().then((results) => {
+    //     semester.value = results
+    //     booting.value = 'Loading Semesters'
+    //     bootingCount.value += 1
+    // })
 
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections'
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections'
+    //     bootingCount.value += 1
+    // })
+
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        degree.value = results.program
+        quarter.value = results.quarter
+        course.value = results.course
+        semester.value = results.semester
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
 
@@ -136,15 +149,28 @@ onMounted(async () => {
             })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
-
 })
 
 
@@ -235,11 +261,21 @@ const filterSubject = () => {
                 //filter by lnid ang ginamit natin dahil para unique sya na di mag merge sa ibang section
                 if (!Object.keys(filtration1).length) {
                     finalStudentList.value = []
-                    alert('Records are Empty')
+                    // alert('Records are Empty')
+                    Swal.fire({
+                        title: "Notice",
+                        text: "Records are Empty",
+                        icon: "question"
+                    });
                 } else {
                     filtration2 = Object.groupBy(filtration1, section => section.enr_section);
                     finalStudentList.value = filtration2[sectionId]
-                    alert('Records Loaded Successfully')
+                    // alert('Records Loaded Successfully')
+                    Swal.fire({
+                        title: "Notice",
+                        text: "Records Loaded Successfully",
+                        icon: "success"
+                    });
                 }
                 filteringData.value = false
 
@@ -250,8 +286,14 @@ const filterSubject = () => {
 
 
     } else {
-        alert('Please Select Subject and Section')
-        filteringData.value = false
+        // alert('Please Select Subject and Section')
+        Swal.fire({
+            title: "Notice",
+            text: "Please Select Subject and Section",
+            icon: "question"
+        }).then(()=>{
+            filteringData.value = false
+        });
     }
 
 }
@@ -295,31 +337,92 @@ const saveGrades = () => {
 }
 
 const generateSheet = (type) => {
-    if (confirm("Are you sure you want to generate a grading sheet?") == true) {
-        savingData.value = true
-        //find lf_lnid para dun sa fetcher ng header ni grading sheet
-        let indexer = groupedAssignmentSubject.value[filterSubjectId.value].findIndex(e => {
-            return e.lf_lnid === filterLnid.value
-        });
+    // if (confirm("Are you sure you want to generate a grading sheet?") == true) {
+    //     savingData.value = true
+    //     //find lf_lnid para dun sa fetcher ng header ni grading sheet
+    //     let indexer = groupedAssignmentSubject.value[filterSubjectId.value].findIndex(e => {
+    //         return e.lf_lnid === filterLnid.value
+    //     });
 
-        let x = {
-            grh_lnid: groupedAssignmentSubject.value[filterSubjectId.value][indexer].lf_lnid,
-            grh_addedby: userID.value,
-            grs_headerid: Object.keys(gradingHeader.value).length ? gradingHeader.value[0].grh_id : null
-        }
+    //     let x = {
+    //         grh_lnid: groupedAssignmentSubject.value[filterSubjectId.value][indexer].lf_lnid,
+    //         grh_addedby: userID.value,
+    //         grs_headerid: Object.keys(gradingHeader.value).length ? gradingHeader.value[0].grh_id : null
+    //     }
 
-        addGradingSheet(x, type).then((results) => {
-            if (results.status == 200) {
-                alert('Update Successful')
-                location.reload()
-            } else {
-                alert('Update Failed')
-                location.reload()
+    //     addGradingSheet(x, type).then((results) => {
+    //         if (results.status == 200) {
+    //             // alert('Update Successful')
+    //             // location.reload()
+    //             Swal.fire({
+    //                 title: "Update Successful",
+    //                 text: "Changes applied, refreshing the page",
+    //                 icon: "success"
+    //             }).then(()=>{
+    //                 location.reload()
+    //             });
+    //         } else {
+    //             // alert('Update Failed')
+    //             // location.reload()
+    //             Swal.fire({
+    //                 title: "Update Failed",
+    //                 text: "Unknown error occured, try again later",
+    //                 icon: "error"
+    //             }).then(()=>{
+    //                 location.reload()
+    //             });
+    //         }
+    //     })
+    // } else {
+    //     return false;
+    // }
+
+    Swal.fire({
+        title: "Generate Record",
+        text: "Are you sure you want to generate a grading sheet?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Im create it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            savingData.value = true
+            //find lf_lnid para dun sa fetcher ng header ni grading sheet
+            let indexer = groupedAssignmentSubject.value[filterSubjectId.value].findIndex(e => {
+                return e.lf_lnid === filterLnid.value
+            });
+
+            let x = {
+                grh_lnid: groupedAssignmentSubject.value[filterSubjectId.value][indexer].lf_lnid,
+                grh_addedby: userID.value,
+                grs_headerid: Object.keys(gradingHeader.value).length ? gradingHeader.value[0].grh_id : null
             }
-        })
-    } else {
-        return false;
-    }
+            addGradingSheet(x, type).then((results) => {
+                if (results.status == 200) {
+                    // alert('Update Successful')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                } else {
+                    // alert('Update Failed')
+                    // location.reload()
+                    Swal.fire({
+                        title: "Update Failed",
+                        text: "Unknown error occured, try again later",
+                        icon: "error"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                }
+            })
+        }
+    });
 }
 
 

@@ -13,7 +13,8 @@ import {
     getProgramList,
     getSemester,
     getSection,
-    getFacultyStudent
+    getFacultyStudent,
+    getAcademicDefaults
 } from "../Fetchers.js";
 
 import { useRouter, useRoute } from 'vue-router'
@@ -34,6 +35,7 @@ const quarter = ref([])
 const gradelvl = ref([])
 const degree = ref([])
 const course = ref([])
+const dtype = ref([])
 const semester = ref([])
 const section = ref([])
 const booting = ref('')
@@ -42,45 +44,55 @@ const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
-    getGradelvl().then((results) => {
-        gradelvl.value = results
-        booting.value = 'Loading Grade Levels'
-        bootingCount.value += 1
-    })
+    // getGradelvl().then((results) => {
+    //     gradelvl.value = results
+    //     booting.value = 'Loading Grade Levels'
+    //     bootingCount.value += 1
+    // })
 
-    getProgram().then((results) => {
-        degree.value = results
-        booting.value = 'Loading Degrees'
-        bootingCount.value += 1
-    })
+    // getProgram().then((results) => {
+    //     degree.value = results
+    //     booting.value = 'Loading Degrees'
+    //     bootingCount.value += 1
+    // })
 
-    getQuarter().then((results) => {
-        quarter.value = results
-        booting.value = 'Loading Quarters'
-        bootingCount.value += 1
-    })
+    // getQuarter().then((results) => {
+    //     quarter.value = results
+    //     booting.value = 'Loading Quarters'
+    //     bootingCount.value += 1
+    // })
 
     getDegree().then((results) => {
-        course.value = results
+        dtype.value = results
         booting.value = 'Loading Courses'
         bootingCount.value += 1
     })
 
-    getProgramList().then((results) => {
-        course.value = results
-        booting.value = 'Loading Courses'
-        bootingCount.value += 1
-    })
+    // getProgramList().then((results) => {
+    //     course.value = results
+    //     booting.value = 'Loading Courses'
+    //     bootingCount.value += 1
+    // })
 
-    getSemester().then((results) => {
-        semester.value = results
-        booting.value = 'Loading Semesters'
-        bootingCount.value += 1
-    })
+    // getSemester().then((results) => {
+    //     semester.value = results
+    //     booting.value = 'Loading Semesters'
+    //     bootingCount.value += 1
+    // })
 
-    getSection().then((results) => {
-        section.value = results
-        booting.value = 'Loading Sections'
+    // getSection().then((results) => {
+    //     section.value = results
+    //     booting.value = 'Loading Sections'
+    //     bootingCount.value += 1
+    // })
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        degree.value = results.program
+        quarter.value = results.quarter
+        course.value = results.course
+        semester.value = results.semester
+        section.value = results.section
+        booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
 
@@ -120,13 +132,27 @@ onMounted(async () => {
             })
 
         } catch (err) {
-            preLoading.value = false
-            alert('error loading the list default components')
+            // preLoading.value = false
+            // alert('error loading the list default components')
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+            }).then(()=>{
+                preLoading.value = false
+            });
         }
     }).catch((err) => {
-        alert('Unauthorized Session, Please Log In')
-        router.push("/");
-        window.stop()
+        // alert('Unauthorized Session, Please Log In')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Session expired, log in again",
+        }).then(()=>{
+            router.push("/");
+            window.stop()
+        });
     })
 })
 
