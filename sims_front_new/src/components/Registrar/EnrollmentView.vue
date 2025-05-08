@@ -60,7 +60,7 @@ const booter = async () => {
         quarter.value = results.quarter
         course.value = results.course
         section.value = results.section
-        program.value = results.section
+        program.value = results.program
         subject.value = results.subject
         booting.value = 'Loading Academic Information'
         bootingCount.value += 1
