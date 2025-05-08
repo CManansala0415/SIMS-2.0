@@ -696,24 +696,24 @@ const refresh = () => {
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="firstname">First Name</label>
-                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="firstname" aria-describedby="firstname"
+                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="firstname" aria-describedby="firstname"
                             v-model="personal.per_firstname" required :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="middlename">Middle Name</label>
-                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="middlename" aria-describedby="middlename"
+                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="middlename" aria-describedby="middlename"
                             v-model="personal.per_middlename" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="lastname">Last Name</label>
-                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="lastname" aria-describedby="lastname"
+                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="lastname" aria-describedby="lastname"
                             v-model="personal.per_lastname" required :disabled="saving?true:false">
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="suffixname">Suffix Name</label>
-                        <input type="text" onkeydown="return /[a-z'-]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="suffixname" aria-describedby="suffixname"
+                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="form-control" id="suffixname" aria-describedby="suffixname"
                             maxlength="3" v-model="personal.per_suffixname" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
@@ -1036,29 +1036,29 @@ const refresh = () => {
                     <div class="form-group col">
                         <label for="famfirstname">First Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famfirstname" aria-describedby="famfirstname"
-                            v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="fammiddlename">Middle Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="fammiddlename" aria-describedby="fammiddlename"
-                            v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="famlastname">Last Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famlastname" aria-describedby="famlastname"
-                            v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="famsuffixname">Suffix Name</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famsuffixname" aria-describedby="famsuffixname"
-                            v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                 </div>
                 <div class="row">
                     <div class="form-group col">
                         <label for="famrelationship">Relationship</label>
                         <input type="text" style="text-transform:uppercase" class="form-control" id="famrelationship" aria-describedby="famrelationship"
-                            v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z'-]/i.test(event.key)" :disabled="saving?true:false">
+                            v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
                     </div>
                     <div class="form-group col">
                         <label for="famcontactno">Contact No.</label>
