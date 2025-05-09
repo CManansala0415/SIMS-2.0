@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum'])->post('/enroll-applicant', [RegistrarControl
 
 
 Route::middleware(['auth:sanctum'])->get('/get-student/{limit}/{offset}/{search}', [RegistrarController::class,'getStudent']);
-Route::middleware(['auth:sanctum'])->get('/get-student-filtering/{limit}/{offset}/{fname}/{mname}/{lname}/{program}/{gradelvl}/{course}', [RegistrarController::class,'getStudentFiltering']);
+Route::middleware(['auth:sanctum'])->get('/get-student-filtering/{limit}/{offset}/{fname}/{mname}/{lname}/{program}/{gradelvl}/{course}/{mode}', [RegistrarController::class,'getStudentFiltering']);
 Route::middleware(['auth:sanctum'])->post('/upload-profile', [FileManagement::class,'uploadProfile']);
 Route::middleware(['auth:sanctum'])->post('/upload-link', [FileManagement::class,'uploadLink']);
 Route::middleware(['auth:sanctum'])->get('/get-student-by-course/{limit}/{offset}/{search}', [RegistrarController::class,'getStudentByCourse']);

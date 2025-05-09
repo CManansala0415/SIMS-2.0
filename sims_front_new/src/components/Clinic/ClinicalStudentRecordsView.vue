@@ -427,12 +427,12 @@ const fileUpload = (id) => {
                             N/A
                         </td>
                     </tr>
-                    <tr v-if="!preLoading && !Object.keys(applicant).length">
+                    <tr v-if="!preLoading && !Object.keys(applicant).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="7">
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(applicant).length">
+                    <tr v-if="preLoading && !Object.keys(applicant).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="7">
                             <div class="m-3">
                                 <Loader />

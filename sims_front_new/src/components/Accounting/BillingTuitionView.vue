@@ -345,7 +345,7 @@ const settlePayments = () => {
         </div>
 
         <div v-if="!balance" class="table-responsive border p-3">
-            <table class="table table-hover table-fixed">
+            <table class="table table-hover table-fixed" style="text-transform:uppercase">
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">Profile</th>
@@ -421,12 +421,12 @@ const settlePayments = () => {
                             N/A
                         </td>
                     </tr>
-                    <tr v-if="!preLoading && !Object.keys(student).length">
+                    <tr v-if="!preLoading && !Object.keys(student).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="6">
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(student).length">
+                    <tr v-if="preLoading && !Object.keys(student).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="6">
                             <div class="m-3">
                                 <Loader />

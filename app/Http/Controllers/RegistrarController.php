@@ -574,10 +574,10 @@ class RegistrarController extends Controller
         ];
     }
 
-    public function getStudentFiltering($limit, $offset, $fname, $mname, $lname, $program, $gradelvl, $course)
+    public function getStudentFiltering($limit, $offset, $fname, $mname, $lname, $program, $gradelvl, $course, $mode)
     {   
         // kapag newly refresh no params for search
-        if(($fname == 404)&&($mname == 404)&&($lname == 404)&&($program == 0)&&($gradelvl == 0)&&($course == 0)){
+        if(($fname == 404)&&($mname == 404)&&($lname == 404)&&($program == 0)&&($gradelvl == 0)&&($course == 0)&&($mode==1)){
 
             if($limit == 0 && $offset == 0){
                 $student = DB::table('def_enrollment')
@@ -618,7 +618,7 @@ class RegistrarController extends Controller
         }
         // kapag may params for search
         // ($fname != 404)||($mname != 404)||($lname != 404) && ($limit == 1 && $offset == 1)
-        else if (($fname == 404)&&($mname == 404)&&($lname == 404)){
+        else if (($fname == 404)&&($mname == 404)&&($lname == 404)&&($mode==1)){
             $student = DB::table('def_enrollment')
                         ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
                         ->select(  
@@ -647,6 +647,78 @@ class RegistrarController extends Controller
                         ->orWhere('def_enrollment.enr_program', '=' , $program)
                         ->orWhere('def_enrollment.enr_course', '=' , $course)
                         ->count();       
+        }
+        //para to sa enrollment view listing filter
+        else if ($mode==2){
+            $student = DB::table('def_enrollment')
+                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->select(  
+                    'def_enrollment.*',
+                    'def_person.*',
+                )                        
+                ->where('def_person.per_status', '=',  1)
+                ->where('def_enrollment.enr_status', '=' , 1)
+                ->where(function($query) use ($program, $gradelvl, $course) {
+                    if($program !=0 && $gradelvl == 0 && $course == 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program);
+                    }else if($program !=0 && $gradelvl != 0 && $course == 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program ==0 && $gradelvl != 0 && $course == 0){
+                        $query->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program !=0 && $gradelvl != 0 && $course == 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program ==0 && $gradelvl == 0 && $course != 0){
+                        $query->where('def_enrollment.enr_course', '=',  $course);
+                    }else if($program ==0 && $gradelvl != 0 && $course != 0){
+                        $query->where('def_enrollment.enr_course', '=',  $course)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program !=0 && $gradelvl == 0 && $course != 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_course', '=',  $course);
+                    }else{
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl)
+                        ->where('def_enrollment.enr_course', '=',  $course);
+                    }
+                })
+                ->limit($limit)->offset($offset)
+                ->get();
+            $count = DB::table('def_enrollment')
+                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->select(  
+                    'def_enrollment.enr_id',
+                )                        
+                ->where('def_person.per_status', '=',  1)
+                ->where('def_enrollment.enr_status', '=' , 1)
+                ->where(function($query) use ($program, $gradelvl, $course) {
+                    if($program !=0 && $gradelvl == 0 && $course == 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program);
+                    }else if($program !=0 && $gradelvl != 0 && $course == 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program ==0 && $gradelvl != 0 && $course == 0){
+                        $query->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program !=0 && $gradelvl != 0 && $course == 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program ==0 && $gradelvl == 0 && $course != 0){
+                        $query->where('def_enrollment.enr_course', '=',  $course);
+                    }else if($program ==0 && $gradelvl != 0 && $course != 0){
+                        $query->where('def_enrollment.enr_course', '=',  $course)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl);
+                    }else if($program !=0 && $gradelvl == 0 && $course != 0){
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_course', '=',  $course);
+                    }else{
+                        $query->where('def_enrollment.enr_program', '=',  $program)
+                        ->where('def_enrollment.enr_gradelvl', '=',  $gradelvl)
+                        ->where('def_enrollment.enr_course', '=',  $course);
+                    }
+                })
+                ->limit($limit)->offset($offset)
+                ->get();
         }
         else{
              $student = DB::table('def_enrollment')

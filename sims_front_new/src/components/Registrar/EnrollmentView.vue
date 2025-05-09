@@ -22,12 +22,14 @@ import Loader from '../snippets/loaders/Loading1.vue';
 // import PrintForm from '../snippets/modal/PrintForms.vue';
 import Taggings from '../snippets/modal/EnrollmentTagging.vue';
 import { getUserID } from "../../routes/user.js";
+import EnrollmentListFIlterModal from '../snippets/modal/EnrollmentListFIlterModal.vue';
 
 const preLoading = ref(true)
 const student = ref([])
 const quarter = ref([])
 const gradelvl = ref([])
 const program = ref([])
+const degree = ref([])
 const course = ref([])
 const curriculum = ref([])
 const section = ref([])
@@ -37,6 +39,7 @@ const taggedSubject = ref([])
 const booting = ref('')
 const bootingCount = ref(0)
 const showTaggingModal = ref(false)
+const showFilterModal = ref(false)
 const showFormData = ref([])
 const activeForm = ref(1)
 const limit = ref(10)
@@ -56,11 +59,13 @@ const accessData = ref([])
 
 const booter = async () => {
     getAcademicDefaults().then((results) => {
+        console.log(results)
         gradelvl.value = results.gradelvl
         quarter.value = results.quarter
         course.value = results.course
         section.value = results.section
         program.value = results.program
+        degree.value = results.degree
         subject.value = results.subject
         booting.value = 'Loading Academic Information'
         bootingCount.value += 1
@@ -125,9 +130,9 @@ onMounted(async () => {
             await booter().then((results) => {
                 booting.value = 'Loading Students...'
                 bootingCount.value += 1
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
-                    console.log(student.value)
+                    // console.log(student.value)
                     studentCount.value = results.count
                     preLoading.value = false
 
@@ -185,7 +190,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -201,7 +206,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -215,7 +220,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -408,21 +413,26 @@ const paramsCourse = ref(0)
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="d-flex gap-2 w-100">
-                <div class="d-flex gap-2">
-                    <div class="d-flex gap-2 justify-content-center align-content-center">
-                        <input type="text" v-model="searchFname" @keyup.enter="search()"
-                            class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                        <input type="text" v-model="searchMname" @keyup.enter="search()"
-                            class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                        <input type="text" v-model="searchLname" @keyup.enter="search()"
-                            class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                    </div>
-                </div>
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
-            <div class="d-flex gap-2 w-100">
+            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
+                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#filterdatamodal" @click="showFilterModal=true"
+                    type="button" class="btn btn-sm btn-dark" :disabled="preLoading? true:false">
+                    <font-awesome-icon icon="fa-solid fa-eye" /> View Student Listing
+                </button>
+            </div>
+            <!-- <div class="d-flex gap-2 w-100">
                 <div class="d-flex gap-2 w-100">
-                    <!-- <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
+                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
                         <option value="0">Select Program</option>
                         <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
                     </select>
@@ -433,14 +443,14 @@ const paramsCourse = ref(0)
                     <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
                         <option value="0">Select Course</option>
                         <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}</option>
-                    </select> -->
+                    </select>
                     <div class="d-flex justify-content-center align-content-center">
-                        <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                        <button @click="search()" type="button" class="btn btn-sm btn-secondary text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                             Search
                         </button>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <div class="table-responsive border p-3 small-font">
@@ -525,17 +535,17 @@ const paramsCourse = ref(0)
                                 </button>
                             </div>
                         </td>
-                        <td v-else class="align-middle p-2">
+                        <td v-else class="align-middle p-2">    
                             N/A
                         </td>
                     </tr>
-                    <tr v-if="!preLoading && !Object.keys(student).length">
-                        <td class="p-3 text-center" colspan="9">
+                    <tr v-if="!preLoading && !Object.keys(student).length" style="text-transform:none">
+                        <td class="p-3 text-center" colspan="9" style="text-transform:none">
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(student).length">
-                        <td class="p-3 text-center" colspan="9">
+                    <tr v-if="preLoading && !Object.keys(student).length" style="text-transform:none">
+                        <td class="p-3 text-center" colspan="9" style="text-transform:none">
                             <div class="m-3">
                                 <Loader />
                             </div>
@@ -579,6 +589,35 @@ const paramsCourse = ref(0)
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showTaggingModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Modal -->
+    <div class="modal fade" id="filterdatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Enrolled Students Listing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showFilterModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <EnrollmentListFIlterModal v-if="showFilterModal" :gradelvldata="gradelvl" :programdata="program" :coursedata="course" :degreedata="degree"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showFilterModal = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>
