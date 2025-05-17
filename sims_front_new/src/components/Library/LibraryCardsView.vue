@@ -290,7 +290,7 @@ const showForm = (data) => {
         <div class="p-3 mb-4 border-bottom">
             <h5 class=" text-uppercase fw-bold">Library Cards</h5>
         </div>
-
+ 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
             <div class="input-group w-50">
                 <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
@@ -299,7 +299,7 @@ const showForm = (data) => {
                     :disabled="preLoading ? true : false">
             </div>
         </div>
-        <div class="table-responsive border p-3 small-font">
+        <div class="table-responsive border p-3 small-font"  style="text-transform:uppercase">
             <table class="table table-hover">
                 <thead>
                     <tr>
@@ -377,7 +377,7 @@ const showForm = (data) => {
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(student).length">
+                    <tr v-if="preLoading && !Object.keys(student).length"  style="text-transform:none">
                         <td class="p-3 text-center" colspan="7">
                             <div class="m-3">
                                 <Loader />

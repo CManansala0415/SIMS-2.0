@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "../../../routes/user";
 import { getCurriculumSubject, getEnrollment, getMilestone, addMilestone, updateEnrollment, updateMilestone, getCommandUpdateCurriculum } from "../../Fetchers.js";
 import Loader from '../loaders/Loader1.vue';
+
 import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter();

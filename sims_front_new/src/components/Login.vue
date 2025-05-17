@@ -85,9 +85,15 @@ const handleLogin = async () => {
                             <input type="email" class="form-control" id="username" aria-describedby="emailHelp" v-model="form.email" required>
                             <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
                         </div>
-                        <div class="mb-3 d-flex flex-column align-items-start w-100">
+                        <div class="mb-1 d-flex flex-column align-items-start w-100">
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" v-model="form.password" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" onclick="password.type = this.checked? 'text':'password'">
+                            <label class="form-check-label" for="flexCheckDefault">
+                                Show Password
+                            </label>
                         </div>
                         <button type="submit" class="btn btn-primary" :disabled="isLogging? true:false">
                             <span v-if="isLogging">Logging In...</span> 

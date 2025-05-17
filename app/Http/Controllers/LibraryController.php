@@ -502,10 +502,16 @@ class LibraryController extends Controller
 
         if($active == 0){
             $cards = DB::table('def_library_card_issue as lbd')
-                ->leftJoin('def_employee as emp', 'lbd.lbrd_issuedby', '=', 'emp.emp_id')
+                ->leftJoin('users as user', 'lbd.lbrd_issuedby', '=', 'user.id')
+                ->leftJoin('def_employee as emp', 'user.id', '=', 'emp.emp_accid')
+                ->leftJoin('def_person as per', 'lbd.lbrd_personid', '=', 'per.per_id')
                 ->select(  
                     'lbd.*',
                     'emp.*',
+                    'per.per_firstname',
+                    'per.per_middlename',
+                    'per.per_lastname',
+                    'per.per_suffixname',
                 )
                 ->where('lbd.lbrd_personid','=', $personid)
                 ->where('lbd.lbrd_enrid','=', $enrid)
@@ -513,10 +519,16 @@ class LibraryController extends Controller
                 ->get();
         }else{
             $cards = DB::table('def_library_card_issue as lbd')
-            ->leftJoin('def_employee as emp', 'lbd.lbrd_issuedby', '=', 'emp.emp_id')
+            ->leftJoin('users as user', 'lbd.lbrd_issuedby', '=', 'user.id')
+            ->leftJoin('def_employee as emp', 'user.id', '=', 'emp.emp_accid')
+            ->leftJoin('def_person as per', 'lbd.lbrd_personid', '=', 'per.per_id')
             ->select(  
                 'lbd.*',
                 'emp.*',
+                'per.per_firstname',
+                'per.per_middlename',
+                'per.per_lastname',
+                'per.per_suffixname',
             )
             ->where('lbd.lbrd_personid','=', $personid)
             ->where('lbd.lbrd_enrid','=', $enrid)
@@ -557,10 +569,12 @@ class LibraryController extends Controller
     public function addLibraryCard(Request $request){
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d h:i:s', time());
+        $code = 'LB-'.$request->input('lbrd_dateissued').$request->input('lbrd_enrid');
 
         try{
             $primary = DB::table('def_library_card_issue')->insert([
                 'lbrd_cardno' => $request->input('lbrd_cardno'),
+                'lbrd_cardcode' => $code,
                 'lbrd_personid' => $request->input('lbrd_personid'),
                 'lbrd_enrid' => $request->input('lbrd_enrid'),
                 'lbrd_issuedby' => $request->input('lbrd_issuedby'),

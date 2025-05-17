@@ -409,9 +409,11 @@ class RegistrarController extends Controller
             ->leftJoin('def_program', 'def_enrollment.enr_course', '=', 'def_program.prog_id') 
             ->leftJoin('def_curriculum', 'def_enrollment.enr_curriculum', '=', 'def_curriculum.curr_id') 
             ->leftJoin('def_section', 'def_enrollment.enr_section', '=', 'def_section.sec_id') 
+            ->leftJoin('def_student_identification', 'def_enrollment.enr_personid', '=', 'def_student_identification.ident_personid') 
 
             ->select(  
                 'def_enrollment.*',
+                'def_student_identification.*',
                 'def_gradelvl.*',
                 'def_program.*',
                 'def_curriculum.*',

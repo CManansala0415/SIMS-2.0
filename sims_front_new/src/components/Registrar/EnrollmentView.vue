@@ -23,6 +23,7 @@ import Loader from '../snippets/loaders/Loading1.vue';
 import Taggings from '../snippets/modal/EnrollmentTagging.vue';
 import { getUserID } from "../../routes/user.js";
 import EnrollmentListFIlterModal from '../snippets/modal/EnrollmentListFIlterModal.vue';
+import EnrollmentPrintModal from '../snippets/modal/EnrollmentPrintModal.vue';
 
 const preLoading = ref(true)
 const student = ref([])
@@ -54,6 +55,7 @@ const linkId = ref('')
 const holdSubmit = ref(false)
 const image = ref('')
 const userID = ref('')
+const showPrintModal = ref('')
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
 
@@ -335,9 +337,13 @@ const showForm = (type, data) => {
 
             break;
         case 3:
-            studentVal.value = data
-            // showTaggingModal.value = true
-            activeForm.value = type
+            showFormData.value = data
+            getCurriculumStudent(data.enr_course, data.enr_program).then((results) => {
+                curriculum.value = results
+                showPrintModal.value = true
+            })
+            // var element = document.getElementById('printform');
+            // html2pdf(element);
             break;
         default:
             activeForm.value = 1
@@ -525,7 +531,8 @@ const paramsCourse = ref(0)
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen"/>
                                 </button>
-                                <button tabindex="-1" title="Print Forms" @click="showForm(3, stud)"
+                                <button tabindex="-1" title="Print Forms" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                    @click="showForm(3, stud)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
                                 </button>
@@ -618,6 +625,36 @@ const paramsCourse = ref(0)
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showFilterModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+     <!-- Print Modal -->
+    <div class="modal fade" id="printmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Print and Download Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showPrintModal = false"></button>
+                </div>
+                <div class="modal-body">
+                    <EnrollmentPrintModal v-if="showPrintModal" :student="showFormData" :subject="subject" :section="section"
+                        :curriculum="curriculum" />
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showPrintModal = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

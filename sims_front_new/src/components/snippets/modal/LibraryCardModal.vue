@@ -8,6 +8,12 @@ import {
     addLibraryCard
 } from "../../Fetchers.js";
 
+import {
+    qrImageGenerator,
+    pdfGenerator
+} from "../../Generators.js";
+
+
 const props = defineProps({
     useriddata: {
     },
@@ -30,12 +36,12 @@ const cardNo = ref('')
 const cardDate = ref('')
 const hasActiveCard = ref(false)
 const verifying = ref(false)
+const qrimage = ref('')
 
 onMounted(() => {
     preLoading.value = true
     getLibraryCardIssue(student.value.per_id, student.value.enr_id, 0).then((results) => {
         libraryCards.value = results
-        preLoading.value = false
         let x = libraryCards.value.findIndex((e) => {
             return e.lbrd_status === 1
         })
@@ -43,11 +49,8 @@ onMounted(() => {
         if (x !== -1) {
             hasActiveCard.value = true
         }
-
+        preLoading.value = false
     })
-
-
-
 })
 
 const deactivateCard = (card) => {
@@ -127,7 +130,7 @@ const deactivateCard = (card) => {
                         title: "Notice",
                         text: "This card has an active borrowed books, to deactivate this card return all the books currently borrowed",
                         icon: "warning"
-                    }).then(()=>{
+                    }).then(() => {
                         verifying.value = false
                     });
                 } else {
@@ -139,7 +142,7 @@ const deactivateCard = (card) => {
                                 title: "Update Successful",
                                 text: "Changes applied, refreshing the page",
                                 icon: "success"
-                            }).then(()=>{
+                            }).then(() => {
                                 location.reload()
                             });
                         } else {
@@ -149,7 +152,7 @@ const deactivateCard = (card) => {
                                 title: "Update Failed",
                                 text: "Unknown error occured, try again later",
                                 icon: "error"
-                            }).then(()=>{
+                            }).then(() => {
                                 location.reload()
                             });
                         }
@@ -178,7 +181,7 @@ const registerNewCard = () => {
                 title: "Update Successful",
                 text: "Changes applied, refreshing the page",
                 icon: "success"
-            }).then(()=>{
+            }).then(() => {
                 location.reload()
             });
         } else {
@@ -188,19 +191,34 @@ const registerNewCard = () => {
                 title: "Update Failed",
                 text: "Unknown error occured, try again later",
                 icon: "error"
-            }).then(()=>{
+            }).then(() => {
                 location.reload()
             });
         }
     })
 
 }
+
+const printForm = (enrid,data) => {
+    let name = 'LC-'+enrid+data
+    qrImageGenerator(data).then((result) => {
+        qrimage.value = result
+        pdfGenerator(name, 'a6', 'landscape', 0)
+        Swal.fire({
+            icon: "success",
+            title: "Download Complete",
+            text: "Check your file manager, refreshing the page",
+        }).then(()=>{
+            location.reload()
+        });
+    })
+}
 </script>
 <template>
     <div class="small-font">
 
         <div v-if="preLoading">
-            <Loader/>
+            <Loader />
         </div>
         <div v-else>
             <div class="d-flex gap-2">
@@ -261,27 +279,127 @@ const registerNewCard = () => {
                         <div class="card text-start" v-for="(lc, index) in libraryCards">
                             <div class="card-body">
                                 <h5 class="card-title">{{ lc.lbrd_cardno }}</h5>
-                                <p class="card-text">Issued Library Card to this student with corresponding details below:</p>
+                                <p class="card-text">Issued Library Card to this student with corresponding details
+                                    below:</p>
                             </div>
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item"><span class="fw-bold">Date Issued:</span> {{ lc.lbrd_dateissued }}</li>
-                                <li class="list-group-item"><span class="fw-bold">Issued By:</span> {{ lc.emp_firstname }} {{
-                                    lc.emp_middlename }} {{ lc.emp_lastname }}</li>
-                                <li class="list-group-item"><span class="fw-bold">Card Status:</span> {{ lc.lbrd_status == 1 ?
-                                    'Active' : 'Inactive'}}</li>
+                                <li class="list-group-item"><span class="fw-bold">Date Issued:</span> {{
+                                    lc.lbrd_dateissued }}</li>
+                                <li class="list-group-item"><span class="fw-bold">Issued By:</span> {{ lc.emp_firstname
+                                }} {{
+                                        lc.emp_middlename }} {{ lc.emp_lastname }}</li>
+                                <li class="list-group-item"><span class="fw-bold">Card Status:</span> {{ lc.lbrd_status
+                                    == 1 ?
+                                    'Active' : 'Inactive' }}</li>
+                                <li class="list-group-item" v-show="false">
+                                    <div class="d-flex justify-content-center small-font">
+                                        <div class="w-100 row bg-opaque" style="height:375px; font-size:12px" id="printform">
+                                            <!-- <div class="col-3 bg-opaque d-flex flex-column justify-content-center align-content-center p-0">
+                                                <div class="bg-danger">
+                                                    <img class="card-img-top" src="/img/clcst_logo.png" height="50px" width="50px" alt="...">
+                                                </div>
+                                                <div class="bg-success d-flex align-items-center justify-content-center  h-100">
+                                                    <p style="writing-mode: vertical-rl; text-orientation: upright; font-size:6px; font-weight:bold;">
+                                                        {{ lc.lbrd_cardcode }}
+                                                    </p>
+                                                </div>
+                                            </div> -->
+                                            <div class="">
+                                                <div class="card-body p-3">
+                                                    <div class="row">
+                                                        <div
+                                                            class="col-3 d-flex justify-content-center align-items-center">
+                                                            <img class="card-img-top" src="/img/clcst_logo.png"
+                                                                alt="...">
+                                                        </div>
+                                                        <div
+                                                            class="col-9 justify-content-center align-content-center">
+                                                            <p class="m-0 fw-bold">CENTRAL LUZON COLLEGE OF SCIENCE AND
+                                                                TECHNOLOGY, INC.
+                                                                CELTECH COLLEGE</p>
+                                                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy.
+                                                                Sto. Rosario, City of San Fernando,
+                                                                Pampanga, Philippines, 2000</p>
+                                                            <!-- <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                                                                <p class="m-0 fw-normal small-font">Founded 1959</p> -->
+                                                        </div>
+                                                        <!-- <div class="col-3 border d-flex justify-content-center align-items-center">
+                                                            <div class="" id="qrcode" v-html="qrimage"></div>
+                                                        </div> -->
+                                                    </div>
+
+                                                </div>
+                                                <div class="row bg-white">
+                                                    <div class="col-9">
+                                                        <ul class="list-group list-group-flush p-3">
+                                                            <li class="list-group-item">
+                                                                <span>
+                                                                    Name:
+                                                                    <span class="fw-bold">
+                                                                        {{ lc.per_firstname }}
+                                                                        {{ lc.per_middlename ? lc.per_middlename : ' ' }}
+                                                                        {{ lc.per_lastname }}
+                                                                        {{ lc.per_suffixname ? lc.per_suffixname : ' ' }}
+                                                                    </span>
+                                                                </span>
+                                                            </li>
+                                                            <li class="list-group-item">
+                                                                <span>
+                                                                    Date Issued:
+                                                                    <span class="fw-bold">
+                                                                        {{ lc.lbrd_dateissued }}
+                                                                    </span>
+                                                                </span>
+                                                            </li>
+                                                            <li class="list-group-item">
+                                                                <span>
+                                                                    Library ID:
+                                                                    <span class="fw-bold">
+                                                                        {{ lc.lbrd_cardno }}
+                                                                    </span>
+                                                                </span>
+                                                            </li>
+                                                            <li class="list-group-item">
+                                                                <span>
+                                                                    Card Code:
+                                                                    <span class="fw-bold">
+                                                                        {{ lc.lbrd_cardcode }}
+                                                                    </span>
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-3 border">
+                                                        <div class="d-flex flex-column justify-content-center align-items-center h-100">
+                                                            <div class="" id="qrcode" v-html="qrimage"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card-body p-3">
+                                                    <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                                                    <p class="m-0 fw-normal small-font">Founded 1959</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
                             </ul>
-                            <div class="card-body">
+                            <div class="card-body d-flex gap-1">
+                                <button @click="printForm(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1"
+                                    class="btn btn-sm btn-primary w-100">
+                                    Download Card
+                                </button>
                                 <button @click="deactivateCard(lc.lbrd_id)" v-if="lc.lbrd_status == 1"
-                                    class="btn btn-sm btn-danger">
+                                    class="btn btn-sm btn-danger w-100">
                                     Deactivate
                                 </button>
-                                <button v-else disabled
-                                    class="btn btn-sm btn-danger pe-none">
+                                <button v-else disabled class="btn btn-sm btn-danger pe-none w-100">
                                     Deactivated
                                 </button>
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
