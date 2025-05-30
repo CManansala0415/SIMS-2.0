@@ -7,7 +7,9 @@ import {
     getGradelvl,
     getProgramList,
     uploadProfile,
-    uploadLink,
+    uploadLinkProfile,
+    uploadSignature,
+    uploadLinkSignature,
     getStudentByCourse,
     getCurriculumStudent,
     getSection,
@@ -24,6 +26,7 @@ import Taggings from '../snippets/modal/EnrollmentTagging.vue';
 import { getUserID } from "../../routes/user.js";
 import EnrollmentListFIlterModal from '../snippets/modal/EnrollmentListFIlterModal.vue';
 import EnrollmentPrintModal from '../snippets/modal/EnrollmentPrintModal.vue';
+import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 
 const preLoading = ref(true)
 const student = ref([])
@@ -41,6 +44,7 @@ const booting = ref('')
 const bootingCount = ref(0)
 const showTaggingModal = ref(false)
 const showFilterModal = ref(false)
+const showPrintID = ref(false)
 const showFormData = ref([])
 const activeForm = ref(1)
 const limit = ref(10)
@@ -50,7 +54,8 @@ const searchValue = ref([])
 const searchFname = ref('')
 const searchMname = ref('')
 const searchLname = ref('')
-const showLink = ref(false)
+const showLinkProfile = ref(false)
+const showLinkSignature = ref(false)
 const linkId = ref('')
 const holdSubmit = ref(false)
 const image = ref('')
@@ -61,7 +66,7 @@ const accessData = ref([])
 
 const booter = async () => {
     getAcademicDefaults().then((results) => {
-        console.log(results)
+        // console.log(results)
         gradelvl.value = results.gradelvl
         quarter.value = results.quarter
         course.value = results.course
@@ -261,57 +266,111 @@ const paginate = (mode) => {
 
 // image uploading
 const formData = new FormData
-const upload = (personID) => {
+const upload = (personID, pictype, existing) => {
+    let old_pic = existing? existing:0
     holdSubmit.value = true
 
     formData.set('image', image.value)
-    uploadProfile(formData).then((results) => {
-        showLink.value = !showLink.value, linkId.value = ''
-        image.value = ''
-        if (results.status == 200) {
-            let data = {
-                profile: results.link,
-                personid: personID
-            }
-            uploadLink(data).then((results) => {
-                if (results.status == 200) {
-                    // alert('Upload Successful')
-                    // location.reload()
-                    // holdSubmit.value = false
-                    Swal.fire({
-                        title: "Upload Successful",
-                        text: "Changes applied, refreshing the page",
-                        icon: "success"
-                    }).then(()=>{
-                        location.reload()
-                        holdSubmit.value = false
-                    });
-                } else {
-                    // alert('Upload Successful but Linking Failed')
-                    // holdSubmit.value = false
-                    Swal.fire({
-                        title: "Upload Notice",
-                        text: "Upload Successful but Linking Failed, try again later",
-                        icon: "question"
-                    }).then(()=>{
-                        holdSubmit.value = false
-                    });
+    if(pictype == 1){
+        //profile
+            uploadProfile(formData, old_pic).then((results) => {
+            showLinkProfile.value = !showLinkProfile.value, linkId.value = ''
+            image.value = ''
+            if (results.status == 200) {
+                let data = {
+                    profile: results.link,
+                    personid: personID,
                 }
-            })
-        } else {
-           // alert('Upload Failed')
-            // holdSubmit.value = false
-            Swal.fire({
-                title: "Upload Error",
-                text: "Upload failed, try again later",
-                icon: "error"
-            }).then(()=>{
-                holdSubmit.value = false
-            });
-        }
-    }).catch((err) => {
-        // console.log(err)
-    })
+                uploadLinkProfile(data).then((results) => {
+                    if (results.status == 200) {
+                        // alert('Upload Successful')
+                        // location.reload()
+                        // holdSubmit.value = false
+                        Swal.fire({
+                            title: "Upload Successful",
+                            text: "Changes applied, refreshing the page",
+                            icon: "success"
+                        }).then(()=>{
+                            location.reload()
+                            holdSubmit.value = false
+                        });
+                    } else {
+                        // alert('Upload Successful but Linking Failed')
+                        // holdSubmit.value = false
+                        Swal.fire({
+                            title: "Upload Notice",
+                            text: "Upload Successful but Linking Failed, try again later",
+                            icon: "question"
+                        }).then(()=>{
+                            holdSubmit.value = false
+                        });
+                    }
+                })
+            } else {
+            // alert('Upload Failed')
+                // holdSubmit.value = false
+                Swal.fire({
+                    title: "Upload Error",
+                    text: "Upload failed, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    holdSubmit.value = false
+                });
+            }
+        }).catch((err) => {
+            // console.log(err)
+        })
+    }else{
+        //signature
+        uploadSignature(formData,old_pic).then((results) => {
+            showLinkSignature.value = !showLinkSignature.value, linkId.value = ''
+            image.value = ''
+            if (results.status == 200) {
+                let data = {
+                    signature: results.link,
+                    personid: personID,
+                    
+                }
+                uploadLinkSignature(data).then((results) => {
+                    if (results.status == 200) {
+                        // alert('Upload Successful')
+                        // location.reload()
+                        // holdSubmit.value = false
+                        Swal.fire({
+                            title: "Upload Successful",
+                            text: "Changes applied, refreshing the page",
+                            icon: "success"
+                        }).then(()=>{
+                            location.reload()
+                            holdSubmit.value = false
+                        });
+                    } else {
+                        // alert('Upload Successful but Linking Failed')
+                        // holdSubmit.value = false
+                        Swal.fire({
+                            title: "Upload Notice",
+                            text: "Upload Successful but Linking Failed, try again later",
+                            icon: "question"
+                        }).then(()=>{
+                            holdSubmit.value = false
+                        });
+                    }
+                })
+            } else {
+            // alert('Upload Failed')
+                // holdSubmit.value = false
+                Swal.fire({
+                    title: "Upload Error",
+                    text: "Upload failed, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    holdSubmit.value = false
+                });
+            }
+        }).catch((err) => {
+            // console.log(err)
+        })
+    }
 }
 
 const handleImage = (e) => {
@@ -406,6 +465,12 @@ const paramsProgram = ref(0)
 const paramsGradelvl = ref(0)
 const paramsCourse = ref(0)
 
+const identificationData = ref([])
+const printID = (data) => {
+    identificationData.value = data
+    showPrintID.value = !showPrintID.value
+}
+
 // const validate = () => {
 //     const regEx1 = /[^a-zA-Z\s]+/;
 //     searchValue.value = searchValue.value.replace(regEx1, '');
@@ -464,6 +529,7 @@ const paramsCourse = ref(0)
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">Profile</th>
+                        <th style="background-color: #237a5b;" class="text-white">Signature</th>
                         <th style="background-color: #237a5b;" class="text-white">Full Name</th>
                         <th style="background-color: #237a5b;" class="text-white">Details</th>
                         <th style="background-color: #237a5b;" class="text-white">Date Enrolled</th>
@@ -475,21 +541,43 @@ const paramsCourse = ref(0)
                     <tr v-if="!preLoading && Object.keys(student).length" v-for="(stud, index) in student">
                         <td class="align-middle p-2">
                             <div class="d-flex flex-column justify-content-center align-content-center">
-                                <div class="d-flex justify-content-center align-content-center w-100">
-                                    <label @click="showLink = !showLink, linkId = index" :for="index" class="m-2">
+                                <div class="d-flex justify-content-center align-content-center w-100" @click="showLinkSignature = false" title="Click to Upload Profile Picture">
+                                    <label @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index" class="m-2" style="cursor: pointer;">
                                         <img :src="stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
                                             class="img-size" />
                                     </label>
                                 </div>
-                                <div v-if="showLink"
+                                <div v-if="showLinkProfile" 
                                     class="d-flex flex-column justify-content-center align-content-center p-2 w-100">
-                                    <form v-if="showLink && index == linkId" @submit.prevent="upload(stud.per_id)"
+                                    <form v-if="showLinkProfile && index == linkId" @submit.prevent="upload(stud.per_id,1,stud.per_profile)"
                                         method="post" enctype="multipart/form-data">
                                         <input type="file" :id="index" class="hidden" @change="handleImage">
-                                        <button type="submit" class="btn btn-primary btn-sm m-2"
+                                        <button type="submit" class="btn btn-primary btn-sm m-1"
                                             :disabled="holdSubmit ? true : false">Upload Photo</button>
+                                        <button class="btn btn-danger btn-sm m-1" @click="showLinkProfile = false">Cancel</button>
                                     </form>
-                                    <p v-if="showLink && index == linkId" class="fw-regular">{{ image.name }}</p>
+                                    <p v-if="showLinkProfile && index == linkId" class="fw-regular">{{ image.name }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="align-middle p-2">
+                            <div class="d-flex flex-column justify-content-center align-content-center">
+                                <div class="d-flex justify-content-center align-content-center w-100"  @click="showLinkProfile = false" title="Click to Upload Signature">
+                                    <label @click="showLinkSignature = !showLinkSignature, linkId = index" :for="index" class="m-2" style="cursor: pointer;">
+                                        <img :src="stud.per_signature ? 'http://localhost:8000/storage/signatures/' + stud.per_signature : '/img/profile_default.png'"
+                                            class="img-size" />
+                                    </label>
+                                </div>
+                                <div v-if="showLinkSignature"
+                                    class="d-flex flex-column justify-content-center align-content-center p-2 w-100">
+                                    <form v-if="showLinkSignature && index == linkId" @submit.prevent="upload(stud.per_id,2,stud.per_signature)"
+                                        method="post" enctype="multipart/form-data">
+                                        <input type="file" :id="index" class="hidden" @change="handleImage">
+                                        <button type="submit" class="btn btn-primary btn-sm m-1"
+                                            :disabled="holdSubmit ? true : false">Upload Photo</button>
+                                        <button class="btn btn-danger btn-sm m-1" @click="showLinkSignature = false">Cancel</button>
+                                    </form>
+                                    <p v-if="showLinkSignature && index == linkId" class="fw-regular">{{ image.name }}</p>
                                 </div>
                             </div>
                         </td>
@@ -540,6 +628,10 @@ const paramsCourse = ref(0)
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                 </button>
+                                 <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
+                                    type="button" title="print ID" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-id-card-clip"/>
+                                </button>
                             </div>
                         </td>
                         <td v-else class="align-middle p-2">    
@@ -547,12 +639,12 @@ const paramsCourse = ref(0)
                         </td>
                     </tr>
                     <tr v-if="!preLoading && !Object.keys(student).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="9" style="text-transform:none">
+                        <td class="p-3 text-center" colspan="10" style="text-transform:none">
                             No Records Found
                         </td>
                     </tr>
                     <tr v-if="preLoading && !Object.keys(student).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="9" style="text-transform:none">
+                        <td class="p-3 text-center" colspan="10" style="text-transform:none">
                             <div class="m-3">
                                 <Loader />
                             </div>
@@ -655,6 +747,35 @@ const paramsCourse = ref(0)
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showPrintModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print ID Modal -->
+    <div class="modal fade" id="printidmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Print ID</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showPrintID = false"></button>
+                </div>
+                <div class="modal-body d-flex flex-column justify-content-center align-items-center">
+                    <ApplicationPrintIdModal v-if="showPrintID" :studentdata="identificationData" :useriddata="userID"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showPrintID = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

@@ -68,7 +68,6 @@ h1 {
   background-size: cover;
 } */
 
-
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -102,6 +101,10 @@ h1 {
   background-color: #2d9c73;
 }
 
+.classic-font{
+  font-family: 'Times New Roman', Times, serif;
+}
+
 .nav-static{
   text-decoration: none;
   color: #2e2e2e;
@@ -111,6 +114,15 @@ h1 {
   background: #2d9c73;
   color: #ffffff;
 }
+
+.idbg{
+  background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('/img/clcst_logo.png');
+  /* background-image: url('/img/bsmt.jpg'); */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 /* .active{
   text-decoration: none;
   background-color: #237a5b;

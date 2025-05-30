@@ -17,13 +17,23 @@ class RegistrarController extends Controller
         return $applicant;
     }
 
-    public function getFamily($id)
+    public function getFamily($id, $mode)
     {
-        $family = DB::table('def_person_family')
+        if($mode == 1){
+            $family = DB::table('def_person_family')
                           ->where('fam_personid', '=', $id)
                           ->where('fam_status', '=',  1)
                           ->get();
-        return $family;
+            return $family;
+        }else{
+            $family = DB::table('def_person_family')
+                    ->where('fam_personid', '=',  $id)
+                    ->where('fam_guardian', '=',  1)
+                    ->where('fam_status', '=',  1)
+                    ->get();
+            return $family;
+        }
+        
     }
 
     public function getAttainment($id)
@@ -173,6 +183,7 @@ class RegistrarController extends Controller
                                 'fam_contact' => $request->input('fam_contact'),
                                 'fam_email' => $request->input('fam_email'),
                                 'fam_user' => $request->input('fam_user'),
+                                'fam_guardian' => $request->input('fam_guardian'),
                             ]);
                         }
                         return $data = [
@@ -576,6 +587,39 @@ class RegistrarController extends Controller
         ];
     }
 
+    public function getStudentIdDetails($enrid){
+        $student = DB::table('def_enrollment')
+                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->leftJoin('sett_ph_country', 'def_person.per_curr_country', '=', 'sett_ph_country.countryCode') 
+                ->leftJoin('sett_ph_province', 'def_person.per_curr_province', '=', 'sett_ph_province.provCode') 
+                ->leftJoin('sett_ph_city', 'def_person.per_curr_city', '=', 'sett_ph_city.citymunCode') 
+                ->leftJoin('sett_ph_barangay', 'def_person.per_curr_barangay', '=', 'sett_ph_barangay.brgyCode') 
+
+                ->leftJoin('def_gradelvl', 'def_enrollment.enr_gradelvl', '=', 'def_gradelvl.grad_id') 
+                ->leftJoin('sett_degree_types', 'def_enrollment.enr_program', '=', 'sett_degree_types.dtype_id') 
+                ->leftJoin('def_program', 'def_enrollment.enr_course', '=', 'def_program.prog_id') 
+                ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                ->select(  
+                    'def_enrollment.*',
+                    'def_person.*',
+                    'sett_ph_country.name as countryName',
+                    'sett_ph_province.provDesc',
+                    'sett_ph_city.citymunDesc',
+                    'sett_ph_barangay.brgyDesc',
+                    'def_gradelvl.grad_name as gradelvl',
+                    'sett_degree_types.dtype_desc as program',
+                    'def_program.prog_name as course',
+                    'def_student_identification.ident_identification as studentid',
+                )
+                ->orderBy('def_enrollment.enr_course')
+                ->orderByDesc('def_enrollment.enr_dateenrolled')
+                ->where('def_enrollment.enr_id', '=' , $enrid)
+                ->where('def_enrollment.enr_status', '=' , 1)
+                ->get();
+
+        return $student;
+    }
+
     public function getStudentFiltering($limit, $offset, $fname, $mname, $lname, $program, $gradelvl, $course, $mode)
     {   
         // kapag newly refresh no params for search
@@ -584,9 +628,11 @@ class RegistrarController extends Controller
             if($limit == 0 && $offset == 0){
                 $student = DB::table('def_enrollment')
                 ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                 ->select(  
                     'def_enrollment.*',
                     'def_person.*',
+                    'def_student_identification.ident_identification as studentid',
                 )
                 ->orderBy('def_enrollment.enr_course')
                 ->orderByDesc('def_enrollment.enr_dateenrolled')
@@ -595,9 +641,11 @@ class RegistrarController extends Controller
             }else{
                 $student = DB::table('def_enrollment')
                 ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                 ->select(  
                     'def_enrollment.*',
                     'def_person.*',
+                    'def_student_identification.ident_identification as studentid',
                 )
                 ->orderBy('def_enrollment.enr_dateenrolled')
                 ->orderByDesc('def_enrollment.enr_dateenrolled')
@@ -623,10 +671,12 @@ class RegistrarController extends Controller
         else if (($fname == 404)&&($mname == 404)&&($lname == 404)&&($mode==1)){
             $student = DB::table('def_enrollment')
                         ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                        ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                         ->select(  
                             'def_enrollment.*',
                             'def_person.*',
-                        )                        
+                            'def_student_identification.ident_identification as studentid',
+                        )
                         ->orderBy('def_enrollment.enr_course')
                         ->orderByDesc('def_enrollment.enr_dateenrolled')
                         ->where('def_person.per_status', '=',  1)
@@ -725,12 +775,15 @@ class RegistrarController extends Controller
         else{
              $student = DB::table('def_enrollment')
                         ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                        ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                         ->select(  
                             'def_enrollment.*',
                             'def_person.*',
-                        )                        
+                            'def_student_identification.ident_identification as studentid',
+                        )
                         ->where('def_person.per_status', '=',  1)
                         ->where('def_enrollment.enr_status', '=' , 1)
+                        
                         ->where(function($query) use ($fname, $mname, $lname) {
                             $query->orWhere('def_person.per_firstname', 'like',  '%' . $fname .'%')
                             ->orWhere('def_person.per_middlename', 'like',  '%' . $mname .'%')

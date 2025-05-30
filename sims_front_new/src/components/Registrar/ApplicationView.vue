@@ -38,6 +38,7 @@ import {
     getBarangay,
     updateApplicant
 } from "../Fetchers.js";
+import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 
 const limit = ref(10)
 const offset = ref(0)
@@ -54,6 +55,7 @@ const showForm = ref(false)
 const showFormModal = ref(false)
 const showEnroll = ref(false)
 const showIdentification = ref(false)
+const showPrintID = ref(false)
 
 const gender = ref([])
 const nationality = ref([])
@@ -381,6 +383,10 @@ const addID = (data) => {
     identificationData.value = data
     showIdentification.value = !showIdentification.value
 }
+const printID = (data) => {
+    identificationData.value = data
+    showPrintID.value = !showPrintID.value
+}
 
 </script>
 <template>
@@ -467,6 +473,9 @@ const addID = (data) => {
                                 <button data-bs-toggle="modal" data-bs-target="#identificationmodal" @click="addID(app)"
                                     type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button>
+                                <!-- <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(app)"
+                                    type="button" title="print ID" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button> -->
                             </div>
                         </td> 
                         <td v-else class="align-middle">
@@ -583,6 +592,35 @@ const addID = (data) => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showIdentification = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print ID Modal -->
+    <div class="modal fade" id="printidmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Print ID</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showPrintID = false"></button>
+                </div>
+                <div class="modal-body">
+                    <ApplicationPrintIdModal v-if="showPrintID" :studentdata="identificationData" :useriddata="userID"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showPrintID = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

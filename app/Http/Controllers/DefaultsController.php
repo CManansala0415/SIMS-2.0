@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 Use DateTime;
+use Response;
 
 class DefaultsController extends Controller
 {
@@ -743,4 +744,8 @@ class DefaultsController extends Controller
         ];
     }
 
+    public function getIDimage($fileName){
+        $path = public_path().'/storage/profiles/'.$fileName;
+        return Response::download($path); 
+    }
 }

@@ -386,15 +386,15 @@ const printForm = (enrid,data) => {
                                 </li>
                             </ul>
                             <div class="card-body d-flex gap-1">
-                                <button @click="printForm(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1"
+                                <button @click="printForm(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1" type="button"
                                     class="btn btn-sm btn-primary w-100">
                                     Download Card
                                 </button>
                                 <button @click="deactivateCard(lc.lbrd_id)" v-if="lc.lbrd_status == 1"
-                                    class="btn btn-sm btn-danger w-100">
+                                    class="btn btn-sm btn-danger w-100" type="button">
                                     Deactivate
                                 </button>
-                                <button v-else disabled class="btn btn-sm btn-danger pe-none w-100">
+                                <button v-else disabled class="btn btn-sm btn-danger pe-none w-100" type="button">
                                     Deactivated
                                 </button>
                             </div>

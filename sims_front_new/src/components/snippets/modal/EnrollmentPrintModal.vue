@@ -363,6 +363,7 @@ const downloadPdf = () => {
                 <tr>
                     <td class="align-middle" colspan="3" v-if="!milestoneLoading && Object.keys(milestone).length">
                         <table class="table" v-for="(e, index) in enrolleeData">
+                            <tbody>
                             <tr class="text-start">
                                 <td class="p-2 border" colspan="2">
                                     <span style="text-transform:none">Name: </span>
@@ -412,6 +413,7 @@ const downloadPdf = () => {
                                     </span>
                                 </td>
                             </tr>
+                            </tbody>
                         </table>
                     </td>
                 </tr>

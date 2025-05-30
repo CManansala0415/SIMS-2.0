@@ -157,7 +157,7 @@ const booter = async() =>{
             personal.value.per_id? forUpdate.value = true:forUpdate.value = false
         }
 
-        await getFamily(results.per_famid).then((results) => {
+        await getFamily(results.per_famid,1).then((results) => {
             if(results){
                 familyMembers.value = results
             }
@@ -560,6 +560,7 @@ const percounter = ref(0)
 const famcounter = ref(0)
 const awrcounter = ref(0)
 const attcounter = ref(0)
+const guardianTick = ref(0)
 const registerApplicant = async() =>{
     
     let pers = {
@@ -580,15 +581,17 @@ const registerApplicant = async() =>{
             percounter.value+=1
 
              //family update
-            fam.forEach(async (items) => {
+            fam.forEach(async (items, index) => {
                 let famdata = {
                     ...items,
                     fam_id: items.fam_id,
                     fam_personid: pers.per_famid,
+                    fam_guardian: index==guardianTick.value? 1:0
                 }
                 updatePersonDetails(famdata, 1).then((results)=>{
                     famcounter.value+=1
                 })
+
             })
             //award update
             awr.forEach(async (items) => {
@@ -620,7 +623,7 @@ const registerApplicant = async() =>{
             text: "You have successfully made changes to this record. Click now refresh to retrieve changes.",
             icon: "success"
         }).then(()=>{
-            location.reload()
+            // location.reload()
         });
 
     }else{
@@ -631,12 +634,13 @@ const registerApplicant = async() =>{
             percounter.value+=1
 
             //family registry
-            fam.forEach(async (items) => {
+            fam.forEach(async (items,index) => {
                 
                 let famdata = {
                     ...items,
                     fam_personid: results.fam_id,
-                    fam_user: userID.value
+                    fam_user: userID.value,
+                    fam_guardian: index==guardianTick.value? 1:0
                 }
                 addApplicant(famdata, 2).then((results)=>{
                     famcounter.value+=1
@@ -672,7 +676,7 @@ const registerApplicant = async() =>{
             text: "You have successfully registered this record. Click now refresh to retrieve changes.",
             icon: "success"
         }).then(()=>{
-            location.reload()
+            // location.reload()
         });
     }
 }
@@ -1008,6 +1012,7 @@ const refresh = () => {
                             <th scope="col">Relationship</th>
                             <th scope="col">Contact No.</th>
                             <th scope="col">Email</th>
+                            <th scope="col">Guardian</th>
                             <th scope="col" class="w-25">Command</th>
                         </tr>
                     </thead>
@@ -1018,6 +1023,15 @@ const refresh = () => {
                             <td>{{ fam.fam_relationship }}</td>
                             <td>{{ fam.fam_contact }}</td>
                             <td style="text-transform:none">{{ fam.fam_email }}</td>
+                            <td style="text-transform:none">
+                               <div class="form-check">
+                                    <input @click="guardianTick=index" class="form-check-input" type="radio" name="flexRadioDefault" :id="'fam'+index" v-model="fam.fam_guardian"
+                                    :checked="fam.fam_guardian == 1? true:false" :disabled="forUpdate? true:false">
+                                    <label class="form-check-label" for="flexRadioDefault1">
+                                        Guardian
+                                    </label>
+                                </div>
+                            </td>
                             <td>
                                 <button @click="addFamMembers('remove', fam, index)" type="button"
                                     class="btn btn-sm btn-danger" :disabled="saving?true:false">
@@ -1026,7 +1040,7 @@ const refresh = () => {
                             </td>
                         </tr>
                         <tr v-if="!Object.keys(familyMembers).length">
-                            <td colspan="5">Empty List</td>
+                            <td colspan="6">Empty List</td>
                         </tr>
                     </tbody>
                 </table>

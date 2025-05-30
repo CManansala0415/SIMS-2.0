@@ -48,7 +48,7 @@ Route::middleware(['auth:sanctum'])->get('/get-specialization', [DefaultsControl
 
 
 Route::middleware(['auth:sanctum'])->get('/get-person/{id}', [RegistrarController::class,'getPerson']);
-Route::middleware(['auth:sanctum'])->get('/get-family/{id}', [RegistrarController::class,'getFamily']);
+Route::middleware(['auth:sanctum'])->get('/get-family/{id}/{mode}', [RegistrarController::class,'getFamily']);
 Route::middleware(['auth:sanctum'])->get('/get-attainment/{id}', [RegistrarController::class,'getAttainment']);
 Route::middleware(['auth:sanctum'])->get('/get-award/{id}', [RegistrarController::class,'getAward']);
 Route::middleware(['auth:sanctum'])->post('/add-applicant/{type}', [RegistrarController::class,'addApplicant']);
@@ -63,8 +63,11 @@ Route::middleware(['auth:sanctum'])->post('/enroll-applicant', [RegistrarControl
 
 Route::middleware(['auth:sanctum'])->get('/get-student/{limit}/{offset}/{search}', [RegistrarController::class,'getStudent']);
 Route::middleware(['auth:sanctum'])->get('/get-student-filtering/{limit}/{offset}/{fname}/{mname}/{lname}/{program}/{gradelvl}/{course}/{mode}', [RegistrarController::class,'getStudentFiltering']);
-Route::middleware(['auth:sanctum'])->post('/upload-profile', [FileManagement::class,'uploadProfile']);
-Route::middleware(['auth:sanctum'])->post('/upload-link', [FileManagement::class,'uploadLink']);
+Route::middleware(['auth:sanctum'])->get('/get-student-id-details/{enrid}', [RegistrarController::class,'getStudentIdDetails']);
+Route::middleware(['auth:sanctum'])->post('/upload-profile/{existing}', [FileManagement::class,'uploadProfile']);
+Route::middleware(['auth:sanctum'])->post('/upload-link-profile', [FileManagement::class,'uploadLinkProfile']);
+Route::middleware(['auth:sanctum'])->post('/upload-signature/{existing}', [FileManagement::class,'uploadSignature']);
+Route::middleware(['auth:sanctum'])->post('/upload-link-signature', [FileManagement::class,'uploadLinkSignature']);
 Route::middleware(['auth:sanctum'])->get('/get-student-by-course/{limit}/{offset}/{search}', [RegistrarController::class,'getStudentByCourse']);
 Route::middleware(['auth:sanctum'])->get('/get-curriculum/{limit}/{offset}/{search}', [RegistrarController::class,'getCurriculum']);
 Route::middleware(['auth:sanctum'])->get('/get-curriculum-student/{prog}/{type}', [RegistrarController::class,'getCurriculumStudent']);
@@ -176,6 +179,9 @@ Route::middleware(['auth:sanctum'])->post('/add-command-access', [CommandControl
 Route::middleware(['auth:sanctum'])->get('/get-command-access/{userid}', [CommandController::class,'getCommandAccess']);
 Route::middleware(['auth:sanctum'])->post('/tag-employee-account', [CommandController::class,'tagEmployeeAccount']);
 Route::middleware(['auth:sanctum'])->get('/get-employee-account/{userid}', [CommandController::class,'getEmployeeAccount']);
+
+Route::middleware(['auth:sanctum'])->get('/get-person-image/{filename}', [DefaultsController::class,'getIDimage']);
+
 
 
 

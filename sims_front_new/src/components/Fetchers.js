@@ -36,11 +36,11 @@ const getPerson = async (id) => {
 }
 
 let family = {}
-const getFamily = async (id) => {
+const getFamily = async (id,mode) => {
     try{
         await axios({
             method: "GET",
-            url: 'api/get-family/'+id,
+            url: 'api/get-family/'+id+'/'+mode,
         }).then(async (results) => {
             // console.log(results.data)
             family = results.data
@@ -542,6 +542,22 @@ const getStudentFiltering = async (limit, offset, fname, mname, lname, program, 
     }
 }
 
+let studentiddetails = {}
+const getStudentIdDetails = async (id) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-student-id-details/'+id
+        }).then(async (results) => {
+            // console.log(results.data)
+            studentiddetails = results.data
+        })
+        return studentiddetails
+    }catch(err){
+        return err
+    }
+}
+
 let studentbycourse = {}
 const getStudentByCourse = async (limit, offset, id) => {
     let search = id
@@ -563,11 +579,11 @@ const getStudentByCourse = async (limit, offset, id) => {
 }
 
 let uploadprofile = {}
-const uploadProfile = async (data) => {
+const uploadProfile = async (data,old) => {
     try{
         await axios({
             method: "POST",
-            url: 'api/upload-profile/',
+            url: 'api/upload-profile/'+old,
             data:data
 
         }).then(async (results) => {
@@ -579,18 +595,52 @@ const uploadProfile = async (data) => {
     }
 }
 
-let uploadlink = {}
-const uploadLink = async (data) => {
+let uploadlinkprofile = {}
+const uploadLinkProfile = async (data) => {
     try{
         await axios({
             method: "POST",
-            url: 'api/upload-link/',
+            url: 'api/upload-link-profile/',
             data:data
 
         }).then(async (results) => {
-            uploadlink = results.data
+            uploadlinkprofile = results.data
         })
-        return uploadlink
+        return uploadlinkprofile
+    }catch(err){
+        return 500
+    }
+}
+
+let uploadsignature = {}
+const uploadSignature = async (data, old) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/upload-signature/'+old,
+            data:data
+
+        }).then(async (results) => {
+            uploadsignature = results.data
+        })
+        return uploadsignature
+    }catch(err){
+        return 500
+    }
+}
+
+let uploadlinksignature = {}
+const uploadLinkSignature = async (data) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/upload-link-signature/',
+            data:data
+
+        }).then(async (results) => {
+            uploadlinksignature = results.data
+        })
+        return uploadlinksignature
     }catch(err){
         return 500
     }
@@ -2376,9 +2426,12 @@ export {
     getEnrollment,
     getStudent,
     getStudentFiltering,
+    getStudentIdDetails,
     getStudentByCourse,
     uploadProfile,
-    uploadLink,
+    uploadLinkProfile,
+    uploadSignature,
+    uploadLinkSignature,
     getCurriculum,
     getCurriculumStudent,
     getTaggedSubject,

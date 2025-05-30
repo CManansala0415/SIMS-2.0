@@ -5,14 +5,60 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File; 
 
 class FileManagement extends Controller
 {
-    public function uploadProfile(Request $request) {
+    public function uploadProfile(Request $request, $existing){
         // $pathToFile = $request->file('image')->store('images', 'public');
+
+        if($existing != 0){
+            $path = public_path().'/storage/profiles/'.$existing;
+            unlink($path);
+        }
+
         $pathToFile = $request->file('image');
         $pathToFile->storeAs(
             'profiles',
+            $pathToFile->getClientOriginalName(),
+            'public'
+        );
+        // return $pathToFile;
+        if($pathToFile){
+            return $data = [
+                'old_profile' => $existing,
+                'status' => 200,
+                'link' =>  $pathToFile->getClientOriginalName(),
+            ];
+        }else{
+            return $data = [
+                'status' => 500,
+            ];
+        }
+    } 
+    public function uploadLinkProfile(Request $request) {
+        $s1 = DB::table('def_person')
+            ->where('per_id','=', $request['personid'])
+            ->update([
+                "per_profile" => $request['profile'],
+            ]);
+        
+        return $data = [
+            'status' => 200,
+        ];
+    } 
+
+    public function uploadSignature(Request $request, $existing) {
+        // $pathToFile = $request->file('image')->store('images', 'public');
+
+        if($existing != 0){
+            $path = public_path().'/storage/signatures/'.$existing;
+            unlink($path);
+        }
+
+        $pathToFile = $request->file('image');
+        $pathToFile->storeAs(
+            'signatures',
             $pathToFile->getClientOriginalName(),
             'public'
         );
@@ -28,17 +74,17 @@ class FileManagement extends Controller
             ];
         }
     } 
-    public function uploadLink(Request $request) {
+    public function uploadLinkSignature(Request $request) {
         $s1 = DB::table('def_person')
-                ->where('per_id','=', $request['personid'])
-                ->update([
-                    "per_profile" => $request['profile'],
-                ]);
-            
-            return $data = [
-                'status' => 200,
-            ];
-    } 
+            ->where('per_id','=', $request['personid'])
+            ->update([
+                "per_signature" => $request['signature'],
+            ]);
+        
+        return $data = [
+            'status' => 200,
+        ];
+    }
 
     public function addMedicalFilesImage(Request $request, $location) {
         // $pathToFile = $request->file('image')->store('images', 'public');

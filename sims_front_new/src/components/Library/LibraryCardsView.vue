@@ -6,7 +6,7 @@ import { getStudent,
          getGradelvl, 
          getProgramList, 
          uploadProfile, 
-         uploadLink, 
+         uploadLinkProfile, 
          getStudentByCourse, 
          getCurriculumStudent, 
          getSection, 
@@ -228,7 +228,7 @@ const upload = (personID) => {
                 profile: results.link,
                 personid: personID
             }
-            uploadLink(data).then((results) => {
+            uploadLinkProfile(data).then((results) => {
                 if (results.status == 200) {
                     // alert('Upload Successful')
                     // location.reload()

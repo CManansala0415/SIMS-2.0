@@ -1,3 +1,4 @@
+import axios from "axios";
 
 const qrImageGenerator = async (data) => {
     var typeNumber = 4;
@@ -10,15 +11,36 @@ const qrImageGenerator = async (data) => {
     return qrcode;
 }
 
+const imageFetcher = async(data, element) =>{
+    await axios({
+        method: "GET",
+        url: 'api/get-person-image/' + data,
+
+    }).then(async (results) => {
+        console.log(results.data)
+        return results.data
+    })
+}
+
 const pdfGenerator = async (name,paper,orientation,margin) => {
     var element = document.getElementById('printform');
     var opt = {
         // margin: [0.1, 0.2, 0.1, 0.2],
         margin: margin,
         filename: name+'.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 1 },
-        jsPDF: { unit: 'in', format: paper, orientation: orientation }
+        image: { type: 'jpeg', quality: 1 },
+        // html2canvas: { scale: 1 },
+        html2canvas: {
+            dpi: 192,
+            scale:4,
+            letterRendering: true,
+            useCORS: true
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: paper, 
+            orientation: orientation
+        },
         
     };
 
@@ -26,10 +48,12 @@ const pdfGenerator = async (name,paper,orientation,margin) => {
     html2pdf().set(opt).from(element).save();
 
     // Old monolithic-style usage:
-    html2pdf(element, opt);
+    // html2pdf(element, opt);
+
 }
 
 export {
     qrImageGenerator,
-    pdfGenerator
+    pdfGenerator,
+    imageFetcher
 }
