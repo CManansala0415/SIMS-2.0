@@ -42,6 +42,9 @@ const requestedItems = ref([])
 const students = ref([])
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
 
 const booter = async () => {
     // getProgram().then((results) => {
@@ -105,7 +108,7 @@ onMounted(async () => {
         try {
             preLoading.value = true
             await booter().then(() => {
-                getRequestDetails(limit.value, offset.value).then((results2) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
                     requestedItems.value = results2.data.map((e) => {
                         let itemdesc = ''
                         let paystat = ''
@@ -173,6 +176,10 @@ onMounted(async () => {
 
 
 const paginate = (mode) => {
+    searchFname.value = searchFname.value.trim()
+    searchMname.value = searchMname.value.trim()
+    searchLname.value = searchLname.value.trim()
+
     switch (mode) {
         case 'prev':
             if (offset.value <= 0) {
@@ -182,7 +189,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value).then((results) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     requestedItems.value = results.data
                     requestedItemsCount.value = results.count
                     preLoading.value = false
@@ -198,7 +205,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, null).then((results) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     requestedItems.value = results.data
                     requestedItemsCount.value = results.count
                     preLoading.value = false
@@ -212,7 +219,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchValue.value).then((results) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     requestedItems.value = results.data
                     requestedItemsCount.value = results.count
                     preLoading.value = false
@@ -293,7 +300,7 @@ const settlement = (data, mode) => {
             confirmButtonText: "Yes, Im Delete it!"
         }).then(async (result) => {
             if (result.isConfirmed) {
-                preloading.value = true
+                preLoading.value = true
                 let del = {
                     acr_id: data.acr_id,
                     acr_updatedby: userID.value,
@@ -322,13 +329,18 @@ const settlement = (data, mode) => {
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
-                        /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
+             <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
+            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addrequestmodal" @click="settlement('', 1)"
                     type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
                     <font-awesome-icon icon="fa-solid fa-add" /> Add New
@@ -367,7 +379,7 @@ const settlement = (data, mode) => {
                         </td>
                         <td v-if="accessData[2].useracc_modifying == 1" class="align-middle">
                             <div v-if="req.acr_status == 0" class="text-center">
-                                <p class="text-danger fw-bold">Cancelled</p>
+                                <span class="text-danger fw-bold">Cancelled</span>
                             </div>
                             <div v-else>
                                 <div v-if="req.acr_paystatus == 1 && req.acr_rendered == 1" class="text-center">

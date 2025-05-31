@@ -86,78 +86,74 @@ class TransactionsController extends Controller
     }
 
     
-    public function getRequestDetails($limit, $offset, $search)
+    public function getRequestDetails($limit, $offset, $fname, $mname, $lname, $mode, $id)
     {   
-        if($search==204){
+        if($mode == 1){
+                $request = DB::table('def_accounts_request as dr')
+                ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
+                ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
+                ->select(  
+                    'dr.*',
+                    'df.*',
+                    'pr.per_firstname',
+                    'pr.per_middlename',
+                    'pr.per_lastname',
+                    'pr.per_suffixname',
+                )
+                ->limit($limit)->offset($offset)
+                ->orderBy('dr.acr_id','DESC')
+                ->get();
 
-            if($limit == 0 && $offset == 0){
-                $request = DB::table('def_accounts_request as dr')
+                $count = DB::table('def_accounts_request as dr')
                 ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
+                ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
+                ->select(  
+                    'dr.*',
+                )
+                ->limit($limit)->offset($offset)
+                ->count();
+
+        }elseif ($mode == 2){
+            $request = DB::table('def_accounts_request')
+                    ->where('acr_id', '=', $id)
+                    ->get();
+            $count = DB::table('def_accounts_request')
+                    ->where('acr_id', '=', $id)
+                    ->count();
+        }else{
+            $request = DB::table('def_accounts_request as dr')
+                ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
+                ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
                 ->select(  
                     'dr.*',
                     'df.*',
+                    'pr.per_firstname',
+                    'pr.per_middlename',
+                    'pr.per_lastname',
+                    'pr.per_suffixname',
                 )
+                ->where(function($query) use ($fname,$mname,$lname) {
+                    $query->orWhere('pr.per_firstname', 'like',  '%' . $fname .'%')
+                    ->orWhere('pr.per_middlename', 'like',  '%' . $mname .'%')
+                    ->orWhere('pr.per_lastname', 'like',  '%' . $lname .'%');
+                })
+                ->limit($limit)->offset($offset)
                 ->orderBy('dr.acr_id','DESC')
                 ->get();
-            }else{
-                $request = DB::table('def_accounts_request as dr')
+
+                $count = DB::table('def_accounts_request as dr')
                 ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
+                ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
                 ->select(  
                     'dr.*',
-                    'df.*',
                 )
-                ->where('dr.acr_status', '=',  1)
-                ->orderBy('dr.acr_id','DESC')
-                ->limit($limit)
-                ->offset($offset)
-                ->get();
-            }
-           
-            $count = DB::table('def_accounts_request as dr')
-            ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
-            ->select(  
-                'dr.*',
-                'df.*',
-            )
-            ->orderBy('dr.acr_id','DESC')
-            ->count();
-        }else if (($limit == 0 && $offset == 0)&&($search != 204)){
-            $request = DB::table('def_accounts_request as dr')->orderBy('dr.acr_id','DESC')
-                        ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
-                        ->select(  
-                            'dr.*',
-                            'df.*',
-                        )
-                        ->where(function($query) use ($search) {
-                            $query->where('dr.acr_id', 'like',  '%' . $search .'%');
-                        })
-                        ->get();
-            $count =  DB::table('def_accounts_request')->orderBy('acr_id','DESC')
-                        // ->where('acr_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('acr_id', 'like',  '%' . $search .'%');
-                        })
-                        ->count();        
-        }
-        else{
-            $request = DB::table('def_accounts_request as dr')->orderBy('dr.acr_id','DESC')
-                        ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
-                        ->select(  
-                            'dr.*',
-                            'df.*',
-                        )
-                        ->where(function($query) use ($search) {
-                            $query->where('dr.acr_personname', 'like',  '%' . $search .'%');
-                        })
-                        ->limit($limit)->offset($offset)
-                        ->get();
-            $count =  DB::table('def_accounts_request')->orderBy('acr_id','DESC')
-                        // ->where('acr_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('acr_personname', 'like',  '%' . $search .'%');
-                        })
-                        ->limit($limit)->offset($offset)
-                        ->count();        
+                 ->where(function($query) use ($fname,$mname,$lname) {
+                    $query->orWhere('pr.per_firstname', 'like',  '%' . $fname .'%')
+                    ->orWhere('pr.per_middlename', 'like',  '%' . $mname .'%')
+                    ->orWhere('pr.per_lastname', 'like',  '%' . $lname .'%');
+                })
+                ->limit($limit)->offset($offset)
+                ->count();
         }
 
         return $data = [

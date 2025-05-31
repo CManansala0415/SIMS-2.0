@@ -142,7 +142,7 @@ onMounted(async () => {
                     // console.log(student.value)
                     studentCount.value = results.count
                     preLoading.value = false
-
+                    
                     let x = student.value.map((e) => {
                         let y = accounts.value.findIndex((f) => {
                             return f.acs_enrid === e.enr_id
@@ -154,6 +154,8 @@ onMounted(async () => {
                     })
 
                     student.value = x
+                    console.log(student.value)
+
                 })
             })
 

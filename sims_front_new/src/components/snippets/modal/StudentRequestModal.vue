@@ -28,12 +28,17 @@ const fullName = ref('')
 const docStamp = ref('')
 const hasDocStamp = ref(false)
 
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
+
 const searchStudent = () => {
     itemRequested.value = 0
     requestingStud.value = 0
     fullName.value = ''
-
-    getApplicant(0, 0, searchValue.value).then((results) => {
+    
+    getApplicant(0, 0, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+        console.log(results)
         students.value = results.data
         studentCount.value = results.count
     })
@@ -106,8 +111,11 @@ onMounted(() => {
 
 
 const itemCost = () => {
-    itemPrice.value = 3000
-
+    items.value.filter((e) => {
+        if (itemRequested.value == e.acf_id) {
+            return itemPrice.value = e.acf_price 
+        }
+    })
     items.value.filter((e) => {
         if (itemRequested.value == e.acf_id) {
             return hasDocStamp.value = e.acf_docstamp == 1 ? true : false
@@ -128,7 +136,7 @@ const itemCost = () => {
                 <div class="w-100">
                     <label for="searchstudent" class="form-label">Search Student</label>
                     <input type="text" class="form-control form-control-sm" id="searchstudent"
-                        placeholder="Enter Name Here..." v-model="searchValue"
+                        placeholder="Enter Name Here..." v-model="searchFname" @keyup.enter="searchStudent()"
                         onkeydown="return /[a-z, ]/i.test(event.key)">
                 </div>
                 <div class=" align-content-end">

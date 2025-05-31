@@ -54,9 +54,9 @@ class RegistrarController extends Controller
         return $award;
     }
 
-    public function getApplicant($limit, $offset, $fname, $mname, $lname)
-    {   
-        if(($fname == 404)&&($mname == 404)&&($lname == 404)){
+    public function getApplicant($limit, $offset, $fname, $mname, $lname, $mode)
+    {   // 1 means general viewing page
+        if($mode == 1){
             $applicant = DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
                         ->limit($limit)->offset($offset)
@@ -70,11 +70,38 @@ class RegistrarController extends Controller
                 'count' => $count,
             ];
 
-        }else{
+        }
+        // 2 means special search single textboxbox search
+        elseif ($mode == 2){
+            if ($fname==404) $fname = '';
             $applicant = DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
-                        ->where(function($query) use ($fname, $mname, $lname) {
-                            $query->where('per_firstname', 'like',  '%' . $fname .'%')
+                        ->where(function($query) use ($fname) {
+                            $query->orWhere('per_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('per_middlename', 'like',  '%' . $fname .'%')
+                            ->orWhere('per_lastname', 'like',  '%' . $fname .'%');
+                        })
+                        ->get();
+            $count =  DB::table('def_person')->orderBy('per_id','DESC')
+                        ->where('per_status', '=',  1)
+                        ->where(function($query) use ($fname) {
+                            $query->orWhere('per_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('per_middlename', 'like',  '%' . $fname .'%')
+                            ->orWhere('per_lastname', 'like',  '%' . $fname .'%');
+                        })
+                        ->limit($limit)->offset($offset)
+                        ->count();      
+            return $data = [
+                'data' => $applicant,
+                'count' => $count,
+            ];
+        }
+        //custom search with fname mname and lname
+        else{
+            $applicant = DB::table('def_person')->orderBy('per_id','DESC')
+                        ->where('per_status', '=',  1)
+                        ->where(function($query) use ($fname,$mname,$lname) {
+                            $query->orWhere('per_firstname', 'like',  '%' . $fname .'%')
                             ->orWhere('per_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('per_lastname', 'like',  '%' . $lname .'%');
                         })
@@ -82,18 +109,18 @@ class RegistrarController extends Controller
                         ->get();
             $count =  DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
-                        ->where(function($query) use ($fname, $mname, $lname) {
-                            $query->where('per_firstname', 'like',  '%' . $fname .'%')
+                        ->where(function($query) use ($fname,$mname,$lname) {
+                            $query->orWhere('per_firstname', 'like',  '%' . $fname .'%')
                             ->orWhere('per_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('per_lastname', 'like',  '%' . $lname .'%');
                         })
                         ->limit($limit)->offset($offset)
-                        ->count();       
+                        ->count();     
+             return $data = [
+                'data' => $applicant,
+                'count' => $count,
+            ];            
         }
-        return $data = [
-            'data' => $applicant,
-            'count' => $count,
-        ];
         
     }
 

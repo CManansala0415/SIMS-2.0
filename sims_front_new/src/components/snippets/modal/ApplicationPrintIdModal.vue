@@ -39,9 +39,8 @@ const studentData = ref([])
 onMounted(() => {
     getStudentIdDetails(student.value.enr_id).then((result1)=>{
         studentData.value = result1[0]
-        console.log(result1)
         getFamily(student.value.per_famid,2).then((result2)=>{
-            if(Object.keys(family.value).length){
+            if(Object.keys(result2).length){
                 family.value = result2[0]
             }else{
                 family.value = 
@@ -114,7 +113,7 @@ const printForm = (studentid) => {
     <!-- CR80 cards are 3.375" x 2.125" (the same size as a credit card) and are the standard, most commonly used size of PVC card. -->
      <!-- height: 640px; width: 480px; -->
         <Loader v-if="preLoading"/>
-        <div v-else>
+        <div v-else class="overflow-auto">
             <div id="printform">
                 <!-- Front -->
                 <div class="position-relative d-flex flex-column justify-content-center align-items-center align-content-start" style="height: 319px;">

@@ -1,14 +1,14 @@
 import axios from 'axios';
 
 let applicant = {}
-const getApplicant = async (limit, offset, fname, mname, lname) => {
+const getApplicant = async (limit, offset, fname, mname, lname, mode) => {
     let firstname = !fname?'404':fname
     let middlename = !mname?'404':mname
     let lastname = !lname?'404':lname
     try{
         await axios({
             method: "GET",
-            url: 'api/get-applicant/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname,
+            url: 'api/get-applicant/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode,
         }).then(async (results) => {
             // console.log(results.data)
             applicant = results.data
@@ -1358,15 +1358,15 @@ const getFeeDetails = async (limit, offset, id) => {
 }
 
 let requestdetails = {}
-const getRequestDetails = async (limit, offset, id) => {
-    let search = id
-    if(!id){
-        search = 204
-    }
+const getRequestDetails = async (limit, offset, fname, mname, lname, mode, id) => {
+    let firstname = !fname?'404':fname
+    let middlename = !mname?'404':mname
+    let lastname = !lname?'404':lname
+
     try{
         await axios({
             method: "GET",
-            url: 'api/get-accounts-request/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-accounts-request/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode+'/'+id,
         }).then(async (results) => {
             // console.log(results.data)
             requestdetails = results.data

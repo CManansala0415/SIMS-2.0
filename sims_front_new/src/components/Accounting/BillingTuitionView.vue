@@ -13,7 +13,8 @@ import {
     getAccountsDetails,
     getMilestone,
     getPriceDetails,
-    getAcademicDefaults
+    getAcademicDefaults,
+    getStudentFiltering
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
@@ -82,6 +83,7 @@ const booter = async () => {
         quarter.value = results.quarter
         course.value = results.course
         section.value = results.section
+        program.value = results.program
         booting.value = 'Loading Academic Information'
         bootingCount.value += 1
     })
@@ -110,7 +112,12 @@ const booter = async () => {
 
 }
 
-
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
+const paramsProgram = ref(0)
+const paramsGradelvl = ref(0)
+const paramsCourse = ref(0)
 onMounted(async () => {
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
@@ -122,10 +129,22 @@ onMounted(async () => {
 
                 booting.value = 'Loading Students...'
                 bootingCount.value += 1
-                getStudent(limit.value, offset.value).then((results2) => {
-                    student.value = results2.data
-                    studentCount.value = results2.count
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
+                    student.value = results.data
+                    studentCount.value = results.count
                     preLoading.value = false
+
+                    // let x = studentAccount.value.map((e) => {
+                    //     let y = accounts.value.findIndex((f) => {
+                    //         return f.acs_enrid === e.enr_id
+                    //     })
+                    //     return {
+                    //         ...e,
+                    //         ...accounts.value[y],
+                    //     }
+                    // })
+
+                    // studentAccount.value = x
                 })
             })
         } catch (err) {
@@ -157,6 +176,10 @@ onMounted(async () => {
 
 
 const paginate = (mode) => {
+    searchFname.value = searchFname.value.trim()
+    searchMname.value = searchMname.value.trim()
+    searchLname.value = searchLname.value.trim()
+
     switch (mode) {
         case 'prev':
             if (offset.value <= 0) {
@@ -166,7 +189,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudent(limit.value, offset.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -174,7 +197,7 @@ const paginate = (mode) => {
             }
             break;
         case 'next':
-
+ 
             if (offset.value >= studentCount.value) {
                 offset.value = studentCount.value
             } else {
@@ -182,7 +205,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudent(limit.value, offset.value, null).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -190,13 +213,13 @@ const paginate = (mode) => {
             }
             break;
         case 'search':
-            searchValue.value = searchValue.value.trim()
+            // searchValue.value = searchValue.value.trim()
             if (searchValue.value || searchValue.value == '') {
                 student.value = []
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudent(limit.value, offset.value, searchValue.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -215,20 +238,20 @@ const paginate = (mode) => {
                 });
             }
             break;
-        case 'course':
-            student.value = []
-            offset.value = 0
-            studentCount.value = 0
-            preLoading.value = true
-            getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
-                student.value = results.data
-                studentCount.value = results.count
-                preLoading.value = false
-            }).catch((err) => {
-                // console.log(err)
-            })
+        // case 'course':
+        //     student.value = []
+        //     offset.value = 0
+        //     studentCount.value = 0
+        //     preLoading.value = true
+        //     getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
+        //         student.value = results.data
+        //         studentCount.value = results.count
+        //         preLoading.value = false
+        //     }).catch((err) => {
+        //         // console.log(err)
+        //     })
 
-            break;
+        //     break;
 
     }
 }
@@ -322,13 +345,18 @@ const settlePayments = () => {
         </div>
 
         <div v-if="!balance" class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
+            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#downloadmodal" @click="excelDownload()"
                     type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
                     <font-awesome-icon icon="fa-solid fa-add" /> Download Excel
@@ -373,7 +401,7 @@ const settlePayments = () => {
                                         <input type="file" :id="index" class="hidden" @change="handleImage">
                                         <button type="submit" class="btn btn-primary btn-sm m-2"
                                             :disabled="holdSubmit ? true : false">Upload Photo</button>
-                                    </form>
+                                    </form> 
                                     <p v-if="showLink && index == linkId" class="fw-regular">{{ image.name }}</p>
                                 </div> -->
                             </div>

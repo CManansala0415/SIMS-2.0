@@ -41,6 +41,9 @@ const requestedItems = ref([])
 const studentsAccount = ref([])
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
 
 const booter = async () => {
     // getProgram().then((results) => {
@@ -144,7 +147,7 @@ onMounted(async () => {
         try {
             preLoading.value = true
             await booter().then(() => {
-                getRequestDetails(limit.value, offset.value).then((results2) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
                     mapper(results2)
                 })
             })
@@ -189,7 +192,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value).then((results) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     mapper(results)
                 })
             }
@@ -203,7 +206,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, null).then((results) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     mapper(results)
                 })
             }
@@ -215,7 +218,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchValue.value).then((results) => {
+                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     mapper(results)
                 }).catch((err) => {
                     // console.log(err)
@@ -268,13 +271,18 @@ const excelDownload = () => {
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                     v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
             </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
+            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#downloadmodal" @click="excelDownload()"
                     type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
                     <font-awesome-icon icon="fa-solid fa-add" /> Download Excel
@@ -314,7 +322,7 @@ const excelDownload = () => {
                         <td v-if="accessData[14].useracc_modifying == 1" class="align-middle p-2">
                             <div class="d-flex gap-2 justify-content-center align-content-center">
                                 <div v-if="req.acr_status == 0" class="text-center">
-                                    <span class="text-red-500 text-xs font-bold">Cancelled</span>
+                                    <span class="text-danger fw-bold">Cancelled</span>
                                 </div>
                                 <div v-else>
                                     <div v-if="req.acr_paystatus == 2" class="text-center">

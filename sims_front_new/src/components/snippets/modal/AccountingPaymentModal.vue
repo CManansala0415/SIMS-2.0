@@ -67,7 +67,7 @@ onMounted(() => {
         } else {
             accountId.value = account.value.acr_id
         }
-        console.log(accountId.value)
+        
         getPaymentDetails(accountId.value, billType.value).then((results) => {
             payment.value = results.data
             let x = payment.value.slice(-1).pop()
@@ -78,6 +78,7 @@ onMounted(() => {
             payment.value.forEach((e) => {
                 paid.value += e.acy_payment
             })
+            console.log(account.value)
 
             checking.value = false
         })
@@ -134,7 +135,7 @@ const initPayment = () => {
                 }
             })
         } else {
-            getRequestDetails(0, 0, accountId.value).then((results) => {
+            getRequestDetails(0, 0, '', '', '', 2, accountId.value).then((results) => {
                 if (results.data[0].acr_status == 1) {
                     addPayment(x).then((results) => {
                         if (results.status != 204) {
@@ -317,12 +318,12 @@ const initPayment = () => {
                                     </td>
                                     <td class="align-middle">{{ py.acy_datepaid }}</td>
                                 </tr>
-                                <tr v-if="!preLoading && !Object.keys(payment).length">
+                                <tr v-if="!checking && !Object.keys(payment).length">
                                     <td class="p-3 text-center" colspan="6">
                                         No Records Found
                                     </td>
                                 </tr>
-                                <tr v-if="preLoading && !Object.keys(payment).length">
+                                <tr v-if="checking && !Object.keys(payment).length">
                                     <td class="p-3 text-center" colspan="6">
                                         <div class="m-3">
                                             <Loader />

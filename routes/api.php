@@ -17,7 +17,7 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 Route::middleware(['auth:sanctum'])->get('/get-user-access/{userid}', [DefaultsController::class,'getUserAccess']);
 
 
-Route::middleware(['auth:sanctum'])->get('/get-applicant/{limit}/{offset}/{fname}/{mname}/{lname}', [RegistrarController::class,'getApplicant']);
+Route::middleware(['auth:sanctum'])->get('/get-applicant/{limit}/{offset}/{fname}/{mname}/{lname}/{mode}', [RegistrarController::class,'getApplicant']);
 Route::middleware(['auth:sanctum'])->get('/get-gender', [DefaultsController::class,'getGender']);
 Route::middleware(['auth:sanctum'])->get('/get-nationality', [DefaultsController::class,'getNationality']);
 Route::middleware(['auth:sanctum'])->get('/get-civilstatus', [DefaultsController::class,'getCivilStatus']);
@@ -110,7 +110,7 @@ Route::middleware(['auth:sanctum'])->post('/add-student-identification', [Regist
 Route::middleware(['auth:sanctum'])->get('/get-accounts-details', [TransactionsController::class,'getAccountsDetails']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-price', [TransactionsController::class,'getPriceDetails']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-fee/{limit}/{offset}/{search}', [TransactionsController::class,'getFeeDetails']);
-Route::middleware(['auth:sanctum'])->get('/get-accounts-request/{limit}/{offset}/{search}', [TransactionsController::class,'getRequestDetails']);
+Route::middleware(['auth:sanctum'])->get('/get-accounts-request/{limit}/{offset}/{fname}/{mname}/{lname}/{mode}/{id}', [TransactionsController::class,'getRequestDetails']);
 Route::middleware(['auth:sanctum'])->post('/add-requested-item', [TransactionsController::class,'addItemRequest']);
 Route::middleware(['auth:sanctum'])->post('/delete-requested-item', [TransactionsController::class,'deleteItemRequest']);
 Route::middleware(['auth:sanctum'])->post('/add-payment', [TransactionsController::class,'addPayment']);
