@@ -179,8 +179,13 @@ Route::middleware(['auth:sanctum'])->post('/add-command-access', [CommandControl
 Route::middleware(['auth:sanctum'])->get('/get-command-access/{userid}', [CommandController::class,'getCommandAccess']);
 Route::middleware(['auth:sanctum'])->post('/tag-employee-account', [CommandController::class,'tagEmployeeAccount']);
 Route::middleware(['auth:sanctum'])->get('/get-employee-account/{userid}', [CommandController::class,'getEmployeeAccount']);
+Route::middleware(['auth:sanctum'])->post('/set-academic-status', [CommandController::class,'setAcademicStatus']);
+Route::middleware(['auth:sanctum'])->get('/get-academic-status/{mode}/{code}', [CommandController::class,'getAcademicStatus']);
 
-Route::middleware(['auth:sanctum'])->get('/get-person-image/{filename}', [DefaultsController::class,'getIDimage']);
+
+Route::middleware(['auth:sanctum'])->get('/get-person-image/{filename}/{type}', [DefaultsController::class,'getIDimage']);
+Route::middleware(['auth:sanctum'])->get('/get-qr-data/{id}/{mode}', [DefaultsController::class,'getQRData']);
+
 
 
 

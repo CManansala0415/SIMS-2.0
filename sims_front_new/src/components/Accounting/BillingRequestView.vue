@@ -18,6 +18,7 @@ import Loader from '../snippets/loaders/Loading1.vue';
 import { getUserID } from "../../routes/user";
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
 import { useRouter, useRoute } from 'vue-router'
+import SearchQR from '../snippets/tech/SearchQR.vue';
 
 const router = useRouter();
 const showDownloadModal = ref(false)
@@ -85,6 +86,7 @@ const booter = async () => {
         booting.value = 'Loading Prices...'
         bootingCount.value += 1
     })
+    
     getFeeDetails(0, 0).then((results) => {
         fee.value = results.data
         booting.value = 'Loading Fees...'
@@ -263,6 +265,14 @@ const excelDownload = () => {
     showDownloadModal.value = true
 }
 
+const showQRScanner = ref(false)
+const getData = (result) =>{
+    console.log(result)
+    requestedItems.value = result
+    showQRScanner.value = !showQRScanner
+    document.getElementById('hideqrscanner').click();
+}
+
 </script>
 <template>
     <div>
@@ -280,6 +290,9 @@ const excelDownload = () => {
                     class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
                 <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Search
+                </button>
+                <button data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Scan QR 
                 </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
@@ -391,6 +404,36 @@ const excelDownload = () => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showPaymentModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                     <SearchQR @fetchData="getData" modeData="3"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

@@ -313,4 +313,198 @@ class CommandController extends Controller
        }
         return $accounts; 
     }
+
+    public function setAcademicStatus(Request $req){
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d h:i:s', time());
+
+        try{
+            if($req['mode'] == 1){
+                $s1 = DB::table('def_command_center')
+                ->where('sett_code','=', $req->input('code'))
+                ->update([
+                    'sett_status' => 1,
+                    'sett_dateupdated' => $date,
+                    'sett_updatedby' => $req->input('userid'),
+                ]);
+        
+                return $data = [
+                    'mode' => $req['mode'],
+                    'status' => 200,
+                ];
+            }
+            else if($req['mode'] == 2){
+                $s2 = DB::table('def_command_center')
+                ->where('sett_code','=', $req->input('code'))
+                ->update([
+                    'sett_status' => 0,
+                    'sett_dateupdated' => $date,
+                    'sett_updatedby' => $req->input('userid'),
+                ]);
+        
+                return $data = [
+                    'mode' => $req['mode'],
+                    'status' => 200,
+                ];
+            }
+            else if($req['mode'] == 3){
+                
+                return $this->generateArchive($date,  $req->input('userid'));
+
+            }else{
+                return $data = [
+                    'mode' => $req['mode'],
+                    'status' => 204,
+                ];
+            }
+        }catch(Exception $ex) {
+            return $data = [
+                'status' => 500,
+            ];
+        }
+    }
+
+    public function getAcademicStatus($mode, $code){
+        $s2 = DB::table('def_command_center')
+            ->where('sett_code','=', $code)
+            ->get();
+
+        return $s2;
+    }
+
+    public function generateArchive($date, $userid){
+        $controller = new RegistrarController();
+        date_default_timezone_set('Asia/Manila');
+        $defdate = date('Y-m-d h:i:s', time());
+        $defdmy = date('Y-m-d', time());
+
+        //save person data
+        $persons = DB::table('def_enrollment')
+                    ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+
+                    ->leftJoin('sett_ph_country as birthcountry', 'def_person.per_birth_country', '=', 'birthcountry.countryCode') 
+                    ->leftJoin('sett_ph_province as birthprovince', 'def_person.per_birth_province', '=', 'birthprovince.provCode') 
+
+                    ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+                    ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+                    ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+                    ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+
+                    ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+                    ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+                    ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+                    ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
+
+                    ->leftJoin('sett_quarter', 'def_enrollment.enr_quarter', '=', 'sett_quarter.quar_id')
+                    ->leftJoin('def_gradelvl', 'def_enrollment.enr_gradelvl', '=', 'def_gradelvl.grad_id') 
+                    ->leftJoin('sett_degree_types', 'def_enrollment.enr_program', '=', 'sett_degree_types.dtype_id') 
+                    ->leftJoin('def_program', 'def_enrollment.enr_course', '=', 'def_program.prog_id') 
+                    ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                    ->leftJoin('def_curriculum', 'def_enrollment.enr_curriculum', '=', 'def_curriculum.curr_id') 
+                    ->leftJoin('def_section', 'def_enrollment.enr_section', '=', 'def_section.sec_id') 
+
+                    ->select(  
+                        'def_enrollment.enr_id',
+                        'def_person.*',
+                        
+                        'birthcountry.name as birthcountryname',
+                        'birthprovince.provDesc as birthprovincename',
+
+                        'currcountry.name as currcountryname',
+                        'currprovince.provDesc as currprovincename',
+                        'currcity.citymunDesc as currcityname',
+                        'currbarangay.brgyDesc as currbarangayname',
+
+                        'permcountry.name as permcountryname',
+                        'permprovince.provDesc as permprovincename',
+                        'permcity.citymunDesc as permcityname',
+                        'permbarangay.brgyDesc as permbarangayname',
+
+                        'sett_quarter.quar_desc as semester',
+                        'def_gradelvl.grad_name as gradelvl',
+                        'sett_degree_types.dtype_desc as program',
+                        'def_program.prog_name as coursename',
+                        'def_program.prog_code as coursecode',
+                        'def_student_identification.ident_identification as studentid',
+                        'def_section.sec_name as section',
+                        'def_curriculum.curr_code as curriculum',
+
+                    )
+                    ->where('def_person.per_status', '=' ,  1)
+                    ->get();   
+
+        if($persons){
+            
+            foreach ($persons as $key => $details) {
+                $load = 'arc-' .$defdmy.  '-' . $details->per_personid;
+                $primary = DB::table('server_archive_persons')->insert([
+                    'arc_personid' => $details->per_id,
+                    'arc_firstname' => $details->per_firstname,
+                    'arc_middlename' => $details->per_middlename,
+                    'arc_lastname' => $details->per_lastname,
+                    'arc_suffixname' => $details->per_suffixname,
+                    'arc_birthday' => $details->per_birthday,
+                    'arc_birth_country' => $details->birthcountryname,
+                    'arc_birth_province' => $details->birthprovincename,
+                    'arc_birth_zipcode' => $details->per_birth_zipcode,
+                    'arc_gender' => $details->per_gender,
+                    'arc_civilstatus' => $details->per_civilstatus,
+                    'arc_nationality' => $details->per_nationality,
+                    'arc_contact' => $details->per_contact,
+                    'arc_email' => $details->per_email,
+                    'arc_curr_home' => $details->per_curr_home,
+                    'arc_curr_country' => $details->currcountryname,
+                    // 'arc_curr_region' => $details->currregionname,
+                    'arc_curr_province' => $details->currprovincename,
+                    'arc_curr_city' => $details->currcityname,
+                    'arc_curr_barangay' => $details->currbarangayname,
+                    'arc_curr_zipcode' => $details->per_curr_zipcode,
+                    'arc_perm_home' => $details->per_perm_home,
+                    'arc_perm_country' => $details->permcountryname,
+                    // 'arc_perm_region' => $details->permregionname,
+                    'arc_perm_province' => $details->permprovincename,
+                    'arc_perm_city' => $details->permcityname,
+                    'arc_perm_barangay' => $details->permbarangayname,
+                    'arc_perm_zipcode' => $details->per_perm_zipcode,
+                    'arc_dateapplied' => $details->per_dateapplied,
+                    'arc_person_dategenerated' => $defdate,
+                    'arc_person_generatedby' => $userid,
+                    'arc_subjects' => $load,
+                ]);    
+                
+                 
+                $grades = $controller->getMilestone($details->enr_id);
+                foreach ($grades as $key => $mark) {
+                    $primary = DB::table('server_archive_subjects')->insert([
+                        'arc_archiveid' => $load,
+                        'arc_personid' => $details->per_id,
+                        'arc_studentid' => $details->studentid,
+                        'arc_enrid' => $details->enr_id,
+                        'arc_coursecode' => $details->coursecode,
+                        'arc_coursename' => $details->coursename,
+                        'arc_yearlevel' => $details->gradelvl,
+                        'arc_program' => $details->program,
+                        'arc_semester' => $details->semester,
+                        'arc_section' => $details->section,
+                        'arc_curriculum' => $details->curriculum,
+                        'arc_subjectcode' => $mark->subj_code,
+                        'arc_subjectname' => $mark->subj_name,
+                        'arc_prelimgrade' => $mark->grs_prelims,
+                        'arc_midtermgrade' => $mark->grs_midterms,
+                        'arc_prefinalgrade' => $mark->grs_prefinals,
+                        'arc_finalgrade' => $mark->grs_finals,
+                        'arc_facultyname' => $mark->emp_firstname.' '.$mark->emp_middlename.' '.$mark->emp_lastname.' '.$mark->emp_suffixname,
+                        'arc_taken_dategenerated' => $date,
+                        'arc_taken_generatedby' => $userid,
+                    ]);    
+                }
+            }
+        }
+        return $data = [
+            'date' => $date,
+            'userid' => $userid,
+            'persons' => $persons,
+            'status' => 200,
+        ];
+    }
 }

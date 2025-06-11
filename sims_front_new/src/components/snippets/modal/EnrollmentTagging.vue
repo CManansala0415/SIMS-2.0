@@ -43,8 +43,8 @@ const subjectData = computed(() => {
 
 const userID = ref('')
 const subjectFilter = ref([])
-const preloading = ref(false)
-const milestoneLoading = ref(false)
+const preloading = ref(true)
+const milestoneLoading = ref(true)
 const currSubject = ref([])
 const enrolleeData = ref([])
 const milestone = ref([])
@@ -62,8 +62,7 @@ onMounted(async () => {
     curriculumFilter.value = curriculumData.value
 
     try {
-        preloading.value = true
-        milestoneLoading.value = true
+
 
         getUserID().then((results) => {
             userID.value = results.account.data.id
@@ -100,22 +99,27 @@ onMounted(async () => {
                             return e
                         }
                     })
-                    // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
-                    milestoneSubject.value.forEach((e) => {
-                        addedSubject.value.push(e)
-                        addedSubjectId.value.push(e.subj_id)
-                    })
+                    
 
                     getMilestone(studentData.value.enr_id).then((results) => {
-                        milestone.value = results
-                        milestone.value.forEach((e) => {
-                            addedSubject.value.push(e)
-                            addedSubjectId.value.push(e.subj_id)
-                        })
-
+                        if(!results.length){
+                            // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
+                            milestoneSubject.value.forEach((e) => {
+                                addedSubject.value.push(e)
+                                addedSubjectId.value.push(e.subj_id)
+                            })
+                        }else{
+                            milestone.value = results
+                            milestone.value.forEach((e) => {
+                                addedSubject.value.push(e)
+                                addedSubjectId.value.push(e.subj_id)
+                            })
+                            
+                        }
+                       
                         preloading.value = false
                         milestoneLoading.value = false
-                    
+                        loadCurrItems.value = false
                     
                     })
 
@@ -136,9 +140,8 @@ onMounted(async () => {
     }
 })
 
-const loadCurrItems = ref(false)
+const loadCurrItems = ref(true)
 const monitorCurriculum = (data) => {
-    loadCurrItems.value = true
     currSubject.value = []
     addedSubject.value = []
     addedSubjectId.value = []
@@ -604,7 +607,10 @@ const filterCurriculum = () => {
                                                 </span>N/A</p>
                                             <p><span class="fw-bold">Pre-requisite: </span>{{
                                                 c.subj_preq_code ? c.subj_preq_code : 'N/A' }}</p>
-                                            <p><span class="fw-bold">Grade: --</span></p>
+                                            <p><span class="fw-bold">Prelim Grade: <span class="text-primary">{{ c.grs_prelims }}</span></span></p>
+                                            <p><span class="fw-bold">Midterm Grade: <span class="text-primary">{{ c.grs_midterms }}</span></span></p>
+                                            <p><span class="fw-bold">Pre-Final Grade: <span class="text-primary">{{ c.grs_prefinals }}</span></span></p>
+                                            <p><span class="fw-bold">Final Grade: <span class="text-primary">{{ c.grs_finals }}</span></span></p>
                                         </div>
                                         <div
                                             class="col-1 p-3 border bg-white shadow d-flex flex-column justify-content-center">

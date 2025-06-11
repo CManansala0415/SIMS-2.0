@@ -30,6 +30,7 @@ const userId = computed(() => {
 
 const qrimage = ref('')
 const profileId = ref('')
+const signatureId = ref('')
 const indicator = ref('#000000')
 const idGenerator = ref('')
 const family = ref([])
@@ -84,7 +85,9 @@ onMounted(() => {
             //         // console.log(response)
             // });
 
-            profileId.value = student.value.per_profile ? 'http://localhost:8000/api/get-person-image/' + student.value.per_profile : '/img/profile_default.png'
+            profileId.value = student.value.per_profile ? 'http://localhost:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
+            signatureId.value = student.value.per_signature ? 'http://localhost:8000/api/get-person-image/' + student.value.per_signature+'/2' : '/img/sig1.png'
+            console.log( signatureId.value)
             // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
             preLoading.value = false
         })
@@ -169,7 +172,7 @@ const printForm = (studentid) => {
                         <!-- b8048e -->
                     
                         <div style="margin-top:1px; width:100%; line-height: 0.1;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
-                            <img src="/img/sig1.png" height="45px" width="45px"/>
+                            <img :src="signatureId" height="45px" width="45px"/>
                             <p style="font-size: 4px; font-weight: bold;">
                                 Student's Signature
                             </p>

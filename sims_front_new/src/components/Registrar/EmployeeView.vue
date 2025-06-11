@@ -318,8 +318,8 @@ onMounted(async () => {
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-tag"
                                     /></button>
                                 <button data-bs-toggle="modal" data-bs-target="#accountemployeemodal"
-                                    @click="AccountEmployee(emp)" type="button" title="Tag Subjects"
-                                    class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-tag"
+                                    @click="AccountEmployee(emp)" type="button" title="Tag Account"
+                                    class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-user-plus"
                                     /></button>    
                             </div>
                         </td>
@@ -327,12 +327,12 @@ onMounted(async () => {
                             N/A
                         </td>
                     </tr>
-                    <tr v-if="!preLoading && !Object.keys(employee).length">
+                    <tr v-if="!preLoading && !Object.keys(employee).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="7">
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(employee).length">
+                    <tr v-if="preLoading && !Object.keys(employee).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="7">
                             <div class="m-3">
                                 <Loader />

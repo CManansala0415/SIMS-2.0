@@ -71,7 +71,7 @@ class RegistrarController extends Controller
             ];
 
         }
-        // 2 means special search single textboxbox search
+        // 2 means special search single textbox search
         elseif ($mode == 2){
             if ($fname==404) $fname = '';
             $applicant = DB::table('def_person')->orderBy('per_id','DESC')
@@ -91,10 +91,19 @@ class RegistrarController extends Controller
                         })
                         ->limit($limit)->offset($offset)
                         ->count();      
-            return $data = [
-                'data' => $applicant,
-                'count' => $count,
-            ];
+        }
+        // 3 for QR search
+        elseif ($mode == 3){
+            $applicant = DB::table('def_person')->orderBy('per_id','DESC')
+                        ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                        ->where('def_student_identification.ident_identification', '=',  $fname)
+                        ->where('def_person.per_status', '=',  1)
+                        ->get();
+            $count = DB::table('def_person')->orderBy('per_id','DESC')
+                        ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                        ->where('def_student_identification.ident_identification', '=',  $fname)
+                        ->where('def_person.per_status', '=',  1)
+                        ->count();
         }
         //custom search with fname mname and lname
         else{
@@ -115,12 +124,13 @@ class RegistrarController extends Controller
                             ->orWhere('per_lastname', 'like',  '%' . $lname .'%');
                         })
                         ->limit($limit)->offset($offset)
-                        ->count();     
-             return $data = [
-                'data' => $applicant,
-                'count' => $count,
-            ];            
+                        ->count();             
         }
+
+        return $data = [
+            'data' => $applicant,
+            'count' => $count,
+        ];
         
     }
 
@@ -799,6 +809,31 @@ class RegistrarController extends Controller
                 ->limit($limit)->offset($offset)
                 ->get();
         }
+        else if ($mode==3){ //qr search
+            $student = DB::table('def_enrollment')
+                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                        ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                        ->select(  
+                            'def_enrollment.*',
+                            'def_person.*',
+                            'def_student_identification.ident_identification as studentid',
+                        )
+                        ->where('def_person.per_status', '=',  1)
+                        ->where('def_enrollment.enr_status', '=' , 1)
+                        ->where('def_student_identification.ident_identification', '=' , $fname)
+                        ->get();
+            $count =  DB::table('def_enrollment')
+                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                        ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                        ->select(  
+                            'def_enrollment.*',
+                            'def_person.*',
+                        )
+                        ->where('def_person.per_status', '=',  1)
+                        ->where('def_enrollment.enr_status', '=' , 1)
+                        ->where('def_student_identification.ident_identification', '=' , $fname)
+                        ->count();  
+        }
         else{
              $student = DB::table('def_enrollment')
                         ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
@@ -958,14 +993,28 @@ class RegistrarController extends Controller
             ->leftJoin('def_enrollment as b', 'a.mi_enrid', '=', 'b.enr_id') 
             ->leftJoin('def_subject as c', 'a.mi_subjid', '=', 'c.subj_id') 
             ->leftJoin('def_subject as d', 'c.subj_preq', '=', 'd.subj_id') 
+            ->leftJoin('def_faculty_grading_sheet as e', 'a.mi_subjid', '=', 'e.grs_subjid') 
+            ->leftJoin('def_employee as f', 'e.grs_addedby', '=', 'f.emp_accid') 
+            
             ->select(  
                 'b.*',
                 'a.*',
                 'c.*',
                 'd.subj_code as subj_preq_code',
+                'e.grs_prelims',
+                'e.grs_midterms',
+                'e.grs_prefinals',
+                'e.grs_finals',
+                'e.grs_updatedby',
+                'f.emp_firstname',
+                'f.emp_middlename',
+                'f.emp_lastname',
+                'f.emp_suffixname',
+
             )
             ->orderBy('b.enr_dateenrolled','ASC')
             ->where('a.mi_enrid', '=' , $id)
+            ->where('e.grs_enrid', '=' , $id)
             ->where('a.mi_status', '=' , 1)
             ->get();
         return $milestone; 

@@ -92,7 +92,7 @@ const save = () => {
                 </div>
                 <div class="d-flex flex-column border p-2">
                     <p class="fw-bold">Identification</p>
-                    <input v-model="customNumber" :disabled="saving ? true : false" placeholder="Ex. 20222121" type="text"
+                    <input v-model="customNumber" :disabled="saving || customNumber ? true : false" placeholder="Ex. 20222121" type="text"
                         class="form-control" tabindex="-1" />
                     <!-- <button type="button" :disabled="saving?true:false" class="p-2 bg-teal-500 text-white rounded-md disabled:opacity-70 disabled:cursor-not-allowed">Generate Identification</button> -->
                 </div>
@@ -102,7 +102,7 @@ const save = () => {
                             class="italic">Once identification is generated, it is linked to all records in the system.
                             it cannot be modified and it is for one time generation only.
                         </span></p>
-                    <button type="submit" :disabled="saving ? true : false"
+                    <button v-if="!customNumber" type="submit" :disabled="saving ? true : false"
                         class="btn btn-sm btn-primary w-100">Save
                         Identification</button>
                 </div>

@@ -27,6 +27,7 @@ import { getUserID } from "../../routes/user.js";
 import EnrollmentListFIlterModal from '../snippets/modal/EnrollmentListFIlterModal.vue';
 import EnrollmentPrintModal from '../snippets/modal/EnrollmentPrintModal.vue';
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
+import SearchQR from '../snippets/tech/SearchQR.vue';
 
 const preLoading = ref(true)
 const student = ref([])
@@ -154,7 +155,7 @@ onMounted(async () => {
                     })
 
                     student.value = x
-                    console.log(student.value)
+                   
 
                 })
             })
@@ -199,7 +200,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -215,7 +216,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -229,7 +230,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -464,7 +465,7 @@ const dropStudent = (id) => {
 
 
 const paramsProgram = ref(0)
-const paramsGradelvl = ref(0)
+const paramsGradelvl = ref(0) 
 const paramsCourse = ref(0)
 
 const identificationData = ref([])
@@ -477,6 +478,13 @@ const printID = (data) => {
 //     const regEx1 = /[^a-zA-Z\s]+/;
 //     searchValue.value = searchValue.value.replace(regEx1, '');
 // }
+const showQRScanner = ref(false)
+const getData = (result) =>{
+    console.log(result)
+    student.value = result
+    showQRScanner.value = !showQRScanner
+    document.getElementById('hideqrscanner').click();
+}
 
 </script>
 <template>
@@ -495,6 +503,9 @@ const printID = (data) => {
                     class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
                 <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Search
+                </button>
+                <button data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Scan QR 
                 </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
@@ -729,7 +740,7 @@ const printID = (data) => {
      <!-- Print Modal -->
     <div class="modal fade" id="printmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Print and Download Form</h5>
@@ -778,6 +789,35 @@ const printID = (data) => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showPrintID = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                     <SearchQR @fetchData="getData" modeData="2"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

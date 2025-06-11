@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 Use DateTime;
 use Response;
 
+use App\Http\Controllers\RegistrarController;
+
 class DefaultsController extends Controller
 {
     
@@ -744,8 +746,33 @@ class DefaultsController extends Controller
         ];
     }
 
-    public function getIDimage($fileName){
-        $path = public_path().'/storage/profiles/'.$fileName;
+    public function getIDimage($fileName, $type){
+        if($type==1){
+            $path = public_path().'/storage/profiles/'.$fileName;
+        }else{
+            $path = public_path().'/storage/signatures/'.$fileName;
+        }
+        
         return Response::download($path); 
+    }
+
+    public function getQRData($id, $mode){
+
+        switch($mode){
+            case 1: // admission and clinic
+                $controller = new RegistrarController();
+                $response = $controller->getApplicant(0, 0, $id, 0, 0, 3);
+            break;
+            case 2: //library cards and enrollment
+                $controller = new RegistrarController();
+                $response = $controller->getStudentFiltering(0, 0, $id, 0, 0, 0, 0, 0, 3);
+            break;
+            case 3: // billing request
+                $controller = new TransactionsController();
+                $response = $controller->getRequestDetails(0, 0, 0, 0, 0, 3, $id);
+            break;
+        }
+
+       return $response;
     }
 }

@@ -2393,6 +2393,54 @@ const getEmployeeAccount = async (userid) => {
     }
 }
 
+let qrdata = {}
+const getQRData = async (userid,mode) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-qr-data/'+userid+'/'+mode,
+        }).then(async (results) => {
+            qrdata = results.data.data
+        })
+        return qrdata
+    }catch(err){
+        return err
+    }
+}
+
+let setacademicstatus = {}
+const setAcademicStatus = async (data) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/set-academic-status',
+            data:data
+
+        }).then(async (results) => {
+            setacademicstatus = results.data
+        })
+        return setacademicstatus
+    }catch(err){
+        return 500
+    }
+}
+
+let getacademic = {}
+const getAcademicStatus = async (mode,code) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-academic-status/'+mode+'/'+code,
+
+        }).then(async (results) => {
+            getacademic = results.data
+        })
+        return getacademic
+    }catch(err){
+        return 500
+    }
+}
+
 export {
 
     getApplicant,
@@ -2539,6 +2587,9 @@ export {
     saveCommandAccess,
     getCommandAccess,
     employeeAccountTag,
-    getEmployeeAccount
+    getEmployeeAccount,
+    getQRData,
+    setAcademicStatus,
+    getAcademicStatus
 }
 

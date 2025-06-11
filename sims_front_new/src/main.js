@@ -31,12 +31,13 @@ import {
     faEarListen,
     faFolder,
     faPills,
-    faKey
+    faKey,
+    faUserPlus
 
  } from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
-library.add(faUserSecret,faPen,faTrash,faGear,faIdCardClip,faSearch,faPowerOff,faAdd,faPrint,faTag,faRotateLeft,faEye,faEarListen,faFolder,faPills,faKey
+library.add(faUserSecret,faPen,faTrash,faGear,faIdCardClip,faSearch,faPowerOff,faAdd,faPrint,faTag,faRotateLeft,faEye,faEarListen,faFolder,faPills,faKey,faUserPlus
 )
 
 const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon);

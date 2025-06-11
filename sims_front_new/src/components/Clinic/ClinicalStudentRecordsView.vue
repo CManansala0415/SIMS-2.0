@@ -7,6 +7,7 @@ import Loader from '../snippets/loaders/Loading1.vue';
 // import MedicalHearing from '../snippets/modal/MedicalHearing.vue';
 // import MedicalFile from '../snippets/modal/MedicalFile.vue';
 
+import SearchQR from '../snippets/tech/SearchQR.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
 import {
@@ -199,7 +200,7 @@ onMounted(async () => {
             await booter().then(() => {
                 booting.value = 'Loading Applicants...'
                 bootingCount.value += 1
-                getApplicant(limit.value, offset.value, ).then((results2) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results2) => {
                     applicant.value = results2.data
                     applicantCount.value = results2.count
                     preLoading.value = false
@@ -245,7 +246,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -261,7 +262,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -275,7 +276,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -330,6 +331,15 @@ const fileUpload = (id) => {
     showFile.value = !showFile.value
 }
 
+const showQRScanner = ref(false)
+
+const getData = (result) =>{
+    console.log(result)
+    applicant.value = result
+    showQRScanner.value = !showQRScanner
+    document.getElementById('hideqrscanner').click();
+}
+
 </script>
 <template>
     <div>
@@ -344,17 +354,20 @@ const fileUpload = (id) => {
                     <!-- <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
                         v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
                         :disabled="preLoading ? true : false"> -->
-                    <input type="text" v-model="searchFname"
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
                         class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                    <input type="text" v-model="searchMname"
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
                         class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                    <input type="text" v-model="searchLname"
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
                         class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
                     <div class="d-flex justify-content-center align-content-center">
                         <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                             Search
                         </button>
                     </div>
+                    <button data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                        Scan QR 
+                    </button>
                 </div>
             </div>
             <div class="d-flex flex-wrap w-100 justify-content-end gap-2">
@@ -597,6 +610,35 @@ const fileUpload = (id) => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showFile = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                     <SearchQR @fetchData="getData" modeData="1"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

@@ -120,6 +120,16 @@ class TransactionsController extends Controller
             $count = DB::table('def_accounts_request')
                     ->where('acr_id', '=', $id)
                     ->count();
+        }
+        elseif ($mode == 3){ //qr search
+            $request = DB::table('def_accounts_request')
+                    ->leftJoin('def_student_identification', 'def_accounts_request.acr_personid', '=', 'def_student_identification.ident_personid') 
+                    ->where('def_student_identification.ident_identification', '=',  $id)
+                    ->get();
+            $count = DB::table('def_accounts_request')
+                    ->leftJoin('def_student_identification', 'def_accounts_request.acr_personid', '=', 'def_student_identification.ident_personid') 
+                    ->where('def_student_identification.ident_identification', '=',  $id)
+                    ->count();
         }else{
             $request = DB::table('def_accounts_request as dr')
                 ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')

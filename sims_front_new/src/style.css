@@ -240,3 +240,36 @@ h1 {
   font-weight: 900;
   font-style: italic;
 }
+
+
+.receipt-1{
+  background-image: url('/img/cropped1.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.receipt-2{
+  background-image: url('/img/cropped2.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.times{
+  font-family: 'Times New Roman', Times, serif;
+}
+
+
+#savingProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#savingStatus {
+  width: 1%;
+  height: 30px;
+  background-color: #04AA6D;
+  transition-property: width;
+  transition-duration: 1s;
+}

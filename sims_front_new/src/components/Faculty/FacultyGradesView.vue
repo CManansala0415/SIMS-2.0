@@ -177,7 +177,7 @@ onMounted(async () => {
 
 
 const filterSubject = () => {
-    // filteringData.value = true
+    filteringData.value = true
     if (filterSubjectId.value && filterLnid.value) {
         finalStudentList.value = []
         let list = []
@@ -304,7 +304,7 @@ const downloadExcel = () => {
 }
 
 const saveGrades = () => {
-    // savingData.value = true
+    savingData.value = true
     let x = finalStudentList.value.map((e) => {
         let prelims = document.getElementById('prelims' + e.enr_id).value
         let midterms = document.getElementById('midterms' + e.enr_id).value
@@ -325,14 +325,17 @@ const saveGrades = () => {
     })
 
     addGradingGrade(x).then((results) => {
-        // if(results.status == 200){
-        //     alert('Update Successful')
-        //     location.reload()
-        // }else{
-        //     alert('Update Failed')
-        //     location.reload()
-        // }
-        console.log(x)
+        if(results.status == 200){
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(()=>{
+                location.reload()
+            });
+        }else{
+           Swal.fire("Changes are not saved", "", "info");
+        }
     })
 }
 
@@ -497,7 +500,7 @@ const openTip = () => {
                 </tr>
             </tbody>
         </table>
-        <div class="table-responsive border p-3 small-font">
+        <div class="table-responsive border p-3 small-font" style="text-transform:uppercase">
             <table v-if="!preLoading && switcher == 0" class="table table-hover">
                 <thead>
                     <tr>
@@ -566,8 +569,8 @@ const openTip = () => {
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="(preLoading && !Object.keys(finalStudentList).length) || (filteringData)">
-                        <td class="p-3 text-center border border-mid-gray" colspan="9">
+                    <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)">
+                        <td class="p-3 text-center border border-mid-gray" colspan="10">
                             Loading Please Wait...
                         </td>
                     </tr>

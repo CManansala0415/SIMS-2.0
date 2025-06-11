@@ -430,6 +430,10 @@ const downloadPdf = () => {
                     <th style="background-color: #000000;" class="text-white">Lecture Units</th>
                     <th style="background-color: #000000;" class="text-white">Laboratory Units</th>
                     <th style="background-color: #000000;" class="text-white">Total Units</th>
+                    <th style="background-color: #000000;" class="text-white">Prelim</th>
+                    <th style="background-color: #000000;" class="text-white">Midterm</th>
+                    <th style="background-color: #000000;" class="text-white">Pre-Final</th>
+                    <th style="background-color: #000000;" class="text-white">Final</th>
                 </tr>
             </thead>
             <tbody>
@@ -448,6 +452,18 @@ const downloadPdf = () => {
                     </td>
                     <td class="align-middle p-2">
                         {{ c.subj_lec + c.subj_lab }}
+                    </td>
+                    <td class="align-middle p-2">
+                        {{ c.grs_prelims }}
+                    </td>
+                    <td class="align-middle p-2">
+                        {{ c.grs_midterms }}
+                    </td>
+                    <td class="align-middle p-2">
+                        {{ c.grs_prefinals }}
+                    </td>
+                    <td class="align-middle p-2">
+                        {{ c.grs_finals }}
                     </td>
                 </tr>
                 <tr v-if="!milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">

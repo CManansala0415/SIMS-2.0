@@ -5,8 +5,12 @@ import { getUserID } from "../../../routes/user";
 import {
     addPayment,
     getRequestDetails,
-    getPaymentDetails
+    getPaymentDetails,
 } from "../../Fetchers.js";
+
+import {
+    pdfGenerator,
+} from "../../Generators.js";
 
 const props = defineProps({
     accountData: {
@@ -48,7 +52,6 @@ const setValues = () => {
 }
 
 
-
 onMounted(() => {
 
     checking.value = true
@@ -78,7 +81,6 @@ onMounted(() => {
             payment.value.forEach((e) => {
                 paid.value += e.acy_payment
             })
-            console.log(account.value)
 
             checking.value = false
         })
@@ -156,7 +158,10 @@ const initPayment = () => {
                                 text: "Changes applied, refreshing the page",
                                 icon: "success"
                             }).then(()=>{
-                                location.reload()
+                                // location.reload()
+                                let name = 'test'
+                                let size = [8.5,4.25]
+                                pdfGenerator(name, size, 'landscape', 0.03)
                             });
                         }
                     })
@@ -195,9 +200,7 @@ const initPayment = () => {
                 </span><span class="italic">Ensure that the details of the payment is correct.
                 </span></p>
         </div>
-
         <div class="d-flex align-content-center justify-content-center gap-2 small-font">
-
             <Loader v-if="checking" />
             <div v-else class="d-flex gap-1 w-100 ">
 
@@ -343,11 +346,19 @@ const initPayment = () => {
                         </div>
                     </div>
                 </div>
-
-
             </div>
-
         </div>
     </div>
+
+    <!-- <div id="printform">
+        <div id="printform" class="receipt-2 times"
+            style="width: 655px; height: 395px; border: 1px solid black;">
+            <div style="position: relative; height: 100%; width: 100%; border:1px solid red; font-weight: bold;">
+                <span style="position:absolute;top:155px; left: 280px; font-size:11.5px;">{{ account.acr_personname }}</span>
+                <span style="position:absolute;top:177px; left: 280px; font-size:11.5px;">{{ account.acr_personname }}</span>
+            </div>
+        </div>
+    </div> -->
+   
 
 </template>

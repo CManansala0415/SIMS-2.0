@@ -36,9 +36,11 @@ import {
     getProvince,
     getCity,
     getBarangay,
-    updateApplicant
+    updateApplicant,
+    getAcademicStatus
 } from "../Fetchers.js";
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
+import SearchQR from '../snippets/tech/SearchQR.vue';
 
 const limit = ref(10)
 const offset = ref(0)
@@ -56,6 +58,8 @@ const showFormModal = ref(false)
 const showEnroll = ref(false)
 const showIdentification = ref(false)
 const showPrintID = ref(false)
+const showQRScanner = ref(false)
+const activeEnrollment = ref(false)
 
 const gender = ref([])
 const nationality = ref([])
@@ -163,6 +167,10 @@ const booter = async () => {
         section.value = results.section
         booting.value = 'Loading Academic Information'
         bootingCount.value += 1
+    })
+
+    getAcademicStatus(1,'cs_05').then((results) => {
+        results[0].sett_status == 1? activeEnrollment.value = true: activeEnrollment.value = false
     })
     // getCountry().then((results) => {
     //     country.value = results
@@ -303,7 +311,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -319,7 +327,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -332,7 +340,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -351,7 +359,6 @@ const paginate = (mode) => {
                 });
             }
             break;
-
     }
 }
 
@@ -370,12 +377,26 @@ const editData = (id) => {
     showFormModal.value = !showFormModal.value
 }
 const enrollApplicant = (data) => {
-    let middle = data.per_middlename ? data.per_middlename : ''
-    let suffix = data.per_suffixname ? data.per_suffixname : ''
+    getAcademicStatus(1,'cs_05').then((results) => {
+        if(results[0].sett_status == 1){
+            let middle = data.per_middlename ? data.per_middlename : ''
+            let suffix = data.per_suffixname ? data.per_suffixname : ''
 
-    editId.value = data.per_id
-    fullName.value = data.per_firstname + ' ' + middle + ' ' + data.per_lastname + ' ' + suffix
-    showEnroll.value = !showEnroll.value
+            editId.value = data.per_id
+            fullName.value = data.per_firstname + ' ' + middle + ' ' + data.per_lastname + ' ' + suffix
+            showEnroll.value = !showEnroll.value
+        }else{
+             Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+                footer: '<a href="#" disabled>Registrar Settings Detected Changes, Reloading the page?</a>'
+            }).then(()=>{
+                location.reload()
+            });
+        }
+    })
+    
 }
 
 const identificationData = ref([])
@@ -386,6 +407,13 @@ const addID = (data) => {
 const printID = (data) => {
     identificationData.value = data
     showPrintID.value = !showPrintID.value
+}
+
+const getData = (result) =>{
+    console.log(result)
+    applicant.value = result
+    showQRScanner.value = !showQRScanner
+    document.getElementById('hideqrscanner').click();
 }
 
 </script>
@@ -412,15 +440,18 @@ const printID = (data) => {
                 <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Search
                 </button>
+                <button data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Scan QR 
+                </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"
                     type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> Add New Record
+                    <font-awesome-icon icon="fa-solid fa-add"  /> New Record
                 </button>
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('old')"
                     type="button" class="btn btn-sm btn-info" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> Add Old Record
+                    <font-awesome-icon icon="fa-solid fa-add"  /> Old Record
                 </button>
             </div>
         </div>
@@ -466,7 +497,7 @@ const printID = (data) => {
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-trash"
                                     /></button>
 
-                                <button data-bs-toggle="modal" data-bs-target="#enrollmentmodal"
+                                <button data-bs-toggle="modal" data-bs-target="#enrollmentmodal" v-if="activeEnrollment"
                                     @click="enrollApplicant(app)" type="button" title="Enroll Applicant"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-gear"
                                     /></button>
@@ -627,5 +658,37 @@ const printID = (data) => {
             </div>
         </div>
     </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- <ApplicationPrintIdModal v-if="showQRScanner" :studentdata="identificationData" :useriddata="userID"/> -->
+                     <SearchQR @fetchData="getData" modeData="1"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 
 </template>

@@ -11,10 +11,10 @@ const qrImageGenerator = async (data) => {
     return qrcode;
 }
 
-const imageFetcher = async(data, element) =>{
+const imageFetcher = async(data, type) =>{
     await axios({
         method: "GET",
-        url: 'api/get-person-image/' + data,
+        url: 'api/get-person-image/' + data + '/'+ type,
 
     }).then(async (results) => {
         console.log(results.data)

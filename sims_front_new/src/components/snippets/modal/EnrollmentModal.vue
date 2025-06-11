@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { enrollApplicant, getEnrollment, getCommandUpdate } from "../../Fetchers.js";
 import { getUserID } from "../../../routes/user";
+import Loader1 from '../loaders/Loader1.vue';
 const userID = ref('')
 
 const props = defineProps({
@@ -12,7 +13,7 @@ const props = defineProps({
     programdata: {
     },
     gradelvldata: {
-    },
+    }, 
     quarterdata: {
     },
     coursedata: {
@@ -50,7 +51,7 @@ const settings = ref([])
 const enrollChecker = ref(false)
 const saving = ref(false)
 const search = ref('')
-
+const preLoading = ref(true)
 const enrollData = ref({
     userid: '',
     personid: '',
@@ -96,6 +97,7 @@ onMounted(async () => {
                     enrolleeData.value = []
                 }
                 enrollChecker.value = false
+                preLoading.value = false
             })
         })
         
@@ -201,10 +203,11 @@ const enroll = () => {
 }
 </script>
 <template>
-    <div class="d-flex flex-column p-2 gap-2">
+    <Loader1 v-if="preLoading"></Loader1>
+    <div v-else class="d-flex flex-column p-2 gap-2">
         <div class="d-flex flex-wrap flex-column">
             <p class="text-success fw-bold">Applicant Name</p>
-            <p class="fw-bold">{{ fullName }}</p>
+            <p class="fw-bold" style="text-transform: uppercase;">{{ fullName }}</p>
             <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Ensure that the details of the following applicant are correct.
                     To enroll this applicant, select the appropiate academic status and refresh the page.

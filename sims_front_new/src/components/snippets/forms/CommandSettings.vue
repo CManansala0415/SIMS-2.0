@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import {
-    addCurriculum, addCurriculumTagging, getCurriculumSubject
+    addCurriculum, addCurriculumTagging, getCurriculumSubject, setAcademicStatus, getAcademicStatus
 } from "../../Fetchers.js";
-
+import Loading1 from '../loaders/Loading1.vue';
+import Loader1 from '../loaders/Loader1.vue';
 import CommandCenterModal from '../modal/CommandCenterModal.vue';
 import AcademicYear from './commandcenterforms/AcademicYear.vue';
 import AcademicSemester from './commandcenterforms/AcademicSemester.vue';
@@ -54,6 +55,7 @@ const userID = computed(() => {
 
 const showCommandCenterModal = ref(false)
 const formValue = ref(0)
+const preLoading = ref(false)
 const execute = (type, mode) => {
     formValue.value = 0
     showCommandCenterModal.value = true
@@ -62,28 +64,269 @@ const execute = (type, mode) => {
             switch (mode) {
                 case 1:
                     formValue.value = 1
+                    preLoading.value=false
                     break;
                 case 2:
                     formValue.value = 2
+                    preLoading.value=false
                     break;
                 case 3:
                     formValue.value = 3
+                    preLoading.value=false
                     break;
                 case 4:
                     formValue.value = 4
+                    preLoading.value=false
                     break;
                 case 5:
                     formValue.value = 5
+                    preLoading.value=false
                     break;
                 default:
 
                     break;
             }
             break;
-        default:
+        case 2:
+            switch (mode) {
+                case 1:
+                    Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to activate enrollment status?",
+                        showCancelButton: true,
+                        confirmButtonText: "Activate",
+                        confirmButtonColor: '#237a5b',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            preLoading.value=true
+                            let x = {
+                                mode:1,//means activate,
+                                userid:userID.value,
+                                code:'cs_05'
+                            }
+                            setAcademicStatus(x).then((result)=>{
+                                if (result.status == 200) {
+                                    Swal.fire("Activated!", "", "success");
+                                    preLoading.value=false
+                                } else {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                    preLoading.value=false
+                                }
+                            })
+                        }
+                    });
+                    break;
+                case 2:
+                     Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to deactivate enrollment status?",
+                        showCancelButton: true,
+                        confirmButtonText: "Deactivate",
+                        confirmButtonColor: '#c91c22',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            preLoading.value=true
+                            let x = {
+                                mode:2,//means deactivate,
+                                userid:userID.value,
+                                code:'cs_05'
+                            }
+                            setAcademicStatus(x).then((result)=>{
+                                if (result.status == 200) {
+                                    Swal.fire("Deactivated!", "", "success");
+                                    preLoading.value=false
+                                } else {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                    preLoading.value=false
+                                }
+                            })
+                        }
+                    });
+                    break;
+                case 3:
+                     Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to activate current semester?",
+                        showCancelButton: true,
+                        confirmButtonText: "Activate",
+                        confirmButtonColor: '#237a5b',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            preLoading.value=true
+                            let x = {
+                                mode:1,//means end semester,
+                                userid:userID.value,
+                                code:'cs_06'
+                            }
+                            setAcademicStatus(x).then((result)=>{
+                                if (result.status == 200) {
+                                    Swal.fire("Activated!", "", "success");
+                                    preLoading.value=false
+                                } else {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                    preLoading.value=false
+                                }
+                            })
+                        }
+                    });
+                    break;
+                case 4:
+                     Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to deactivate the semester?",
+                        showCancelButton: true,
+                        confirmButtonText: "Deactivate",
+                        confirmButtonColor: '#c91c22',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            preLoading.value=true
+                            let x = {
+                                mode:2,//means end semester,
+                                userid:userID.value,
+                                code:'cs_06'
+                            }
+                            setAcademicStatus(x).then((result)=>{
+                                if (result.status == 200) {
+                                    Swal.fire("Deactivated!", "", "success");
+                                    preLoading.value=false
+                                } else {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                    preLoading.value=false
+                                }
+                            })
+                        }
+                    });
+                    break;
+                case 5:
+                     Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to archive current semester information?",
+                        showCancelButton: true,
+                        confirmButtonText: "Generate",
+                        confirmButtonColor: '#237a5b',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            // preLoading.value=true
+                            
+                            Swal.fire({
+                                title: "Saving Please wait...",
+                                text: "Do not click, close or refresh the page to avoid archiving failure",
+                                html: `
+                                    Do not click, close or refresh the page to avoid archiving failure
+                                    <div id="savingProgress" class="mt-2">
+                                        <div id="savingStatus"></div>
+                                    </div>
+                                    <span class="fw-bold mt-3" id="percentage">0</span><span>% Completed</span>
+                                `,
+                                showConfirmButton: false,
+                                allowOutsideClick: false
+                            });
+                            
+                            resetStopwatch()
+                            startStopwatch()// trigger progress bar
+                            
 
+                            let semesterstat = false
+                            getAcademicStatus(1,'cs_06').then((results)=>{
+                                results[0].sett_status == 1? semesterstat = true: semesterstat = false
+
+                                if(semesterstat){
+                                    stopStopwatch()
+                                    setTimeout(Swal.fire("Terminate semester first to use this command", "", "info"), 1500);
+                                    
+                                }else{
+                                    let x = {
+                                        mode:3,//means archive semester,
+                                        userid:userID.value,
+                                    }
+                                    setAcademicStatus(x).then((result)=>{
+                                        if (result.status == 200) {
+                                            stopStopwatch();
+                                            setTimeout(noticeAlert, 1800);
+                                            alertNotice.value = 1
+                                        } else {
+                                            stopStopwatch();
+                                            setTimeout(noticeAlert, 1800);
+                                            alertNotice.value = 2
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    });
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        default:
             break;
     }
+
+    
+}
+
+const alertNotice = ref('') // for detection if nag error o hindi yung saving ng archive
+
+const noticeAlert = () =>{
+    Swal.fire(alertNotice.value == 1? 'Generated':'Changes are not saved', "", alertNotice.value == 1? 'success':'info')
+}
+
+const savingBar = (data) =>{
+    var width = 10;
+    var elem = document.getElementById("savingStatus");
+    var percent = document.getElementById("percentage");
+
+    if(data == 'done'){
+        width = 100
+    }else{
+        width+=data
+    }
+
+    if(width<=100){
+        elem.style.width = width + "%";
+    }
+
+    percent.innerHTML = width
+    // var i = 0;
+    // if (i == 0) {
+    //     i = 1;
+    //     var elem = document.getElementById("savingStatus");
+    //     var width = 1;
+    //     var id = setInterval(frame, 10);
+    //     function frame() {
+    //         if (width >= 100) {
+    //             clearInterval(id);
+    //             i = 0;
+    //         } else {
+    //             width++;
+    //             elem.style.width = width + "%";
+    //         }
+    //     }
+    // }
+}
+
+const seconds = ref(0);
+const timerInterval=ref('');
+
+const startStopwatch = () => {
+  timerInterval.value = setInterval(() => {
+    seconds.value++;
+    // console.log(seconds.value); // Or update an HTML element
+    savingBar(seconds.value) 
+  }, 1000);
+}
+
+const stopStopwatch = () => {
+  clearInterval(timerInterval.value);
+  savingBar('done')
+}
+
+const resetStopwatch = () => {
+    clearInterval(timerInterval.value);
+    seconds.value = 0;
+    // console.log(seconds.value); // Or update an HTML element
 }
 
 </script>
@@ -105,8 +348,9 @@ const execute = (type, mode) => {
                 </div>
             </nav>
 
-            <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade  show active" id="nav-assign" role="tabpanel" aria-labelledby="assign-tab">
+            <Loading1 v-show="preLoading" class="mt-5"></Loading1>
+            <div v-show="!preLoading" class="tab-content" id="nav-tabContent">
+                <div  class="tab-pane fade  show active" id="nav-assign" role="tabpanel" aria-labelledby="assign-tab">
                     <div class="table-responsive border p-3 small-font">
                         <table class="table table-hover">
                             <thead>
@@ -201,7 +445,7 @@ const execute = (type, mode) => {
                                         Trigger enrollment status to active.
                                     </td>
                                     <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 1)">Execute</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -212,7 +456,18 @@ const execute = (type, mode) => {
                                         Trigger enrollment status to Inactive.
                                     </td>
                                     <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 2)">Execute</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle">
+                                        Start Semester
+                                    </td>
+                                    <td class="align-middle">
+                                        Trigger enrollment status to Inactive.
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 3)">Execute</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -220,35 +475,21 @@ const execute = (type, mode) => {
                                         End Semester
                                     </td>
                                     <td class="align-middle">
-                                        Archive all milestones and generate archive of this current academic term into
-                                        the server.
+                                        Stop Semester
                                     </td>
                                     <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Archive Admission
-                                    </td>
-                                    <td class="align-middle">
-                                        Generate all admission records into excel file (Data is based on active academic
-                                        year of the system).
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 4)">Execute</button>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="align-middle">
-                                        Archive Enrollment
+                                        Archive Semester
                                     </td>
                                     <td class="align-middle">
-                                        Generate all enrollee records into excel file (Data is based on active academic
-                                        year of the system).
+                                        Generate and save all current semester information to the server.
                                     </td>
                                     <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 5)">Execute</button>
                                     </td>
                                 </tr>
                             </tbody>

@@ -12,11 +12,13 @@ import { getStudent,
          getSection, 
          getTaggedSubject, 
          deleteEnrollment,
-         getAcademicDefaults } from "../Fetchers.js";
+         getAcademicDefaults,
+        getStudentFiltering } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 import LibraryCard from '../snippets/modal/LibraryCardModal.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router'
+import SearchQR from '../snippets/tech/SearchQR.vue';
 
 const router = useRouter();
 const preLoading = ref(true)
@@ -43,6 +45,13 @@ const image = ref('')
 const userID = ref('')
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
+const searchFname = ref('')
+const searchMname = ref('')
+const searchLname = ref('')
+const paramsProgram = ref(0)
+const paramsGradelvl = ref(0)
+const paramsCourse = ref(0)
+
 const booter = async () => {
     // getProgram().then((results) => {
     //     program.value = results
@@ -147,7 +156,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudent(limit.value, offset.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -163,7 +172,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudent(limit.value, offset.value, null).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -177,7 +186,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudent(limit.value, offset.value, searchValue.value).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -283,6 +292,17 @@ const showForm = (data) => {
     showCardData.value = data
     showCard.value = !showCard.value
 }
+
+
+const showQRScanner = ref(false)
+
+const getData = (result) =>{
+    console.log(result)
+    student.value = result
+    showQRScanner.value = !showQRScanner
+    document.getElementById('hideqrscanner').click();
+}
+
 </script>
 
 <template>
@@ -292,11 +312,19 @@ const showForm = (data) => {
         </div>
  
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
+            <div class="d-flex gap-2 justify-content-center align-content-center">
+                <input type="text" v-model="searchFname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
+                <input type="text" v-model="searchMname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                <input type="text" v-model="searchLname" @keyup.enter="search()"
+                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Search
+                </button>
+                <button data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Scan QR 
+                </button>
             </div>
         </div>
         <div class="table-responsive border p-3 small-font"  style="text-transform:uppercase">
@@ -420,6 +448,35 @@ const showForm = (data) => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showCard = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                     <SearchQR @fetchData="getData" modeData="2"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>
