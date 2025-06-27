@@ -1014,7 +1014,7 @@ class RegistrarController extends Controller
             )
             ->orderBy('b.enr_dateenrolled','ASC')
             ->where('a.mi_enrid', '=' , $id)
-            ->where('e.grs_enrid', '=' , $id)
+            ->orWhere('e.grs_enrid', '=' , $id)
             ->where('a.mi_status', '=' , 1)
             ->get();
         return $milestone; 
@@ -2424,6 +2424,16 @@ class RegistrarController extends Controller
                 'status' => 500,
             ];
         }
+    }
+
+    public function getArchiveMerge ($id){
+        $data = DB::table('server_archive_subjects as sj')
+        ->leftJoin('server_archive_persons as sp', 'sj.arc_archiveid', '=', 'sp.arc_subjects') 
+        ->orderBy('sj.arc_takenid')
+        ->where('sj.arc_personid','=', $id)
+        ->get();
+
+        return $data; 
     }
     
     

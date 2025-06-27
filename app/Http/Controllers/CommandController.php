@@ -470,9 +470,11 @@ class CommandController extends Controller
                     'arc_person_dategenerated' => $defdate,
                     'arc_person_generatedby' => $userid,
                     'arc_subjects' => $load,
+                    'arc_gradelvl' => $details->gradelvl,
+                    'arc_semester' => $details->semester,
+
                 ]);    
-                
-                 
+
                 $grades = $controller->getMilestone($details->enr_id);
                 foreach ($grades as $key => $mark) {
                     $primary = DB::table('server_archive_subjects')->insert([
@@ -489,6 +491,9 @@ class CommandController extends Controller
                         'arc_curriculum' => $details->curriculum,
                         'arc_subjectcode' => $mark->subj_code,
                         'arc_subjectname' => $mark->subj_name,
+                        'arc_lecture' => $mark->subj_lec,
+                        'arc_laboratory' => $mark->subj_lab,
+                        'arc_dateenrolled' => $mark->enr_dateenrolled,
                         'arc_prelimgrade' => $mark->grs_prelims,
                         'arc_midtermgrade' => $mark->grs_midterms,
                         'arc_prefinalgrade' => $mark->grs_prefinals,

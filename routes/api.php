@@ -105,6 +105,7 @@ Route::middleware(['auth:sanctum'])->post('/delete-scheduled-faculty', [Registra
 Route::middleware(['auth:sanctum'])->get('/get-faculty-availability', [RegistrarController::class,'getFacultyAvailability']);
 Route::middleware(['auth:sanctum'])->get('/get-student-identification/{id}', [RegistrarController::class,'getStudentIdentification']);
 Route::middleware(['auth:sanctum'])->post('/add-student-identification', [RegistrarController::class,'addStudentIdentification']);
+Route::middleware(['auth:sanctum'])->get('/get-archive-merge/{id}', [RegistrarController::class,'getArchiveMerge']);
 
 
 Route::middleware(['auth:sanctum'])->get('/get-accounts-details', [TransactionsController::class,'getAccountsDetails']);

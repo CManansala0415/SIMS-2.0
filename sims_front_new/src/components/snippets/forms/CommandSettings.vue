@@ -464,7 +464,7 @@ const resetStopwatch = () => {
                                         Start Semester
                                     </td>
                                     <td class="align-middle">
-                                        Trigger enrollment status to Inactive.
+                                        Start Semester
                                     </td>
                                     <td class="align-middle">
                                         <button type="button" class="btn btn-dark small-font" @click="execute(2, 3)">Execute</button>

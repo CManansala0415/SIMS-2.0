@@ -2441,6 +2441,22 @@ const getAcademicStatus = async (mode,code) => {
     }
 }
 
+let getarchivemerge = {}
+const getArchiveMerge = async (id) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-archive-merge/'+id,
+
+        }).then(async (results) => {
+            getarchivemerge = results.data
+        })
+        return getarchivemerge
+    }catch(err){
+        return 500
+    }
+}
+
 export {
 
     getApplicant,
@@ -2590,6 +2606,7 @@ export {
     getEmployeeAccount,
     getQRData,
     setAcademicStatus,
-    getAcademicStatus
+    getAcademicStatus,
+    getArchiveMerge
 }
 

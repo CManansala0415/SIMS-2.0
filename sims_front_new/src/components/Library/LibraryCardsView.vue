@@ -322,7 +322,7 @@ const getData = (result) =>{
                 <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Search
                 </button>
-                <button data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Scan QR 
                 </button>
             </div>
@@ -466,7 +466,7 @@ const getData = (result) =>{
                         @click="showQRScanner = false" id="hideqrscanner"></button>
                 </div>
                 <div class="modal-body">
-                     <SearchQR @fetchData="getData" modeData="2"/>
+                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="2"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

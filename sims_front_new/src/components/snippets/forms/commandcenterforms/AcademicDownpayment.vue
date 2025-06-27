@@ -36,7 +36,7 @@ const save = ()=>{
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
-                location.reload()
+                // location.reload()
             });
         } else {
             // alert('Update Failed')
@@ -46,7 +46,7 @@ const save = ()=>{
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
-                location.reload()
+                // location.reload()
             });
         }
     })
