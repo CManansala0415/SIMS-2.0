@@ -504,7 +504,7 @@ const getData = (result) =>{
                 <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Search
                 </button>
-                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                <button @click="() => $refs.focusTrap.activate(), showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Scan QR 
                 </button>
             </div>
@@ -803,11 +803,11 @@ const getData = (result) =>{
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" tabindex="-1"
                         @click="showQRScanner = false" id="hideqrscanner"></button>
                 </div>
-                <div class="modal-body">
-                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="2"/>
+                <div class="modal-body" v-if="showQRScanner" >
+                    <SearchQR @fetchData="getData" modeData="2"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -816,7 +816,7 @@ const getData = (result) =>{
                             else (Data Privacy Act of 2012)</small>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" tabindex="-1"
                             @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
@@ -824,5 +824,14 @@ const getData = (result) =>{
             </div>
         </div>
     </div>
+
+    <!--  <button @click="() => $refs.focusTrap.activate()">Show the modal</button>
+    <focus-trap :active="false" ref="focusTrap" :initial-focus="() => $refs.qrInput">
+        <modal-dialog>
+            <p>Hello there!</p>
+            <input ref="nameInput" />
+            <button @click="() => $refs.focusTrap.deactivate()">Okay...</button>
+        </modal-dialog>
+    </focus-trap> -->
 
 </template>

@@ -41,6 +41,7 @@ import {
 } from "../Fetchers.js";
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 import SearchQR from '../snippets/tech/SearchQR.vue';
+import ApplicationMilestoneModal from '../snippets/modal/ApplicationMilestoneModal.vue';
 
 const limit = ref(10)
 const offset = ref(0)
@@ -60,6 +61,7 @@ const showIdentification = ref(false)
 const showPrintID = ref(false)
 const showQRScanner = ref(false)
 const activeEnrollment = ref(false)
+const showMilestones = ref(false)
 
 const gender = ref([])
 const nationality = ref([])
@@ -404,6 +406,12 @@ const addID = (data) => {
     identificationData.value = data
     showIdentification.value = !showIdentification.value
 }
+
+const viewMilestones = (data) => {
+    identificationData.value = data
+    showMilestones.value = !showMilestones.value
+}
+
 const printID = (data) => {
     identificationData.value = data
     showPrintID.value = !showPrintID.value
@@ -504,6 +512,9 @@ const getData = (result) =>{
                                 <button data-bs-toggle="modal" data-bs-target="#identificationmodal" @click="addID(app)"
                                     type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button>
+                                <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app)"
+                                    type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-tag"/></button>
                                 <!-- <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(app)"
                                     type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button> -->
@@ -689,6 +700,34 @@ const getData = (result) =>{
         </div>
     </div>
 
+    <!-- Milestone Modal -->
+    <div class="modal fade" id="milestonemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Student Milestones</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showMilestones= false"></button>
+                </div>
+                <div class="modal-body">
+                    <ApplicationMilestoneModal v-if="showMilestones" :student="identificationData" />
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showMilestones= false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
 </template>

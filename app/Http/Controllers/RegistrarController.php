@@ -2044,7 +2044,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_depid','DESC')
+                )->orderBy('def_employee.emp_firstname','ASC')
                 ->get();
             }else{
                 $employee = DB::table('def_employee')
@@ -2052,7 +2052,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_depid','DESC')
+                )->orderBy('def_employee.emp_firstname','ASC')
                 ->limit($limit)
                 ->offset($offset)
                 ->get();
@@ -2073,7 +2073,7 @@ class RegistrarController extends Controller
                         ->select(  
                             'def_employee.*',
                             'def_department.*',
-                        )->orderBy('def_employee.emp_depid','DESC')
+                        )->orderBy('def_employee.emp_firstname','ASC')
                         ->where('emp_status', '=',  1)
                         ->where(function($query) use ($fname, $mname, $lname) {
                             $query->where('emp_firstname', 'like',  '%' . $fname .'%')
@@ -2087,7 +2087,7 @@ class RegistrarController extends Controller
                         ->select(  
                             'def_employee.*',
                             'def_department.*',
-                        )->orderBy('def_employee.emp_depid','DESC')
+                        )->orderBy('def_employee.emp_firstname','ASC')
                         ->where('emp_status', '=',  1)
                         ->where(function($query) use ($fname, $mname, $lname) {
                             $query->where('emp_firstname', 'like',  '%' . $fname .'%')
@@ -2103,7 +2103,7 @@ class RegistrarController extends Controller
                         ->select(  
                             'def_employee.*',
                             'def_department.*',
-                        )->orderBy('def_employee.emp_depid','DESC')
+                        )->orderBy('def_employee.emp_firstname','ASC')
                         ->where('emp_status', '=',  1)
                         ->where(function($query) use ($fname, $mname, $lname) {
                             $query->where('emp_firstname', 'like',  '%' . $fname .'%')

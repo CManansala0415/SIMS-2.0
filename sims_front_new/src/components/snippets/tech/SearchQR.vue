@@ -58,20 +58,25 @@ const focusInput = () =>{
 
 
 <template>
-    <div class="mb-3 small-font d-flex flex-column gap-2">
-        <span class="text-success fw-bold">Note: &nbsp;</span>Make sure that the scanner is plugged in
-        <div v-if="inactive" class="alert alert-danger" role="alert">
-            Please click enable to start scanning
+    <div id="scanner">
+        <div class="mb-3 small-font d-flex flex-column gap-2" tabindex="-1">
+            <span><span class="text-success fw-bold">Note: </span>&nbsp;Make sure that the scanner is plugged in</span>
+            <div v-if="inactive" class="alert alert-danger" role="alert">
+                Please click enable to start scanning
+            </div>
+            <div v-if="active" class="alert alert-info" role="alert">
+                Scanner is now running...
+            </div>
+            <div v-if="progress" class="alert alert-success" role="alert">
+                <!-- <Loader v-if="preLoading"/> -->
+                Information detected, redirecting please wait...
+            </div>
+            <button class="btn btn-sm btn-primary" @click=" () => $refs.focusTrap.activate(), focusInput()" tabindex="-1">Enable Scanning</button>
         </div>
-        <div v-if="active" class="alert alert-info" role="alert">
-            Scanner is now running...
-        </div>
-        <div v-if="progress" class="alert alert-success" role="alert">
-            <!-- <Loader v-if="preLoading"/> -->
-            Information detected, redirecting please wait...
-        </div>
-        <button class="btn btn-sm btn-primary" @click="focusInput()">Start Scanning</button>
+        <focus-trap :active="false" ref="focusTrap">
+            <input id="qrInput" type="text" class="form-control" v-model="refid" @keyup.enter="scan()" :disabled="disabler" tabindex="-1" style="opacity:0; height: 0; width: 0; padding: 0;"/>
+        </focus-trap>
+        <!-- style="opacity:0; height: 0; width: 0; padding: 0;"  -->
     </div>
-    <input id="qrInput" type="text" class="form-control" v-model="refid" @keyup.enter="scan()" style="opacity:0; height: 0; width: 0; padding: 0;" :disabled="disabler"/>
-     <!-- style="opacity:0; height: 0; width: 0; padding: 0;" :disabled="disabler" -->
+
 </template>

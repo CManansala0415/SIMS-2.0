@@ -39,7 +39,12 @@ import {
 /* add icons to the library */
 library.add(faUserSecret,faPen,faTrash,faGear,faIdCardClip,faSearch,faPowerOff,faAdd,faPrint,faTag,faRotateLeft,faEye,faEarListen,faFolder,faPills,faKey,faUserPlus
 )
+// focus trapper
+import { FocusTrap } from 'focus-trap-vue';
 
-const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon);
+const app = createApp(App)
+            .component('font-awesome-icon', FontAwesomeIcon)
+            .component('FocusTrap', FocusTrap);
+            
 app.use(router,bootstrap)
 app.mount('#app')

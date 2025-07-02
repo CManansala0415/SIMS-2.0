@@ -17,6 +17,8 @@
     "@fortawesome/vue-fontawesome": "^3.0.8",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "focus-trap": "^7.6.5",
+    "focus-trap-vue": "^4.0.3",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   },

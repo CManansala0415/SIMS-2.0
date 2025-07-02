@@ -2,8 +2,9 @@
 import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "./routes/user";
-import { useRouter, useRoute } from 'vue-router'
-import loader from './components/snippets/loaders/Loading1.vue'
+import { useRouter, useRoute } from 'vue-router';
+import { getCommandUpdate } from './components/Fetchers.js'
+import loader from './components/snippets/loaders/Loading1.vue';
 const user = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -11,6 +12,10 @@ const route = useRoute();
 const path = computed(() => route.path)
 const isLoading = ref(true)
 const accessData = ref([])
+const semInfo = ref('')
+const enrollmentInfo = ref('')
+const yrFromInfo = ref('')
+const yrFromto = ref('')
 onMounted(async () => {
 
   window.stop()
@@ -26,6 +31,15 @@ onMounted(async () => {
     //alert('Unauthorized Session, Please Log In')
     router.push("/");
     isLoading.value = false
+  })
+
+  getCommandUpdate().then((result)=>{
+    // console.log(result)
+    semInfo.value = result[0].quar_code
+    yrFromInfo.value = result[1].sett_yearfrom
+    yrFromto.value = result[1].sett_yearto
+    enrollmentInfo.value = result[4].sett_status == 1?'Active':'Inactive'
+    
   })
 
 })
@@ -371,10 +385,26 @@ const active_class = ref("nav-static border p-2 active");
     </nav>
 
     <div>
-      <div v-if="path != '/'" class="d-flex align-content-center justify-content-end flex-wrap small-font">
+      <div v-if="path != '/'" class="d-flex align-content-center justify-content-between flex-wrap small-font">
         
-        <span v-if="fetchingUserAccess"class="fw-regular">Identifying User...</span>
-        <span v-else class="fw-regular">Welcome <span class="fw-bold">{{ userName }}</span></span>
+        <div>
+          <span v-if="fetchingUserAccess"class="fw-regular">Identifying Academic Calendar...</span>
+          <div class="dropdown" v-else>
+              <button class="btn btn-sm dropdown-toggle" type="button" id="notifications"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Academic Status
+              </button>
+              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="notifications">
+                <li class="dropdown-item">SY {{ yrFromto }}-{{ yrFromInfo }}</li>
+                <li class="dropdown-item">{{ semInfo }} Semester</li>
+                <li class="dropdown-item">Enrollment is {{ enrollmentInfo }}</li>
+              </ul>
+            </div>
+        </div>
+        <div>
+          <span v-if="fetchingUserAccess"class="fw-regular">Identifying User...</span>
+          <span v-else class="fw-regular">Welcome <span class="fw-bold">{{ userName }}</span></span>
+        </div>
       </div>
       <div v-if="path != '/'" class="container w-100 m-0 border mb-4 mt-2">
         <div class="row g-2">

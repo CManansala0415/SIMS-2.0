@@ -45,10 +45,11 @@ class CommandController extends Controller
                         'sett_updatedby' => $req->input('sett_updatedby'),
                         'sett_dateupdated' => $date,
                     ]);
-        
+                    
                     return $data = [
                         'status' => 200,
                     ];
+
                 break;
 
                 case 'cs_03':
@@ -92,7 +93,12 @@ class CommandController extends Controller
 
     public function getCommandUpdate(){
         $settings = DB::table('def_command_center')
-            ->where('sett_status', '=' , 1)
+            ->leftJoin('sett_quarter', 'def_command_center.sett_semester', '=', 'sett_quarter.quar_id') 
+            ->select(
+                'def_command_center.*',
+                'sett_quarter.quar_code'
+            )
+            // ->where('def_command_center.sett_status', '=' , 1)
             ->get();
         return $settings; 
     }
@@ -377,6 +383,7 @@ class CommandController extends Controller
         date_default_timezone_set('Asia/Manila');
         $defdate = date('Y-m-d h:i:s', time());
         $defdmy = date('Y-m-d', time());
+        $randomizer = md5(rand(1,1000000).uniqid(mt_rand(), true));
 
         //save person data
         $persons = DB::table('def_enrollment')
@@ -436,7 +443,7 @@ class CommandController extends Controller
         if($persons){
             
             foreach ($persons as $key => $details) {
-                $load = 'arc-' .$defdmy.  '-' . $details->per_personid;
+                $load = 'arc-' .$defdmy.  '-' . $details->per_personid. '-' .$randomizer;
                 $primary = DB::table('server_archive_persons')->insert([
                     'arc_personid' => $details->per_id,
                     'arc_firstname' => $details->per_firstname,
@@ -505,6 +512,16 @@ class CommandController extends Controller
                 }
             }
         }
+
+        // truncate these table to start new tables in fresh state after backuping important information
+        DB::table('def_enrollment')->truncate();
+        DB::table('def_milestone')->truncate();
+        DB::table('def_faculty_grading_header')->truncate();
+        DB::table('def_faculty_grading_sheet')->truncate();
+        DB::table('def_launch')->truncate();
+        DB::table('def_launch_faculty')->truncate();
+        DB::table('def_employee_load')->truncate();
+
         return $data = [
             'date' => $date,
             'userid' => $userid,

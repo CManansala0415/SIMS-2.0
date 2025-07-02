@@ -78,8 +78,8 @@ onMounted(async () => {
 
             milestoneCompData.value = Object.groupBy(results, item => item.arc_id);
            
-            console.log(milestoneCompData.value )
-            console.log(milestoneCompHeader.value )
+            // console.log(milestoneCompData.value )
+            // console.log(milestoneCompHeader.value )
            
         })
 
@@ -122,10 +122,11 @@ onMounted(async () => {
                             return e
                         }
                     })
+                    console.log(milestoneSubject.value)
                     
 
                     getMilestone(studentData.value.enr_id).then((results) => {
-
+                        
                         if(!results.length){
                             // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
                             milestoneSubject.value.forEach((e) => {
@@ -680,7 +681,7 @@ const filterCurriculum = () => {
                 </div>
                 <div class="tab-pane fade" id="ctab3" role="tabpanel" aria-labelledby="tab3">
                     <div class="container overflow-hidden p-3">
-                        <div class="row gy-2 gx-2 ">
+                        <div v-if="Object.keys(milestoneCompHeader).length" class="row gy-2 gx-2">
                             <div class="col-12 border-bottom">
                                 <div class="p-3">
                                     <span class="fw-bold border bg-primary text-white p-2 rounded-3">MILESTONE</span>
@@ -822,6 +823,9 @@ const filterCurriculum = () => {
                                         </table>
                                 </div>
                             </div>
+                        </div>
+                        <div v-else class="">
+                            <span>No Milestone Found</span>
                         </div>
                     </div>
                 </div>

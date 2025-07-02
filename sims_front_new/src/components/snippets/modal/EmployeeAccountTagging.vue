@@ -87,13 +87,13 @@ const saveTag = (mode) =>{
         //     return false;
         // }
         Swal.fire({
-            title: "Delete Record",
-            text: "Are you sure you want to deactivate this record?",
+            title: "Tag Account",
+            text: "Are you sure you want to tag this account to this record?",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, Im Delete it!"
+            confirmButtonText: "Yes, Im going to update it!"
         }).then(async (result) => {
             if (result.isConfirmed) {
                 preLoading.value = true
