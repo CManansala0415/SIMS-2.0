@@ -274,15 +274,17 @@ const upload = (personID, pictype, existing) => {
     holdSubmit.value = true
 
     formData.set('image', image.value)
+    let folder = 'Enrollment'
     if(pictype == 1){
         //profile
-            uploadProfile(formData, old_pic).then((results) => {
+            uploadProfile(formData, old_pic, folder).then((results) => {
             showLinkProfile.value = !showLinkProfile.value, linkId.value = ''
             image.value = ''
             if (results.status == 200) {
                 let data = {
                     profile: results.link,
                     personid: personID,
+                    type:'Enrollment'
                 }
                 uploadLinkProfile(data).then((results) => {
                     if (results.status == 200) {
@@ -577,7 +579,7 @@ const getData = (result) =>{
                             <div class="d-flex flex-column justify-content-center align-content-center">
                                 <div class="d-flex justify-content-center align-content-center w-100"  @click="showLinkProfile = false" title="Click to Upload Signature">
                                     <label @click="showLinkSignature = !showLinkSignature, linkId = index" :for="index" class="m-2" style="cursor: pointer;">
-                                        <img :src="stud.per_signature ? 'http://localhost:8000/storage/signatures/' + stud.per_signature : '/img/profile_default.png'"
+                                        <img :src="stud.per_signature ? 'http://localhost:8000/storage/signatures/' + stud.per_signature : '/img/404.png'"
                                             class="img-size" />
                                     </label>
                                 </div>

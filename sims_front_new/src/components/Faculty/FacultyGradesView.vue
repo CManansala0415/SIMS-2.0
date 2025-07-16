@@ -565,8 +565,8 @@ const openTip = () => {
 
                     </tr>
                     <tr v-if="(!preLoading && !Object.keys(finalStudentList).length) && (!filteringData)">
-                        <td class="p-3 text-center border border-mid-gray" colspan="9">
-                            No Records Found
+                        <td class="p-3 text-center border border-mid-gray" colspan="10">
+                            No Grading Sheet Found
                         </td>
                     </tr>
                     <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)">

@@ -32,12 +32,14 @@ import {
     faFolder,
     faPills,
     faKey,
-    faUserPlus
+    faUserPlus,
+    faIdCard,
+    faGraduationCap
 
  } from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
-library.add(faUserSecret,faPen,faTrash,faGear,faIdCardClip,faSearch,faPowerOff,faAdd,faPrint,faTag,faRotateLeft,faEye,faEarListen,faFolder,faPills,faKey,faUserPlus
+library.add(faUserSecret,faPen,faTrash,faGear,faIdCardClip,faSearch,faPowerOff,faAdd,faPrint,faTag,faRotateLeft,faEye,faEarListen,faFolder,faPills,faKey,faUserPlus,faIdCard,faGraduationCap
 )
 // focus trapper
 import { FocusTrap } from 'focus-trap-vue';

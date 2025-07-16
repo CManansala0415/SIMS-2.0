@@ -445,6 +445,7 @@ class CommandController extends Controller
             foreach ($persons as $key => $details) {
                 $load = 'arc-' .$defdmy.  '-' . $details->per_personid. '-' .$randomizer;
                 $primary = DB::table('server_archive_persons')->insert([
+                    'arc_studentid' => $details->studentid,
                     'arc_personid' => $details->per_id,
                     'arc_firstname' => $details->per_firstname,
                     'arc_middlename' => $details->per_middlename,

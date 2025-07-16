@@ -21,6 +21,7 @@ import LibraryCardsView from '../components/Library/LibraryCardsView.vue';
 import FacultyClassView from '../components/Faculty/FacultyClassView.vue';
 import FacultyGradesView from '../components/Faculty/FacultyGradesView.vue';
 import FacultyMasterlist from '../components/Faculty/FacultyMasterlist.vue';
+import AlumniTracker from '../components/Registrar/AlumniTracker.vue';
 
 const routes = [
      
@@ -47,6 +48,9 @@ const routes = [
     },
     {
         path: '/registrar-settings', name:'/registrar-settings', component: RegistrarSettings
+    },
+    {
+        path: '/registrar-alumni', name:'/registrar-alumni', component: AlumniTracker
     },
     {
         path: '/registrar-library-books', name:'/registrar-library-books', component: LibraryBooksView

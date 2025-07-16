@@ -202,6 +202,7 @@ const accessData = async (data) => {
                     })
 
                     parseInt(access_value[0].useracc_viewing) == 1? accessModuleData.value[index1].module_access[index2].access_checked = true : accessModuleData.value[index1].module_access[index2].access_checked = false
+                    console.log(accessModuleData.value[index1].module_access[index2].access_checked)
                     accessModuleData.value[index1].module_access[index2].access_viewing = parseInt(access_value[0].useracc_viewing)
                     accessModuleData.value[index1].module_access[index2].access_modifying = parseInt(access_value[0].useracc_modifying)
                     accessModuleData.value[index1].module_grant = parseInt(access_value[0].useracc_grant)
@@ -282,6 +283,16 @@ const accessModuleData = ref(
                     access_id: 6,
                     access_value: 6,
                     access_description: 'Registrar Settings',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                },
+                6: {
+                    useracc_id:0,
+                    access_id: 7,
+                    access_value: 7,
+                    access_description: 'Alumni Tracker',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,

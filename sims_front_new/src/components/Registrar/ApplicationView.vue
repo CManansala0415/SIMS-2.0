@@ -711,7 +711,7 @@ const getData = (result) =>{
                         @click="showMilestones= false"></button>
                 </div>
                 <div class="modal-body">
-                    <ApplicationMilestoneModal v-if="showMilestones" :student="identificationData" />
+                    <ApplicationMilestoneModal v-if="showMilestones" :student="identificationData" moduleType="1"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

@@ -197,7 +197,8 @@ const linker = () => {
       "/registrar-request",
       "/registrar-launch",
       "/registrar-personnel",
-      "/registrar-settings"
+      "/registrar-settings",
+      "/registrar-alumni",
     ].includes(path.value):
 
       switchItem(1, 1)
@@ -531,6 +532,14 @@ const active_class = ref("nav-static border p-2 active");
                           <p class="m-2">Registrar Settings</p>
                         </router-link>
                       </li>
+
+                      <li>
+                        <router-link v-if="accessData[6].useracc_grant == 1" to="/registrar-alumni" class="dropdown-item" title="Alumni Association"
+                          tabindex="-1">
+                          <p class="m-2">Alumni Tracker</p>
+                        </router-link>
+                      </li>
+
                     </ul>
                   </div>
                 </nav>

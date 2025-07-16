@@ -1,0 +1,446 @@
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import { getUserID } from "../../../routes/user.js";
+import {
+    getCurriculumSubject,
+    getEnrollment,
+    getMilestone,
+    addMilestone,
+    updateEnrollment,
+    updateMilestone,
+    getCommandUpdateCurriculum,
+    getAcademicStatus,
+    getArchiveMerge,
+
+}
+    from "../../Fetchers.js";
+import {
+    pdfGenerator
+} from "../../Generators.js";
+import Loader from '../loaders/Loader1.vue';
+
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter();
+const route = useRoute();
+const path = computed(() => route.path)
+
+const props = defineProps({
+    student: {
+    },
+    curriculum: {
+    },
+    section: {
+    },
+    subject: {
+    },
+    moduleType: {
+    }
+})
+
+
+const emit = defineEmits(['close-modal'])
+const close = (data) => {
+    window.stop()
+    emit('close-modal')
+}
+
+const studentData = computed(() => {
+    return props.student
+});
+const moduleData = computed(() => {
+    return props.moduleType
+});
+
+const userID = ref('')
+const preloading = ref(true)
+const milestoneLoading = ref(true)
+
+const milestoneCompData = ref([])
+const milestoneCompHeader = ref([])
+const milestoneCompLoading = ref(true)
+const studentID = ref('')
+const profileId = ref('')
+
+
+onMounted(async () => {
+    window.stop()
+    try {
+        console.log(studentData.value)
+        console.log(moduleData.value)
+
+        if (moduleData.value == 2) {
+            studentID.value = studentData.value.arc_personid
+        } else {
+            studentID.value = studentData.value.per_id
+        }
+
+        getArchiveMerge(studentID.value).then((results) => {
+            // milestoneCompData.value = results
+            milestoneCompLoading.value = false
+            // group naten yung archive para makapag create ng headers to be looped
+            milestoneCompHeader.value = results.filter((value, index, self) =>
+                index === self.findIndex((t) => t.arc_id === value.arc_id)
+            );
+            milestoneCompData.value = Object.groupBy(results, item => item.arc_id);
+            // console.log(milestoneCompData.value )
+            // console.log(milestoneCompHeader.value )
+
+            profileId.value = milestoneCompHeader.value[0].arc_profile ? 'http://localhost:8000/api/get-person-image/' + milestoneCompHeader.value[0].arc_profile + '/2' : '/img/profile_default.png'
+            preloading.value = false
+
+        })
+
+        getUserID().then((results) => {
+            userID.value = results.account.data.id
+        })
+
+    } catch (err) {
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(() => {
+            // preLoading.value = false
+        });
+    }
+})
+
+
+const downloadPdf = (filetype) => {
+    // var element = document.getElementById('printform');
+    // html2pdf(element);
+    let name = studentID.value + '_' + filetype
+    pdfGenerator(name, 'a4', 'landscape', 0.1)
+    Swal.fire({
+        icon: "success",
+        title: "Download Complete",
+        text: "Check your file manager, refreshing the page",
+    }).then(() => {
+        location.reload()
+    });
+
+}
+
+
+</script>
+
+<template>
+    <div class="d-flex flex-wrap w-100 ">
+        <div v-if="preloading" class="d-flex w-100 mt-4 justify-content-center align-content-center">
+            <Loader />
+        </div>
+        <div v-else class="container p-3">
+            <div v-if="Object.keys(milestoneCompHeader).length" class="d-flex flex-column">
+                <div class="col-12 border-bottom">
+                    <div class="p-3">
+                        <span class="fw-bold border bg-primary text-white p-2 rounded-3">Transcript of Records</span>
+                    </div>
+                </div>
+                <div class="col-12 small-font " id="printform">
+                    <div class="row w-100 backdrop">
+                        <div class="border p-2 col-3">
+                            <div class="align-middle p-2">
+                                <img src="/img/clcst_logo.png" height="100px" width="100px" alt="...">
+                            </div>
+                        </div>
+                        <div class="border p-2 col-6">
+                            <div class="align-content-center p-2">
+                                <p class="m-0 fw-bold fs-6 text-success">CENTRAL LUZON COLLEGE OF SCIENCE AND
+                                    TECHNOLOGY, INC.
+                                    CELTECH COLLEGE</p>
+                                <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San
+                                    Fernando,
+                                    Pampanga, Philippines, 2000</p>
+                                <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                                <p class="m-0 fw-normal small-font">Founded 1959</p>
+                            </div>
+                        </div>
+                        <div class="border p-2 col-3">
+                            <div class="align-content-center p-2">
+                                <p class="m-0 ">
+                                    We <span class="fw-bold">Train</span>,
+                                    We <span class="fw-bold">Touch</span>
+                                    We <span class="fw-bold">Transform</span>
+                                </p><br />
+                                <p class="m-0 fw-bold">ISO 9001:2015 CERTIFIED</p>
+                                <p class="m-0 text-danger fw-bolder">No. 12090</p>
+                            </div>
+                        </div>
+                        <div class="border p-2 col-12 text-white green-dark">
+                            <div class="d-flex flex align-items-center justify-content-center">
+                                <span class="fs-5">OFFICIAL TRANSCRIPT OF RECORDS</span>
+                            </div>
+                        </div>
+                        <div class="border p-2 col-10">
+                            <div class="d-flex flex-column align-items-start">
+                                <span>
+                                    <span class="fw-bold">Name:</span> &nbsp;{{ milestoneCompHeader[0].arc_firstname }}
+                                    {{ milestoneCompHeader[0].arc_middlename ? milestoneCompHeader[0].arc_middlename : ' ' }}
+                                    {{ milestoneCompHeader[0].arc_lastname }}
+                                    {{ milestoneCompHeader[0].arc_suffixname ? milestoneCompHeader[0].arc_suffixname : ' ' }}
+                                </span>
+                                <span>
+                                    <span class="fw-bold">Date of Birth:</span> &nbsp;
+                                    {{ milestoneCompHeader[0].arc_birthday }}
+                                </span>
+                                <span>
+                                    <span class="fw-bold">Address: &nbsp;</span>
+                                    {{ milestoneCompHeader[0].arc_curr_home }},
+                                    {{ milestoneCompHeader[0].arc_curr_barangay }},
+                                    {{ milestoneCompHeader[0].arc_curr_city }},
+                                    {{ milestoneCompHeader[0].arc_curr_province }},
+                                    {{ milestoneCompHeader[0].arc_curr_zipcode }}
+                                </span>
+
+                                <span>
+                                    <span class="fw-bold">Email: &nbsp;</span>
+                                    {{ milestoneCompHeader[0].arc_email }}
+                                </span>
+                                <span>
+                                    <span class="fw-bold">Contact No: &nbsp;</span>
+                                    0{{ milestoneCompHeader[0].arc_contact }}
+                                </span>
+                                <span>
+                                    <span class="fw-bold">Course: &nbsp;</span>
+                                    {{ milestoneCompHeader[0].arc_coursename }}
+                                </span>
+                                <span>
+                                    <span class="fw-bold">Date of Graduation: &nbsp;</span>
+                                    N/A
+                                </span>
+                            </div>
+                        </div>
+                        <div class="border p-2 col-2">
+                            <div class="d-flex flex justify-content-center">
+                                <img :src="profileId" class="img-size" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 border shadow d-flex flex-column card justify-content-center align-items-center mb-2 idbg"
+                        v-for="(mtc, index) in milestoneCompHeader">
+                        <div class="row w-100 backdrop">
+                            <div class="border p-2 col-3">
+                                <div class="align-middle p-2">
+                                    <img src="/img/clcst_logo.png" height="100px" width="100px" alt="...">
+                                </div>
+                            </div>
+                            <div class="border p-2 col-6">
+                                <div class="align-content-center p-2">
+                                    <p class="m-0 fw-bold fs-6 text-success">CENTRAL LUZON COLLEGE OF SCIENCE AND
+                                        TECHNOLOGY, INC.
+                                        CELTECH COLLEGE</p>
+                                    <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San
+                                        Fernando,
+                                        Pampanga, Philippines, 2000</p>
+                                    <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                                    <p class="m-0 fw-normal small-font">Founded 1959</p>
+                                </div>
+                            </div>
+                            <div class="border p-2 col-3">
+                                <div class="align-content-center p-2">
+                                    <p class="m-0 ">
+                                        We <span class="fw-bold">Train</span>,
+                                        We <span class="fw-bold">Touch</span>
+                                        We <span class="fw-bold">Transform</span>
+                                    </p><br />
+                                    <p class="m-0 fw-bold">ISO 9001:2015 CERTIFIED</p>
+                                    <p class="m-0 text-danger fw-bolder">No. 12090</p>
+                                </div>
+                            </div>
+                            <div class="border p-2 col-12 text-white green-dark">
+                                <div class="d-flex flex align-items-center justify-content-center">
+                                    <span class="fs-5">OFFICIAL TRANSCRIPT OF RECORDS</span>
+                                </div>
+                            </div>
+                            <div class="border p-2 col-10">
+                                <div class="d-flex flex-column align-items-start">
+                                    <span>
+                                        <span class="fw-bold">Name:</span> &nbsp;{{ mtc.arc_firstname }}
+                                        {{ mtc.arc_middlename ? mtc.arc_middlename : ' ' }}
+                                        {{ mtc.arc_lastname }}
+                                        {{ mtc.arc_suffixname ? mtc.arc_suffixname : ' ' }}
+                                    </span>
+                                    <span>
+                                        <span class="fw-bold">Date of Birth:</span> &nbsp;
+                                        {{ mtc.arc_birthday }}
+                                    </span>
+                                    <span>
+                                        <span class="fw-bold">Address: &nbsp;</span>
+                                        {{ mtc.arc_curr_home }},
+                                        {{ mtc.arc_curr_barangay }},
+                                        {{ mtc.arc_curr_city }},
+                                        {{ mtc.arc_curr_province }},
+                                        {{ mtc.arc_curr_zipcode }}
+                                    </span>
+
+                                    <span>
+                                        <span class="fw-bold">Email: &nbsp;</span>
+                                        {{ mtc.arc_email }}
+                                    </span>
+                                    <span>
+                                        <span class="fw-bold">Contact No: &nbsp;</span>
+                                        0{{ mtc.arc_contact }}
+                                    </span>
+                                    <span>
+                                        <span class="fw-bold">Course: &nbsp;</span>
+                                        {{ mtc.arc_coursename }}
+                                    </span>
+                                    <span>
+                                        <span class="fw-bold">Date of Graduation: &nbsp;</span>
+                                        N/A
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="border p-2 col-2">
+                                <div class="d-flex flex justify-content-center">
+                                    <img :src="profileId" class="img-size" />
+                                </div>
+                            </div>
+                            <!-- <div class="border p-2 col-12">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Course: &nbsp;</span>{{ mtc.arc_coursename }}
+                                </div>
+                            </div> -->
+                            <div class="border p-2 col-4">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Grade Level: &nbsp;</span>{{ mtc.arc_yearlevel }}
+                                </div>
+                            </div>
+                            <div class="border p-2 col-4">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Quarter: &nbsp;</span>{{ mtc.arc_semester }}
+                                </div>
+                            </div>
+                            <div class="border p-2 col-4">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Curriculum Code: &nbsp;</span> {{
+                                        mtc.arc_curriculum ? mtc.arc_curriculum : 'N/A' }}
+                                </div>
+
+                            </div>
+                            <div class="border p-2 col-4">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Section: &nbsp;</span> {{ mtc.arc_section ?
+                                        mtc.arc_section : 'N/A' }}
+                                </div>
+
+                            </div>
+                            <div class="border p-2 col-4">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Date of Application: &nbsp;</span> {{
+                                        mtc.arc_dateapplied }}
+                                </div>
+                            </div>
+                            <div class="border p-2 col-4">
+                                <div class="d-flex flex align-items-start">
+                                    <span class="fw-bold">Student ID: &nbsp;</span> {{
+                                        mtc.arc_studentid }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row w-100 backdrop">
+                            <div class="border p-2 col-12">
+                                <div class="d-flex flex justify-content-center">
+                                    <span class="fw-bold">Subjects Taken</span>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table-bordered w-100 backdrop border-secondary-subtle">
+                            <thead>
+                                <tr>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Code</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Subjects Description</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Lec</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Lab</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Total</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Prelims</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Midterms</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Pre-Finals</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Finals</span>
+                                    </th>
+                                    <th class="p-2">
+                                        <span class="fw-bold">Faculty</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-if="!Object.keys(milestoneCompData).length && !milestoneCompLoading">
+                                    <td class="align-middle">
+                                        No Subjects Added
+                                    </td>
+                                </tr>
+                                <tr v-if="!Object.keys(milestoneCompData).length && milestoneCompLoading">
+                                    <td class="align-middle">
+                                        <Loader />
+                                    </td>
+                                </tr>
+                                <tr v-if="Object.keys(milestoneCompData).length && !milestoneCompLoading"
+                                    v-for="(c, index) in milestoneCompData[mtc.arc_id]">
+                                    <td class="align-middle">
+                                        <span class="fw-bold">{{ c.arc_subjectcode }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="">{{ c.arc_subjectname }}</span>
+                                        <!-- <span v-if="c.mi_crossenr" class="mt-3">Cross Enrolled to: <span
+                                                                class=" text-red-500"> {{ c.mi_crossenr }}</span></span> -->
+                                    </td>
+                                    <td class="align-middle">
+                                        <span>{{ c.arc_lecture }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span>{{ c.arc_laboratory }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="fw-bold">{{ c.arc_lecture + c.arc_laboratory }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="text-primary">{{ c.arc_prelimgrade }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="text-primary">{{ c.arc_midtermgrade }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="text-primary">{{ c.arc_prefinalgrade }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="text-primary">{{ c.arc_finalgrade }}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span class="text-primary">{{ c.arc_facultyname }}</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="border mt-3 p-2 rounded-2 d-flex gap-2 justify-content-end">
+                        <button class="btn btn-sm btn-success" @click="downloadPdf()">Download TOR</button>
+                    </div>
+                </div>
+            </div>
+            <div v-else class="">
+                <span>No Milestone Found</span>
+            </div>
+        </div>
+    </div>
+
+</template>

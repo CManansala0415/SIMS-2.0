@@ -10,8 +10,11 @@ import { getCurriculumSubject,
     getCommandUpdateCurriculum, 
     getAcademicStatus, 
     getArchiveMerge, 
- } 
+     } 
     from "../../Fetchers.js";
+import {
+    pdfGenerator
+} from "../../Generators.js";
 import Loader from '../loaders/Loader1.vue';
 
 import { useRouter, useRoute } from 'vue-router'
@@ -98,8 +101,21 @@ onMounted(async () => {
     }
 })
 
-const viewType = ref(0)
 
+const downloadPdf = (filetype) => {
+    // var element = document.getElementById('printform');
+    // html2pdf(element);
+    let name = studentID.value + '_' + filetype
+    pdfGenerator(name,'a4','landscape',0.1)
+    Swal.fire({
+        icon: "success",
+        title: "Download Complete",
+        text: "Check your file manager, refreshing the page",
+    }).then(()=>{
+        location.reload()
+    });
+
+}
 
 </script>
 
@@ -112,11 +128,11 @@ const viewType = ref(0)
             <div v-if="Object.keys(milestoneCompHeader).length" class="d-flex flex-column">
                 <div class="col-12 border-bottom">
                     <div class="p-3">
-                        <span class="fw-bold border bg-primary text-white p-2 rounded-3">MILESTONE</span>
+                        <span class="fw-bold border bg-primary text-white p-2 rounded-3">Diploma</span>
                     </div>
                 </div>
-                <div class="col-12 small-font">
-                    <div v-if="viewType == 0"
+                <div class="col-12 small-font" id="printform">
+                    <div
                         class="p-3 border shadow d-flex flex-column card justify-content-center align-items-center mb-2"
                         v-for="(mtc, index) in milestoneCompHeader">
                         <div class="row w-100">
@@ -253,7 +269,9 @@ const viewType = ref(0)
                             </tbody>
                         </table>
                     </div>
-                
+                    <div class="border mt-3 p-2 rounded-2 d-flex gap-2 justify-content-end">
+                        <button class="btn btn-sm btn-success" @click="downloadPdf()">Download Diploma</button>
+                    </div>
                 </div>
             </div>
             <div v-else class="">

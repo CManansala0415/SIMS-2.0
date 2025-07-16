@@ -579,11 +579,11 @@ const getStudentByCourse = async (limit, offset, id) => {
 }
 
 let uploadprofile = {}
-const uploadProfile = async (data,old) => {
+const uploadProfile = async (data,old,folder) => {
     try{
         await axios({
             method: "POST",
-            url: 'api/upload-profile/'+old,
+            url: 'api/upload-profile/'+old+'/'+folder,
             data:data
 
         }).then(async (results) => {
@@ -2457,9 +2457,30 @@ const getArchiveMerge = async (id) => {
     }
 }
 
+let alumni = {}
+const getAlumniStudents = async (limit, offset, fname, mname, lname, mode) => {
+    let firstname = !fname?'404':fname
+    let middlename = !mname?'404':mname
+    let lastname = !lname?'404':lname
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-alumni-students/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode,
+        }).then(async (results) => {
+            // console.log(results.data)
+            alumni = results.data
+        })
+        return alumni
+    }catch(err){
+        return err
+    }
+}
+
+
 export {
 
     getApplicant,
+    getAlumniStudents,
     getGender,
     getNationality,
     getCivilStatus,

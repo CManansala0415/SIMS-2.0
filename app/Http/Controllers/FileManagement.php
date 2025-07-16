@@ -9,21 +9,29 @@ use Illuminate\Support\Facades\File;
 
 class FileManagement extends Controller
 {
-    public function uploadProfile(Request $request, $existing){
+    public function uploadProfile(Request $request, $existing, $folder){
         // $pathToFile = $request->file('image')->store('images', 'public');
+        $linkingfolder = '';
+        if($folder == 'Alumni'){
+            $linkingfolder = '/storage/alumni/';
+            $foldername = 'alumni';
+        }else{
+            $linkingfolder = '/storage/profiles/';
+            $foldername = 'profiles';
+        }
 
         if($existing != 0){
-            $path = public_path().'/storage/profiles/'.$existing;
+            $path = public_path().$linkingfolder.$existing;
             unlink($path);
         }
 
         $pathToFile = $request->file('image');
         $pathToFile->storeAs(
-            'profiles',
+            $foldername,
             $pathToFile->getClientOriginalName(),
             'public'
         );
-        // return $pathToFile;
+
         if($pathToFile){
             return $data = [
                 'old_profile' => $existing,
@@ -35,13 +43,46 @@ class FileManagement extends Controller
                 'status' => 500,
             ];
         }
+
+        // legacy code
+        // if($existing != 0){
+        //     $path = public_path().'/storage/profiles/'.$existing;
+        //     unlink($path);
+        // }
+
+        // $pathToFile = $request->file('image');
+        // $pathToFile->storeAs(
+        //     'profiles',
+        //     $pathToFile->getClientOriginalName(),
+        //     'public'
+        // );
+        // // return $pathToFile;
+        // if($pathToFile){
+        //     return $data = [
+        //         'old_profile' => $existing,
+        //         'status' => 200,
+        //         'link' =>  $pathToFile->getClientOriginalName(),
+        //     ];
+        // }else{
+        //     return $data = [
+        //         'status' => 500,
+        //     ];
+        // }
     } 
     public function uploadLinkProfile(Request $request) {
-        $s1 = DB::table('def_person')
-            ->where('per_id','=', $request['personid'])
-            ->update([
-                "per_profile" => $request['profile'],
+        if($request['type'] == 'Alumni'){
+            $s1 = DB::table('server_archive_persons')
+                ->where('arc_personid','=', $request['personid'])
+                ->update([
+                    "arc_profile" => $request['profile'],
             ]);
+        }else{
+            $s1 = DB::table('def_person')
+                ->where('per_id','=', $request['personid'])
+                ->update([
+                    "per_profile" => $request['profile'],
+            ]);
+        }
         
         return $data = [
             'status' => 200,

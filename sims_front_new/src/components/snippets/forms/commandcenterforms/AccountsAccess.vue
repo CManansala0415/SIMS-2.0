@@ -166,6 +166,29 @@ const accessModuleData = ref(
                         },
                     }
                 },
+                6: {
+                    access_id: 7,
+                    access_value: 7,
+                    access_description: 'Alumni Tracker Access',
+                    access_checked: false,
+                    access_disabled: false,
+                    access_action:{
+                        0: {
+                            action_id:1,
+                            action_value: 1,
+                            action_description:'View / General Access',
+                            action_checked: false,
+                            action_disabled: true,
+                        },
+                        1: {
+                            action_id:2,
+                            action_value: 2,
+                            action_description:'Add, Edit, Delete / Modifier Access',
+                            action_checked: false,
+                            action_disabled: false,
+                        },
+                    }
+                },
             }
         },
         1: {

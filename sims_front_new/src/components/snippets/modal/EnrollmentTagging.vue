@@ -60,10 +60,12 @@ const milestoneCompLoading = ref(true)
 onMounted(async () => {
     window.stop()
     enr_section.value = studentData.value.enr_section
-    // enr_curriculum.value = studentData.value.enr_curriculum
+    enr_curriculum.value = studentData.value.enr_curriculum
     subjectFilter.value = subjectData.value
     sectionFilter.value = sectionData.value
     curriculumFilter.value = curriculumData.value
+
+    console.log(studentData.value)
 
     try {
         
@@ -98,10 +100,13 @@ onMounted(async () => {
             let grad = enrolleeData.value[0].enr_gradelvl
             let cour = enrolleeData.value[0].enr_course
 
+            console.log(curr)
+
             getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
                 settingscurr.value=results
+
                 //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
-                if(Object.keys(results).length == 0){
+                if(Object.keys(results).length == 0 || !Object.keys(results).length){
                     curr = 0
                 }else{
                     curr = settingscurr.value[0].sett_course_currid

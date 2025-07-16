@@ -749,7 +749,10 @@ class DefaultsController extends Controller
     public function getIDimage($fileName, $type){
         if($type==1){
             $path = public_path().'/storage/profiles/'.$fileName;
-        }else{
+        }else if($type==2){
+            $path = public_path().'/storage/alumni/'.$fileName;
+        }
+        else{
             $path = public_path().'/storage/signatures/'.$fileName;
         }
         
@@ -770,6 +773,10 @@ class DefaultsController extends Controller
             case 3: // billing request
                 $controller = new TransactionsController();
                 $response = $controller->getRequestDetails(0, 0, 0, 0, 0, 3, $id);
+            break;
+            case 4: // alumni tracker
+                $controller = new RegistrarController();
+                $response = $controller->getAlumniStudents(0, 0, $id, 0, 0, 3);
             break;
         }
 

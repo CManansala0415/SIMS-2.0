@@ -16,6 +16,7 @@ const studentInfo = computed(() => {
 });
 
 const customNumber = ref('')
+const studentLrn = ref('')
 const userID = ref('')
 const saving = ref(false)
 const preloading = ref(false)
@@ -27,7 +28,9 @@ onMounted(() => {
         getStudentIdentification(studentInfo.value.per_id).then((results) => {
             identity.value = results
             customNumber.value = identity.value.ident_identification
+            studentLrn.value = identity.value.ident_lrn
             preloading.value = false
+            console.log(identity.value)
         })
     })
 
@@ -36,38 +39,48 @@ onMounted(() => {
 
 
 const save = () => {
-    saving.value = true
-    let x = {
-        ident_idno: identity.value.ident_idno,
-        ident_identification: customNumber.value,
-        ident_personid: studentInfo.value.per_id,
-        ident_addedby: userID.value
-    }
-
-    addStudentIdentification(x).then((results) => {
-        if (results.status != 204) {
-            // alert('Update Failed')
-            // location.reload()
-            Swal.fire({
-                title: "Update Failed",
-                text: "Unknown error occured, try again later",
-                icon: "error"
-            }).then(()=>{
-                location.reload()
-            });
-            
-        } else {
-            // alert('Configuration Successful')
-            // location.reload()
-            Swal.fire({
-                title: "Update Successful",
-                text: "Changes applied, refreshing the page",
-                icon: "success"
-            }).then(()=>{
-                location.reload()
-            });
+    if(customNumber.value && studentLrn.value){
+        saving.value = true
+        let x = {
+            ident_idno: identity.value.ident_idno,
+            ident_identification: customNumber.value,
+            ident_lrn: studentLrn.value,
+            ident_personid: studentInfo.value.per_id,
+            ident_addedby: userID.value
         }
-    })
+
+        addStudentIdentification(x).then((results) => {
+            if (results.status != 204) {
+                // alert('Update Failed')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Failed",
+                    text: "Unknown error occured, try again later",
+                    icon: "error"
+                }).then(()=>{
+                    location.reload()
+                });
+                
+            } else {
+                // alert('Configuration Successful')
+                // location.reload()
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
+            }
+        })
+    }else{
+        Swal.fire({
+            title: "Saving Failed",
+            text: "Please fill out fields before saving.",
+            icon: "error"
+        })
+    }
+    
 }
 </script>
 
@@ -91,8 +104,14 @@ const save = () => {
                     <p class="p-2 bg-secondary-subtle">{{ studentInfo.per_email }}</p>
                 </div>
                 <div class="d-flex flex-column border p-2">
-                    <p class="fw-bold">Identification</p>
-                    <input v-model="customNumber" :disabled="saving || customNumber ? true : false" placeholder="Ex. 20222121" type="text"
+                    <p class="fw-bold">LRN (for SHS only)</p>
+                    <input v-model="studentLrn" :disabled="saving || identity.ident_lrn? true : false" placeholder="Ex. 20222121" type="text"
+                        class="form-control" tabindex="-1" />
+                    <!-- <button type="button" :disabled="saving?true:false" class="p-2 bg-teal-500 text-white rounded-md disabled:opacity-70 disabled:cursor-not-allowed">Generate Identification</button> -->
+                </div>
+                <div class="d-flex flex-column border p-2">
+                    <p class="fw-bold">Student Identification Number</p>
+                    <input v-model="customNumber" :disabled="saving || identity.ident_identification? true : false" placeholder="Ex. 20222121" type="text"
                         class="form-control" tabindex="-1" />
                     <!-- <button type="button" :disabled="saving?true:false" class="p-2 bg-teal-500 text-white rounded-md disabled:opacity-70 disabled:cursor-not-allowed">Generate Identification</button> -->
                 </div>
@@ -102,7 +121,7 @@ const save = () => {
                             class="italic">Once identification is generated, it is linked to all records in the system.
                             it cannot be modified and it is for one time generation only.
                         </span></p>
-                    <button v-if="!customNumber" type="submit" :disabled="saving ? true : false"
+                    <button v-if="!identity.ident_identification" type="submit" :disabled="saving ? true : false"
                         class="btn btn-sm btn-primary w-100">Save
                         Identification</button>
                 </div>

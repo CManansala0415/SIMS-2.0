@@ -2403,6 +2403,7 @@ class RegistrarController extends Controller
                 ->update([
                     'ident_personid' => $request->input('ident_personid'),
                     'ident_identification' => $request->input('ident_identification'),
+                    'ident_lrn' => $request->input('ident_lrn'),
                     'ident_updatedby' => $request->input('ident_updatedby'),
                     'ident_dateupdated' => $date,
                 ]);
@@ -2410,6 +2411,7 @@ class RegistrarController extends Controller
                 $primary = DB::table('def_student_identification')->insert([
                     'ident_personid' => $request->input('ident_personid'),
                     'ident_identification' => $request->input('ident_identification'),
+                    'ident_lrn' => $request->input('ident_lrn'),
                     'ident_addedby' => $request->input('ident_addedby'),
                     'ident_dateadded' => $date,
                 ]);
@@ -2434,6 +2436,84 @@ class RegistrarController extends Controller
         ->get();
 
         return $data; 
+    }
+
+    public function getAlumniStudents($limit, $offset, $fname, $mname, $lname, $mode)
+    {   // 1 means general viewing page
+        if($mode == 1){
+            $alumni = DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_person_status', '=',  1)
+                        ->limit($limit)->offset($offset)
+                        ->get();
+            $count =  DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_person_status', '=',  1)
+                        ->limit($limit)->offset($offset)
+                        ->count();       
+            return $data = [
+                'data' => $alumni,
+                'count' => $count,
+            ];
+
+        }
+        // 2 means special search single textbox search
+        elseif ($mode == 2){
+            if ($fname==404) $fname = '';
+            $alumni = DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_person_status', '=',  1)
+                        ->where(function($query) use ($fname) {
+                            $query->orWhere('arc_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('arc_middlename', 'like',  '%' . $fname .'%')
+                            ->orWhere('arc_lastname', 'like',  '%' . $fname .'%');
+                        })
+                        ->get();
+            $count =  DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_person_status', '=',  1)
+                        ->where(function($query) use ($fname) {
+                            $query->orWhere('arc_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('arc_middlename', 'like',  '%' . $fname .'%')
+                            ->orWhere('arc_lastname', 'like',  '%' . $fname .'%');
+                        })
+                        ->limit($limit)->offset($offset)
+                        ->count();      
+        }
+        // 3 for QR search
+        elseif ($mode == 3){
+            $alumni = DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_studentid', '=',  $fname)
+                        ->where('arc_person_status', '=',  1)
+                        ->get();
+            $count = DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_studentid', '=',  $fname)
+                        ->where('arc_person_status', '=',  1)
+                        ->count();
+        }
+        //custom search with fname mname and lname
+        else{
+            $alumni = DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_person_status', '=',  1)
+                        ->where(function($query) use ($fname,$mname,$lname) {
+                            $query->orWhere('arc_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('arc_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('arc_lastname', 'like',  '%' . $lname .'%');
+                        })
+                        ->limit($limit)->offset($offset)
+                        ->get();
+            $count =  DB::table('server_archive_persons')->orderBy('arc_id','DESC')
+                        ->where('arc_person_status', '=',  1)
+                        ->where(function($query) use ($fname,$mname,$lname) {
+                            $query->orWhere('arc_firstname', 'like',  '%' . $fname .'%')
+                            ->orWhere('arc_middlename', 'like',  '%' . $mname .'%')
+                            ->orWhere('arc_lastname', 'like',  '%' . $lname .'%');
+                        })
+                        ->limit($limit)->offset($offset)
+                        ->count();             
+        }
+
+        return $data = [
+            'data' => $alumni,
+            'count' => $count,
+        ];
+        
     }
     
     

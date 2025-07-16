@@ -28,6 +28,7 @@ const pdfGenerator = async (name,paper,orientation,margin) => {
         // margin: [0.1, 0.2, 0.1, 0.2],
         margin: margin,
         filename: name+'.pdf',
+        pagebreak: { mode: 'css', before: '.pagebreak' },
         image: { type: 'jpeg', quality: 1 },
         // html2canvas: { scale: 1 },
         html2canvas: {

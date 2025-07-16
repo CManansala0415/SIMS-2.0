@@ -235,7 +235,8 @@ const upload = (personID) => {
         if (results.status == 200) {
             let data = {
                 profile: results.link,
-                personid: personID
+                personid: personID,
+                type:'Library'
             }
             uploadLinkProfile(data).then((results) => {
                 if (results.status == 200) {

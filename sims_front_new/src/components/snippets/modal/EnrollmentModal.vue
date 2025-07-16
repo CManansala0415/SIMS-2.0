@@ -222,12 +222,12 @@ const enroll = () => {
                 <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
             </select>
         </div>
-        <div class="d-flex flex-wrap form-group">
+        <!-- <div class="d-flex flex-wrap form-group">
             <label for="lrn">LRN (if applicable)</label>
             <input v-model="enrollData.lrn" type="text" class="form-control"
                 :disabled="enrollChecker || enrolleeData.enr_id || enrollData.program == 2 ? true : false"
                 title="Click Edit to modify details" id="lrn" aria-describedby="lrn" />
-        </div>
+        </div> -->
         <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester / Quarter</label>
             <select v-model="enrollData.quarter" class="form-control"
@@ -244,7 +244,7 @@ const enroll = () => {
                 title="Click Edit to modify details" id="prog" aria-describedby="prog">
                 <option value="" disabled>-- Select Type --</option>
                 <option v-for="(c, index) in course" :value="c.prog_id"
-                    :disabled="enrollData.program != c.prog_progtype ? true : false">{{ c.prog_name }}</option>
+                    v-show="enrollData.program == c.prog_progtype ? true : false">{{ c.prog_name }}</option>
             </select>
         </div>
         <div class="d-flex flex-wrap form-group">
@@ -254,7 +254,7 @@ const enroll = () => {
                 title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl">
                 <option value="" disabled>-- Select Type --</option>
                 <option v-for="(g, index) in filteredGradelvl" :value="g.grad_id"
-                    :disabled="enrollData.program != g.grad_dtypeid ? true : false">{{ g.grad_name }}</option>
+                    v-show="enrollData.program == g.grad_dtypeid ? true : false">{{ g.grad_name }}</option>
             </select>
         </div>
         <div class="d-flex flex-column mt-3">

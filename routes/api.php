@@ -64,7 +64,7 @@ Route::middleware(['auth:sanctum'])->post('/enroll-applicant', [RegistrarControl
 Route::middleware(['auth:sanctum'])->get('/get-student/{limit}/{offset}/{search}', [RegistrarController::class,'getStudent']);
 Route::middleware(['auth:sanctum'])->get('/get-student-filtering/{limit}/{offset}/{fname}/{mname}/{lname}/{program}/{gradelvl}/{course}/{mode}', [RegistrarController::class,'getStudentFiltering']);
 Route::middleware(['auth:sanctum'])->get('/get-student-id-details/{enrid}', [RegistrarController::class,'getStudentIdDetails']);
-Route::middleware(['auth:sanctum'])->post('/upload-profile/{existing}', [FileManagement::class,'uploadProfile']);
+Route::middleware(['auth:sanctum'])->post('/upload-profile/{existing}/{folder}', [FileManagement::class,'uploadProfile']);
 Route::middleware(['auth:sanctum'])->post('/upload-link-profile', [FileManagement::class,'uploadLinkProfile']);
 Route::middleware(['auth:sanctum'])->post('/upload-signature/{existing}', [FileManagement::class,'uploadSignature']);
 Route::middleware(['auth:sanctum'])->post('/upload-link-signature', [FileManagement::class,'uploadLinkSignature']);
@@ -106,6 +106,7 @@ Route::middleware(['auth:sanctum'])->get('/get-faculty-availability', [Registrar
 Route::middleware(['auth:sanctum'])->get('/get-student-identification/{id}', [RegistrarController::class,'getStudentIdentification']);
 Route::middleware(['auth:sanctum'])->post('/add-student-identification', [RegistrarController::class,'addStudentIdentification']);
 Route::middleware(['auth:sanctum'])->get('/get-archive-merge/{id}', [RegistrarController::class,'getArchiveMerge']);
+Route::middleware(['auth:sanctum'])->get('/get-alumni-students/{limit}/{offset}/{fname}/{mname}/{lname}/{mode}', [RegistrarController::class,'getAlumniStudents']);
 
 
 Route::middleware(['auth:sanctum'])->get('/get-accounts-details', [TransactionsController::class,'getAccountsDetails']);
