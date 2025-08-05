@@ -385,6 +385,10 @@ class CommandController extends Controller
         $defdmy = date('Y-m-d', time());
         $randomizer = md5(rand(1,1000000).uniqid(mt_rand(), true));
 
+        $getschoolyear = DB::table('def_command_center')
+            ->where('sett_code','=', 'cs_01')
+            ->first();
+        
         //save person data
         $persons = DB::table('def_enrollment')
                     ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
@@ -480,6 +484,8 @@ class CommandController extends Controller
                     'arc_subjects' => $load,
                     'arc_gradelvl' => $details->gradelvl,
                     'arc_semester' => $details->semester,
+                    'arc_schoolyear' => 'SY '.$getschoolyear->sett_yearfrom.'-'.$getschoolyear->sett_yearto,
+                    'arc_fullname' => $details->per_lastname.', '.$details->per_firstname.' '.$details->per_middlename.' '.$details->per_suffixname,
 
                 ]);    
 
@@ -501,6 +507,7 @@ class CommandController extends Controller
                         'arc_subjectname' => $mark->subj_name,
                         'arc_lecture' => $mark->subj_lec,
                         'arc_laboratory' => $mark->subj_lab,
+                        'arc_units' => $mark->subj_lec+$mark->subj_lab,
                         'arc_dateenrolled' => $mark->enr_dateenrolled,
                         'arc_prelimgrade' => $mark->grs_prelims,
                         'arc_midtermgrade' => $mark->grs_midterms,
