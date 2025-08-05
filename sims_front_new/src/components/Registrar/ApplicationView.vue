@@ -313,7 +313,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -329,7 +329,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -342,7 +342,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false

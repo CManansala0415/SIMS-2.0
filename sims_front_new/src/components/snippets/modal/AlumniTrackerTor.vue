@@ -74,15 +74,17 @@ onMounted(async () => {
         } else {
             studentID.value = studentData.value.per_id
         }
-
+        console.log(studentData.value)
         getArchiveMerge(studentID.value).then((results) => {
             // milestoneCompData.value = results
+
             milestoneCompLoading.value = false
             // group naten yung archive para makapag create ng headers to be looped
             milestoneCompHeader.value = results.filter((value, index, self) =>
                 index === self.findIndex((t) => t.arc_id === value.arc_id)
             );
 
+            console.log(results)
 
             let x = results.map((e) => {
                 let rgrade = (
@@ -142,9 +144,9 @@ onMounted(async () => {
             // console.log(milestoneCompData.value )
             // console.log(milestoneCompHeader.value )
 
-
             profileId.value = milestoneCompHeader.value[0].arc_profile ? 'http://localhost:8000/api/get-person-image/' + milestoneCompHeader.value[0].arc_profile + '/2' : '/img/profile_default.png'
             preloading.value = false
+            // console.log(milestoneCompHeader.value)
 
         })
 
@@ -197,7 +199,7 @@ const downloadPdf = (filetype) => {
                             Records</span>
                     </div>
                 </div>
-                <div id="printform" class="d-flex flex-column gap-1">
+                <div id="printform" class="h-auto d-flex flex-column justify-content-center align-items-start">
 
                     <!--Page 1-->
                     <div class="small-font bg-opaque "
@@ -310,11 +312,11 @@ const downloadPdf = (filetype) => {
 
                             <div class="container w-100 backdrop h-100 border-3 border-black">
                                 <div class="d-flex flex justify-content-center">
-                                    <span class="fw-bold bg-success px-3 py-1 text-white rounded-2">Subjects Taken</span>
+                                    <span class="fw-bold bg-success px-3 py-1 text-white rounded-2 mb-3">Subjects Taken</span>
                                 </div>
-                                <div class="h-100 d-flex flex-column justify-content-evenly">
+                                <div class="h-100 d-flex flex-column justify-content-start">
                                     <!-- 1st year 1st Sem-->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[0] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[0].arc_yearlevel }}
@@ -338,7 +340,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[0].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -397,7 +399,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[0].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -422,10 +424,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[0].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -437,7 +445,7 @@ const downloadPdf = (filetype) => {
                                     <!-- 1st year 1st sem -->
 
                                     <!-- 1st year 2nd sem -->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[1] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[1].arc_yearlevel }}
@@ -461,7 +469,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[1].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -520,7 +528,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[1].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -545,10 +553,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[1].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -560,7 +574,7 @@ const downloadPdf = (filetype) => {
                                     <!-- 1st year 2nd sem-->
 
                                     <!-- 2nd year 1st Sem-->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[2] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[2].arc_yearlevel }}
@@ -584,7 +598,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[2].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -643,7 +657,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[2].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -668,10 +682,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[2].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -683,7 +703,7 @@ const downloadPdf = (filetype) => {
                                     <!-- 2nd year 1st sem -->
 
                                     <!-- 2nd year 2nd sem -->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[3] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[3].arc_yearlevel }}
@@ -707,7 +727,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[3].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -766,7 +786,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[3].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -791,10 +811,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[3].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -1136,11 +1162,11 @@ const downloadPdf = (filetype) => {
 
                             <div class="container w-100 backdrop h-100 border-3 border-black">
                                 <div class="d-flex flex justify-content-center">
-                                    <span class="fw-bold bg-success px-3 py-1 text-white rounded-2">Subjects Taken</span>
+                                    <span class="fw-bold bg-success px-3 py-1 text-white rounded-2 mb-3">Subjects Taken</span>
                                 </div>
-                                <div class="h-100 d-flex flex-column justify-content-evenly">
+                                <div class="h-100 d-flex flex-column justify-content-start">
                                     <!-- 1st year 1st Sem-->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[4] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[4].arc_yearlevel }}
@@ -1164,7 +1190,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[4].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -1223,7 +1249,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[4].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -1248,10 +1274,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[4].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -1263,7 +1295,7 @@ const downloadPdf = (filetype) => {
                                     <!-- 1st year 1st sem -->
 
                                     <!-- 1st year 2nd sem -->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[5] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[5].arc_yearlevel }}
@@ -1287,7 +1319,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[5].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -1346,7 +1378,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[5].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -1371,10 +1403,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[5].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -1386,7 +1424,7 @@ const downloadPdf = (filetype) => {
                                     <!-- 1st year 2nd sem-->
 
                                     <!-- 2nd year 1st Sem-->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[6] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[6].arc_yearlevel }}
@@ -1410,7 +1448,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[6].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -1469,7 +1507,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[6].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -1494,10 +1532,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[6].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>
@@ -1509,7 +1553,7 @@ const downloadPdf = (filetype) => {
                                     <!-- 2nd year 1st sem -->
 
                                     <!-- 2nd year 2nd sem -->
-                                    <div class="container w-100 border shadow-sm border"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                    <div class="container w-100 border shadow-sm border" v-if="milestoneCompHeader[7] !== undefined"> <!--v-for="(mtc, index) in milestoneCompHeader"-->
                                         <div class="row bg-body-subtle">
                                             <div class="col-12 d-flex flex justify-content-center green-mid text-white">
                                                 <span class="fw-bold"></span>{{ milestoneCompHeader[7].arc_yearlevel }}
@@ -1533,7 +1577,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="fw-bold">Subjects Description</span>
                                                             </div>
                                                         </th>
-                                                        <th class="p-1">
+                                                        <th class="p-1" v-if="milestoneCompHeader[0].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">Final Grade</span>
@@ -1592,7 +1636,7 @@ const downloadPdf = (filetype) => {
                                                                 <span class="">{{ c.arc_subjectname }}</span>
                                                             </div>
                                                         </td>
-                                                        <td class="align-middle">
+                                                        <td class="align-middle" v-if="milestoneCompHeader[7].arc_migtype != 2">
                                                             <div
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span>
@@ -1617,10 +1661,16 @@ const downloadPdf = (filetype) => {
                                                             <!-- <span>{{ c.arc_lecture }}</span> -->
                                                         </td>
                                                         <td class="align-middle">
-                                                            <div
+                                                            <div v-if="milestoneCompHeader[7].arc_migtype != 2"
                                                                 style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
                                                                 <span class="fw-bold">{{ c.arc_lecture +
                                                                     c.arc_laboratory
+                                                                    }}</span>
+                                                            </div>
+                                                            <div v-else
+                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                <span class="fw-bold">{{ 
+                                                                    c.arc_units
                                                                     }}</span>
                                                             </div>
                                                         </td>

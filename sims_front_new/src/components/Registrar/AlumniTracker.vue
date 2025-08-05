@@ -271,10 +271,10 @@ const paginate = (mode) => {
                 offset.value -= 10
                 alumniCount.value = 0
                 preLoading.value = true
-                getAlumniStudents(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+                getAlumniStudents(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
                     // alumni.value = results.data
-                    alumni.value = results.data.filter((value, index, self) =>
-                        index === self.findIndex((t) => t.arc_studentid === value.arc_studentid)
+                    alumni.value = results.data.filter((val, index, self) =>
+                        index === self.findIndex((t) => t.arc_studentid === val.arc_studentid)
                     );
                     alumniCount.value = results.count
                     preLoading.value = false
@@ -290,10 +290,10 @@ const paginate = (mode) => {
                 offset.value += 10
                 alumniCount.value = 0
                 preLoading.value = true
-                getAlumniStudents(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+                getAlumniStudents(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
                     // alumni.value = results.data
-                    alumni.value = results.data.filter((value, index, self) =>
-                        index === self.findIndex((t) => t.arc_studentid === value.arc_studentid)
+                    alumni.value = results.data.filter((val, index, self) =>
+                        index === self.findIndex((t) => t.arc_studentid === val.arc_studentid)
                     );
                     alumniCount.value = results.count
                     preLoading.value = false
@@ -306,10 +306,10 @@ const paginate = (mode) => {
                 offset.value = 0
                 alumniCount.value = 0
                 preLoading.value = true
-                getAlumniStudents(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,2).then((results) => {
+                getAlumniStudents(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
                     // alumni.value = results.data
-                    alumni.value = results.data.filter((value, index, self) =>
-                        index === self.findIndex((t) => t.arc_studentid === value.arc_studentid)
+                    alumni.value = results.data.filter((val, index, self) =>
+                        index === self.findIndex((t) => t.arc_studentid === val.arc_studentid)
                     );
                     alumniCount.value = results.count
                     preLoading.value = false

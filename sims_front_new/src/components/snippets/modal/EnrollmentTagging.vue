@@ -100,7 +100,7 @@ onMounted(async () => {
             let grad = enrolleeData.value[0].enr_gradelvl
             let cour = enrolleeData.value[0].enr_course
 
-            console.log(curr)
+            // console.log(curr)
 
             getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
                 settingscurr.value=results

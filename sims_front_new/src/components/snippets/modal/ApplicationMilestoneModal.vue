@@ -178,27 +178,38 @@ const viewType = ref(0)
                                     <th class="border p-2">
                                         <span class="fw-bold">Subjects Description</span>
                                     </th>
-                                    <th class="border p-2">
+
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Lec</span>
                                     </th>
-                                    <th class="border p-2">
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Lab</span>
                                     </th>
-                                    <th class="border p-2">
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Total</span>
                                     </th>
-                                    <th class="border p-2">
+
+                                    <th class="border p-2" v-if="mtc.arc_migtype == 2">
+                                        <span class="fw-bold">Units</span>
+                                    </th>
+
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Prelims</span>
                                     </th>
-                                    <th class="border p-2">
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Midterms</span>
                                     </th>
-                                    <th class="border p-2">
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Pre-Finals</span>
                                     </th>
-                                    <th class="border p-2">
+                                    <th class="border p-2" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">Finals</span>
                                     </th>
+
+                                    <th class="border p-2" v-if="mtc.arc_migtype == 2">
+                                        <span class="fw-bold">Grade</span>
+                                    </th>
+
                                     <th class="border p-2">
                                         <span class="fw-bold">Faculty</span>
                                     </th>
@@ -225,26 +236,33 @@ const viewType = ref(0)
                                         <!-- <span v-if="c.mi_crossenr" class="mt-3">Cross Enrolled to: <span
                                                                 class=" text-red-500"> {{ c.mi_crossenr }}</span></span> -->
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span>{{ c.arc_lecture }}</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span>{{ c.arc_laboratory }}</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span class="fw-bold">{{ c.arc_lecture + c.arc_laboratory }}</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span class="text-primary">{{ c.arc_prelimgrade }}</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span class="text-primary">{{ c.arc_midtermgrade }}</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span class="text-primary">{{ c.arc_prefinalgrade }}</span>
                                     </td>
-                                    <td class="align-middle">
+                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                         <span class="text-primary">{{ c.arc_finalgrade }}</span>
+                                    </td>
+
+                                    <td class="align-middle" v-if="mtc.arc_migtype == 2">
+                                        <span class="text-primary">{{ c.arc_units }}</span>
+                                    </td>
+                                    <td class="align-middle" v-if="mtc.arc_migtype == 2">
+                                        <span class="text-primary">{{ c.arc_grade }}</span>
                                     </td>
                                     <td class="align-middle">
                                         <span class="text-primary">{{ c.arc_facultyname }}</span>
