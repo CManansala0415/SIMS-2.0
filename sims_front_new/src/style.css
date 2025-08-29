@@ -286,3 +286,34 @@ h1 {
 .page-break {
     page-break-before: always;
 }
+
+.blackletter-header-1 {
+  font-family: 'Old English Text MT';
+  /* font-weight: 700; */
+  /* font-style: normal; */
+}
+
+.blackletter-header-2 {
+  font-family: 'Trajan Pro';
+  /* font-weight: 700; */
+  /* font-style: normal; */
+}
+
+.blackletter-header-3 {
+  font-family: 'Bookman Old Style';
+  /* font-weight: 700; */
+  /* font-style: normal; */
+}
+
+/* for forms as labels*/
+.label-selectbox{
+  width: 100%;
+  color: black;
+  text-align: center;
+  border:none; 
+  background: none; 
+  padding: 0; 
+  -webkit-appearance: none; /* For Chrome, Safari, and Opera */ 
+  -moz-appearance: none; /* For Firefox */
+  appearance: none;
+}

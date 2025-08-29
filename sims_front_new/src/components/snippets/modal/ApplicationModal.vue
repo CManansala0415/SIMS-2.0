@@ -623,7 +623,7 @@ const registerApplicant = async() =>{
             text: "You have successfully made changes to this record. Click now refresh to retrieve changes.",
             icon: "success"
         }).then(()=>{
-            // location.reload()
+            location.reload()
         });
 
     }else{
@@ -676,7 +676,7 @@ const registerApplicant = async() =>{
             text: "You have successfully registered this record. Click now refresh to retrieve changes.",
             icon: "success"
         }).then(()=>{
-            // location.reload()
+            location.reload()
         });
     }
 }

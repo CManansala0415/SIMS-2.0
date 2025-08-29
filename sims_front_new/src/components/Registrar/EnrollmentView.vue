@@ -28,6 +28,7 @@ import EnrollmentListFIlterModal from '../snippets/modal/EnrollmentListFIlterMod
 import EnrollmentPrintModal from '../snippets/modal/EnrollmentPrintModal.vue';
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 import SearchQR from '../snippets/tech/SearchQR.vue';
+import EnrollmentReceiptModal from '../snippets/modal/EnrollmentReceiptModal.vue';
 
 const preLoading = ref(true)
 const student = ref([])
@@ -62,6 +63,7 @@ const holdSubmit = ref(false)
 const image = ref('')
 const userID = ref('')
 const showPrintModal = ref('')
+const printType = ref('')
 const emit = defineEmits(['fetchUser'])
 const accessData = ref([])
 
@@ -388,7 +390,7 @@ const search = () => {
     paginate('search')
 }
 const studentVal = ref([])
-const showForm = (type, data) => {
+const showForm = (type, data, printtype) => {
 
 
     switch (type) {
@@ -405,6 +407,7 @@ const showForm = (type, data) => {
             getCurriculumStudent(data.enr_course, data.enr_program).then((results) => {
                 curriculum.value = results
                 showPrintModal.value = true
+                printType.value = printtype
             })
             // var element = document.getElementById('printform');
             // html2pdf(element);
@@ -634,8 +637,13 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen"/>
                                 </button>
-                                <button tabindex="-1" title="Print Forms" data-bs-toggle="modal" data-bs-target="#printmodal"
-                                    @click="showForm(3, stud)"
+                                <button tabindex="-1" title="Print Grades" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                    @click="showForm(3, stud, 1)"
+                                    class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-print"/>
+                                </button>
+                                <button tabindex="-1" title="Print Receipt" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                    @click="showForm(3, stud, 2)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
                                 </button>
@@ -643,7 +651,7 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                 </button>
-                                 <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
+                                <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
                                     type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/>
                                 </button>
@@ -742,7 +750,7 @@ const getData = (result) =>{
      <!-- Print Modal -->
     <div class="modal fade" id="printmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Print and Download Form</h5>
@@ -750,7 +758,9 @@ const getData = (result) =>{
                         @click="showPrintModal = false"></button>
                 </div>
                 <div class="modal-body">
-                    <EnrollmentPrintModal v-if="showPrintModal" :student="showFormData" :subject="subject" :section="section"
+                    <EnrollmentPrintModal v-if="showPrintModal && printType == 1" :student="showFormData" :subject="subject" :section="section"
+                        :curriculum="curriculum" />
+                    <EnrollmentReceiptModal v-if="showPrintModal && printType == 2" :student="showFormData" :subject="subject" :section="section"
                         :curriculum="curriculum" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

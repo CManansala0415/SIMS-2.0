@@ -44,7 +44,10 @@ import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.v
 import SearchQR from '../snippets/tech/SearchQR.vue';
 import ApplicationMilestoneModal from '../snippets/modal/ApplicationMilestoneModal.vue';
 import AlumniTrackerTor from '../snippets/modal/AlumniTrackerTor.vue';
+import AlumniTrackerForm137 from '../snippets/modal/AlumniTrackerForm137.vue';
 import AlumnitrackerDiploma from '../snippets/modal/AlumnitrackerDiploma.vue';
+import AlumniApplicationData from '../snippets/modal/AlumniApplicationData.vue';
+import AlumnitrackerCard from '../snippets/modal/AlumnitrackerCard.vue';
 
 const limit = ref(10)
 const offset = ref(0)
@@ -65,6 +68,7 @@ const showPrintID = ref(false)
 const showQRScanner = ref(false)
 const activeEnrollment = ref(false)
 const showMilestones = ref(false)
+const showCard = ref(false)
 
 const gender = ref([])
 const nationality = ref([])
@@ -91,23 +95,23 @@ const emit = defineEmits(['fetchUser'])
 
 const booter = async () => {
 
-    // getGender().then((results) => {
-    //     gender.value = results
-    //     booting.value = 'Loading Genders'
-    //     bootingCount.value += 1
-    // })
+    getGender().then((results) => {
+        gender.value = results
+        booting.value = 'Loading Genders'
+        bootingCount.value += 1
+    })
 
-    // getNationality().then((results) => {
-    //     nationality.value = results
-    //     booting.value = 'Loading Nationalities'
-    //     bootingCount.value += 1
-    // })
+    getNationality().then((results) => {
+        nationality.value = results
+        booting.value = 'Loading Nationalities'
+        bootingCount.value += 1
+    })
 
-    // getCivilStatus().then((results) => {
-    //     civilstatus.value = results
-    //     booting.value = 'Loading Civil Status'
-    //     bootingCount.value += 1
-    // })
+    getCivilStatus().then((results) => {
+        civilstatus.value = results
+        booting.value = 'Loading Civil Status'
+        bootingCount.value += 1
+    })
 
     // getGradelvl().then((results) => {
     //     gradelvl.value = results
@@ -151,18 +155,18 @@ const booter = async () => {
     //     bootingCount.value += 1
     // })
 
-    // getDemograph().then((results) => {
-    //     country.value = results.country
-    //     region.value = results.region
-    //     province.value = results.province
-    //     city.value = results.city
-    //     barangay.value = results.barangay
-    //     gender.value = results.gender
-    //     nationality.value = results.nationality
-    //     civilstatus.value = results.civilstatus
-    //     booting.value = 'Loading Demographic Information'
-    //     bootingCount.value += 1
-    // })
+    getDemograph().then((results) => {
+        country.value = results.country
+        region.value = results.region
+        province.value = results.province
+        city.value = results.city
+        barangay.value = results.barangay
+        gender.value = results.gender
+        nationality.value = results.nationality
+        civilstatus.value = results.civilstatus
+        booting.value = 'Loading Demographic Information'
+        bootingCount.value += 1
+    })
     // getAcademicDefaults().then((results) => {
     //     gradelvl.value = results.gradelvl
     //     degree.value = results.program
@@ -514,8 +518,17 @@ const handleImage = (e) => {
                                     type="button" title="View TOR" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card"/></button>
                                 <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app,3)"
+                                    type="button" title="View Form 137" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-id-card"/></button>
+                                <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app,4)"
+                                    type="button" title="View Card" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-id-card"/></button>
+                                <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app,5)"
                                     type="button" title="View Diploma" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-graduation-cap"/></button>
+                                <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app,6)"
+                                    type="button" title="Edit Details" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-pen"/></button>
                             </div>
                         </td> 
                         <td v-else class="align-middle">
@@ -591,7 +604,19 @@ const handleImage = (e) => {
                 <div class="modal-body">
                     <ApplicationMilestoneModal v-if="showMilestones && modalMode==1" :student="identificationData" moduleType="2" />
                     <AlumniTrackerTor v-if="showMilestones && modalMode==2" :student="identificationData" moduleType="2"/>
-                    <AlumnitrackerDiploma v-if="showMilestones && modalMode==3" :student="identificationData" moduleType="2"/>
+                    <AlumniTrackerForm137 v-if="showMilestones && modalMode==3" :student="identificationData" moduleType="2"/>
+                    <AlumnitrackerCard v-if="showMilestones && modalMode==4" :student="identificationData" moduleType="2"/>
+                    <AlumnitrackerDiploma v-if="showMilestones && modalMode==5" :student="identificationData" moduleType="2"/>
+                    <AlumniApplicationData v-if="showMilestones && modalMode==6" :studentData="identificationData"  
+                                            :genderData="gender"
+                                            :civilstatusData="civilstatus"
+                                            :nationalityData="nationality"
+                                            :regionData="region"
+                                            :provinceData="province"
+                                            :cityData="city"
+                                            :barangayData="barangay"
+                                            :countryData="country"/>
+                                            
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -608,6 +633,8 @@ const handleImage = (e) => {
             </div>
         </div>
     </div>
+
+    
     
 
 </template>

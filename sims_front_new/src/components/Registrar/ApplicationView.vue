@@ -10,6 +10,7 @@ import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
 // import Enroll from '../snippets/modal/Enrollment.vue';
 import ApplicationModal from '../snippets/modal/ApplicationModal.vue';
+import ApplicationFormModal from '../snippets/modal/ApplicationFormModal.vue';
 import EnrollmentModal from '../snippets/modal/EnrollmentModal.vue';
 import StudentIdModal from '../snippets/modal/StudentIdModal.vue';
 // import ApplicationModal from '../snippets/modal/ApplicationForm.vue';
@@ -60,6 +61,7 @@ const showEnroll = ref(false)
 const showIdentification = ref(false)
 const showPrintID = ref(false)
 const showQRScanner = ref(false)
+const showApplicationForm = ref(false)
 const activeEnrollment = ref(false)
 const showMilestones = ref(false)
 
@@ -417,11 +419,16 @@ const printID = (data) => {
     showPrintID.value = !showPrintID.value
 }
 
-const getData = (result) =>{
-    console.log(result)
-    applicant.value = result
+const getData = (data) =>{
+    applicant.value = data
     showQRScanner.value = !showQRScanner
     document.getElementById('hideqrscanner').click();
+}
+
+const viewApplicationFormModal = (data) => {
+    editId.value = data
+    formMode.value = data
+    showApplicationForm.value = !showApplicationForm.value
 }
 
 </script>
@@ -515,9 +522,9 @@ const getData = (result) =>{
                                 <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app)"
                                     type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-tag"/></button>
-                                <!-- <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(app)"
-                                    type="button" title="print ID" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button> -->
+                                <button data-bs-toggle="modal" data-bs-target="#applicationformmodal" @click="viewApplicationFormModal(app.per_id)"
+                                    type="button" title="print application form" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button>
                             </div>
                         </td> 
                         <td v-else class="align-middle">
@@ -693,6 +700,37 @@ const getData = (result) =>{
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showQRScanner = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Application Form Modal -->
+    <div class="modal fade" id="applicationformmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Print Application Form</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showApplicationForm = false"></button>
+                </div>
+                <div class="modal-body">
+                    <ApplicationFormModal v-if="showApplicationForm" :genderData="gender" :civilstatusData="civilstatus"
+                        :nationalityData="nationality" :regionData="region" :provinceData="province" :cityData="city"
+                        :barangayData="barangay" :formId="editId" :formMode="formMode" :countryData="country"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showApplicationForm = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

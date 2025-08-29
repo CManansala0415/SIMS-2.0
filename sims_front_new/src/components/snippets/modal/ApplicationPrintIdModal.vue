@@ -86,7 +86,7 @@ onMounted(() => {
             // });
 
             profileId.value = student.value.per_profile ? 'http://localhost:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
-            signatureId.value = student.value.per_signature ? 'http://localhost:8000/api/get-person-image/' + student.value.per_signature+'/2' : '/img/sig1.png'
+            signatureId.value = student.value.per_signature ? 'http://localhost:8000/api/get-person-image/' + student.value.per_signature+'/3' : '/img/sig1.png'
             console.log( signatureId.value)
             // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
             preLoading.value = false
@@ -133,7 +133,7 @@ const printForm = (studentid) => {
                     </div>
                     <div style="height: 235px; width:100%;" class="idbg">
                         <div style="margin-top: 75px; width:100%; line-height: 0.1;text-align: center; padding: 1px;">
-                            <span style="font-size: 8px; font-weight: bold;">
+                            <span style="font-size: 8px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_firstname }}
                                 {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
                                 {{ studentData.per_lastname }}
@@ -209,19 +209,20 @@ const printForm = (studentid) => {
                                 id="qrcode" v-html="qrimage"></div>
                         </div>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-2">
-                            <div style="width: 150px; text-align: center; padding: 5px; font-size: 7px;">
+                            <div style="width: 150px; text-align: center; padding: 5px; font-size: 6px;">
                                 Use this QR code for fast-tracking when engaging in transactions within school premises
                             </div>
                         </div>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-2 text-center">
-                            <span style="font-size: 8px; font-weight: bold; text-transform: uppercase;">
+                            <span style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_curr_home }}, 
                                 <br/>{{ studentData.brgyDesc }}, {{ studentData.citymunDesc }}, 
                                 <br/>{{ studentData.provDesc }}, {{ studentData.countryName }}
                             </span>
-                            <span style="font-size: 8px; font-weight: bold; margin-top: 4px;">
+                            <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Address</span>
+                            <span style="font-size: 7px; font-weight: bold; margin-top: 4px;">
                                 <br/>
-                                <span style="font-size: 8px; font-weight: bold; text-transform: uppercase;">
+                                <span style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                     {{ family.fam_firstname }}
                                     {{ family.fam_middlename ? family.fam_middlename : ' ' }}
                                     {{ family.fam_lastname }}
@@ -229,10 +230,11 @@ const printForm = (studentid) => {
                                 </span> 
                                 <br/>{{ family.fam_contact }}
                             </span>
+                            <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Emergency Contact</span>
                         </div>
                         <div style="margin-top:4px; width:100%; line-height: 1.2;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
                             <img src="/img/sig1.png" height="45px" width="45px"/>
-                            <p style="font-size: 8px;">
+                            <p style="font-size: 7px;">
                                 <span style="font-weight:bold;">Renato P. Legaspi, Ph.D.</span>
                                 <br/> President / CEO
                             </p>

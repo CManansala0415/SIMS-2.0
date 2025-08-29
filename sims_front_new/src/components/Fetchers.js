@@ -2476,6 +2476,22 @@ const getAlumniStudents = async (limit, offset, fname, mname, lname, mode) => {
     }
 }
 
+let updatearchivedetails = {}
+const updateArchiveDetails = async (data) => {
+    try{
+        await axios({
+            method: "POST",
+            url: 'api/update-archive-details',
+            data:data
+
+        }).then(async (results) => {
+            updatearchivedetails = results.data
+        })
+        return updatearchivedetails
+    }catch(err){
+        return 500
+    }
+}
 
 export {
 
@@ -2628,6 +2644,7 @@ export {
     getQRData,
     setAcademicStatus,
     getAcademicStatus,
-    getArchiveMerge
+    getArchiveMerge,
+    updateArchiveDetails
 }
 

@@ -35,7 +35,8 @@ const pdfGenerator = async (name,paper,orientation,margin) => {
             dpi: 192,
             scale:4,
             letterRendering: true,
-            useCORS: true
+            useCORS: true,
+            scrollY: 0
         },
         jsPDF: { 
             unit: 'in', 

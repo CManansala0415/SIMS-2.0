@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Loader from '../loaders/Loading1.vue';
+import LoaderMini from '../loaders/Loader1.vue';
 import { getUserID } from "../../../routes/user";
-import { addLaunch, getLaunchChecker } from "../../Fetchers.js";
+import { addLaunch, getLaunchChecker, getCommandUpdate } from "../../Fetchers.js";
 
 const props = defineProps({
     degreeData: {
@@ -47,6 +48,7 @@ const filteredSemester = ref([])
 const filteredCurriculum = ref([])
 const search = ref('')
 const showItems = ref(false)
+const isLoading = ref(true)
 
 const launch = ref({
     ln_dtype: '',
@@ -59,6 +61,14 @@ const launch = ref({
     ln_year: '',
 })
 
+
+// const semInfo = ref('')
+// const enrollmentInfo = ref('')
+// const yrFromInfo = ref('')
+// const yrFromto = ref('')
+
+
+
 onMounted(async () => {
     filteredGradelvl.value = gradelvl.value
     filteredCourse.value = course.value
@@ -66,11 +76,22 @@ onMounted(async () => {
     filteredCurriculum.value = curriculum.value
     filterSemester()
 
+    getCommandUpdate().then((result)=>{
+        launch.value.ln_year = result[1].sett_yearfrom
+        launch.value.ln_quarter = result[0].sett_semester
 
+        // semInfo.value = result[0].quar_code
+        // yrFromInfo.value = result[1].sett_yearfrom
+        // yrFromto.value = result[1].sett_yearto
+        // enrollmentInfo.value = result[4].sett_status == 1?'Active':'Inactive'
 
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
+        getUserID().then((results) => {
+            userID.value = results.account.data.id
+            isLoading.value = false
+        })
     })
+
+    
 })
 
 const filterSemester = () => {
@@ -130,7 +151,7 @@ const filterCurriculum = (id) => {
     })
 }
 
-
+ 
 
 const saveLaunch = async () => {
     // saving.value = true
@@ -246,11 +267,13 @@ const saveLaunch = async () => {
     });
 
 
+
 }
+
 
 </script>
 <template>
-    <form @submit.prevent="saveLaunch" class="d-flex flex-column p-2 gap-2">
+    <form @submit.prevent="saveLaunch" class="d-flex flex-column p-2 gap-2" v-if="!isLoading">
         <div class="d-flex flex-wrap flex-column">
             <p class="text-success fw-bold">Initialize Semester</p>
             <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
@@ -269,14 +292,14 @@ const saveLaunch = async () => {
             <label for="year">Academic Year (From/To)</label>
             <div class="d-flex gap-1" id="year">
                 <input class="form-control form-control-sm" type="number" min="1900" max="2099" step="1"
-                    v-model="launch.ln_year" required />
+                    v-model="launch.ln_year" required disabled/>
                 <input class="form-control form-control-sm pe-none" type="number" min="1900" max="2099" step="1"
                     :value="launch.ln_year + 1" disabled />
             </div>
         </div>
         <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester</label>
-            <select class="form-control form-select-sm" v-model="launch.ln_quarter" required
+            <select class="form-control form-select-sm" v-model="launch.ln_quarter" required disabled
                 title="Click Edit to modify details" id="sem" aria-describedby="sem">
                 <option v-for="(sem, index) in filteredSemester" :value="sem.quar_id">
                     {{ sem.quar_desc }}
@@ -342,4 +365,7 @@ const saveLaunch = async () => {
             <button :disabled="saving? true:false" type="submit" class="btn btn-sm btn-success w-100">Create launch</button>
         </div>
     </form>
+    <div v-else>
+        <LoaderMini></LoaderMini>
+    </div>
 </template>

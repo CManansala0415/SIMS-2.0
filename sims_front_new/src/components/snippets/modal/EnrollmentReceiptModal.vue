@@ -337,9 +337,19 @@ const downloadPdf = () => {
     });
 
 }
+
+const formType = ref(1)
 </script>
 
 <template>
+    <div class="col-12 border-bottom" v-if="!milestoneLoading && Object.keys(milestone).length">
+        <div class="p-3 w-100 d-flex justify-content-center">
+            <select v-model="formType" class="form-select w-50">
+                <option value="1">Registrar</option>
+                <option value="2">Cashier</option>
+            </select>
+        </div>
+    </div>
     <div id="printform" v-if="!milestoneLoading && Object.keys(milestone).length" class="d-flex justify-content-center">
         <div class="border small-font bg-opaque h-100" 
                         style="width: 770px; height: 1105px; border:2px solid black; font-size: 8.8px;">
@@ -365,8 +375,9 @@ const downloadPdf = () => {
                         <td colspan="3">
                             <div class="d-flex flex-column text-center w-100">
                                 <span class="fw-bold">OFFICIAL STUDY LOAD</span>
-                                <span class="fw-bold">STUDENT'S COPY</span>
-                                <span>Subject Grades</span>
+                                <span v-if="formType == 1" class="fw-bold">REGISTRAR'S COPY</span>
+                                <span v-if="formType == 2" class="fw-bold">CASHIER'S COPY</span>
+                                <span>No. SF-12606</span>
                             </div>
                         </td>
                     </tr>
@@ -436,22 +447,22 @@ const downloadPdf = () => {
                 <thead>
                     <tr>
                         <th style="background-color: #000000;" class="text-white">Code</th>
-                        <th style="background-color: #000000; width: 300px;" class="text-white">Subject</th>
-                        <th style="background-color: #000000;" class="text-white">Lecture</th>
-                        <th style="background-color: #000000;" class="text-white">Laboratory</th>
-                        <!-- <th style="background-color: #000000;" class="text-white">Total</th> -->
-                        <th style="background-color: #000000;" class="text-white">Prelim</th>
-                        <th style="background-color: #000000;" class="text-white">Midterm</th>
-                        <th style="background-color: #000000;" class="text-white">Pre-Final</th>
-                        <th style="background-color: #000000;" class="text-white">Final</th>
+                        <th style="background-color: #000000;" class="text-white">Subject</th>
+                        <th style="background-color: #000000;" class="text-white">Lecture Units</th>
+                        <th style="background-color: #000000;" class="text-white">Laboratory Units</th>
+                        <th style="background-color: #000000;" class="text-white">Total Units</th>
+                        <th style="background-color: #000000;" class="text-white">Days</th>
+                        <th style="background-color: #000000;" class="text-white">Time</th>
+                        <th style="background-color: #000000;" class="text-white">Room</th>
+                        <th style="background-color: #000000;" class="text-white">Faculty</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(c, index) in milestone">
-                        <td class="align-middle p-2 text-start">
+                        <td class="align-middle p-2">
                             {{ c.subj_code }}
                         </td>
-                        <td class="align-middle p-2 text-start">
+                        <td class="align-middle p-2">
                             {{ c.subj_name }}
                         </td>
                         <td class="align-middle p-2">
@@ -460,25 +471,25 @@ const downloadPdf = () => {
                         <td class="align-middle p-2">
                             {{ c.subj_lab }}
                         </td>
-                        <!-- <td class="align-middle p-2">
+                        <td class="align-middle p-2">
                             {{ c.subj_lec + c.subj_lab }}
-                        </td> -->
-                        <td class="align-middle p-2">
-                            {{ c.grs_prelims }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.grs_midterms }}
+                            TBA
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.grs_prefinals }}
+                            TBA
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.grs_finals }}
+                            TBA
+                        </td>
+                        <td class="align-middle p-2">
+                            TBA
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <div class="d-flex flex-column justify-content-center align-items-center mb-2" style="font-size:8px">
+            <div class="d-flex flex-column justify-content-center align-items-center" style="font-size:8px">
                 <div class="w-75 p-1 ">
                     <span class="fst-italic">
                         I shall abide by all the rules and regulations now enforced or may be promulgated by Central Luzon
@@ -536,7 +547,128 @@ const downloadPdf = () => {
                     </div>
                 </div>
             </div>
-            
+            <div class="d-flex flex-column justify-content-center align-items-center mt-3" style="font-size:8px" v-if="formType == 1">
+                <div class="d-flex flex-column gap-1 justify-content-center align-content-center align-items-center">
+                    <span class="fw-bold mt-1">
+                        STUDENT AFFAIRS OFFICE 
+                    </span>
+                    <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
+                        UNDERTAKING
+                    </span>
+                    <span class="w-75 p-1 fst-italic" style="text-align: justify;">
+                        I, <span class="fw-semibold text-uppercase">
+                                {{ studentData.per_firstname }}
+                                {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
+                                {{ studentData.per_lastname }}
+                                {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
+                            </span>
+                            <span class="fw-semibold text-uppercase">
+                                {{ enrolleeData[0].prog_code }}-{{ enrolleeData[0].grad_code }}
+                            </span>, do hereby state that I am NOT A MEMBER OF ANY FRATERNITY/ SORORITY or any UNDERGROUND OR ILLEGAL ORGANIZATION OR AGGRUPATION THAT ADVOCATES VIOLENCE. ERODES THE VALUES AND TEACHINGS OF CLCST, and/ or UNDERMINES THE SAFETY AND SECURITY OF THE SCHOOL AND IT'S STUDENTS AND EMPLOYEES.
+                        I also state that I shall abide with all College policies and regulations and shall subject myself to disciplinary procedure in accordance with the
+                        School's existing Student Handbook should I commit any violation as prescribed in the said Student Handbook and other duly issued policies.
+                        I am executing this Undertaking as a necessary condition and/ or requisite for my admission and continuance of study in Central Luzon College of Science and Technology, Inc.. I fully understand that if I should commit any violation of this Undertaking, I shall be disqualified for admission/ readmission without prejudice to the right of the School to initiate 
+                        <span class="fw-bold">CRIMINAL</span> <span class="fw-bold">CIVIL</span> and/ or <span class="fw-bold">ADMINISTRATIVE</span> charges against me.
+                        Done this 27th day of August, 20 25 at Central Luzon College of Science and Technology, Inc., .
+                    </span>
+                    <small>
+                            Note: This statement serves as the official policy regarding
+                            withdrawal/drop charges. For questions, contact the Registrar's Office.
+                    </small>
+
+                    <div class="d-flex gap-2 w-75 justify-content-between mt-3">
+                        <div class="w-100 text-center">
+                            <div style="height:1px; background:#808080;"></div>
+                            <p style="font-size:8px; color:#374151;">Student Signature over
+                                Printed Name</p>
+                        </div>
+                        <div class="w-100 text-center">
+                            <div style="height:1px; background:#808080;"></div>
+                            <p style="font-size:8px; color:#374151;">Parent / Guardian</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="w-100 p-2 d-flex gap-2 justify-content-around" v-if="formType == 2">
+                <div class="w-100 border bg-body-secondary">
+                    <span class="fw-bold">Payments</span>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <td class="p-1">Date</td>
+                                <td class="p-1">OR No.</td>
+                                <td class="p-1">Amount</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-1">Date</td>
+                                <td class="p-1">Date</td>
+                                <td class="p-1">Date</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="w-100 p-2">
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Tuition Fee</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Miscellaneous Fees</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Laboratory Fees</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Other Fees</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Additional Fees</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Tuition and Fees</span>
+                        <span class="fw-bold">0.00</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Mode of Payment</span>
+                        <span class="fw-bold">INSTALLMENT</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Prelim</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Midterm</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Pre-Final</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Final</span>
+                        <span class="fw-bold">0.00</span>
+                    </div>
+                    <div class="text-center mt-1 fst-italic">
+                        <span class="fw-bold">Note: </span>
+                        <span>Above fees exclude other applicable charges to be paid at cashiers office.</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -556,4 +688,5 @@ const downloadPdf = () => {
 
     <button class="btn btn-success w-100 mt-3" @click="downloadPdf()" v-if="!milestoneLoading && Object.keys(milestone).length"
         v-show="!milestoneLoading && Object.keys(milestone).length">Download Form</button>
-</template>
+
+</template> 

@@ -40,12 +40,17 @@ class FacultyController extends Controller
         ->leftJoin('def_launch as lch', 'laf.lf_lnid', '=', 'lch.ln_id')
         ->leftJoin('def_section as sct', 'lch.ln_section', '=', 'sct.sec_id')
         ->leftJoin('def_program as crs', 'lch.ln_course', '=', 'crs.prog_id')
+        ->leftJoin('sett_degree_types as sdt', 'lch.ln_dtype', '=', 'sdt.dtype_id') 
+        ->leftJoin('def_gradelvl as dgl', 'lch.ln_gradelvl', '=', 'dgl.grad_id') 
         ->select(  
             'laf.*',
             'sbj.*',
             'lch.*',
             'sct.*',
             'crs.*',
+            'sdt.dtype_desc',
+            'dgl.grad_name',
+            
         )
         ->where('laf.lf_empid', '=',  $id)
         ->orderBy('laf.lf_id','DESC')
@@ -120,11 +125,13 @@ class FacultyController extends Controller
                     ->leftJoin('def_enrollment as b', 'a.mi_enrid', '=', 'b.enr_id') 
                     ->leftJoin('def_subject as c', 'a.mi_subjid', '=', 'c.subj_id') 
                     ->leftJoin('def_subject as d', 'c.subj_preq', '=', 'd.subj_id') 
+                    ->leftJoin('sett_degree_types as e', 'b.enr_program', '=', 'e.dtype_id') 
                     ->select(  
                         'b.*',
                         'a.*',
                         'c.*',
                         'd.subj_code as subj_preq_code',
+                        'e.dtype_desc',
                     )
                     ->orderBy('b.enr_dateenrolled','ASC')
                     ->where('a.mi_enrid', '=' , $value['enr_id'])

@@ -39,7 +39,8 @@ onMounted(() => {
 
 
 const save = () => {
-    if(customNumber.value && studentLrn.value){
+    //  && studentLrn.value
+    if(customNumber.value){
         saving.value = true
         let x = {
             ident_idno: identity.value.ident_idno,

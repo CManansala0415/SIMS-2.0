@@ -1040,23 +1040,14 @@ const loadFaculty = () => {
                 <span class="fw-bold">{{ launch.prog_name }}({{ launch.prog_code }})</span>
             </div>
             <div class="d-flex gap-2 p-2 small-font mb-3">
-                <div class="w-100 border align-content-center rounded-2 shadow p-3">
-                    <span class="">Semester:</span><span class="text-success fw-bold">{{ launch.quar_code }}</span>
-                </div>
-                <div class="w-100 border align-content-center rounded-2 shadow p-3">
-                    <span class="">Degree:</span> <span class="text-success fw-bold">{{ launch.dtype_desc }}</span>
-                </div>
-                <div class="w-100 border align-content-center rounded-2 shadow p-3">
-                    <span class="">Grade Level:</span> <span class="text-success fw-bold">{{ launch.grad_name }}</span>
-                </div>
-                <div class="w-100 border align-content-center rounded-2 shadow p-3">
-                    <span class="">Section:</span> <span class="text-success fw-bold">{{ launch.sec_name }}</span>
-                </div>
-                <div class="w-100 border align-content-center rounded-2 shadow p-3">
-                    <span class="">Academic Year:</span> <span class="text-success fw-bold">{{ launch.ln_year }}</span>
-                </div>
-                <div class="w-100 border align-content-center rounded-2 shadow p-3">
-                    <span class="">Slots:</span> <span class="text-success fw-bold">{{ launch.ln_slots }}</span>
+                <div class="w-100 border d-flex align-content-center justify-content-evenly rounded-2 shadow p-3">
+                    <span class="">Semester: &nbsp;<span class="text-success fw-bold">{{ launch.quar_code }}</span></span>
+                    <span class="">Degree: &nbsp;<span class="text-success fw-bold">{{ launch.dtype_desc }}</span></span> 
+                    <span class="">Grade Level: &nbsp;<span class="text-success fw-bold">{{ launch.grad_name }}</span></span> 
+                    <span class="">Section: &nbsp;<span class="text-success fw-bold">{{ launch.sec_name }}</span></span> 
+                    <span class="">Academic Year: &nbsp;<span class="text-success fw-bold">{{ launch.ln_year }}</span></span> 
+                    <span class="">Slots: &nbsp;<span class="text-success fw-bold">{{ launch.ln_slots }}</span></span>
+
                 </div>
             </div>
         </div>

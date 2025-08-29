@@ -32,15 +32,7 @@ onMounted(async () => {
     router.push("/");
     isLoading.value = false
   })
-
-  getCommandUpdate().then((result)=>{
-    // console.log(result)
-    semInfo.value = result[0].quar_code
-    yrFromInfo.value = result[1].sett_yearfrom
-    yrFromto.value = result[1].sett_yearto
-    enrollmentInfo.value = result[4].sett_status == 1?'Active':'Inactive'
-    
-  })
+  
 
 })
 
@@ -178,8 +170,19 @@ const getUser = (data) => {
 
 
   linker()
-  fetchingUserAccess.value = false
-  isLoading.value = false
+
+  getCommandUpdate().then((result)=>{
+    // console.log(result)
+    semInfo.value = result[0].quar_code
+    yrFromInfo.value = result[1].sett_yearfrom
+    yrFromto.value = result[1].sett_yearto
+    enrollmentInfo.value = result[4].sett_status == 1?'Active':'Inactive'
+    
+    fetchingUserAccess.value = false
+    isLoading.value = false
+    
+  })
+  
 }
 
 const linker = () => {

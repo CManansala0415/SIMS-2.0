@@ -537,4 +537,46 @@ class CommandController extends Controller
             'status' => 200,
         ];
     }
+
+    public function updateArchiveDetails(Request $req) {
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d h:i:s', time());
+
+        $s1 = DB::table('server_archive_persons')
+                    ->where('arc_personid','=', $req['arc_personid'])
+                    ->update([
+                    'arc_firstname' => $req['arc_firstname'],
+                    'arc_middlename' => $req['arc_middlename'],
+                    'arc_lastname' => $req['arc_lastname'],
+                    'arc_suffixname' => $req['arc_suffixname'],
+                    'arc_birthday' => $req['arc_birthday'],
+                    'arc_gender' => $req['arc_gender'],
+                    'arc_civilstatus' => $req['arc_civilstatus'],
+                    'arc_nationality' => $req['arc_nationality'],
+                    'arc_contact' => $req['arc_contact'],
+                    'arc_email' => $req['arc_email'],
+                    'arc_curr_home' => $req['arc_curr_home'],
+                    'arc_curr_country' => $req['arc_curr_country'],
+                    'arc_curr_region' => $req['arc_curr_region'],
+                    'arc_curr_province' => $req['arc_curr_province'],
+                    'arc_curr_city' => $req['arc_curr_city'],
+                    'arc_curr_barangay' => $req['arc_curr_barangay'],
+                    'arc_curr_zipcode' => $req['arc_curr_zipcode'],
+                    'arc_perm_home' => $req['arc_perm_home'],
+                    'arc_perm_country' => $req['arc_perm_country'],
+                    'arc_perm_region' => $req['arc_perm_region'],
+                    'arc_perm_province' => $req['arc_perm_province'],
+                    'arc_perm_city' => $req['arc_perm_city'],
+                    'arc_perm_barangay' => $req['arc_perm_barangay'],
+                    'arc_perm_zipcode' => $req['arc_perm_zipcode'],
+                    'arc_dateupdated' => $date,
+                    'arc_updatedby' => $req['$arc_updatedby'],
+                ]);  
+                
+        return $data = [
+            'status' => 200,
+        ];  
+    }
 }
+
+

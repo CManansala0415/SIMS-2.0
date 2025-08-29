@@ -144,6 +144,7 @@ onMounted(async () => {
                             studentSubjects.value.push(...results3.milestone)
                         })
                     })
+                    console.log(groupedAssignmentStudent.value)
                     preLoading.value = false
                 })
             })
@@ -456,10 +457,10 @@ const openTip = () => {
                     <td class="align-middle">
                         <select class="form-select form-select-sm w-100" v-model="filterLnid">
                             <option value="0">
-                                Select Section
+                                Select Class
                             </option>
                             <option v-for="(gps, index1, index2) in groupedAssignmentSection" :value="gps[0].lf_lnid">
-                                {{ gps[0].prog_code }} ({{ gps[0].sec_name }})
+                                {{ gps[0].prog_code }} ({{ gps[0].sec_name }} {{ gps[0].grad_name }} {{ gps[0].dtype_desc }}) 
                             </option>
                         </select>
                     </td>
