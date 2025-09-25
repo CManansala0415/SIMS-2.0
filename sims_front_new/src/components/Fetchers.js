@@ -900,7 +900,7 @@ const getLaunchChecker = async (ln_dtype, ln_quarter, ln_course, ln_gradelvl, ln
                 ln_gradelvl:ln_gradelvl,
                 ln_curriculum:ln_curriculum,
                 ln_section:ln_section,
-                ln_year:ln_year
+                ln_year:ln_year? ln_year:0
             },
         }).then(async (results) => {
             // console.log(results.data)
@@ -2389,7 +2389,7 @@ const getEmployeeAccount = async (userid) => {
         })
         return employeeaccount
     }catch(err){
-        return err
+        return err 
     }
 }
 
@@ -2490,6 +2490,22 @@ const updateArchiveDetails = async (data) => {
         return updatearchivedetails
     }catch(err){
         return 500
+    }
+}
+
+let getenrollmentschedule = {}
+const getEnrollmentSchedule = async (curr,prog,grad,cour,sec,lnid) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-enrollment-schedule/'+curr+'/'+prog+'/'+grad+'/'+cour+'/'+sec+'/'+lnid,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getenrollmentschedule = results.data
+        })
+        return getenrollmentschedule
+    }catch(err){
+        return err
     }
 }
 
@@ -2645,6 +2661,7 @@ export {
     setAcademicStatus,
     getAcademicStatus,
     getArchiveMerge,
-    updateArchiveDetails
+    updateArchiveDetails,
+    getEnrollmentSchedule
 }
 

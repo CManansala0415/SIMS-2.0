@@ -115,10 +115,12 @@ const booter = async () => {
 
 }
 
+const accessData = ref([])
 onMounted(async () => {
 
     getUserID().then(async (results1) => {
         userID.value = results1.account.data.id
+        accessData.value = results1.access
         emit('fetchUser', results1)
         try {
             await booter().then(() => {
@@ -142,9 +144,13 @@ onMounted(async () => {
                         getFacultyStudentMilestone(section, gradelvl, course).then((results3) => {
                             groupedAssignmentStudent.value.push(results3.students)
                             studentSubjects.value.push(...results3.milestone)
+
+                            // console.log(results3)
+                            // console.log(groupedAssignmentStudent.value)
+                            // console.log(studentSubjects.value)
                         })
                     })
-                    console.log(groupedAssignmentStudent.value)
+                  
                     preLoading.value = false
                 })
             })
@@ -184,6 +190,8 @@ const filterSubject = () => {
         let list = []
         let enrids = []
         let students = []
+
+        console.log(studentSubjects.value)
 
         // filter muna yung subjects na enrolled ni students
         studentSubjects.value.forEach((e, index) => {
@@ -587,7 +595,7 @@ const openTip = () => {
                 
             </table>
         </div>
-        <div v-if="!preLoading && Object.keys(finalStudentList).length" class="w-100 mt-2">
+        <div v-if="!preLoading && Object.keys(finalStudentList).length " class="w-100 mt-2">
             <div class="d-flex shadow rounded-3 border w-100 justify-content-between p-3 gap-2">
                 <div class="w-75 align-content-center text-md-start">
                     <span class="fw-bold text-primary">Note: </span><span class="italic">Once

@@ -63,6 +63,9 @@ const studentID = ref('')
 const profileId = ref('')
 
 
+const pagesContent = ref([])
+const pagesCount = ref(0)
+
 onMounted(async () => {
     window.stop()
     try {
@@ -74,7 +77,7 @@ onMounted(async () => {
         } else {
             studentID.value = studentData.value.per_id
         }
-        console.log(studentData.value)
+        // console.log(studentData.value)
         getArchiveMerge(studentID.value).then((results) => {
             // milestoneCompData.value = results
 
@@ -84,7 +87,7 @@ onMounted(async () => {
                 index === self.findIndex((t) => t.arc_id === value.arc_id)
             );
 
-            console.log(results)
+            // console.log(results)
 
             let x = results.map((e) => {
                 let rgrade = (
@@ -145,9 +148,20 @@ onMounted(async () => {
             // console.log(milestoneCompHeader.value )
 
             profileId.value = milestoneCompHeader.value[0].arc_profile ? 'http://localhost:8000/api/get-person-image/' + milestoneCompHeader.value[0].arc_profile + '/2' : '/img/profile_default.png'
-            preloading.value = false
-            // console.log(milestoneCompHeader.value)
+            
 
+            // pagesContent
+            // pagesCount
+             
+            for (let i = 0; i < milestoneCompHeader.value.length; i += 5) {
+                let group = {
+                    items: milestoneCompHeader.value.slice(i, i + 5)
+                };
+                pagesContent.value.push(group);
+            }
+
+            preloading.value = false
+            // console.log(pagesContent.value)
         })
 
         getUserID().then((results) => {
@@ -202,368 +216,371 @@ const downloadPdf = (filetype) => {
                 <div id="printform" class="h-auto d-flex flex-column justify-content-center align-items-start">
 
                     <!--Page 1-->
-                    <div class="small-font bg-opaque "
-                        style="width: 795px; border:2px solid black; font-size: 8.8px;">
-                        <!-- height:1315px; width: 745px; height:1215px; -->
-                        <div class="h-100 backdrop d-flex flex-column justify-content-between">
-                            <div class="container w-100">
-                                <div class="row">
-                                    <div class="p-1 col-3 d-flex justify-content-center align-content-center ">
-                                        <div class="d-flex flex-column justify-content-center align-items-center">
-                                            <img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
-                                            <div
-                                                class="small-font d-flex flex-column justify-content-center align-items-center mt-2">
-                                                <p class="m-0 fw-bold">ISO 9001:2015 CERTIFIED</p>
-                                                <p class="m-0 text-danger fw-bolder">No. 12090</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="p-1 col-9">
-                                        <div class="text-end p-2">
-                                            <p class="m-0 fw-bold fs-6 text-success">CENTRAL LUZON COLLEGE OF SCIENCE
-                                                AND
-                                                TECHNOLOGY, INC.</p>
-                                            <!-- <p class="m-0 fw-bold fs-6 text-success">CELTECH COLLEGE</p> -->
-                                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City
-                                                of
-                                                San
-                                                Fernando,
-                                                Pampanga, Philippines, 2000</p>
-                                            <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
-                                            <p class="m-0 fw-normal small-font">Founded 1959</p>
-                                            <br />
-                                            <p class="m-0 fst-italic">
-                                                We <span class="fw-bold">Train</span>,
-                                                We <span class="fw-bold">Touch</span>
-                                                We <span class="fw-bold">Transform</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="p-1 col-12">
-                                        <div class="d-flex flex align-items-center justify-content-center">
-                                            <span>OFFICIAL TRANSCRIPT OF RECORDS</span>
-                                        </div>
-                                    </div>
-                                    <div class="p-1 col-12 d-flex justify-content-center align-content-center">
-                                        <div
-                                            class="text-start d-flex justify-content-between align-items-start w-100 border-0 border-bottom pb-2">
-                                            <div class="h-100 w-75 p-2">
-                                                <div class="px-3">
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Name:</span> &nbsp;{{
-                                                            milestoneCompHeader[0].arc_firstname
-                                                        }}
-                                                        {{ milestoneCompHeader[0].arc_middlename ?
-                                                            milestoneCompHeader[0].arc_middlename
-                                                            : ' ' }}
-                                                        {{ milestoneCompHeader[0].arc_lastname }}
-                                                        {{ milestoneCompHeader[0].arc_suffixname ?
-                                                            milestoneCompHeader[0].arc_suffixname
-                                                            : ' ' }}
-                                                    </p>
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Date of Birth:</span> &nbsp;
-                                                        {{ milestoneCompHeader[0].arc_birthday }}
-                                                    </p>
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Address: &nbsp;</span>
-                                                        {{ milestoneCompHeader[0].arc_curr_home }},
-                                                        {{ milestoneCompHeader[0].arc_curr_barangay }},
-                                                        {{ milestoneCompHeader[0].arc_curr_city }},
-                                                        {{ milestoneCompHeader[0].arc_curr_province }},
-                                                        {{ milestoneCompHeader[0].arc_curr_zipcode }}
-                                                    </p>
-
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Email: &nbsp;</span>
-                                                        {{ milestoneCompHeader[0].arc_email }}
-                                                    </p>
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Contact No: &nbsp;</span>
-                                                        0{{ milestoneCompHeader[0].arc_contact }}
-                                                    </p>
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Course: &nbsp;</span>
-                                                        {{ milestoneCompHeader[0].arc_coursename }}
-                                                    </p>
-                                                    <p class="m-0 p-0">
-                                                        <span class="fw-bold">Date of Graduation: &nbsp;</span>
-                                                        N/A
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="h-100 p-1 d-flex flex-column justify-content-center align-items-center">
+                    <div v-for="(page, pageIndex) in pagesContent">
+                        <div class="small-font bg-opaque mb-1"
+                            style="width: 795px; height:1321px; border:2px solid black; font-size: 8.8px;">
+                            <!-- height:1315px; width: 745px; height:1215px; -->
+                            <div class="h-100 backdrop d-flex flex-column justify-content-between">
+                                <div class="container w-100">
+                                    <div class="row">
+                                        <div class="p-1 col-3 d-flex justify-content-center align-content-center ">
+                                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                                <img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
                                                 <div
-                                                    class="d-flex flex-column flex justify-content-center align-items-center">
-                                                    <img :src="profileId" class="img-size" />
-                                                    <p class="m-0 p-0 mt-1">
-                                                        <span class="fw-bold">#
-                                                            {{ milestoneCompHeader[0].arc_studentid }}</span>
-                                                    </p>
+                                                    class="small-font d-flex flex-column justify-content-center align-items-center mt-2">
+                                                    <p class="m-0 fw-bold">ISO 9001:2015 CERTIFIED</p>
+                                                    <p class="m-0 text-danger fw-bolder">No. 12090</p>
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="p-1 col-9">
+                                            <div class="text-end p-2">
+                                                <p class="m-0 fw-bold fs-6 text-success">CENTRAL LUZON COLLEGE OF SCIENCE
+                                                    AND
+                                                    TECHNOLOGY, INC.</p>
+                                                <!-- <p class="m-0 fw-bold fs-6 text-success">CELTECH COLLEGE</p> -->
+                                                <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City
+                                                    of
+                                                    San
+                                                    Fernando,
+                                                    Pampanga, Philippines, 2000</p>
+                                                <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                                                <p class="m-0 fw-normal small-font">Founded 1959</p>
+                                                <br />
+                                                <p class="m-0 fst-italic">
+                                                    We <span class="fw-bold">Train</span>,
+                                                    We <span class="fw-bold">Touch</span>
+                                                    We <span class="fw-bold">Transform</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="p-1 col-12">
+                                            <div class="d-flex flex align-items-center justify-content-center">
+                                                <span>OFFICIAL TRANSCRIPT OF RECORDS</span>
+                                            </div>
+                                        </div>
+                                        <div class="p-1 col-12 d-flex justify-content-center align-content-center">
+                                            <div
+                                                class="text-start d-flex justify-content-between align-items-start w-100 border-0 border-bottom pb-2">
+                                                <div class="h-100 w-75 p-2">
+                                                    <div class="px-3">
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Name:</span> &nbsp;{{
+                                                                milestoneCompHeader[0].arc_firstname
+                                                            }}
+                                                            {{ milestoneCompHeader[0].arc_middlename ?
+                                                                milestoneCompHeader[0].arc_middlename
+                                                                : ' ' }}
+                                                            {{ milestoneCompHeader[0].arc_lastname }}
+                                                            {{ milestoneCompHeader[0].arc_suffixname ?
+                                                                milestoneCompHeader[0].arc_suffixname
+                                                                : ' ' }}
+                                                        </p>
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Date of Birth:</span> &nbsp;
+                                                            {{ milestoneCompHeader[0].arc_birthday }}
+                                                        </p>
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Address: &nbsp;</span>
+                                                            {{ milestoneCompHeader[0].arc_curr_home }},
+                                                            {{ milestoneCompHeader[0].arc_curr_barangay }},
+                                                            {{ milestoneCompHeader[0].arc_curr_city }},
+                                                            {{ milestoneCompHeader[0].arc_curr_province }},
+                                                            {{ milestoneCompHeader[0].arc_curr_zipcode }}
+                                                        </p>
+
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Email: &nbsp;</span>
+                                                            {{ milestoneCompHeader[0].arc_email }}
+                                                        </p>
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Contact No: &nbsp;</span>
+                                                            0{{ milestoneCompHeader[0].arc_contact }}
+                                                        </p>
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Course: &nbsp;</span>
+                                                            {{ milestoneCompHeader[0].arc_coursename }}
+                                                        </p>
+                                                        <p class="m-0 p-0">
+                                                            <span class="fw-bold">Date of Graduation: &nbsp;</span>
+                                                            N/A
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div
+                                                    class="h-100 p-1 d-flex flex-column justify-content-center align-items-center">
+                                                    <div
+                                                        class="d-flex flex-column flex justify-content-center align-items-center">
+                                                        <img :src="profileId" class="img-size" />
+                                                        <p class="m-0 p-0 mt-1">
+                                                            <span class="fw-bold">#
+                                                                {{ milestoneCompHeader[0].arc_studentid }}</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                     </div>
-
                                 </div>
-                            </div>
 
-                            <div class="container w-100 backdrop h-100 border-3 border-black">
-                                <div class="d-flex flex justify-content-center">
-                                    <span class="fw-bold bg-success px-3 py-1 text-white rounded-2 mb-3">Subjects Taken</span>
-                                </div>
-                                <div class="h-100 d-flex flex-column justify-content-start">
-                                    <!-- 1st year 1st Sem-->
-                                    <div class="container w-100" > <!--v-for="(mtc, index) in milestoneCompHeader"-->
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <td  class="align-middle fw-bolder" style="width: 100px;">Term</td>
-                                                    <td class="align-middle fw-bolder" >Subjects</td>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                               <tr v-for="(mtc, index) in milestoneCompHeader" v-if="milestoneCompHeader !== undefined">
-                                                    <td class="align-middle">
-                                                         <div class="d-flex flex-column">
-                                                            <span class="fw-bold">{{ mtc.arc_yearlevel }}</span>
-                                                            <span class="fw-bold">&nbsp;</span>({{mtc.arc_schoolyear}}, {{mtc.arc_semester}})
-                                                            <span class="fw-bold">&nbsp;</span>{{mtc.arc_coursename}}
-                                                         </div>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <table class="w-" style="table-layout: fixed;">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="p-1" style="width:70px; white-space: nowrap;">
+                                <div class="container w-100 backdrop h-100 border-3 border-black">
+                                    <div class="d-flex flex justify-content-center">
+                                        <span class="fw-bold bg-success px-3 py-1 text-white rounded-2 mb-3">Subjects Taken</span>
+                                    </div>
+                                    <div class="h-100 d-flex flex-column justify-content-start text-center">
+                                        <!-- 1st year 1st Sem-->
+                                        <div class="container w-100" > <!--v-for="(mtc, index) in milestoneCompHeader"-->
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <td  class="align-middle fw-bolder" style="width: 100px;">Term</td>
+                                                        <td class="align-middle fw-bolder" >Subjects</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr v-for="(mtc, index) in page.items" v-if="milestoneCompHeader !== undefined">
+                                                        <td class="align-middle">
+                                                            <div class="d-flex flex-column">
+                                                                <span class="fw-bold">{{ mtc.arc_yearlevel }}</span>
+                                                                <span class="fw-bold">&nbsp;</span>({{mtc.arc_schoolyear}}, {{mtc.arc_semester}})
+                                                                <span class="fw-bold">&nbsp;</span>{{mtc.arc_coursename}}
+                                                            </div>
+                                                        </td>
+                                                        <td class="align-middle">
+                                                            <table class="w-" style="table-layout: fixed;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="p-1" style="width:70px; white-space: nowrap;">
+                                                                            <div
+                                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                                <span class="fw-bold">Code</span>
+                                                                            </div>
+                                                                        </th>
+                                                                        <th class="p-1" style="width:400px; white-space: nowrap;">
+                                                                            <div
+                                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                                <span class="fw-bold">Subjects Description</span>
+                                                                            </div>
+                                                                        </th>
+                                                                        <th class="p-1" v-if="mtc.arc_migtype != 2">
+                                                                            <div
+                                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                                <span class="fw-bold">Final Grade</span>
+                                                                            </div>
+                                                                        </th>
+                                                                        <th class="p-1">
+                                                                            <div
+                                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                                <span class="fw-bold">Rating</span>
+                                                                            </div>
+                                                                        </th>
+                                                                        <th class="p-1">
+                                                                            <div
+                                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                                <span class="fw-bold">Re-Exam</span>
+                                                                            </div>
+                                                                        </th>
+                                                                        <th class="p-1">
+                                                                            <div
+                                                                                style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                                <span class="fw-bold">Credit</span>
+                                                                            </div>
+                                                                        </th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <tr v-if="Object.keys(milestoneCompData).length && !milestoneCompLoading"
+                                                                    v-for="(c, index) in milestoneCompData[mtc.arc_id]">
+                                                                <td class="align-middle">
+                                                                    <div
+                                                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                                                                        <span class="fw-bold">{{ c.arc_subjectcode }}</span>
+                                                                    </div>
+                                                                    </td>
+                                                                    <td class="align-middle">
                                                                         <div
                                                                             style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                            <span class="fw-bold">Code</span>
+                                                                            <span class="">{{ c.arc_subjectname }}</span>
                                                                         </div>
-                                                                    </th>
-                                                                    <th class="p-1" style="width:400px; white-space: nowrap;">
+                                                                    </td>
+                                                                    <td class="align-middle" v-if="mtc.arc_migtype != 2">
                                                                         <div
                                                                             style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                            <span class="fw-bold">Subjects Description</span>
+                                                                            <span>
+                                                                                {{
+                                                                                    c.raw_grade
+                                                                                }}
+                                                                            </span>
                                                                         </div>
-                                                                    </th>
-                                                                    <th class="p-1" v-if="mtc.arc_migtype != 2">
+                                                                    </td>
+                                                                    <td class="align-middle">
                                                                         <div
                                                                             style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                            <span class="fw-bold">Final Grade</span>
+                                                                            <span class="fw-semibold">
+                                                                                {{
+                                                                                    c.conv_grade
+                                                                                }}
+                                                                            </span>
                                                                         </div>
-                                                                    </th>
-                                                                    <th class="p-1">
-                                                                        <div
+
+                                                                    </td>
+                                                                    <td class="align-middle">
+                                                                        <!-- <span>{{ c.arc_lecture }}</span> -->
+                                                                    </td>
+                                                                    <td class="align-middle">
+                                                                        <div v-if="mtc.arc_migtype != 2"
                                                                             style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                            <span class="fw-bold">Rating</span>
+                                                                            <span class="fw-bold">{{ c.arc_lecture +
+                                                                                c.arc_laboratory
+                                                                                }}</span>
                                                                         </div>
-                                                                    </th>
-                                                                    <th class="p-1">
-                                                                        <div
+                                                                        <div v-else
                                                                             style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                            <span class="fw-bold">Re-Exam</span>
+                                                                            <span class="fw-bold">{{ 
+                                                                                c.arc_units
+                                                                                }}</span>
                                                                         </div>
-                                                                    </th>
-                                                                    <th class="p-1">
-                                                                        <div
-                                                                            style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                            <span class="fw-bold">Credit</span>
-                                                                        </div>
-                                                                    </th>
+                                                                    </td>
                                                                 </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            <tr v-if="Object.keys(milestoneCompData).length && !milestoneCompLoading"
-                                                                v-for="(c, index) in milestoneCompData[mtc.arc_id]">
-                                                               <td class="align-middle">
-                                                                <div
-                                                                    style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                    <span class="fw-bold">{{ c.arc_subjectcode }}</span>
-                                                                </div>
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <div
-                                                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                        <span class="">{{ c.arc_subjectname }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="align-middle" v-if="mtc.arc_migtype != 2">
-                                                                    <div
-                                                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                        <span>
-                                                                            {{
-                                                                                c.raw_grade
-                                                                            }}
-                                                                        </span>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <div
-                                                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                        <span class="fw-semibold">
-                                                                            {{
-                                                                                c.conv_grade
-                                                                            }}
-                                                                        </span>
-                                                                    </div>
-
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <!-- <span>{{ c.arc_lecture }}</span> -->
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <div v-if="mtc.arc_migtype != 2"
-                                                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                        <span class="fw-bold">{{ c.arc_lecture +
-                                                                            c.arc_laboratory
-                                                                            }}</span>
-                                                                    </div>
-                                                                    <div v-else
-                                                                        style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-                                                                        <span class="fw-bold">{{ 
-                                                                            c.arc_units
-                                                                            }}</span>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                            </tbody>
-                                                        </table>
-                                                       
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                                </tbody>
+                                                            </table>
+                                                        
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <p> --- End of Page {{ pageIndex+1 }} ---</p>
+                                        <!-- 1st year 1st sem -->
                                     </div>
-                                    <!-- 1st year 1st sem -->
                                 </div>
-                            </div>
-                            <div class="container w-100 backdrop mt-3 p-0">
-                                <div class="w-100">
-                                    <div class="border p-1 col-12">
-                                        <div class="d-flex justify-content-center p-1">
-                                            <span class="fw-bold">PURPOSE: </span>
-                                            <span class="fst-italic">&nbsp;VALID FOR CERTIFICATION, AUTHENTICATION &
-                                                VERIFICATION (CAV) PURPOSES ONLY</span>
-                                        </div>
-                                    </div>
-                                    <div class="border p-1 col-12">
-                                        <div class="d-flex gap-1 justify-content-center p-1 small-font">
-                                            <div class="border w-100">
-                                                <div class="d-flex gap-1 justify-content-center ">
-                                                    <div class="w-100">
-                                                        <span class="small-font fw-bold">Rating System</span>
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center ">
-                                                    <div class="w-100">
-                                                        97.50 - 100
-                                                    </div>
-                                                    <div class="w-100">
-                                                        1.0
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center ">
-                                                    <div class="w-100">
-                                                        92.50 - 97.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        1.25
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="border w-100">
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        87.50 - 92.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        1.5
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        82.50 - 87.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        1.75
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        77.50 - 82.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        2.0
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="border w-100">
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        72.50 - 77.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        2.25
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        65.00 - 72.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        2.5
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        57.50 - 64.99
-                                                    </div>
-                                                    <div class="w-100">
-                                                        2.75
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="border w-100">
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        50.00 - 57.49
-                                                    </div>
-                                                    <div class="w-100">
-                                                        3.0
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        46.00 - 49.99
-                                                    </div>
-                                                    <div class="w-100">
-                                                        2.5 Conditional
-                                                    </div>
-                                                </div>
-                                                <div class="d-flex gap-1 justify-content-center">
-                                                    <div class="w-100">
-                                                        45.99 - Below
-                                                    </div>
-                                                    <div class="w-100">
-                                                        5.0 Failure
-                                                    </div>
-                                                </div>
+                                <div class="container w-100 backdrop mt-3 p-0">
+                                    <div class="w-100">
+                                        <div class="border p-1 col-12">
+                                            <div class="d-flex justify-content-center p-1">
+                                                <span class="fw-bold">PURPOSE: </span>
+                                                <span class="fst-italic">&nbsp;VALID FOR CERTIFICATION, AUTHENTICATION &
+                                                    VERIFICATION (CAV) PURPOSES ONLY</span>
                                             </div>
                                         </div>
-                                        <div class="d-flex gap-1 justify-content-center p-1 small-font">
-                                            <div class="border w-100">
-                                                <div class="d-flex gap-1 justify-content-center ">
-                                                    <div class="w-100">
-                                                        <span class="fw-bold">INC</span> - Incomplete
+                                        <div class="border p-1 col-12">
+                                            <div class="d-flex gap-1 justify-content-center p-1 small-font">
+                                                <div class="border w-100">
+                                                    <div class="d-flex gap-1 justify-content-center ">
+                                                        <div class="w-100">
+                                                            <span class="small-font fw-bold">Rating System</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="w-100">
-                                                        <span class="fw-bold">AW</span> - Authorized Withdrawal
+                                                    <div class="d-flex gap-1 justify-content-center ">
+                                                        <div class="w-100">
+                                                            97.50 - 100
+                                                        </div>
+                                                        <div class="w-100">
+                                                            1.0
+                                                        </div>
                                                     </div>
-                                                    <div class="w-100">
-                                                        <span class="fw-bold">UW</span> - Unauthorized Withdrawal
+                                                    <div class="d-flex gap-1 justify-content-center ">
+                                                        <div class="w-100">
+                                                            92.50 - 97.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            1.25
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="border w-100">
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            87.50 - 92.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            1.5
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            82.50 - 87.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            1.75
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            77.50 - 82.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            2.0
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="border w-100">
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            72.50 - 77.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            2.25
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            65.00 - 72.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            2.5
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            57.50 - 64.99
+                                                        </div>
+                                                        <div class="w-100">
+                                                            2.75
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="border w-100">
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            50.00 - 57.49
+                                                        </div>
+                                                        <div class="w-100">
+                                                            3.0
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            46.00 - 49.99
+                                                        </div>
+                                                        <div class="w-100">
+                                                            2.5 Conditional
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <div class="w-100">
+                                                            45.99 - Below
+                                                        </div>
+                                                        <div class="w-100">
+                                                            5.0 Failure
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-1 justify-content-center p-1 small-font">
+                                                <div class="border w-100">
+                                                    <div class="d-flex gap-1 justify-content-center ">
+                                                        <div class="w-100">
+                                                            <span class="fw-bold">INC</span> - Incomplete
+                                                        </div>
+                                                        <div class="w-100">
+                                                            <span class="fw-bold">AW</span> - Authorized Withdrawal
+                                                        </div>
+                                                        <div class="w-100">
+                                                            <span class="fw-bold">UW</span> - Unauthorized Withdrawal
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -571,10 +588,10 @@ const downloadPdf = (filetype) => {
                                     </div>
                                 </div>
                             </div>
-
                         </div>
+                        <!-- <div class="page-break"></div> -->
                     </div>
-                    <div class="page-break"></div>
+                    
                     <!--Page 1-->
                 </div> <!-- print div -->
 

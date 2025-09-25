@@ -225,7 +225,6 @@ const time = ref([
 ])
 
 const curriculum = ref([])
-const checking = ref(false)
 const showScheduler = ref(false)
 const showOccupancy = ref(false)
 const showCalendar = ref(false)
@@ -242,7 +241,7 @@ const saving = ref(false)
 const savingCount = ref(0)
 const scheduleList = ref([])
 const loadedSched = ref([])
-const preLoading = ref(false)
+const preLoading = ref(true)
 const showFaculty = ref(false)
 const curriculumSubject = ref([])
 const scheduledFaculty = ref([])
@@ -269,14 +268,12 @@ const booter = async () => {
         faculty.value = results
 
     })
-
     getFacultyAvailability().then((results) => {
         availability.value = results
     })
 }
 onMounted(async () => {
     try {
-        checking.value = true
         await booter().then((results) => {
             getUserID().then(async (results) => {
                 userID.value = results.account.data.id
@@ -310,11 +307,12 @@ onMounted(async () => {
                 //check if may false it means may subject pang walang faculty
                 let checker = arr => arr.every(v => v === true);
                 allow.value = checker(scheduledFaculty.value)
-                checking.value = false
+                loadSched()
+                
             })
         })
     } catch (err) {
-        // checking.value = false
+        // preLoading.value = false
         // alert('error loading the list default components')
         Swal.fire({
             icon: "error",
@@ -322,7 +320,7 @@ onMounted(async () => {
             text: "Something went wrong!",
             footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
         }).then(()=>{
-            checking.value = false
+            preLoading.value = false
         });
     }
 })
@@ -845,6 +843,7 @@ const saveSched = () => {
                     scheduleList.value = []
                     loadedSched.value = []
                     loadSched()
+                    location.reload()
                 });
             }
         })
@@ -853,7 +852,6 @@ const saveSched = () => {
 
 const loadSched = () => {
 
-    preLoading.value = true
     getFacultyAvailability().then((results) => {
         availability.value = results
 
@@ -995,7 +993,7 @@ const loadSched = () => {
 
             })
 
-
+ 
             loadedSched.value.forEach(async (e) => {
                 if (e.sched_id) {
                     scheduleList.value.push(e)
@@ -1004,6 +1002,7 @@ const loadSched = () => {
 
             preLoading.value = false
             showCalendar.value = true
+
             // console.log(loadedSched.value)
             // console.log(showCalendar.value)
 
@@ -1026,14 +1025,14 @@ const loadFaculty = () => {
 
 </script>
 <template>
-    <div v-if="!checking" class="p-1 d-flex gap-2 justify-content-end mb-3">
-            <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1"
-                    @click="close" type="button" class="btn btn-sm btn-primary"
-                    :disabled="preLoading ? true : false"> <font-awesome-icon icon="fa-solid fa-rotate-left"/> Back
-                </button>
-            </div>
+    <div v-if="!preLoading" class="p-1 d-flex gap-2 justify-content-end mb-3">
+        <div class="d-flex flex-wrap w-50 justify-content-end">
+            <button tabindex="-1"
+                @click="close" type="button" class="btn btn-sm btn-primary"
+                :disabled="preLoading ? true : false"> <font-awesome-icon icon="fa-solid fa-rotate-left"/> Back
+            </button>
         </div>
+    </div>
     <div class="border p-3">
         <div class="w-100">
             <div class="w-100 align-content-center p-3">
@@ -1052,12 +1051,12 @@ const loadFaculty = () => {
             </div>
         </div>
         <div class="">
-            <div v-if="!checking && Object.keys(curriculum).length"
+            <div v-if="!preLoading && Object.keys(curriculum).length"
                 :class="saving || preLoading ? 'd-flex gap-2 pe-none p-3 bg-secondary-subtle justify-content-center' : 'd-flex gap-2 pe-auto p-3 bg-secondary-subtle justify-content-center'">
-                <button :disabled="saving || preLoading ? true : false" @click="loadSched()" tabindex="-1"
+                <!-- <button :disabled="saving || preLoading ? true : false" @click="loadSched()" tabindex="-1"
                     title="Load Schedule" type="button" class="btn btn-sm btn-dark">
                     Load Schedule
-                </button>
+                </button> -->
                 <button v-if="Object.keys(loadedSched).length" :disabled="saving || preLoading ? true : false"
                     @click="loadFaculty()" tabindex="-1" title="Load Faculties" type="button" data-bs-toggle="modal"
                     data-bs-target="#facultymodal" class="btn btn-sm btn-dark">
@@ -1070,14 +1069,14 @@ const loadFaculty = () => {
                 </button>
                
             </div>
-            <div v-if="!checking && !Object.keys(curriculum).length" class="w-100 mt-4 p-4">
+            <div v-if="!preLoading && !Object.keys(curriculum).length" class="w-100 mt-4 p-4">
                 <p class="text-danger fw-bold">No Curriculum Found</p>
                 <p class="small-font">To Enable schedule customization, make sure the curriculum tagged is existing
                     and has a tagged subjects in it.</p>
             </div>
-            <div v-if="checking && !Object.keys(curriculum).length" class="w-100 mt-4 p-4">
+            <!-- <div v-if="preLoading && !Object.keys(curriculum).length" class="w-100 mt-4 p-4">
                 <Loader />
-            </div>
+            </div> -->
 
             <div v-if="!preLoading && !saving && showCalendar" class="w-100">
                 <div v-if="!allow" class="w-100 h-100 flex flex-col items-center justify-center mt-5">
@@ -1101,6 +1100,7 @@ const loadFaculty = () => {
                                     @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid)"
                                     readonly v-model="tm.sched_mon_code" />
                                 <input type="hidden" readonly v-model="tm.sched_mon" />
+                                {{ tm.sched_id }}
                             </td>
                             <td :class="tm.classname">
                                 <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
@@ -1108,6 +1108,7 @@ const loadFaculty = () => {
                                     @click="assignSubject(tm.timeid, 'Tuesday', index, tm.sched_tue, tm.sched_tue_bid, tm.sched_tue_classrid)"
                                     readonly v-model="tm.sched_tue_code" />
                                 <input type="hidden" readonly v-model="tm.sched_tue" />
+                                {{ tm.sched_id }}
                             </td>
                             <td :class="tm.classname">
                                 <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
@@ -1115,6 +1116,7 @@ const loadFaculty = () => {
                                     @click="assignSubject(tm.timeid, 'Wednesday', index, tm.sched_wed, tm.sched_wed_bid, tm.sched_wed_classrid)"
                                     readonly v-model="tm.sched_wed_code" />
                                 <input type="hidden" readonly v-model="tm.sched_wed" />
+                                {{ tm.sched_id }}
                             </td>
                             <td :class="tm.classname">
                                 <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
@@ -1122,6 +1124,7 @@ const loadFaculty = () => {
                                     @click="assignSubject(tm.timeid, 'Thursday', index, tm.sched_thurs, tm.sched_thurs_bid, tm.sched_thurs_classrid)"
                                     readonly v-model="tm.sched_thurs_code" />
                                 <input type="hidden" readonly v-model="tm.sched_thurs" />
+                                {{ tm.sched_id }}
                             </td>
                             <td :class="tm.classname">
                                 <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
@@ -1129,6 +1132,7 @@ const loadFaculty = () => {
                                     @click="assignSubject(tm.timeid, 'Friday', index, tm.sched_fri, tm.sched_fri_bid, tm.sched_fri_classrid)"
                                     readonly v-model="tm.sched_fri_code" />
                                 <input type="hidden" readonly v-model="tm.sched_fri" />
+                                {{ tm.sched_id }}
                             </td>
                             <td :class="tm.classname">
                                 <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
@@ -1136,6 +1140,7 @@ const loadFaculty = () => {
                                     @click="assignSubject(tm.timeid, 'Saturday', index, tm.sched_sat, tm.sched_sat_bid, tm.sched_sat_classrid)"
                                     readonly v-model="tm.sched_sat_code" />
                                 <input type="hidden" readonly v-model="tm.sched_sat" />
+                                {{ tm.sched_id }}
                             </td>
                         </tr>
 
@@ -1156,7 +1161,7 @@ const loadFaculty = () => {
             <div v-if="preLoading" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
                     <Loader />
-                    <p class=" mt-3">Retrieving Items Please Wait...</p>
+                    <p class=" mt-3">This may take a while</p>
                 </div>
             </div>
             <div v-if="saving" class="w-100 h-100 bg-opacity-55 border">

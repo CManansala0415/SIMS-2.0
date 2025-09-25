@@ -67,6 +67,7 @@ const booter = async () => {
     })
     getEmployee(0, 0).then((results) => {
         employee.value = results.data
+        // console.log(employee.value)
     })
     getScheduledSubjects(curriculumId.value).then((results) => {
         // console.log(results)
@@ -338,16 +339,20 @@ onMounted(async () => {
 
                     //check if may nassign na na sched sa sa subject na nakatag para di sya mapalitan kapag meron
                     let hasSched = availability.value.findIndex((obj) => {
+                        // return (
+                        //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
+                        //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
+                        //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
+                        //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
+                        //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
+                        //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid)
+                        // );
                         return (
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) ||
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid)
+                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) && (obj.occ_lnid == launchId.value) 
                         );
                     })
 
+                    // console.log(hasSched)
                     // console.log(e.subj_id + ' : ' + hasSched + ' : ' + empid)
 
                     if (indexer !== -1) {
@@ -416,7 +421,7 @@ onMounted(async () => {
                             title="Click Edit to modify details">
                             <option value="" disabled>-- Select Faculty --</option>
                             <option v-for="(emp, index) in employee" :value="emp.emp_id">
-                                {{ emp.emp_firstname }} {{ emp.emp_middlename }} {{ emp.emp_lastname }} {{
+                                {{ emp.emp_lastname }}, {{ emp.emp_firstname }} {{ emp.emp_middlename ? emp.emp_middlename : '' }}  {{
                                     emp.emp_suffixname ? emp.emp_suffixname : '' }}
                             </option>
                         </select>

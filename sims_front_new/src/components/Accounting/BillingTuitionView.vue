@@ -135,6 +135,7 @@ onMounted(async () => {
                     studentCount.value = results.count
                     preLoading.value = false
 
+                    // console.log(accounts.value)
                     // let x = studentAccount.value.map((e) => {
                     //     let y = accounts.value.findIndex((f) => {
                     //         return f.acs_enrid === e.enr_id
@@ -618,7 +619,7 @@ const getData = (result) =>{
                             </div>
                         </div>
                     </div>
-                    <div class="col-12">
+                    <div class="col-12" v-if="Object.keys(milestone).length">
                         <div class=" d-flex justify-content-end gap-2 mt-3">
                             <div class="form-group text-start">
                                 <label class="fw-bold">Total Cost</label>

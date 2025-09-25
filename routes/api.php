@@ -59,6 +59,7 @@ Route::middleware(['auth:sanctum'])->post('/delete-perdetails/{type}', [Registra
 Route::middleware(['auth:sanctum'])->get('/get-enrollment/{personid}', [RegistrarController::class,'getEnrollment']);
 Route::middleware(['auth:sanctum'])->post('/delete-enrollment', [RegistrarController::class,'deleteEnrollment']);
 Route::middleware(['auth:sanctum'])->post('/enroll-applicant', [RegistrarController::class,'enrollApplicant']);
+Route::middleware(['auth:sanctum'])->get('/get-enrollment-schedule/{curr}/{prog}/{grad}/{cour}/{sec}/{lnid}', [RegistrarController::class,'getEnrollmentSchedule']);
 
 
 Route::middleware(['auth:sanctum'])->get('/get-student/{limit}/{offset}/{search}', [RegistrarController::class,'getStudent']);

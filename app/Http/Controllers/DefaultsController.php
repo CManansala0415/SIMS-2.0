@@ -501,6 +501,7 @@ class DefaultsController extends Controller
                         'subj_preq' => $request->input('subj_preq'),
                         'subj_dtypeid' => $request->input('subj_dtypeid'),
                         'subj_specid' => $request->input('subj_specid'),
+                        'subj_schedpass' => $request->input('subj_schedpass'),
                         'subj_addedby' => $request->input('subj_addedby'),
                         'subj_updatedby' => null,
                         'subj_dateadded' => $date,
@@ -529,6 +530,7 @@ class DefaultsController extends Controller
                         'subj_preq' => $request->input('subj_preq'),
                         'subj_dtypeid' => $request->input('subj_dtypeid'),
                         'subj_specid' => $request->input('subj_specid'),
+                        'subj_schedpass' => $request->input('subj_schedpass'),
                         'subj_updatedby' => $request->input('subj_addedby'),
                         'subj_dateupdated' => $date,
                     ]);
@@ -770,13 +772,17 @@ class DefaultsController extends Controller
                 $controller = new RegistrarController();
                 $response = $controller->getStudentFiltering(0, 0, $id, 0, 0, 0, 0, 0, 3);
             break;
-            case 3: // billing request
+            case 3: // billing request by personid
                 $controller = new TransactionsController();
                 $response = $controller->getRequestDetails(0, 0, 0, 0, 0, 3, $id);
             break;
             case 4: // alumni tracker
                 $controller = new RegistrarController();
                 $response = $controller->getAlumniStudents(0, 0, $id, 0, 0, 3);
+            break;
+            case 5: // billing request header
+                $controller = new TransactionsController();
+                $response = $controller->getRequestDetails(0, 0, 0, 0, 0, 5, $id);
             break;
         }
 

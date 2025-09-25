@@ -1,7 +1,17 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "../../../routes/user.js";
-import { getCurriculumSubject, getEnrollment, getMilestone, addMilestone, updateEnrollment, updateMilestone, getCommandUpdateCurriculum } from "../../Fetchers.js";
+import {
+    getCurriculumSubject,
+    getEnrollment,
+    getMilestone,
+    addMilestone,
+    updateEnrollment,
+    updateMilestone,
+    getCommandUpdateCurriculum,
+    getEnrollmentSchedule,
+    getLaunchChecker
+} from "../../Fetchers.js";
 import Loader from '../loaders/Loader1.vue';
 import {
     pdfGenerator
@@ -45,8 +55,8 @@ const subjectData = computed(() => {
 
 const userID = ref('')
 const subjectFilter = ref([])
-const preloading = ref(false)
-const milestoneLoading = ref(false)
+const preloading = ref(true)
+const milestoneLoading = ref(true)
 const currSubject = ref([])
 const enrolleeData = ref([])
 const milestone = ref([])
@@ -56,8 +66,9 @@ const enr_curriculum = ref('')
 const settingscurr = ref([])
 const studentID = ref('')
 const studentSem = ref('')
+const studentSemId = ref('')
 const studentDateEnr = ref('')
-
+const scheduleData = ref([])
 onMounted(async () => {
     window.stop()
     enr_section.value = studentData.value.enr_section
@@ -79,6 +90,7 @@ onMounted(async () => {
             // for printing
             studentID.value = results[0].ident_identification
             studentSem.value = results[0].quar_code
+            studentSemId.value = results[0].quar_id
             studentDateEnr.value = results[0].enr_dateenrolled
 
             let curr = enrolleeData.value[0].enr_curriculum
@@ -123,8 +135,23 @@ onMounted(async () => {
                             addedSubjectId.value.push(e.subj_id)
                         })
 
-                        preloading.value = false
-                        milestoneLoading.value = false
+                        getLaunchChecker(
+                            prog,
+                            studentSemId.value,
+                            cour,
+                            grad,
+                            curr,
+                            enr_section.value
+                        ).then(async (results) => {
+
+                            getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results.ln_id).then((results) => {
+                                scheduleData.value = results.data
+                                preloading.value = false
+                                milestoneLoading.value = false
+
+                                console.log(scheduleData.value)
+                            })
+                        })
 
 
                     })
@@ -339,6 +366,100 @@ const downloadPdf = () => {
 }
 
 const formType = ref(1)
+
+// Chat GPT Helper
+// Day mapping
+const dayMap = [
+    { field: "sched_mon", label: "Monday", key: "mon", order: 1 },
+    { field: "sched_tue", label: "Tuesday", key: "tue", order: 2 },
+    { field: "sched_wed", label: "Wednesday", key: "wed", order: 3 },
+    { field: "sched_thurs", label: "Thursday", key: "thurs", order: 4 },
+    { field: "sched_fri", label: "Friday", key: "fri", order: 5 },
+    { field: "sched_sat", label: "Saturday", key: "sat", order: 6 },
+]
+
+// Format time like "0800","A" -> "08:00 AM"
+function formatTime(hhmm, meridian, isEnd = false) {
+    let suffix = meridian === "A" ? "AM" : "PM"
+    if (isEnd && hhmm.startsWith("12")) suffix = "PM"
+
+    let hours = parseInt(hhmm.slice(0, 2), 10)
+    const minutes = hhmm.slice(2, 4)
+    const displayHour = (hours % 12) === 0 ? 12 : (hours % 12)
+
+    return `${String(displayHour).padStart(2, "0")}:${minutes} ${suffix}`
+}
+
+function parseScheduleEntry(code, sc, day) {
+    if (!code) return null
+    const startRaw = code.slice(0, 4)
+    const endRaw = code.slice(4, 8)
+    const meridian = code.slice(8) // "A" or "P"
+
+    return {
+        start: formatTime(startRaw, meridian, false),
+        end: formatTime(endRaw, meridian, true),
+        rawStart: startRaw + meridian,
+        rawEnd: endRaw + (endRaw.startsWith("12") ? "P" : meridian),
+        day: day.label,
+        dayOrder: day.order,
+        room: sc[`${day.key}_room_name`] || "",
+        building: sc[`${day.key}_buil_name`] || "",
+        faculty: [
+            sc[`${day.key}_faculty_lastname`] || "",
+            sc[`${day.key}_faculty_firstname`] || "",
+            sc[`${day.key}_faculty_middlename`] || "",
+            sc[`${day.key}_faculty_suffixname`] || ""
+        ].filter(Boolean).join(" ").trim(),
+    }
+}
+
+function getScheduleGroupsForSubject(subjId) {
+    const sd = Array.isArray(scheduleData.value) ? scheduleData.value : []
+    const entries = []
+
+    for (const sc of sd) {
+        for (const d of dayMap) {
+            if (sc[d.field] === subjId) {
+                const e = parseScheduleEntry(sc.sched_time, sc, d)
+                if (e) entries.push(e)
+            }
+        }
+    }
+
+    if (!entries.length) return []
+
+    entries.sort((a, b) => a.dayOrder - b.dayOrder || a.rawStart.localeCompare(b.rawStart))
+
+    const groups = []
+    let cur = null
+
+    entries.forEach((e, i) => {
+        if (!cur) {
+            cur = { ...e }
+            return
+        }
+        const prev = entries[i - 1]
+        const canMerge =
+            e.day === cur.day &&
+            e.room === cur.room &&
+            e.building === cur.building &&
+            e.faculty === cur.faculty &&
+            e.rawStart === prev.rawEnd
+
+        if (canMerge) {
+            cur.end = e.end
+            cur.rawEnd = e.rawEnd
+        } else {
+            groups.push(cur)
+            cur = { ...e }
+        }
+    })
+    if (cur) groups.push(cur)
+
+    return groups
+}
+// Chat GPT Helper
 </script>
 
 <template>
@@ -351,8 +472,8 @@ const formType = ref(1)
         </div>
     </div>
     <div id="printform" v-if="!milestoneLoading && Object.keys(milestone).length" class="d-flex justify-content-center">
-        <div class="border small-font bg-opaque h-100" 
-                        style="width: 770px; height: 1105px; border:2px solid black; font-size: 8.8px;">
+        <div class="border small-font bg-opaque h-100"
+            style="width: 770px; height: 1105px; border:2px solid black; font-size: 8.8px;">
             <table class="table table-fixed" style="text-transform:uppercase">
                 <thead>
                     <tr>
@@ -362,12 +483,14 @@ const formType = ref(1)
                         <th class="align-middle text-center">
                             <p class="m-0">CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.
                                 CELTECH COLLEGE</p>
-                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San Fernando,
+                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San
+                                Fernando,
                                 Pampanga, Philippines, 2000</p>
                             <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
                             <p class="m-0 fw-normal small-font">Founded 1959</p>
                         </th>
-                        <th class="align-middle"><img src="/img/clcst_logo.png" height="60px" width="60px" alt="..."></th>
+                        <th class="align-middle"><img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -447,44 +570,69 @@ const formType = ref(1)
                 <thead>
                     <tr>
                         <th style="background-color: #000000;" class="text-white">Code</th>
-                        <th style="background-color: #000000;" class="text-white">Subject</th>
-                        <th style="background-color: #000000;" class="text-white">Lecture Units</th>
-                        <th style="background-color: #000000;" class="text-white">Laboratory Units</th>
-                        <th style="background-color: #000000;" class="text-white">Total Units</th>
+                        <th style="background-color: #000000; width: 120px;" class="text-white">Subject</th>
+                        <th style="background-color: #000000;" class="text-white">Units</th>
                         <th style="background-color: #000000;" class="text-white">Days</th>
                         <th style="background-color: #000000;" class="text-white">Time</th>
                         <th style="background-color: #000000;" class="text-white">Room</th>
-                        <th style="background-color: #000000;" class="text-white">Faculty</th>
+                        <th style="background-color: #000000; width: 120px;" class="text-white">Faculty</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(c, index) in milestone">
+                    <tr v-for="(c, index) in milestone" :key="index">
+                        <!-- Code -->
                         <td class="align-middle p-2">
                             {{ c.subj_code }}
                         </td>
+
+                        <!-- Subject -->
                         <td class="align-middle p-2">
                             {{ c.subj_name }}
                         </td>
+
+                        <!-- Units -->
                         <td class="align-middle p-2">
-                            {{ c.subj_lec }}
+                            Lec: {{ c.subj_lec }} | Lab: {{ c.subj_lab }} | Total: {{ c.subj_lec + c.subj_lab }}
                         </td>
+
+                        <!-- Days -->
                         <td class="align-middle p-2">
-                            {{ c.subj_lab }}
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.day }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
                         </td>
+
+                        <!-- Time -->
                         <td class="align-middle p-2">
-                            {{ c.subj_lec + c.subj_lab }}
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.start }} - {{ g.end }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
                         </td>
+
+                        <!-- Room -->
                         <td class="align-middle p-2">
-                            TBA
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.room }} <span v-if="g.building">- {{ g.building }}</span>
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
                         </td>
+
+                        <!-- Faculty -->
                         <td class="align-middle p-2">
-                            TBA
-                        </td>
-                        <td class="align-middle p-2">
-                            TBA
-                        </td>
-                        <td class="align-middle p-2">
-                            TBA
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.faculty }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
                         </td>
                     </tr>
                 </tbody>
@@ -492,16 +640,21 @@ const formType = ref(1)
             <div class="d-flex flex-column justify-content-center align-items-center" style="font-size:8px">
                 <div class="w-75 p-1 ">
                     <span class="fst-italic">
-                        I shall abide by all the rules and regulations now enforced or may be promulgated by Central Luzon
+                        I shall abide by all the rules and regulations now enforced or may be promulgated by Central
+                        Luzon
                         College of Science and Technology, Inc. from time to time
-                        Likewise, I agree to the cancellation of the credits I have earned in subjects I have enrolled under
+                        Likewise, I agree to the cancellation of the credits I have earned in subjects I have enrolled
+                        under
                         false pretenses.
                     </span>
                 </div>
-                <div class="p-1 d-flex flex-column gap-1 justify-content-center align-content-center align-items-center border border-dark-subtle rounded bg-body-tertiary shadow-sm">
+                <div
+                    class="p-1 d-flex flex-column gap-1 justify-content-center align-content-center align-items-center border border-dark-subtle rounded bg-body-tertiary shadow-sm">
                     <span class="text-danger fw-bold mt-1"> IMPORTANT </span>
                     <span class="fw-bold mt-1">
-                        OFFICIAL STUDY LOAD - means officially enrolled subjects and it will serve as an admission slip to the classroom.
+                        OFFICIAL STUDY LOAD - means officially enrolled subjects and it will serve as an admission slip
+                        to the
+                        classroom.
                     </span>
                     <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
                         * CHARGES TO STUDENTS WITHDRAWING/ DROPPING *
@@ -529,8 +682,8 @@ const formType = ref(1)
                         </li>
                     </ul>
                     <small>
-                            Note: This statement serves as the official policy regarding
-                            withdrawal/drop charges. For questions, contact the Registrar's Office.
+                        Note: This statement serves as the official policy regarding
+                        withdrawal/drop charges. For questions, contact the Registrar's Office.
                     </small>
 
                     <div class="d-flex gap-2 w-75 justify-content-between mt-3">
@@ -547,33 +700,49 @@ const formType = ref(1)
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-column justify-content-center align-items-center mt-3" style="font-size:8px" v-if="formType == 1">
+            <div class="d-flex flex-column justify-content-center align-items-center mt-3" style="font-size:8px"
+                v-if="formType == 1">
                 <div class="d-flex flex-column gap-1 justify-content-center align-content-center align-items-center">
                     <span class="fw-bold mt-1">
-                        STUDENT AFFAIRS OFFICE 
+                        STUDENT AFFAIRS OFFICE
                     </span>
                     <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
                         UNDERTAKING
                     </span>
                     <span class="w-75 p-1 fst-italic" style="text-align: justify;">
                         I, <span class="fw-semibold text-uppercase">
-                                {{ studentData.per_firstname }}
-                                {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
-                                {{ studentData.per_lastname }}
-                                {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
-                            </span>
-                            <span class="fw-semibold text-uppercase">
-                                {{ enrolleeData[0].prog_code }}-{{ enrolleeData[0].grad_code }}
-                            </span>, do hereby state that I am NOT A MEMBER OF ANY FRATERNITY/ SORORITY or any UNDERGROUND OR ILLEGAL ORGANIZATION OR AGGRUPATION THAT ADVOCATES VIOLENCE. ERODES THE VALUES AND TEACHINGS OF CLCST, and/ or UNDERMINES THE SAFETY AND SECURITY OF THE SCHOOL AND IT'S STUDENTS AND EMPLOYEES.
-                        I also state that I shall abide with all College policies and regulations and shall subject myself to disciplinary procedure in accordance with the
-                        School's existing Student Handbook should I commit any violation as prescribed in the said Student Handbook and other duly issued policies.
-                        I am executing this Undertaking as a necessary condition and/ or requisite for my admission and continuance of study in Central Luzon College of Science and Technology, Inc.. I fully understand that if I should commit any violation of this Undertaking, I shall be disqualified for admission/ readmission without prejudice to the right of the School to initiate 
-                        <span class="fw-bold">CRIMINAL</span> <span class="fw-bold">CIVIL</span> and/ or <span class="fw-bold">ADMINISTRATIVE</span> charges against me.
+                            {{ studentData.per_firstname }}
+                            {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
+                            {{ studentData.per_lastname }}
+                            {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
+                        </span>
+                        <span class="fw-semibold text-uppercase">
+                            {{ enrolleeData[0].prog_code }}-{{ enrolleeData[0].grad_code }}
+                        </span>, do hereby state that I am NOT A MEMBER OF ANY FRATERNITY/ SORORITY or any UNDERGROUND
+                        OR ILLEGAL
+                        ORGANIZATION OR AGGRUPATION THAT ADVOCATES VIOLENCE. ERODES THE VALUES AND TEACHINGS OF CLCST,
+                        and/ or
+                        UNDERMINES THE SAFETY AND SECURITY OF THE SCHOOL AND IT'S STUDENTS AND EMPLOYEES.
+                        I also state that I shall abide with all College policies and regulations and shall subject
+                        myself to
+                        disciplinary procedure in accordance with the
+                        School's existing Student Handbook should I commit any violation as prescribed in the said
+                        Student Handbook
+                        and other duly issued policies.
+                        I am executing this Undertaking as a necessary condition and/ or requisite for my admission and
+                        continuance
+                        of study in Central Luzon College of Science and Technology, Inc.. I fully understand that if I
+                        should
+                        commit any violation of this Undertaking, I shall be disqualified for admission/ readmission
+                        without
+                        prejudice to the right of the School to initiate
+                        <span class="fw-bold">CRIMINAL</span> <span class="fw-bold">CIVIL</span> and/ or <span
+                            class="fw-bold">ADMINISTRATIVE</span> charges against me.
                         Done this 27th day of August, 20 25 at Central Luzon College of Science and Technology, Inc., .
                     </span>
                     <small>
-                            Note: This statement serves as the official policy regarding
-                            withdrawal/drop charges. For questions, contact the Registrar's Office.
+                        Note: This statement serves as the official policy regarding
+                        withdrawal/drop charges. For questions, contact the Registrar's Office.
                     </small>
 
                     <div class="d-flex gap-2 w-75 justify-content-between mt-3">
@@ -671,7 +840,7 @@ const formType = ref(1)
             </div>
         </div>
     </div>
-    
+
     <div v-if="!milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
         <div class="p-3 text-center" style="text-transform:none">
             No Records Found
@@ -686,7 +855,8 @@ const formType = ref(1)
     </div>
 
 
-    <button class="btn btn-success w-100 mt-3" @click="downloadPdf()" v-if="!milestoneLoading && Object.keys(milestone).length"
+    <button class="btn btn-success w-100 mt-3" @click="downloadPdf()"
+        v-if="!milestoneLoading && Object.keys(milestone).length"
         v-show="!milestoneLoading && Object.keys(milestone).length">Download Form</button>
 
-</template> 
+</template>

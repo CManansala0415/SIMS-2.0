@@ -464,16 +464,16 @@ const downloadPdf = () => {
                             {{ c.subj_lec + c.subj_lab }}
                         </td> -->
                         <td class="align-middle p-2">
-                            {{ c.grs_prelims }}
+                            {{ c.grs_prelims? c.grs_prelims:'N/A' }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.grs_midterms }}
+                            {{ c.grs_midterms? c.grs_midterms:'N/A' }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.grs_prefinals }}
+                            {{ c.grs_prefinals? c.grs_prefinals:'N/A' }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.grs_finals }}
+                            {{ c.grs_finals? c.grs_finals:'N/A' }}
                         </td>
                     </tr>
                 </tbody>

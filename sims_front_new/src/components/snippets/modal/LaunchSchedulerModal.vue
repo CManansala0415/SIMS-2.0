@@ -117,6 +117,8 @@ const occupier = ref({
     subj_code: '',
     sec_name: '',
     gradelvl_name: '',
+    course_name: 'test',
+
 })
 const occupied = ref(false)
 const checking = ref(false)
@@ -149,8 +151,10 @@ const filterOccupancy = (id) => {
     occupied.value = false
     checking.value = true
     getOccupancy(buildingId.value, classroomId.value).then((results) => {
-
+        
         occupancy.value = results.filter((e) => {
+            
+
             if (e.occ_time == timeId.value) {
                 switch (timeDay.value) {
                     case 'Monday':
@@ -160,6 +164,7 @@ const filterOccupancy = (id) => {
                             subj_name: e.mon_subj_name,
                             sec_name: e.mon_sec_name,
                             gradelvl_name: e.mon_gradelvl_name,
+                            course_name:e.mon_course_name,
                         }
                         break;
                     case 'Tuesday':
@@ -169,6 +174,7 @@ const filterOccupancy = (id) => {
                             subj_name: e.tue_subj_name,
                             sec_name: e.tue_sec_name,
                             gradelvl_name: e.tue_gradelvl_name,
+                            course_name:e.tue_course_name,
                         }
                         break;
                     case 'Wednesday':
@@ -178,6 +184,7 @@ const filterOccupancy = (id) => {
                             subj_name: e.wed_subj_name,
                             sec_name: e.wed_sec_name,
                             gradelvl_name: e.wed_gradelvl_name,
+                            course_name:e.wed_course_name,
                         }
                         break;
                     case 'Thursday':
@@ -187,6 +194,7 @@ const filterOccupancy = (id) => {
                             subj_name: e.thurs_subj_name,
                             sec_name: e.thurs_sec_name,
                             gradelvl_name: e.thurs_gradelvl_name,
+                            course_name:e.thurs_course_name,
                         }
                         break;
                     case 'Friday':
@@ -196,6 +204,7 @@ const filterOccupancy = (id) => {
                             subj_name: e.fri_subj_name,
                             sec_name: e.fri_sec_name,
                             gradelvl_name: e.fri_gradelvl_name,
+                            course_name:e.fri_course_name,
                         }
                         break;
                     case 'Saturday':
@@ -204,13 +213,13 @@ const filterOccupancy = (id) => {
                             subj_code: e.sat_subj_code,
                             sec_name: e.sat_sec_name,
                             gradelvl_name: e.sat_gradelvl_name,
+                            course_name:e.sat_course_name,
                         }
                         break;
                 }
             }
         })
         checking.value = false
-
     })
 }
 
@@ -227,6 +236,7 @@ onMounted(async () => {
         getScheduledFaculty().then((results) => {
             faculty.value = results
 
+            
             getCurriculumSubject(curriculumId.value, launch.value.ln_quarter, launch.value.ln_gradelvl).then((results) => {
                 curriculumSubject.value = results
 
@@ -260,13 +270,10 @@ onMounted(async () => {
     })
 
 
-
-
     if (bid.value) {
         buildingId.value = bid.value
         filterClassroom()
         classroomId.value = classrid.value
-
 
     } else {
         buildingId.value = ''
@@ -274,14 +281,15 @@ onMounted(async () => {
     }
 })
 
-const assignSubject = (subj_id, subj_code, faculty_id) => {
-
+const assignSubject = (subj_id, subj_code, faculty_id, pass) => {
+    
     let msg = 'The faculty assigned for this subject has already a schedule for this time slot. These are the actions you can perform: \n\n- Change the assigned instructor for the subject. \n- Assign this subject to a different time slot'
     let data = availability.value.filter((e) => {
         if (
             (e.occ_time === timeId.value) &&
             (e.occ_day == timeDay.value) &&
-            (e.occ_faculty == faculty_id)
+            (e.occ_faculty == faculty_id) &&
+            (pass != 1) // means ojt or practicum, should not overlap
             // ((e.occ_subjid == subj_id))
         ) {
             return e
@@ -292,7 +300,6 @@ const assignSubject = (subj_id, subj_code, faculty_id) => {
     // console.log(subj_id)
     // console.log(faculty_id)
     // console.log(availability.value)
-    // console.log(data)
     // data[0].occ_faculty === faculty_id && object.occ_day == 'tuesday'
     switch (timeDay.value) {
         case 'Monday':
@@ -397,7 +404,7 @@ const setOthers = (value) => {
     </div>
     <div v-else class="container">
         <div class="row">
-            <div class="col overflow-auto small-font" style="height: 30rem;">
+            <div class="col overflow-auto small-font" style="height: 40rem;">
                 <div class="text-start border mb-2 card shadow p-3">
                     <p class="col-span-3 font-semibold">Other Alternatives</p>
                     <div class="d-flex flex-column gap-2">
@@ -465,6 +472,8 @@ const setOthers = (value) => {
                                 </div>
                                 <div class="card-body">
                                     <h5 class="card-title">{{ occupier.subj_name }} ({{ occupier.subj_code }})</h5>
+                                    <h5 class="card-title">{{ occupier.sec_name }} {{ occupier.gradelvl_name }}</h5>
+                                    <h5 class="card-title">{{ occupier.course_name }}</h5>
                                     <p class="card-text">This room is already occupied within the selected timeslot. Try selecting another room or timeslot.</p>
                                     <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
                                 </div>
@@ -489,7 +498,7 @@ const setOthers = (value) => {
                                                     </td>
                                                 </tr>
                                                 <tr v-else v-for="(subj, index) in filteredSubject"
-                                                    @click="assignSubject(subj.subj_id, subj.subj_code, subj.faculty_id)"
+                                                    @click="assignSubject(subj.subj_id, subj.subj_code, subj.faculty_id, subj.subj_schedpass)"
                                                     :class="activeID == subj.subj_id ? 'pe-none' : 'pe-auto'"
                                                     :disabled="activeID == subj.subj_id ? true : false">
                                                     <td

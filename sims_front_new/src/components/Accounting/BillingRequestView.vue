@@ -150,6 +150,7 @@ onMounted(async () => {
             preLoading.value = true
             await booter().then(() => {
                 getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
+                    console.log(results2)
                     mapper(results2)
                 })
             })
@@ -267,7 +268,7 @@ const excelDownload = () => {
 
 const showQRScanner = ref(false)
 const getData = (result) =>{
-    console.log(result)
+    // console.log(result)
     requestedItems.value = result
     showQRScanner.value = !showQRScanner
     document.getElementById('hideqrscanner').click();
@@ -423,7 +424,7 @@ const getData = (result) =>{
                         @click="showQRScanner = false" id="hideqrscanner"></button>
                 </div>
                 <div class="modal-body">
-                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="3"/>
+                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="5"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

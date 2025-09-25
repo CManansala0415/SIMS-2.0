@@ -22,37 +22,63 @@ const imageFetcher = async(data, type) =>{
     })
 }
 
-const pdfGenerator = async (name,paper,orientation,margin) => {
+// const pdfGenerator = async (name,paper,orientation,margin) => {
+//     var element = document.getElementById('printform');
+//     var opt = {
+//         // margin: [0.1, 0.2, 0.1, 0.2],
+//         margin: margin,
+//         filename: name+'.pdf',
+//         pagebreak: { mode: 'css', before: '.pagebreak' },
+//         image: { type: 'jpeg', quality: 1 },
+//         // html2canvas: { scale: 1 },
+//         html2canvas: {
+//             dpi: 192,
+//             scale:4,
+//             letterRendering: true,
+//             useCORS: true,
+//             scrollY: 0
+//         },
+//         jsPDF: { 
+//             unit: 'in', 
+//             format: paper, 
+//             orientation: orientation
+//         },
+        
+//     };
+
+//     // New Promise-based usage:
+//     html2pdf().set(opt).from(element).save();
+
+//     // Old monolithic-style usage:
+//     // html2pdf(element, opt);
+
+// }
+
+const pdfGenerator = async (name, paper, orientation, margin) => {
     var element = document.getElementById('printform');
     var opt = {
-        // margin: [0.1, 0.2, 0.1, 0.2],
         margin: margin,
-        filename: name+'.pdf',
+        filename: name + '.pdf',
         pagebreak: { mode: 'css', before: '.pagebreak' },
         image: { type: 'jpeg', quality: 1 },
-        // html2canvas: { scale: 1 },
         html2canvas: {
             dpi: 192,
-            scale:4,
+            scale: 4,
             letterRendering: true,
             useCORS: true,
             scrollY: 0
         },
         jsPDF: { 
-            unit: 'in', 
-            format: paper, 
+            unit: 'in',
+            format: paper,
             orientation: orientation
         },
-        
     };
 
-    // New Promise-based usage:
-    html2pdf().set(opt).from(element).save();
+    // ✅ Return the promise so callers can await it
+    return html2pdf().set(opt).from(element).save();
+};
 
-    // Old monolithic-style usage:
-    // html2pdf(element, opt);
-
-}
 
 export {
     qrImageGenerator,

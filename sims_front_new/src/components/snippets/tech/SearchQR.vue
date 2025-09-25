@@ -27,7 +27,7 @@ const mode = computed(() => {
 //     preLoading.value=false
 // })
 const scan = () =>{
-    console.log(disabler.value)
+    // console.log(disabler.value)
     setTimeout(disabler.value=true, 200);
     search()
 

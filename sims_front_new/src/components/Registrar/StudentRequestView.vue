@@ -19,6 +19,7 @@ import StudentRequestModal from '../snippets/modal/StudentRequestModal.vue';
 // import RenderModal from '../snippets/modal/RenderItem.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router'
+import SearchQR from '../snippets/tech/SearchQR.vue';
 
 const router = useRouter();
 const preLoading = ref(true)
@@ -320,6 +321,13 @@ const settlement = (data, mode) => {
     }
 }
 
+const showQRScanner = ref(false)
+const getData = (result) =>{
+    // console.log(result)
+    requestedItems.value = result
+    showQRScanner.value = !showQRScanner
+    document.getElementById('hideqrscanner').click();
+}
 
 </script>
 <template>
@@ -339,17 +347,21 @@ const settlement = (data, mode) => {
                 <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
                     Search
                 </button>
+                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                    Scan QR 
+                </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addrequestmodal" @click="settlement('', 1)"
                     type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
                     <font-awesome-icon icon="fa-solid fa-add" /> Add New
                 </button>
+                
             </div>
         </div>
 
         <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
+            <table class="table table-hover text-uppercase">
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">Request ID</th>
@@ -400,12 +412,12 @@ const settlement = (data, mode) => {
                             N/A
                         </td>
                     </tr>
-                    <tr v-if="!preLoading && !Object.keys(requestedItems).length">
+                    <tr v-if="!preLoading && !Object.keys(requestedItems).length" style="text-transform: none;">
                         <td class="align-middle" colspan="7">
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(requestedItems).length">
+                    <tr v-if="preLoading && !Object.keys(requestedItems).length" style="text-transform: none;">
                         <td class="align-middle" colspan="7">
                             <div class="m-3">
                                 <Loader />
@@ -430,7 +442,7 @@ const settlement = (data, mode) => {
      <!-- Add Request Modal -->
      <div class="modal fade" id="addrequestmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Request</h5>
@@ -478,6 +490,35 @@ const settlement = (data, mode) => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showRenderModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="5"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

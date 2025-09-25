@@ -92,6 +92,12 @@ class TransactionsController extends Controller
                 $request = DB::table('def_accounts_request as dr')
                 ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
                 ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
+
+                ->leftJoin('sett_ph_country as currcountry', 'pr.per_curr_country', '=', 'currcountry.countryCode') 
+                ->leftJoin('sett_ph_province as currprovince', 'pr.per_curr_province', '=', 'currprovince.provCode') 
+                ->leftJoin('sett_ph_city as currcity', 'pr.per_curr_city', '=', 'currcity.citymunCode') 
+                ->leftJoin('sett_ph_barangay as currbarangay', 'pr.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+
                 ->select(  
                     'dr.*',
                     'df.*',
@@ -99,6 +105,11 @@ class TransactionsController extends Controller
                     'pr.per_middlename',
                     'pr.per_lastname',
                     'pr.per_suffixname',
+                    'pr.per_curr_home',
+                    'currcountry.name as currcountryname',
+                    'currprovince.provDesc as currprovincename',
+                    'currcity.citymunDesc as currcityname',
+                    'currbarangay.brgyDesc as currbarangayname',
                 )
                 ->limit($limit)->offset($offset)
                 ->orderBy('dr.acr_id','DESC')
@@ -130,7 +141,15 @@ class TransactionsController extends Controller
                     ->leftJoin('def_student_identification', 'def_accounts_request.acr_personid', '=', 'def_student_identification.ident_personid') 
                     ->where('def_student_identification.ident_identification', '=',  $id)
                     ->count();
-        }else{
+        }elseif ($mode == 5){ //qr search request
+            $request = DB::table('def_accounts_request')
+                    ->where('acr_reqheader', '=',  $id)
+                    ->get();
+            $count = DB::table('def_accounts_request')
+                    ->where('acr_reqheader', '=',  $id)
+                    ->count();
+        }
+        else{
             $request = DB::table('def_accounts_request as dr')
                 ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
                 ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
@@ -175,10 +194,15 @@ class TransactionsController extends Controller
 
     public function addItemRequest(Request $request)
     {
+        $randomizer = uniqid();
+
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
             $date = date('Y-m-d h:i:s', time());
+
+            $header = $request->input('acr_reqitem').'-'.$request->input('acr_personid').'-'.$randomizer;
+
             $primary = DB::table('def_accounts_request')->insert([
                 'acr_amount' => $request->input('acr_amount'),
                 'acr_personid' => $request->input('acr_personid'),
@@ -188,9 +212,11 @@ class TransactionsController extends Controller
                 'acr_addedby' => $request->input('acr_addedby'),
                 'acr_docstamp' => $request->input('acr_docstamp'),
                 'acr_dateadded' =>$date,
+                'acr_reqheader' =>$header,
             ]);
             return $data = [
                 'status' => 204,
+                'header' => $header
             ];
         }
         catch (Exception $ex) {

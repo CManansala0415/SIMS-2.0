@@ -502,7 +502,7 @@ class RegistrarController extends Controller
                 $primary = DB::table('def_accounts_settlement')->insert([
                     'acs_personid' => $request->input('personid'),
                     'acs_enrid' => $enr->enr_id,
-                    'acs_dateadded' => $date
+                    'acs_dateadded' => $date,
                 ]);
             }
 
@@ -1129,19 +1129,35 @@ class RegistrarController extends Controller
     }
     public function getlaunchChecker(Request $params)
     {
-        $launch = DB::table('def_launch')
-        ->select(  
-            'def_launch.*'
-        )
-        ->where('ln_status', '=',  1)
-        ->where('ln_dtype', '=',  $params->ln_dtype)
-        ->where('ln_quarter', '=',  $params->ln_quarter)
-        ->where('ln_course', '=',  $params->ln_course)
-        ->where('ln_gradelvl', '=',  $params->ln_gradelvl)
-        ->where('ln_curriculum', '=',  $params->ln_curriculum)
-        ->where('ln_section', '=',  $params->ln_section)
-        ->where('ln_year', '=',  $params->ln_year)
-        ->first();
+        if($params->ln_year != 0){ 
+            $launch = DB::table('def_launch')
+                ->select(  
+                    'def_launch.*'
+                )
+                ->where('ln_status', '=',  1)
+                ->where('ln_dtype', '=',  $params->ln_dtype)
+                ->where('ln_quarter', '=',  $params->ln_quarter)
+                ->where('ln_course', '=',  $params->ln_course)
+                ->where('ln_gradelvl', '=',  $params->ln_gradelvl)
+                ->where('ln_curriculum', '=',  $params->ln_curriculum)
+                ->where('ln_section', '=',  $params->ln_section)
+                ->where('ln_year', '=',  $params->ln_year)
+                ->first();
+        }else{
+            $launch = DB::table('def_launch')
+                ->select(  
+                    'def_launch.*'
+                )
+                ->where('ln_status', '=',  1)
+                ->where('ln_dtype', '=',  $params->ln_dtype)
+                ->where('ln_quarter', '=',  $params->ln_quarter)
+                ->where('ln_course', '=',  $params->ln_course)
+                ->where('ln_gradelvl', '=',  $params->ln_gradelvl)
+                ->where('ln_curriculum', '=',  $params->ln_curriculum)
+                ->where('ln_section', '=',  $params->ln_section)
+                ->first();
+        }
+       
 
         return $launch;
     }
@@ -1885,36 +1901,42 @@ class RegistrarController extends Controller
             ->leftJoin('def_launch_schedule as thurs_sched', 'sched_occ.occ_thurs_schedid', '=', 'thurs_sched.sched_id') 
             ->leftJoin('def_launch_schedule as fri_sched', 'sched_occ.occ_fri_schedid', '=', 'fri_sched.sched_id') 
             ->leftJoin('def_launch_schedule as sat_sched', 'sched_occ.occ_sat_schedid', '=', 'sat_sched.sched_id') 
-    
+                
             ->leftJoin('def_launch as mon_launch', 'mon_sched.sched_lnid', '=', 'mon_launch.ln_id') 
             ->leftJoin('def_section as mon_section', 'mon_launch.ln_section', '=', 'mon_section.sec_id') 
             ->leftJoin('def_gradelvl as mon_gradelvl', 'mon_launch.ln_gradelvl', '=', 'mon_gradelvl.grad_id') 
             ->leftJoin('def_subject as mon_subject', 'mon_sched.sched_mon', '=', 'mon_subject.subj_id') 
-    
+            ->leftJoin('def_program as mon_course', 'mon_launch.ln_course', '=', 'mon_course.prog_id') 
+
             ->leftJoin('def_launch as tue_launch', 'tue_sched.sched_lnid', '=', 'tue_launch.ln_id') 
             ->leftJoin('def_section as tue_section', 'tue_launch.ln_section', '=', 'tue_section.sec_id') 
             ->leftJoin('def_gradelvl as tue_gradelvl', 'tue_launch.ln_gradelvl', '=', 'tue_gradelvl.grad_id') 
             ->leftJoin('def_subject as tue_subject', 'tue_sched.sched_tue', '=', 'tue_subject.subj_id') 
+            ->leftJoin('def_program as tue_course', 'tue_launch.ln_course', '=', 'tue_course.prog_id') 
     
             ->leftJoin('def_launch as wed_launch', 'wed_sched.sched_lnid', '=', 'wed_launch.ln_id') 
             ->leftJoin('def_section as wed_section', 'wed_launch.ln_section', '=', 'wed_section.sec_id') 
             ->leftJoin('def_gradelvl as wed_gradelvl', 'wed_launch.ln_gradelvl', '=', 'wed_gradelvl.grad_id') 
             ->leftJoin('def_subject as wed_subject', 'wed_sched.sched_wed', '=', 'wed_subject.subj_id') 
+            ->leftJoin('def_program as wed_course', 'wed_launch.ln_course', '=', 'wed_course.prog_id') 
     
             ->leftJoin('def_launch as thurs_launch', 'thurs_sched.sched_lnid', '=', 'thurs_launch.ln_id') 
             ->leftJoin('def_section as thurs_section', 'thurs_launch.ln_section', '=', 'thurs_section.sec_id') 
             ->leftJoin('def_gradelvl as thurs_gradelvl', 'thurs_launch.ln_gradelvl', '=', 'thurs_gradelvl.grad_id') 
             ->leftJoin('def_subject as thurs_subject', 'thurs_sched.sched_thurs', '=', 'thurs_subject.subj_id') 
+            ->leftJoin('def_program as thurs_course', 'thurs_launch.ln_course', '=', 'thurs_course.prog_id') 
     
             ->leftJoin('def_launch as fri_launch', 'fri_sched.sched_lnid', '=', 'fri_launch.ln_id') 
             ->leftJoin('def_section as fri_section', 'fri_launch.ln_section', '=', 'fri_section.sec_id') 
             ->leftJoin('def_gradelvl as fri_gradelvl', 'fri_launch.ln_gradelvl', '=', 'fri_gradelvl.grad_id') 
             ->leftJoin('def_subject as fri_subject', 'fri_sched.sched_fri', '=', 'fri_subject.subj_id') 
+            ->leftJoin('def_program as fri_course', 'fri_launch.ln_course', '=', 'fri_course.prog_id') 
     
             ->leftJoin('def_launch as sat_launch', 'sat_sched.sched_lnid', '=', 'sat_launch.ln_id') 
             ->leftJoin('def_section as sat_section', 'sat_launch.ln_section', '=', 'sat_section.sec_id') 
             ->leftJoin('def_gradelvl as sat_gradelvl', 'sat_launch.ln_gradelvl', '=', 'sat_gradelvl.grad_id') 
             ->leftJoin('def_subject as sat_subject', 'sat_sched.sched_sat', '=', 'sat_subject.subj_id') 
+            ->leftJoin('def_program as sat_course', 'sat_launch.ln_course', '=', 'sat_course.prog_id') 
         
     
             ->select(  
@@ -1928,6 +1950,8 @@ class RegistrarController extends Controller
                 'mon_section.sec_name as mon_sec_name',
                 'mon_gradelvl.grad_code as mon_gradelvl_code',
                 'mon_gradelvl.grad_name as mon_gradelvl_name',
+                'mon_course.prog_id as mon_course_id',
+                'mon_course.prog_name as mon_course_name',
                  
                 'tue_sched.sched_lnid as tue_sched_lnid',
                 'tue_sched.sched_tue_code as tue_subj_code',
@@ -1937,6 +1961,8 @@ class RegistrarController extends Controller
                 'tue_section.sec_name as tue_sec_name',
                 'tue_gradelvl.grad_code as tue_gradelvl_code',
                 'tue_gradelvl.grad_name as tue_gradelvl_name',
+                'tue_course.prog_id as tue_course_id',
+                'tue_course.prog_name as tue_course_name',
                 
                 'wed_sched.sched_lnid as wed_sched_lnid',
                 'wed_sched.sched_wed_code as wed_subj_code',
@@ -1946,6 +1972,8 @@ class RegistrarController extends Controller
                 'wed_section.sec_name as wed_sec_name',
                 'wed_gradelvl.grad_code as wed_gradelvl_code',
                 'wed_gradelvl.grad_name as wed_gradelvl_name',
+                'wed_course.prog_id as wed_course_id',
+                'wed_course.prog_name as wed_course_name',
     
                 'thurs_sched.sched_lnid as thurs_sched_lnid',
                 'thurs_sched.sched_thurs_code as thurs_subj_code',
@@ -1955,6 +1983,8 @@ class RegistrarController extends Controller
                 'thurs_section.sec_name as thurs_sec_name',
                 'thurs_gradelvl.grad_code as thurs_gradelvl_code',
                 'thurs_gradelvl.grad_name as thurs_gradelvl_name',
+                'thurs_course.prog_id as thurs_course_id',
+                'thurs_course.prog_name as thurs_course_name',
     
                 'fri_sched.sched_lnid as fri_sched_lnid',
                 'fri_sched.sched_fri_code as fri_subj_code',
@@ -1964,6 +1994,8 @@ class RegistrarController extends Controller
                 'fri_section.sec_name as fri_sec_name',
                 'fri_gradelvl.grad_code as fri_gradelvl_code',
                 'fri_gradelvl.grad_name as fri_gradelvl_name',
+                'fri_course.prog_id as fri_course_id',
+                'fri_course.prog_name as fri_course_name',
     
                 'sat_sched.sched_lnid as sat_sched_lnid',
                 'sat_sched.sched_sat_code as sat_subj_code',
@@ -1973,6 +2005,8 @@ class RegistrarController extends Controller
                 'sat_section.sec_name as sat_sec_name',
                 'sat_gradelvl.grad_code as sat_gradelvl_code',
                 'sat_gradelvl.grad_name as sat_gradelvl_name',
+                'sat_course.prog_id as sat_course_id',
+                'sat_course.prog_name as sat_course_name',
             )
             ->orderBy('sched_occ.occ_id','ASC')
             ->where('sched_occ.occ_mon_bid', '=', $bid)
@@ -2044,7 +2078,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_firstname','ASC')
+                )->orderBy('def_employee.emp_lastname','ASC')
                 ->get();
             }else{
                 $employee = DB::table('def_employee')
@@ -2052,7 +2086,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_firstname','ASC')
+                )->orderBy('def_employee.emp_lastname','ASC')
                 ->limit($limit)
                 ->offset($offset)
                 ->get();
@@ -2206,6 +2240,10 @@ class RegistrarController extends Controller
         $s1 = DB::table('def_employee')
         ->where('emp_id','=', $request['emp_id'])
         ->delete();
+
+        // $s2 = DB::table('users_access') 
+        //     ->where('useracc_id', '=' , $request['emp_id'])
+        //     ->delete();
         return 200; 
        
     }
@@ -2374,7 +2412,29 @@ class RegistrarController extends Controller
     public function getFacultyAvailability()
     {
 
-        $availability = DB::table('def_launch_occupancy_faculty')->orderBy('occ_id')
+        $availability = DB::table('def_launch_occupancy_faculty as occ')
+        ->leftJoin('def_subject as subj', 'occ.occ_subjid', '=', 'subj.subj_id')
+        ->leftJoin('def_launch as lch', 'occ.occ_lnid', '=', 'lch.ln_id')
+        ->leftJoin('def_employee as emp', 'occ.occ_faculty', '=', 'emp.emp_id')
+        ->leftJoin('def_program as prog', 'lch.ln_course', '=', 'prog.prog_id')
+        ->leftJoin('def_section as sec', 'lch.ln_section', '=', 'sec.sec_id')
+        ->leftJoin('def_gradelvl as grad', 'lch.ln_gradelvl', '=', 'grad.grad_id')
+        ->select(  
+            'occ.*',
+            'subj.subj_code',
+            'subj.subj_name',
+            'emp.emp_firstname',
+            'emp.emp_middlename',
+            'emp.emp_lastname',
+            'emp.emp_suffixname',
+            'prog.prog_name',
+            'prog.prog_code',
+            'sec.sec_code',
+            'sec.sec_name',
+            'grad.grad_code',
+            'grad.grad_name',
+        )
+        ->orderBy('occ.occ_id')
         ->get();
         return $availability; 
     }
@@ -2514,6 +2574,195 @@ class RegistrarController extends Controller
             'count' => $count,
         ];
         
+    }
+
+    public function getEnrollmentSchedule($curr, $prog, $grad, $cour, $sec, $lnid)
+    {
+       try{
+                $schedule = DB::table('def_launch as lch')
+                ->leftJoin('def_launch_schedule as lcs', 'lch.ln_id', '=', 'lcs.sched_lnid') 
+                ->leftJoin('def_classroom as monroom', 'lcs.sched_mon_classrid', '=', 'monroom.classr_id') 
+                ->leftJoin('def_classroom as tueroom', 'lcs.sched_tue_classrid', '=', 'tueroom.classr_id') 
+                ->leftJoin('def_classroom as wedroom', 'lcs.sched_wed_classrid', '=', 'wedroom.classr_id') 
+                ->leftJoin('def_classroom as thursroom', 'lcs.sched_thurs_classrid', '=', 'thursroom.classr_id') 
+                ->leftJoin('def_classroom as friroom', 'lcs.sched_fri_classrid', '=', 'friroom.classr_id') 
+                ->leftJoin('def_classroom as satroom', 'lcs.sched_sat_classrid', '=', 'satroom.classr_id')
+                ->leftJoin('sett_building as monbuil', 'lcs.sched_mon_bid', '=', 'monbuil.buil_id') 
+                ->leftJoin('sett_building as tuebuil', 'lcs.sched_tue_bid', '=', 'tuebuil.buil_id') 
+                ->leftJoin('sett_building as wedbuil', 'lcs.sched_wed_bid', '=', 'wedbuil.buil_id') 
+                ->leftJoin('sett_building as thursbuil', 'lcs.sched_thurs_bid', '=', 'thursbuil.buil_id') 
+                ->leftJoin('sett_building as fribuil', 'lcs.sched_fri_bid', '=', 'fribuil.buil_id') 
+                ->leftJoin('sett_building as satbuil', 'lcs.sched_sat_bid', '=', 'satbuil.buil_id') 
+
+                ->leftJoin('def_launch_faculty as monfaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'monfaculty.lf_lnid');
+                    $join->on('lcs.sched_mon', '=', 'monfaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as monemp', 'monfaculty.lf_empid', '=', 'monemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as mon_sched_day', function($join) {
+                    $join->on('monfaculty.lf_lnid', '=', 'mon_sched_day.occ_lnid');
+                    $join->on('monfaculty.lf_subjid', '=', 'mon_sched_day.occ_subjid');
+                    $join->on('monfaculty.lf_empid', '=', 'mon_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'mon_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->leftJoin('def_launch_faculty as tuefaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'tuefaculty.lf_lnid');
+                    $join->on('lcs.sched_tue', '=', 'tuefaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as tueemp', 'tuefaculty.lf_empid', '=', 'tueemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as tue_sched_day', function($join) {
+                    $join->on('tuefaculty.lf_lnid', '=', 'tue_sched_day.occ_lnid');
+                    $join->on('tuefaculty.lf_subjid', '=', 'tue_sched_day.occ_subjid');
+                    $join->on('tuefaculty.lf_empid', '=', 'tue_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'tue_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->leftJoin('def_launch_faculty as wedfaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'wedfaculty.lf_lnid');
+                    $join->on('lcs.sched_wed', '=', 'wedfaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as wedemp', 'wedfaculty.lf_empid', '=', 'wedemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as wed_sched_day', function($join) {
+                    $join->on('wedfaculty.lf_lnid', '=', 'wed_sched_day.occ_lnid');
+                    $join->on('wedfaculty.lf_subjid', '=', 'wed_sched_day.occ_subjid');
+                    $join->on('wedfaculty.lf_empid', '=', 'wed_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'wed_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->leftJoin('def_launch_faculty as thursfaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'thursfaculty.lf_lnid');
+                    $join->on('lcs.sched_thurs', '=', 'thursfaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as thursemp', 'thursfaculty.lf_empid', '=', 'thursemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as thurs_sched_day', function($join) {
+                    $join->on('thursfaculty.lf_lnid', '=', 'thurs_sched_day.occ_lnid');
+                    $join->on('thursfaculty.lf_subjid', '=', 'thurs_sched_day.occ_subjid');
+                    $join->on('thursfaculty.lf_empid', '=', 'thurs_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'thurs_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->leftJoin('def_launch_faculty as frifaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'frifaculty.lf_lnid');
+                    $join->on('lcs.sched_fri', '=', 'frifaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as friemp', 'frifaculty.lf_empid', '=', 'friemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as fri_sched_day', function($join) {
+                    $join->on('frifaculty.lf_lnid', '=', 'fri_sched_day.occ_lnid');
+                    $join->on('frifaculty.lf_subjid', '=', 'fri_sched_day.occ_subjid');
+                    $join->on('frifaculty.lf_empid', '=', 'fri_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'fri_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->leftJoin('def_launch_faculty as satfaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'satfaculty.lf_lnid');
+                    $join->on('lcs.sched_sat', '=', 'satfaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as satemp', 'satfaculty.lf_empid', '=', 'satemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as sat_sched_day', function($join) {
+                    $join->on('satfaculty.lf_lnid', '=', 'sat_sched_day.occ_lnid');
+                    $join->on('satfaculty.lf_subjid', '=', 'sat_sched_day.occ_subjid');
+                    $join->on('satfaculty.lf_empid', '=', 'sat_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'sat_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->where('lch.ln_course', '=',  $cour)
+                ->where('lch.ln_gradelvl', '=',  $grad)
+                ->where('lch.ln_curriculum', '=',  $curr)
+                ->where('lch.ln_id', '=',  $lnid)
+
+                ->select(  
+                    'lch.*',
+                    'lcs.*',
+                    'monroom.classr_id as mon_room_id',
+                    'monroom.classr_name as mon_room_name',
+                    'tueroom.classr_id as tue_room_id',
+                    'tueroom.classr_name as tue_room_name',
+                    'wedroom.classr_id as wed_room_id',
+                    'wedroom.classr_name as wed_room_name',
+                    'thursroom.classr_id as thurs_room_id',
+                    'thursroom.classr_name as thurs_room_name',
+                    'friroom.classr_id as fri_room_id',
+                    'friroom.classr_name as fri_room_name',
+                    'satroom.classr_id as sat_room_id',
+                    'satroom.classr_name as sat_room_name',
+                    'monbuil.buil_id as mon_buil_id',
+                    'monbuil.buil_name as mon_buil_name',
+                    'tuebuil.buil_id as tue_buil_id',
+                    'tuebuil.buil_name as tue_buil_name',
+                    'wedbuil.buil_id as wed_buil_id',
+                    'wedbuil.buil_name as wed_buil_name',
+                    'thursbuil.buil_id as thurs_buil_id',
+                    'thursbuil.buil_name as thurs_buil_name',
+                    'fribuil.buil_id as fri_buil_id',
+                    'fribuil.buil_name as fri_buil_name',
+                    'satbuil.buil_id as sat_buil_id',
+                    'satbuil.buil_name as sat_buil_name',
+                    'monfaculty.lf_empid as mon_faculty',
+                    'tuefaculty.lf_empid as tue_faculty',
+                    'wedfaculty.lf_empid as wed_faculty',
+                    'thursfaculty.lf_empid as thurs_faculty',
+                    'frifaculty.lf_empid as fri_faculty',
+                    'satfaculty.lf_empid as sat_faculty',
+                    'monemp.emp_firstname as mon_faculty_firstname',
+                    'monemp.emp_middlename as mon_faculty_middlename',
+                    'monemp.emp_lastname as mon_faculty_lastname',
+                    'monemp.emp_suffixname as mon_faculty_suffixname',
+                    'tueemp.emp_firstname as tue_faculty_firstname',
+                    'tueemp.emp_middlename as tue_faculty_middlename',
+                    'tueemp.emp_lastname as tue_faculty_lastname',
+                    'tueemp.emp_suffixname as tue_faculty_suffixname',
+                    'wedemp.emp_firstname as wed_faculty_firstname',
+                    'wedemp.emp_middlename as wed_faculty_middlename',
+                    'wedemp.emp_lastname as wed_faculty_lastname',
+                    'wedemp.emp_suffixname as wed_faculty_suffixname',
+                    'thursemp.emp_firstname as thurs_faculty_firstname',
+                    'thursemp.emp_middlename as thurs_faculty_middlename',
+                    'thursemp.emp_lastname as thurs_faculty_lastname',
+                    'thursemp.emp_suffixname as thurs_faculty_suffixname',
+                    'friemp.emp_firstname as fri_faculty_firstname',
+                    'friemp.emp_middlename as fri_faculty_middlename',
+                    'friemp.emp_lastname as fri_faculty_lastname',
+                    'friemp.emp_suffixname as fri_faculty_suffixname',
+                    'satemp.emp_firstname as sat_faculty_firstname',
+                    'satemp.emp_middlename as sat_faculty_middlename',
+                    'satemp.emp_lastname as sat_faculty_lastname',
+                    'satemp.emp_suffixname as sat_faculty_suffixname',
+                    'mon_sched_day.occ_day as occ_mon',
+                    'tue_sched_day.occ_day as occ_tue',
+                    'wed_sched_day.occ_day as occ_wed',
+                    'thurs_sched_day.occ_day as occ_thurs',
+                    'fri_sched_day.occ_day as occ_fri',
+                    'sat_sched_day.occ_day as occ_sat'
+                   
+                )
+                
+                ->orderBy('lcs.sched_id','asc')
+                ->orderBy('lcs.sched_time','asc')
+                ->orderBy('lcs.sched_mon' ,'desc')
+                ->orderBy('lcs.sched_tue' ,'desc')
+                ->orderBy('lcs.sched_wed' ,'desc')
+                ->orderBy('lcs.sched_thurs' ,'desc')
+                ->orderBy('lcs.sched_fri' ,'desc')
+                ->orderBy('lcs.sched_sat' ,'desc')
+                ->distinct()
+                ->get();
+
+                return $data = [
+                    'data' => $schedule,
+                    'status' => 204,
+                    'lnid' => $lnid,
+                    'curriculum' => $curr,
+                    'dtype' => $prog,
+                    'gradelvl' => $grad,
+                    'course' => $cour,
+                ];
+        }
+        catch (Exception $ex) {
+            return $data = [
+                'status' => 500,
+            ];
+        }     
     }
     
     

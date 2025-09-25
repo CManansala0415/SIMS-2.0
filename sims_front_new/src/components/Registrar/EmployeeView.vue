@@ -183,7 +183,7 @@ const removeEmployee = (id) => {
         confirmButtonText: "Yes, Im Delete it!"
     }).then(async (result) => {
         if (result.isConfirmed) {
-            preloading.value = true
+            preLoading.value = true
             let x = {
                 emp_id: id
             }

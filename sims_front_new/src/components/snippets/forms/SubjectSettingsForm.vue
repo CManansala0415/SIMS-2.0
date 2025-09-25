@@ -47,6 +47,7 @@ const editData = ref({
     subj_preq: '',
     subj_dtypeid: '',
     subj_specid: '',
+    subj_schedpass: '',
 
 })
 const edit = (data) => {
@@ -63,6 +64,7 @@ const edit = (data) => {
         editData.value.subj_preq = data.subj_preq
         editData.value.subj_dtypeid = data.subj_dtypeid
         editData.value.subj_specid = data.subj_specid
+        editData.value.subj_schedpass = data.subj_schedpass
         editData.value.subj_addedby = userID.value
         searchValueModal.value = data.subj_preq
     } else {
@@ -75,6 +77,7 @@ const edit = (data) => {
         editData.value.subj_preq = ''
         editData.value.subj_dtypeid = ''
         editData.value.subj_specid = ''
+        editData.value.subj_schedpass = ''
         editData.value.subj_addedby = userID.value
         searchValueModal.value = ''
 
@@ -307,6 +310,15 @@ onMounted(async () => {
                                 </option>
                             </select>
                         </div>
+                        <div class="d-flex flex-wrap form-group">
+                            <label for="type">By Pass Schedule</label>
+                            <select class="form-control" v-model="editData.subj_schedpass"
+                                :disabled="editData.subj_dtypeid ? false : true" required>
+                                <option value="0" >No</option>
+                                <option value="1" >Yes</option>
+                            </select>
+                        </div>
+                        
                         <!-- <div class="d-flex flex-wrap form-group">
                             <label for="type">Pre-requisite</label>
                             <select class="form-control" v-model="editData.subj_preq" required>

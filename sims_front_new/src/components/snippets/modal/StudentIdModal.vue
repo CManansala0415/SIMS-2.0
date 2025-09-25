@@ -98,11 +98,13 @@ const save = () => {
                 </div>
                 <div class="d-flex flex-column">
                     <p class="fw-bold">Contact No.</p>
-                    <p class="p-2 bg-secondary-subtle">{{ studentInfo.per_contact }}</p>
+                    <p v-if="studentInfo.per_contact" class="p-2 bg-secondary-subtle">{{ studentInfo.per_contact }}</p>
+                    <p v-else class="p-2 bg-secondary-subtle">N/A</p>
                 </div>
                 <div class="d-flex flex-column">
                     <p class="fw-bold">Email</p>
-                    <p class="p-2 bg-secondary-subtle">{{ studentInfo.per_email }}</p>
+                    <p v-if="studentInfo.per_email" class="p-2 bg-secondary-subtle">{{ studentInfo.per_email }}</p>
+                    <p v-else class="p-2 bg-secondary-subtle">N/A</p>
                 </div>
                 <div class="d-flex flex-column border p-2">
                     <p class="fw-bold">LRN (for SHS only)</p>

@@ -13,7 +13,8 @@ import {
     getProgramList,
     getSemester,
     getSection,
-    getAcademicDefaults
+    getAcademicDefaults,
+    getEnrollmentSchedule
 } from "../Fetchers.js";
 
 import { useRouter, useRoute } from 'vue-router'
@@ -96,10 +97,12 @@ const booter = async () => {
     })
 
 }
-
+ 
+const accessData = ref([])
 onMounted(async () => {
     getUserID().then(async (results1) => {
         userID.value = results1.account.data.id
+        accessData.value = results1.access
         emit('fetchUser', results1)
         try {
             preLoading.value = true
@@ -115,8 +118,8 @@ onMounted(async () => {
                     // console.log(groupBySection)
                     groupedAssignmentSection.value = groupBySection
                     groupedAssignmentSubject.value = groupBySubject
-                    // console.log(groupedAssignmentSection.value)
-                    // console.log(groupedAssignmentSubject.value)
+                    console.log(groupedAssignmentSection.value)
+                    console.log(groupedAssignmentSubject.value)
                     preLoading.value = false
                 })
             })
@@ -155,6 +158,125 @@ onMounted(async () => {
 //   }
 // }
 
+const scheduleData = ref([])
+const loadingSchedule = ref(false)
+const subjectDetails = (status, index) => {
+    loadingSchedule.value = true
+    showSubjects.value = status
+    indexerId.value = index
+    scheduleData.value = []
+    // console.log(indexerId.value)
+    // console.log(showSubjects.value)
+    // console.log(groupedAssignmentSection.value[index][0].ln_curriculum)
+
+    let curr = groupedAssignmentSection.value[index][0].ln_curriculum
+    let prog = groupedAssignmentSection.value[index][0].prog_id
+    let grad = groupedAssignmentSection.value[index][0].ln_gradelvl
+    let cour = groupedAssignmentSection.value[index][0].ln_course 
+    let sec = groupedAssignmentSection.value[index][0].ln_section
+    let lnid = groupedAssignmentSection.value[index][0].ln_id
+    // console.log(curr, prog, grad, cour, sec, lnid)
+
+    getEnrollmentSchedule(curr, prog, grad, cour, sec, lnid).then((results) => {
+        scheduleData.value = results.data
+        loadingSchedule.value = false
+        // console.log(scheduleData.value)
+    })
+}
+
+// Chat GPT Helper
+// Day mapping
+const dayMap = [
+    { field: "sched_mon", label: "Monday", key: "mon", order: 1 },
+    { field: "sched_tue", label: "Tuesday", key: "tue", order: 2 },
+    { field: "sched_wed", label: "Wednesday", key: "wed", order: 3 },
+    { field: "sched_thurs", label: "Thursday", key: "thurs", order: 4 },
+    { field: "sched_fri", label: "Friday", key: "fri", order: 5 },
+    { field: "sched_sat", label: "Saturday", key: "sat", order: 6 },
+]
+
+// Format time like "0800","A" -> "08:00 AM"
+function formatTime(hhmm, meridian, isEnd = false) {
+    let suffix = meridian === "A" ? "AM" : "PM"
+    if (isEnd && hhmm.startsWith("12")) suffix = "PM"
+
+    let hours = parseInt(hhmm.slice(0, 2), 10)
+    const minutes = hhmm.slice(2, 4)
+    const displayHour = (hours % 12) === 0 ? 12 : (hours % 12)
+
+    return `${String(displayHour).padStart(2, "0")}:${minutes} ${suffix}`
+}
+
+function parseScheduleEntry(code, sc, day) {
+    if (!code) return null
+    const startRaw = code.slice(0, 4)
+    const endRaw = code.slice(4, 8)
+    const meridian = code.slice(8) // "A" or "P"
+
+    return {
+        start: formatTime(startRaw, meridian, false),
+        end: formatTime(endRaw, meridian, true),
+        rawStart: startRaw + meridian,
+        rawEnd: endRaw + (endRaw.startsWith("12") ? "P" : meridian),
+        day: day.label,
+        dayOrder: day.order,
+        room: sc[`${day.key}_room_name`] || "",
+        building: sc[`${day.key}_buil_name`] || "",
+        faculty: [
+            sc[`${day.key}_faculty_lastname`] || "",
+            sc[`${day.key}_faculty_firstname`] || "",
+            sc[`${day.key}_faculty_middlename`] || "",
+            sc[`${day.key}_faculty_suffixname`] || ""
+        ].filter(Boolean).join(" ").trim(),
+    }
+}
+
+function getScheduleGroupsForSubject(subjId) {
+    const sd = Array.isArray(scheduleData.value) ? scheduleData.value : []
+    const entries = []
+
+    for (const sc of sd) {
+        for (const d of dayMap) {
+            if (sc[d.field] === subjId) {
+                const e = parseScheduleEntry(sc.sched_time, sc, d)
+                if (e) entries.push(e)
+            }
+        }
+    }
+
+    if (!entries.length) return []
+
+    entries.sort((a, b) => a.dayOrder - b.dayOrder || a.rawStart.localeCompare(b.rawStart))
+
+    const groups = []
+    let cur = null
+
+    entries.forEach((e, i) => {
+        if (!cur) {
+            cur = { ...e }
+            return
+        }
+        const prev = entries[i - 1]
+        const canMerge =
+            e.day === cur.day &&
+            e.room === cur.room &&
+            e.building === cur.building &&
+            e.faculty === cur.faculty &&
+            e.rawStart === prev.rawEnd
+
+        if (canMerge) {
+            cur.end = e.end
+            cur.rawEnd = e.rawEnd
+        } else {
+            groups.push(cur)
+            cur = { ...e }
+        }
+    })
+    if (cur) groups.push(cur)
+
+    return groups
+}
+// Chat GPT Helper
 
 </script>
 <template>
@@ -219,9 +341,9 @@ onMounted(async () => {
                             {{ groupedAssignmentSection[index][0].sec_name }}
                         </td>
                         <td class="align-middle">
-                            <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                data-bs-target="#editdatamodal" title="Medical Form / Checkup"
-                                @click="showSubjects = true, indexerId = index">
+                           <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
+                                data-bs-target="#editdatamodal" title="View Subjects"
+                                @click="subjectDetails(true,index)">
                                 <font-awesome-icon icon="fa-solid fa-eye" />
                                 View Subjects
                             </button>
@@ -271,8 +393,8 @@ onMounted(async () => {
                         </td>
                         <td class="align-middle">
                             <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                data-bs-target="#editdatamodal" title="Medical Form / Checkup"
-                                @click="showSubjects = true, indexerId = index">
+                                data-bs-target="#editdatamodal" title="View Subjects"
+                                @click="subjectDetails(true,index)">
                                 <font-awesome-icon icon="fa-solid fa-eye" />
                                 View Subjects
                             </button>
@@ -305,7 +427,7 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showSubjects = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" v-if="showSubjects">
                     <div class="d-flex flex-wrap flex-column">
                         <p class="text-success fw-bold">Subjects handled</p>
                         <p class=" fst-italic border p-3 rounded-3 bg-secondary-subtle small-font"><span
@@ -325,10 +447,11 @@ onMounted(async () => {
                                         <th style="background-color: #237a5b;" class="text-white">Subject Name</th>
                                         <th style="background-color: #237a5b;" class="text-white">Units</th>
                                         <th style="background-color: #237a5b;" class="text-white">Total Units</th>
+                                        <th style="background-color: #237a5b;" class="text-white" colspan="3">Schedule</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(app, index) in groupedAssignmentSection[indexerId]">
+                                    <tr v-for="(app, index) in groupedAssignmentSection[indexerId]" v-if="Object.keys(groupedAssignmentSection).length && !loadingSchedule">
                                         <td class="align-middle">
                                             {{ index + 1 }}
                                         </td>
@@ -351,13 +474,49 @@ onMounted(async () => {
                                         <td class="align-middle">
                                             {{ app.subj_lec + app.subj_lab }}
                                         </td>
+                                        <!-- Days -->
+                                        <td class="align-middle p-2">
+                                            <template v-if="getScheduleGroupsForSubject(app.subj_id).length">
+                                                <div v-for="(g, i) in getScheduleGroupsForSubject(app.subj_id)" :key="i">
+                                                    {{ g.day }}
+                                                </div>
+                                            </template>
+                                            <span v-else>TBA</span>
+                                        </td>
+
+                                        <!-- Time -->
+                                        <td class="align-middle p-2">
+                                            <template v-if="getScheduleGroupsForSubject(app.subj_id).length">
+                                                <div v-for="(g, i) in getScheduleGroupsForSubject(app.subj_id)" :key="i">
+                                                    {{ g.start }} - {{ g.end }}
+                                                </div>
+                                            </template>
+                                            <span v-else>TBA</span>
+                                        </td>
+
+                                        <!-- Room -->
+                                        <td class="align-middle p-2">
+                                            <template v-if="getScheduleGroupsForSubject(app.subj_id).length">
+                                                <div v-for="(g, i) in getScheduleGroupsForSubject(app.subj_id)" :key="i">
+                                                    {{ g.room }} <span v-if="g.building">- {{ g.building }}</span>
+                                                </div>
+                                            </template>
+                                            <span v-else>TBA</span>
+                                        </td>
                                         <!-- <td class="align-middle">
-                          {{ app.lf_lnid }}
-                        </td> -->
+                                            {{ app.lf_lnid }}
+                                            </td> -->
                                     </tr>
-                                    <tr v-if="!Object.keys(groupedAssignmentSection).length">
-                                        <td class="align-middle" colspan="4">
+                                    <tr v-if="!Object.keys(groupedAssignmentSection).length && !loadingSchedule && !Object.keys(scheduleData).length">
+                                        <td class="align-middle" colspan="7">
                                             No Records Found
+                                        </td>
+                                    </tr>
+                                    <tr v-if="loadingSchedule && !Object.keys(scheduleData).length">
+                                        <td class="align-middle" colspan="7">
+                                            <div class="m-3">
+                                                <Loader />
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>

@@ -87,7 +87,7 @@ onMounted(() => {
 
             profileId.value = student.value.per_profile ? 'http://localhost:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
             signatureId.value = student.value.per_signature ? 'http://localhost:8000/api/get-person-image/' + student.value.per_signature+'/3' : '/img/sig1.png'
-            console.log( signatureId.value)
+            // console.log( signatureId.value)
             // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
             preLoading.value = false
         })
@@ -143,7 +143,7 @@ const printForm = (studentid) => {
                         </div>  
                         <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px;">
                             <span style="font-size: 5px; font-weight: bold;">
-                                Bachelor of Science in Information and Technology<br/>
+                                {{ studentData.course }}<br/>
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
                             </span>
                         </div>
@@ -214,13 +214,25 @@ const printForm = (studentid) => {
                             </div>
                         </div>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-2 text-center">
-                            <span style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
+                            <span v-if="
+                                studentData.per_curr_home&&
+                                studentData.brgyDesc&&
+                                studentData.citymunDesc&&
+                                studentData.provDesc&&
+                                studentData.countryName
+                            " style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_curr_home }}, 
                                 <br/>{{ studentData.brgyDesc }}, {{ studentData.citymunDesc }}, 
                                 <br/>{{ studentData.provDesc }}, {{ studentData.countryName }}
                             </span>
+                            <span v-else style="font-size: 7px; font-weight: bold; text-transform: uppercase;">N/A</span>
                             <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Address</span>
-                            <span style="font-size: 7px; font-weight: bold; margin-top: 4px;">
+
+                            <span v-if="
+                                family.fam_firstname&&
+                                family.fam_lastname
+                            "
+                            style="font-size: 7px; font-weight: bold; margin-top: 4px;">
                                 <br/>
                                 <span style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                     {{ family.fam_firstname }}
@@ -230,7 +242,9 @@ const printForm = (studentid) => {
                                 </span> 
                                 <br/>{{ family.fam_contact }}
                             </span>
+                            <span v-else style="font-size: 7px; font-weight: bold; text-transform: uppercase;">N/A</span>
                             <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Emergency Contact</span>
+
                         </div>
                         <div style="margin-top:4px; width:100%; line-height: 1.2;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
                             <img src="/img/sig1.png" height="45px" width="45px"/>

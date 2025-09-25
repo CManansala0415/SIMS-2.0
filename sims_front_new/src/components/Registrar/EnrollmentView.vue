@@ -142,7 +142,7 @@ onMounted(async () => {
                 bootingCount.value += 1
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
-                    // console.log(student.value)
+                    
                     studentCount.value = results.count
                     preLoading.value = false
                     
@@ -157,7 +157,7 @@ onMounted(async () => {
                     })
 
                     student.value = x
-                   
+                //    console.log(student.value)
 
                 })
             })
@@ -485,7 +485,7 @@ const printID = (data) => {
 // }
 const showQRScanner = ref(false)
 const getData = (result) =>{
-    console.log(result)
+    // console.log(result)
     student.value = result
     showQRScanner.value = !showQRScanner
     document.getElementById('hideqrscanner').click();
@@ -637,12 +637,12 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen"/>
                                 </button>
-                                <button tabindex="-1" title="Print Grades" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Grades" data-bs-toggle="modal" data-bs-target="#printmodal"
                                     @click="showForm(3, stud, 1)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
                                 </button>
-                                <button tabindex="-1" title="Print Receipt" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal" data-bs-target="#printmodal"
                                     @click="showForm(3, stud, 2)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
@@ -651,7 +651,7 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                 </button>
-                                <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
+                                <button v-if="stud.acs_payment > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
                                     type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/>
                                 </button>

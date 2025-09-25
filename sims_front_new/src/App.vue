@@ -673,17 +673,17 @@ const active_class = ref("nav-static border p-2 active");
                         </router-link>
                       </li> -->
                       <li>
-                        <router-link v-if="accessData[16].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
+                        <router-link v-if="accessData[17].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Loadings</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link v-if="accessData[17].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
+                        <router-link v-if="accessData[18].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Students</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link v-if="accessData[18].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
+                        <router-link v-if="accessData[19].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Grading Sheet</p>
                         </router-link>
                       </li>
