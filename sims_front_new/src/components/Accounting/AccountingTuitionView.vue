@@ -34,6 +34,7 @@ const booter = async () => {
 onMounted(async () => {
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
+        console.log(results1)
         emit('fetchUser', results1)
         accessData.value = results1.access
         try {
@@ -233,7 +234,7 @@ const itemModal = (type, data) => {
 <template>
     <div>
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Accounting Items</h5>
+            <h5 class=" text-uppercase fw-bold">Tuition Setup</h5>
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">

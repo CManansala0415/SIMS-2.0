@@ -43,7 +43,7 @@ const linkId = ref('')
 const holdSubmit = ref(false)
 const image = ref('')
 const userID = ref('')
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const searchFname = ref('')
 const searchMname = ref('')
@@ -118,6 +118,7 @@ onMounted(async () => {
                     // console.log(student.value)
                     studentCount.value = results2.count
                     preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
         } catch (err) {
@@ -130,6 +131,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

@@ -10,7 +10,7 @@ const router = useRouter();
 const route = useRoute();
 const path = computed(() => route.path)
 const isLoading = ref(false)
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser','doneLoading'])
 
 onMounted(async () => {
   //get user here
@@ -18,10 +18,12 @@ onMounted(async () => {
   isLoading.value = true
   await router.isReady()
   getUserID().then((results) => {
+    window.__userAccess = results.access || [];
     user.value = results.account.data.name
     userID.value = results.account.data.id
     isLoading.value = false
     emit('fetchUser', results)
+    emit('doneLoading', false)
   }).catch((err) => {
     // alert('Unauthorized Session, Please Log In')
     // router.push("/");

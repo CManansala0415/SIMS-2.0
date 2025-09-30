@@ -36,7 +36,7 @@ const userID = ref('')
 const router = useRouter();
 const booting = ref('')
 const bootingCount = ref(0)
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const booter = async () => {
     getGender().then((results) => {
@@ -73,6 +73,7 @@ onMounted(async () => {
                     employee.value = results2.data
                     employeeCount.value = results2.count
                     preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
         } catch (err) {
@@ -85,6 +86,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

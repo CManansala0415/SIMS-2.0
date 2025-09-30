@@ -64,7 +64,7 @@ const image = ref('')
 const userID = ref('')
 const showPrintModal = ref('')
 const printType = ref('')
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 
 const booter = async () => {
@@ -142,9 +142,7 @@ onMounted(async () => {
                 bootingCount.value += 1
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
                     student.value = results.data
-                    
                     studentCount.value = results.count
-                    preLoading.value = false
                     
                     let x = student.value.map((e) => {
                         let y = accounts.value.findIndex((f) => {
@@ -159,6 +157,8 @@ onMounted(async () => {
                     student.value = x
                 //    console.log(student.value)
 
+                    preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
 
@@ -172,6 +172,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

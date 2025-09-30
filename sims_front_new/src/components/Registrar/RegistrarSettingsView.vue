@@ -27,7 +27,7 @@ import {
     getSpecialization
 } from "../Fetchers.js";
 import UserAccountSettings from '../snippets/forms/UserAccountSettings.vue';
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const router = useRouter();
 
@@ -83,6 +83,7 @@ onMounted(async () => {
                 accessData.value = results.access[5].useracc_modifying
                 preLoading.value = false
                 emit('fetchUser', results)
+                emit('doneLoading', false)
 
             }).catch((err) => {
                 Swal.fire({
@@ -104,6 +105,7 @@ onMounted(async () => {
             footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
         }).then(()=>{
             preLoading.value = false
+            emit('doneLoading', false)
         });
     }
 })

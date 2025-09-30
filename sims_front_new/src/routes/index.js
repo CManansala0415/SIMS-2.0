@@ -10,6 +10,7 @@ import BillingRequestView from '../components/Accounting/BillingRequestView.vue'
 import BillingTuitionView from '../components/Accounting/BillingTuitionView.vue';
 import StudentRequestView from '../components/Registrar/StudentRequestView.vue';
 import AccountingItemsView from '../components/Accounting/AccountingItemsView.vue';
+import AccountingTuitionView from '../components/Accounting/AccountingTuitionView.vue';
 // import AccountingPackage from '../components/Accounting/AccountingPackage.vue';
 import ClinicalStudentRecordsView from '../components/Clinic/ClinicalStudentRecordsView.vue';
 import ClinicalMedicalSupplies from '../components/Clinic/ClinicalMedicalSuppliesView.vue';
@@ -79,15 +80,15 @@ const routes = [
     {
         path: '/registrar-request', name:'/registrar-request', component: StudentRequestView
     },
-    {
+    { 
         path: '/accounting-request', name:'/accounting-request', component: BillingRequestView
     },
     {
         path: '/accounting-items', name:'/accounting-items', component: AccountingItemsView
     },
-    // {
-    //     path: '/accounting-package', name:'/accounting-package', component: AccountingPackage
-    // },
+    {
+        path: '/accounting-tuition', name:'/accounting-tuition', component: AccountingTuitionView
+    },
     {
         path: '/faculty-classes', name:'/faculty-classes', component: FacultyClassView
     },

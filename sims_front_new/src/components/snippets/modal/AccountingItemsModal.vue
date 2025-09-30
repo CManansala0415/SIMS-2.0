@@ -4,6 +4,8 @@ import { getUserID } from "../../../routes/user";
 import {
     addAccountingItem
 } from "../../Fetchers.js";
+import { useRouter, useRoute } from 'vue-router';
+const router = useRouter();
 
 const props = defineProps({
     itemData: {

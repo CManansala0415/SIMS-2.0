@@ -50,7 +50,7 @@ const billLoading = ref([])
 const price = ref([])
 const grandTotal = ref(0)
 const showPaymentModal = ref(false)
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 
 const booter = async () => {
@@ -134,6 +134,7 @@ onMounted(async () => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
+                    emit('doneLoading', false)
 
                     // console.log(accounts.value)
                     // let x = studentAccount.value.map((e) => {
@@ -159,6 +160,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

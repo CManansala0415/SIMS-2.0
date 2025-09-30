@@ -4,7 +4,7 @@ import axios from 'axios';
 import { getUserID } from "../routes/user";
 import { useRouter } from 'vue-router'
 const router = useRouter();
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const isLogging = ref(false)
 const form = ref({
     email: '',

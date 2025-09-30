@@ -85,7 +85,7 @@ const fullName = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
 const accessData = ref([])
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser','doneLoading'])
 
 
 const booter = async () => {
@@ -230,6 +230,8 @@ onMounted(async () => {
                     applicantCount.value = results.count
                     
                     preLoading.value = false
+                    emit('doneLoading', false)
+
                 })
             })
 
@@ -242,7 +244,10 @@ onMounted(async () => {
                 text: "Something went wrong!",
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
+
                 preLoading.value = false
+                emit('doneLoading', false)
+
             });
         }
     }).catch((err) => {
@@ -315,7 +320,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false
@@ -331,7 +336,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 applicantCount.value = 0
                 preLoading.value = true
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,4).then((results) => {
+                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     preLoading.value = false

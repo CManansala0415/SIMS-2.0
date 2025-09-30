@@ -74,7 +74,7 @@ class TransactionsController extends Controller
                             $query->where('acf_id', 'like',  '%' . $search .'%')
                             ->orWhere('acf_desc', 'like',  '%' . $search .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -121,7 +121,7 @@ class TransactionsController extends Controller
                 ->select(  
                     'dr.*',
                 )
-                ->limit($limit)->offset($offset)
+                // ->limit($limit)->offset($offset)
                 ->count();
 
         }elseif ($mode == 2){
@@ -181,7 +181,7 @@ class TransactionsController extends Controller
                     ->orWhere('pr.per_middlename', 'like',  '%' . $mname .'%')
                     ->orWhere('pr.per_lastname', 'like',  '%' . $lname .'%');
                 })
-                ->limit($limit)->offset($offset)
+                // ->limit($limit)->offset($offset)
                 ->count();
         }
 

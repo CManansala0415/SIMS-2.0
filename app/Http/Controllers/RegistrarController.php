@@ -56,14 +56,14 @@ class RegistrarController extends Controller
 
     public function getApplicant($limit, $offset, $fname, $mname, $lname, $mode)
     {   // 1 means general viewing page
-        if($mode == 1){
+        if($mode == 1 && $fname == 404 && $mname == 404 && $lname == 404){
             $applicant = DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
                         ->limit($limit)->offset($offset)
                         ->get();
             $count =  DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
             return $data = [
                 'data' => $applicant,
@@ -89,7 +89,7 @@ class RegistrarController extends Controller
                             ->orWhere('per_middlename', 'like',  '%' . $fname .'%')
                             ->orWhere('per_lastname', 'like',  '%' . $fname .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();      
         }
         // 3 for QR search
@@ -107,6 +107,7 @@ class RegistrarController extends Controller
         }
         //custom search with fname mname and lname
         else{
+
             $applicant = DB::table('def_person')->orderBy('per_id','DESC')
                         ->where('per_status', '=',  1)
                         ->where(function($query) use ($fname,$mname,$lname) {
@@ -123,7 +124,7 @@ class RegistrarController extends Controller
                             ->orWhere('per_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('per_lastname', 'like',  '%' . $lname .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();             
         }
 
@@ -614,7 +615,7 @@ class RegistrarController extends Controller
                             ->orWhere('per_suffixname', 'like',  '%' . $search .'%')
                             ->orWhere('per_dateapplied', 'like',  '%' . $search .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -806,7 +807,7 @@ class RegistrarController extends Controller
                         ->where('def_enrollment.enr_course', '=',  $course);
                     }
                 })
-                ->limit($limit)->offset($offset)
+                // ->limit($limit)->offset($offset)
                 ->get();
         }
         else if ($mode==3){ //qr search
@@ -876,7 +877,7 @@ class RegistrarController extends Controller
                         //     ->orWhere('def_enrollment.enr_program', '=',  $program)
                         //     ->orWhere('def_enrollment.enr_course', '=',  $course);
                         // })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -1269,7 +1270,7 @@ class RegistrarController extends Controller
                             ->orWhere('def_section.sec_name', 'like',  '%' . $search .'%')
                             ->orWhere('def_gradelvl.grad_name', 'like',  '%' . $search .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -2144,7 +2145,7 @@ class RegistrarController extends Controller
                             ->orWhere('emp_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('emp_lastname', 'like',  '%' . $lname .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -2241,9 +2242,9 @@ class RegistrarController extends Controller
         ->where('emp_id','=', $request['emp_id'])
         ->delete();
 
-        // $s2 = DB::table('users_access') 
-        //     ->where('useracc_id', '=' , $request['emp_id'])
-        //     ->delete();
+        $s2 = DB::table('users_access') 
+            ->where('useracc_id', '=' , $request['emp_id'])
+            ->delete();
         return 200; 
        
     }
@@ -2507,7 +2508,7 @@ class RegistrarController extends Controller
                         ->get();
             $count =  DB::table('server_archive_persons')->orderBy('arc_id','DESC')
                         ->where('arc_person_status', '=',  1)
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
             return $data = [
                 'data' => $alumni,
@@ -2533,7 +2534,7 @@ class RegistrarController extends Controller
                             ->orWhere('arc_middlename', 'like',  '%' . $fname .'%')
                             ->orWhere('arc_lastname', 'like',  '%' . $fname .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();      
         }
         // 3 for QR search
@@ -2565,7 +2566,7 @@ class RegistrarController extends Controller
                             ->orWhere('arc_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('arc_lastname', 'like',  '%' . $lname .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();             
         }
 

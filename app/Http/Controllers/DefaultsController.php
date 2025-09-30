@@ -26,7 +26,7 @@ class DefaultsController extends Controller
         return $data = [
             'access' => $user_access,
             'employee' => $tagged_user,
-            'status' => 500,
+            'status' => 200,
         ];
     }
 

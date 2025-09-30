@@ -45,235 +45,259 @@ const academics = ref(0)
 const userName = ref('')
 const fetchingUserAccess = ref(true)
 
-const releaseMenu = (bool) =>{
-  // console.log(bool)
-  fetchingUserAccess.value = bool
-  isLoading.value = bool
-}
-
 const getUser = (data) => {
-  // route -> [category, modulecode, accesscode]
   const moduleMap = {
-    // Administrative (Category 1)
-    "/registrar-application": ["1", "1", "1"],
-    "/registrar-enrollment": ["1", "1", "1"],
-    "/registrar-request": ["1", "1", "1"],
-    "/registrar-launch": ["1", "1", "1"],
-    "/registrar-personnel": ["1", "1", "1"],
-    "/registrar-settings": ["1", "1", "1"],
-    "/registrar-alumni": ["1", "1", "1"],
-
-    "/registrar-library-books": ["1", "2", "1"],
-    "/registrar-library-books-ddc": ["1", "2", "1"],
-    "/registrar-library-books-borrowers": ["1", "2", "1"],
-    "/registrar-library-cards": ["1", "2", "1"],
-
-    "/registrar-clinical-students": ["1", "3", "1"],
-    "/registrar-clinical-employee": ["1", "3", "1"],
-    "/registrar-clinical-medical-supplies": ["1", "3", "1"],
-
-    // Transactions (Category 2)
-    "/accounting-items": ["2", "1", "1"],       // Accounting module
-    "/accounting-tuition": ["2", "1", "2"],    // Accounting module
-    "/accounting-billing": ["2", "2", "1"],    // Billing module
-    "/accounting-request": ["2", "2", "2"],    // Billing module or other transaction
-
-    // Academics (Category 3)
-    "/faculty-classes": ["3", "1", "1"],
-    "/faculty-student": ["3", "1", "2"],
-    "/faculty-grading-sheet": ["3", "1", "3"],
+    "/registrar-application": "1",
+    "/registrar-enrollment": "1",
+    "/registrar-request": "1",
+    "/registrar-launch": "1",
+    "/registrar-personnel": "1",
+    "/registrar-settings": "1",
+    "/registrar-alumni": "1",
+    "/registrar-library-books": "2",
+    "/registrar-library-books-ddc": "2",
+    "/registrar-library-books-borrowers": "2",
+    "/registrar-library-cards": "2",
+    "/registrar-clinical-students": "3",
+    "/registrar-clinical-employee": "3",
+    "/registrar-clinical-medical-supplies": "3",
+    "/accounting-items": "4",
+    "/accounting-tuition": "4",
+    "/accounting-billing": "4",
+    "/accounting-request": "4",
+    "/faculty-classes": "5",
+    "/faculty-student": "5",
+    "/faculty-grading-sheet": "5",
   };
 
   const currentModule = moduleMap[path.value];
+  const record = currentModule
+    ? data.access.find((item) => item.useracc_modulecode === currentModule)
+    : null;
 
-  if (currentModule && Array.isArray(data?.access)) {
-    const [category, moduleCode, accessCode] = currentModule;
-
-    const hasFullPermission = data.access.some(
-      (item) =>
-        String(item.useracc_category) === category &&
-        String(item.useracc_modulecode) === moduleCode &&
-        String(item.useracc_accesscode) === accessCode &&
-        Number(item.useracc_viewing) === 1 &&
-        Number(item.useracc_modifying) === 1
-    );
-
-    // console.log("Access array:", data.access);
-    // console.log("Current module triple:", currentModule);
-    // console.log("Has full permission:", hasFullPermission);
-
-    if (!hasFullPermission) {
-      Swal.fire({
-        title: "Error",
-        text: "Unauthorized Operations Detected",
-        icon: "error",
-        timer: 1000,
-        showConfirmButton: false,
-        willClose: () => {
-          router.push("/home");
-        },
-      });
-      return; // stop here on unauthorized
-    }
+  if (record && (record.useracc_viewing !== "1" || record.useracc_modifying !== "1")) {
+    Swal.fire({
+      title: "Error",
+      text: "Unauthorized Operations Detected",
+      icon: "error",
+    }).then(() => {
+      router.push("/home");
+    });
+    return;
   }
 
-  // if no module mapping or user has permission → continue
+  // default action
   menuItemsHandler(data);
 };
 
 
-// --- helper to return link/description based on the actual object values ---
-function getMetaForEntry(modulecode, accesscode, category) {
-  modulecode = String(modulecode);
-  accesscode = String(accesscode);
-  category = String(category);
+const menuItemsHandler = (data) =>{
 
-  // Administrative (category 1)
-  if (category === "1") {
-    if (modulecode === "1") return { link: "/registrar-application", description: "Registrar" };
-    if (modulecode === "2") return { link: "/registrar-library-books", description: "Library" };
-    if (modulecode === "3") return { link: "/registrar-clinical-students", description: "Clinic" };
-  }
+      accessData.value = data.access
+      // console.log(accessData.value)
+      // filter muna sa 3 categories
+      // administrative
+      let x = data.access.filter((e) => {
+        return e.useracc_category == 1
+      })
+      // transactions
+      let y = data.access.filter((e) => {
+        return e.useracc_category == 2
+      })
+      // academics
+      let z = data.access.filter((e) => {
+        return e.useracc_category == 3
+      })
 
-  // Transactions (category 2)
-  if (category === "2") {
-    if (modulecode === "1") return { link: "/accounting-items", description: "Accounting" };
-    if (modulecode === "2") return { link: "/accounting-billing", description: "Billing / Cashier" };
-  }
+      // find filtered categories if meron silang atleast 1 grant or viewing and modifying is 1
+      // administrative
+      let a = x.filter((e) => {
+        return ((e.useracc_grant == 1)&&(e.useracc_viewing == 1 || e.useracc_modifying == 1))
+      })
+      // transactions
+      let b = y.filter((e) => {
+        return ((e.useracc_grant == 1)&&(e.useracc_viewing == 1 || e.useracc_modifying == 1))
+      })
+      // academics
+      let c = z.filter((e) => {
+        return ((e.useracc_grant == 1)&&(e.useracc_viewing == 1 || e.useracc_modifying == 1))
+      })
 
-  // Academics (category 3)
-  if (category === "3") {
-    if (modulecode === "1") return { link: "/faculty-classes", description: "Class" };
-    // Expand as needed:
-    // if (modulecode === "1" && accesscode === "3") return { link: "/faculty-student", description: "Grades" };
-    // if (modulecode === "1" && accesscode === "4") return { link: "/faculty-grading-sheet", description: "Masterlist" };
-  }
+      administrative.value = a.length
+      transactions.value = b.length
+      academics.value = c.length
+      userName.value = data.employee.emp_firstname + ' ' + data.employee.emp_lastname
 
-  return { link: "", description: "" };
+
+      let adminPrep = a.map((e)=>{
+        let link = ''
+        let desc = ''
+        if(e.useracc_modulecode == 1){
+          link = '/registrar-application'
+          desc = 'Registrar'
+        }
+        if(e.useracc_modulecode == 2){
+          link = '/registrar-library-books'
+          desc = 'Library'
+        }
+        if(e.useracc_modulecode == 3){
+          link = '/registrar-clinical-students'
+          desc = 'Clinic'
+        }
+        return{
+          ...e,
+          link:link,
+          description:desc
+        }
+      })
+
+      administrativeAccess.value = [...new Map(adminPrep.map(item =>
+      [item['useracc_modulecode'], item])).values()]
+
+      // administrativeAccess.value = [
+      //   ...adminPrep
+      //     .reduce((uniq, curr) => {
+      //       if (!uniq.has(curr['useracc_modulecode'])) {
+      //         uniq.set(curr['useracc_modulecode'], curr);
+      //       }
+      //       return uniq;
+      //     }, new Map())
+      //     .values()
+      // ]
+
+      let transacPrep = b.map((e)=>{
+        let link = ''
+        let desc = ''
+        if((e.useracc_modulecode == 1)&&(e.useracc_accesscode==2)){
+          link = '/accounting-billing'
+          desc = 'Billing / Cashier'
+        }
+        if((e.useracc_modulecode == 2)&&(e.useracc_accesscode==2)){
+          link = '/accounting-items'
+          desc = 'Accounting'
+        }
+        return{
+          ...e,
+          link:link,
+          description:desc
+        }
+      })
+
+      transactionsAccess.value = [...new Map(transacPrep.map(item =>
+      [item['useracc_modulecode'], item])).values()]
+      // transactionsAccess.value = transacPrep
+      // console.log(transactionsAccess.value)
+
+      let academicPrep = c.map((e)=>{
+        let link = ''
+        let desc = ''
+        if((e.useracc_modulecode == 1)&&(e.useracc_accesscode==2)){
+          link = '/faculty-classes'
+          desc = 'Class'
+        }
+        // if((e.useracc_modulecode == 5)&&(e.useracc_accesscode==2)){
+        //   link = '/faculty-student'
+        //   desc = 'Grades'
+        // }
+        // if((e.useracc_modulecode == 5)&&(e.useracc_accesscode==3)){
+        //   link = '/faculty-grading-sheet'
+        //   desc = 'Masterlist'
+        // }
+        return{
+          ...e,
+          link:link,
+          description:desc
+        }
+      })
+
+      academicsAccess.value = [...new Map(academicPrep.map(item =>
+      [item['useracc_modulecode'], item])).values()]
+      // academicsAccess.value = academicPrep
+      // console.log(academicsAccess.value)
+
+
+      linker()
+
+      getCommandUpdate().then((result)=>{
+        // console.log(result)
+        semInfo.value = result[0].quar_code
+        yrFromInfo.value = result[1].sett_yearfrom
+        yrFromto.value = result[1].sett_yearto
+        enrollmentInfo.value = result[4].sett_status == 1?'Active':'Inactive'
+        
+        fetchingUserAccess.value = false
+        isLoading.value = false
+        
+      })
 }
 
-
-// --- menuItemsHandler: single-pass building + dedupe --- 
-const menuItemsHandler = (data) => {
-  accessData.value = Array.isArray(data?.access) ? data.access : [];
-  userName.value = `${data?.employee?.emp_firstname || ""} ${data?.employee?.emp_lastname || ""}`.trim();
-
-  // buckets keyed by category number strings "1","2","3"
-  const buckets = { "1": [], "2": [], "3": [] };
-
-  (accessData.value).forEach((e) => {
-    // refer to actual object values (coerce to number for checks)
-    const grant = Number(e.useracc_grant);
-    const viewing = Number(e.useracc_viewing);
-    const modifying = Number(e.useracc_modifying);
-    const category = String(e.useracc_category);
-
-    // only include if granted and either viewing or modifying is enabled
-    if (grant === 1 && (viewing === 1 || modifying === 1)) {
-      const meta = getMetaForEntry(e.useracc_modulecode, e.useracc_accesscode, e.useracc_category);
-      buckets[category] = buckets[category] || [];
-      buckets[category].push({
-        ...e,
-        link: meta.link,
-        description: meta.description,
-      });
-    }
-  });
-
-  // dedupe by modulecode (keep the first occurrence per modulecode)
-  const dedupeByModule = (arr) =>
-    [...new Map(arr.map((it) => [String(it.useracc_modulecode), it])).values()];
-
-  administrative.value = (buckets["1"] || []).length;
-  transactions.value = (buckets["2"] || []).length;
-  academics.value = (buckets["3"] || []).length;
-
-  administrativeAccess.value = dedupeByModule(buckets["1"] || []);
-  transactionsAccess.value = dedupeByModule(buckets["2"] || []);
-  academicsAccess.value = dedupeByModule(buckets["3"] || []);
-
-
-  // next steps
-  linker();
-
-  // existing post-fetch work
-  getCommandUpdate().then((result) => {
-    semInfo.value = result[0].quar_code;
-    yrFromInfo.value = result[1].sett_yearfrom;
-    yrFromto.value = result[1].sett_yearto;
-    enrollmentInfo.value = result[4].sett_status == 1 ? "Active" : "Inactive";
-
-    // fetchingUserAccess.value = false;
-    // isLoading.value = false;
-  });
-};
-
-// --- linker: simplified, uses route groups and path.value --- 
 const linker = () => {
-  const groups = [
-    {
-      paths: ["/"],
-      action: () => {
-        router.push("/home");
-        switchItem(0, 0);
-      },
-    },
-    {
-      paths: [
-        "/registrar-application",
-        "/registrar-enrollment",
-        "/registrar-request",
-        "/registrar-launch",
-        "/registrar-personnel",
-        "/registrar-settings",
-        "/registrar-alumni",
-      ],
-      action: () => switchItem(1, 1),
-    },
-    {
-      paths: [
-        "/registrar-library-books",
-        "/registrar-library-books-ddc",
-        "/registrar-library-books-borrowers",
-        "/registrar-library-cards",
-      ],
-      action: () => switchItem(1, 2),
-    },
-    {
-      paths: [
-        "/registrar-clinical-students",
-        "/registrar-clinical-employee",
-        "/registrar-clinical-medical-supplies",
-      ],
-      action: () => switchItem(1, 3),
-    },
-    {
-      paths: ["/accounting-items", "/accounting-tuition"],
-      action: () => switchItem(2, 1),
-    },
-    {
-      paths: ["/accounting-billing", "/accounting-request"], 
-      action: () => switchItem(2, 2),
-    },
-    {
-      paths: [
-        "/faculty-classes",
-        "/faculty-student",
-        "/faculty-grading-sheet",
-      ],
-      action: () => switchItem(3, 1),
-    },
-  ];
-
-  for (const g of groups) {
-    if (g.paths.includes(path.value)) {
-      g.action();
+  switch (true) {
+    case [
+      "/",
+    ].includes(path.value):
+      router.push("/home");
+      switchItem(0, 0)
       break;
-    }
+
+    case [
+      "/registrar-application",
+      "/registrar-enrollment",
+      "/registrar-request",
+      "/registrar-launch",
+      "/registrar-personnel",
+      "/registrar-settings",
+      "/registrar-alumni",
+    ].includes(path.value):
+
+      switchItem(1, 1)
+      break;
+
+    case [
+      "/registrar-library-books",
+      "/registrar-library-books-ddc",
+      "/registrar-library-books-borrowers",
+      "/registrar-library-cards",
+    ].includes(path.value):
+
+      switchItem(1, 2)
+      break;
+
+    case [
+      "/registrar-clinical-students",
+      "/registrar-clinical-employee",
+      "/registrar-clinical-medical-supplies"
+    ].includes(path.value):
+
+      switchItem(1, 3)
+      break;
+
+    case [
+      "/accounting-items",
+      "/accounting-tuition",
+    ].includes(path.value):
+
+      switchItem(2, 1)
+      break;
+
+    case [
+      "/accounting-billing",
+      "/accounting-request",
+    ].includes(path.value):
+
+      switchItem(2, 2)
+      break;
+
+    case [
+      "/faculty-classes",
+      "/faculty-student",
+      "/faculty-grading-sheet",
+    ].includes(path.value):
+
+      switchItem(3, 1)
+      break;
   }
-};
-
-
+}
 
 const handleLogout = async () => {
   Swal.fire({
@@ -347,8 +371,6 @@ const showItems = (item) => {
 }
 
 const switchItem = (access, item) => {
-  fetchingUserAccess.value = true
-  isLoading.value = true 
 
   switch (access) {
     case 0:
@@ -371,13 +393,6 @@ const switchItem = (access, item) => {
       return false;
   }
 
-}
-
-const checkPath = (data) =>{
-  if(path.value != data){
-    fetchingUserAccess.value = true
-    isLoading.value = true
-  }
 }
 
 
@@ -527,49 +542,49 @@ const active_class = ref("nav-static border p-2 active");
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                       <li>
-                        <router-link @click="checkPath('/registrar-application')" v-if="accessData[0].useracc_grant == 1" to="/registrar-application" class="dropdown-item" title="Student Application"
+                        <router-link v-if="accessData[0].useracc_grant == 1" to="/registrar-application" class="dropdown-item" title="Student Application"
                           tabindex="-1">
                           <p class="m-2">Student Admission</p>
                         </router-link>
                       </li>
 
                       <li>
-                        <router-link @click="checkPath('/registrar-enrollment')" v-if="accessData[1].useracc_grant == 1" to="/registrar-enrollment" class="dropdown-item" title="Student Enrollment"
+                        <router-link v-if="accessData[1].useracc_grant == 1" to="/registrar-enrollment" class="dropdown-item" title="Student Enrollment"
                           tabindex="-1">
                           <p class="m-2">Enrolled Students</p>
                         </router-link>
                       </li>
 
                       <li>
-                        <router-link @click="checkPath('/registrar-request')" v-if="accessData[2].useracc_grant == 1" to="/registrar-request" class="dropdown-item" title="Student Request"
+                        <router-link v-if="accessData[2].useracc_grant == 1" to="/registrar-request" class="dropdown-item" title="Student Request"
                           tabindex="-1">
                           <p class="m-2">Student Requests</p>
                         </router-link>
                       </li>
 
                       <li>
-                        <router-link @click="checkPath('/registrar-launch')" v-if="accessData[3].useracc_grant == 1" to="/registrar-launch" class="dropdown-item" title="Student Schedules"
+                        <router-link v-if="accessData[3].useracc_grant == 1" to="/registrar-launch" class="dropdown-item" title="Student Schedules"
                           tabindex="-1">
                           <p class="m-2">Semester Launch</p>
                         </router-link>
                       </li>
 
                       <li>
-                        <router-link @click="checkPath('/registrar-personnel')" v-if="accessData[4].useracc_grant == 1" to="/registrar-personnel" class="dropdown-item" title="Personnel Management"
+                        <router-link v-if="accessData[4].useracc_grant == 1" to="/registrar-personnel" class="dropdown-item" title="Personnel Management"
                           tabindex="-1">
                           <p class="m-2">Employee Management</p>
                         </router-link>
                       </li>
 
                       <li>
-                        <router-link @click="checkPath('/registrar-settings')" v-if="accessData[5].useracc_grant == 1" to="/registrar-settings" class="dropdown-item" title="Registrar Settings"
+                        <router-link v-if="accessData[5].useracc_grant == 1" to="/registrar-settings" class="dropdown-item" title="Registrar Settings"
                           tabindex="-1">
                           <p class="m-2">Registrar Settings</p>
                         </router-link>
                       </li>
 
                       <li>
-                        <router-link @click="checkPath('/registrar-alumni')" v-if="accessData[6].useracc_grant == 1" to="/registrar-alumni" class="dropdown-item" title="Alumni Association"
+                        <router-link v-if="accessData[6].useracc_grant == 1" to="/registrar-alumni" class="dropdown-item" title="Alumni Association"
                           tabindex="-1">
                           <p class="m-2">Alumni Tracker</p>
                         </router-link>
@@ -587,25 +602,25 @@ const active_class = ref("nav-static border p-2 active");
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                       <li>
-                        <router-link @click="checkPath('/registrar-library-books')" v-if="accessData[7].useracc_grant == 1" to="/registrar-library-books" class="dropdown-item" title="Book Inventory"
+                        <router-link v-if="accessData[7].useracc_grant == 1" to="/registrar-library-books" class="dropdown-item" title="Book Inventory"
                           tabindex="-1">
                           <p class="m-2">Book Supplies</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/registrar-library-books-borrowers')" v-if="accessData[8].useracc_grant == 1" to="/registrar-library-books-borrowers" class="dropdown-item"
+                        <router-link v-if="accessData[8].useracc_grant == 1" to="/registrar-library-books-borrowers" class="dropdown-item"
                           title="Book Borrowers" tabindex="-1">
                           <p class="m-2">Book Borrowers</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/registrar-library-books-ddc')" v-if="accessData[9].useracc_grant == 1" to="/registrar-library-books-ddc" class="dropdown-item" title="Book DDC"
+                        <router-link v-if="accessData[9].useracc_grant == 1" to="/registrar-library-books-ddc" class="dropdown-item" title="Book DDC"
                           tabindex="-1">
                           <p class="m-2">Book DDC</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/registrar-library-cards')" v-if="accessData[10].useracc_grant == 1" to="/registrar-library-cards" class="dropdown-item" title="Library Cards"
+                        <router-link v-if="accessData[10].useracc_grant == 1" to="/registrar-library-cards" class="dropdown-item" title="Library Cards"
                           tabindex="-1">
                           <p class="m-2">Library Cards</p>
                         </router-link>
@@ -622,19 +637,19 @@ const active_class = ref("nav-static border p-2 active");
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                       <li>
-                        <router-link @click="checkPath('/registrar-clinical-students')" v-if="accessData[11].useracc_grant == 1" to="/registrar-clinical-students" class="dropdown-item" title="Clinical Records"
+                        <router-link v-if="accessData[11].useracc_grant == 1" to="/registrar-clinical-students" class="dropdown-item" title="Clinical Records"
                           tabindex="-1">
                           <p class="m-2">Student Records</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/registrar-clinical-employee')" v-if="accessData[12].useracc_grant == 1" to="/registrar-clinical-employee" class="dropdown-item" title="Clinical Records"
+                        <router-link v-if="accessData[12].useracc_grant == 1" to="/registrar-clinical-employee" class="dropdown-item" title="Clinical Records"
                           tabindex="-1">
                           <p class="m-2">Employee Records</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/registrar-clinical-medical-supplies')" v-if="accessData[13].useracc_grant == 1" to="/registrar-clinical-medical-supplies" class="dropdown-item"
+                        <router-link v-if="accessData[13].useracc_grant == 1" to="/registrar-clinical-medical-supplies" class="dropdown-item"
                           title="Clinical Records" tabindex="-1">
                           <p class="m-2">Medical Supplies</p>
                         </router-link>
@@ -651,12 +666,12 @@ const active_class = ref("nav-static border p-2 active");
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                       <li>
-                        <router-link @click="checkPath('/accounting-billing')" v-if="accessData[14].useracc_grant == 1" to="/accounting-billing" class="dropdown-item" title="Billing" tabindex="-1">
+                        <router-link v-if="accessData[14].useracc_grant == 1" to="/accounting-billing" class="dropdown-item" title="Billing" tabindex="-1">
                           <p class="m-2">Tuition Payment</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/accounting-request')" v-if="accessData[15].useracc_grant == 1" to="/accounting-request" class="dropdown-item" title="request" tabindex="-1">
+                        <router-link v-if="accessData[15].useracc_grant == 1" to="/accounting-request" class="dropdown-item" title="request" tabindex="-1">
                           <p class="m-2">Request Payment</p>
                         </router-link>
                       </li>
@@ -673,12 +688,12 @@ const active_class = ref("nav-static border p-2 active");
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                       <li>
-                        <router-link @click="checkPath('/accounting-items')" v-if="accessData[16].useracc_grant == 1" to="/accounting-items" class="dropdown-item" title="items" tabindex="-1">
+                        <router-link v-if="accessData[16].useracc_grant == 1" to="/accounting-items" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Miscellaneuos / Items</p>
                         </router-link> 
                       </li>
                       <li>
-                        <router-link @click="checkPath('/accounting-tuition')" v-if="accessData[17].useracc_grant == 1" to="/accounting-tuition" class="dropdown-item" title="items" tabindex="-1">
+                        <router-link v-if="accessData[17].useracc_grant == 1" to="/accounting-tuition" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Tuition Setup</p>
                         </router-link> 
                       </li>
@@ -710,17 +725,17 @@ const active_class = ref("nav-static border p-2 active");
                         </router-link>
                       </li> -->
                       <li>
-                        <router-link @click="checkPath('/faculty-classes')" v-if="accessData[18].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
+                        <router-link v-if="accessData[18].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Loadings</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/faculty-student')" v-if="accessData[19].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
+                        <router-link v-if="accessData[19].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Students</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/faculty-grading-sheet')" v-if="accessData[20].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
+                        <router-link v-if="accessData[20].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Grading Sheet</p>
                         </router-link>
                       </li>
@@ -752,7 +767,7 @@ const active_class = ref("nav-static border p-2 active");
           </div>
           <div class="col-12">
             <!-- <loader v-if="isLoading"/> -->
-            <RouterView @fetchUser="getUser" @doneLoading="releaseMenu"></RouterView>
+            <RouterView @fetchUser="getUser"></RouterView>
           </div>
         </div>
       </div>

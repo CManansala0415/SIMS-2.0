@@ -38,7 +38,7 @@ const employeeToUpdate = ref([])
 const subject = ref([])
 const subjectAll = ref([])
 const userID = ref('')
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const accountEmployeeModal = ref(false)
 const booter = async () => {
@@ -209,6 +209,7 @@ onMounted(async () => {
                     employee.value = results2.data
                     employeeCount.value = results2.count
                     preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
 
@@ -223,6 +224,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

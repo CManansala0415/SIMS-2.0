@@ -40,7 +40,7 @@ const price = ref([])
 const fee = ref([])
 const requestedItems = ref([])
 const studentsAccount = ref([])
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const searchFname = ref('')
 const searchMname = ref('')
@@ -137,6 +137,7 @@ const mapper = (results) => {
 
     requestedItemsCount.value = results.count
     preLoading.value = false
+    emit('doneLoading', false)
 }
 
 onMounted(async () => {
@@ -165,6 +166,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

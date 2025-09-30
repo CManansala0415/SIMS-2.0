@@ -28,7 +28,7 @@ const borrowedBooks = ref([])
 const modeData = ref('')
 const showModal = ref(false)
 const showBorrow = ref(false)
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const booter = async () => {
 
@@ -63,6 +63,7 @@ onMounted(async () => {
                     booksCount.value = results2.count
                     checkAvailability()
                     preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
 
@@ -76,6 +77,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

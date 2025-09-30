@@ -72,7 +72,7 @@ const medicalSupplies = ref([])
 const editId = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const booter = async () => {
 
@@ -204,6 +204,7 @@ onMounted(async () => {
                     applicant.value = results2.data
                     applicantCount.value = results2.count
                     preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
 
@@ -217,6 +218,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {

@@ -105,7 +105,7 @@ class LibraryController extends Controller
                             ->orWhere('lba.lbrb_source', 'like',  '%' . $search .'%')
                             ->orWhere('lba.lbrb_publisher', 'like',  '%' . $search .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -167,7 +167,7 @@ class LibraryController extends Controller
                             $query->where('lbc.lbrc_ddc', 'like',  '%' . $search .'%')
                             ->orWhere('lbc.lbrc_desc', 'like',  '%' . $search .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 
@@ -439,7 +439,7 @@ class LibraryController extends Controller
                             ->orWhere('per.per_lastname', 'like',  '%' . $search .'%')
                             ->orWhere('per.per_suffixname', 'like',  '%' . $search .'%');
                         })
-                        ->limit($limit)->offset($offset)
+                        // ->limit($limit)->offset($offset)
                         ->count();       
         }
 

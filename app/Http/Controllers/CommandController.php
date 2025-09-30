@@ -196,11 +196,11 @@ class CommandController extends Controller
     public function saveCommandAccess(Request $req){
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d h:i:s', time());
-        $data = $req->all();
+        $request = $req->all();
         try{
             $if = '';
             $moduleindex = 0;
-            foreach ($data as $module) {
+            foreach ($request as $module) {
                 $moduleindex++;
 
                 // echo $module['module_access'][0]['access_description'];
@@ -213,9 +213,9 @@ class CommandController extends Controller
                             'useracc_accesscode' => $access['access_id'],
                             'useracc_category' => $module['module_category'],
                             'useracc_category_desc' => $module['module_category_desc'],
-                            'useracc_viewing' => isset($access['access_viewing'])? $access['access_viewing']:0,
-                            'useracc_modifying' => isset($access['access_modifying'])? $access['access_modifying']:0,
-                            'useracc_grant' => isset($module['module_grant'])? $module['module_grant']:0,
+                            'useracc_viewing' => $access['access_viewing'],
+                            'useracc_modifying' => $access['access_modifying'],
+                            'useracc_grant' => $module['module_grant'],
                             'useracc_addedby' => $module['sett_addedby'],
                             'useracc_dateadded' => $date,
                         ]);
@@ -245,7 +245,8 @@ class CommandController extends Controller
     
             return $data = [
                 'status' => 200,
-                'mode' =>  $if
+                'mode' =>  $if,
+                'data' => $request
             ];
 
         }catch(Exception $ex) {

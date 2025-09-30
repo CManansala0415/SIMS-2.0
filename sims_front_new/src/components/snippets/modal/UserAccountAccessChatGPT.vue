@@ -31,7 +31,7 @@ const accountModuleDetail = computed(() => {
 const emit = defineEmits(['close'])
 const saving = ref(false)
 
-const accessModuleData = ref(
+const accessModuleDef = ref(
     {
         0: {
             user_id:0,
@@ -317,47 +317,56 @@ const accessModuleData = ref(
     }
 )
 
+const accessModuleResults = ref([]);
+const accessModuleData = ref([]);
+
 onMounted(async () => {
-    // console.log(accessModuleData.value)
-    // console.log(accountModuleDetail.value)
-    
-    accessModuleData.value[0].user_id = accountModuleDetail.value.id // registrar
-    accessModuleData.value[1].user_id = accountModuleDetail.value.id // library
-    accessModuleData.value[2].user_id = accountModuleDetail.value.id // clinic
-    accessModuleData.value[3].user_id = accountModuleDetail.value.id // billing
-    accessModuleData.value[4].user_id = accountModuleDetail.value.id // accounting
-    accessModuleData.value[5].user_id = accountModuleDetail.value.id // academics
+  console.log('Default access modules:', accessModuleDef.value);
 
-    getCommandAccess(accountModuleDetail.value.id).then((results)=>{
-        if(results.length > 0){
-            Object.keys(accessModuleData.value).forEach(function(index1) {
-                Object.keys(accessModuleData.value[index1].module_access).forEach(function(index2) {
-                    let access_value = results.filter((e)=>{
-                        if( (accessModuleData.value[index1].module_id == e.useracc_modulecode)
-                            && 
-                            (accessModuleData.value[index1].module_access[index2].access_id == e.useracc_accesscode)
-                            && 
-                            (accessModuleData.value[index1].module_category == e.useracc_category)){
-                            return{
-                                e
-                            }
-                        }
-                    })
+  try {
+    const results = await getCommandAccess(accountModuleDetail.value.id);
+    accessModuleResults.value = results;
 
-                    parseInt(access_value[0].useracc_viewing) == 1? accessModuleData.value[index1].module_access[index2].access_checked = true : accessModuleData.value[index1].module_access[index2].access_checked = false
-                    // console.log(accessModuleData.value[index1].module_access[index2].access_checked)
-                    accessModuleData.value[index1].module_access[index2].access_viewing = parseInt(access_value[0].useracc_viewing)
-                    accessModuleData.value[index1].module_access[index2].access_modifying = parseInt(access_value[0].useracc_modifying)
-                    accessModuleData.value[index1].module_grant = parseInt(access_value[0].useracc_grant)
-                    accessModuleData.value[index1].module_access[index2].access_disabled = parseInt(access_value[0].useracc_grant)==1? 0:1 // if may grant na 1, mawawala disabled
-                    accessModuleData.value[index1].module_access[index2].useracc_id = access_value[0].useracc_id
-                }); 
-            }); 
+    // Deep copy to avoid mutating the original
+    const mergedData = JSON.parse(JSON.stringify(accessModuleDef.value));
+
+    // Create a lookup map keyed by category + module + access
+    const dbMap = {};
+    results.forEach(item => {
+      const key = `${item.useracc_category}-${item.useracc_modulecode}-${item.useracc_accesscode}`;
+      dbMap[key] = item;
+    });
+
+    // Merge DB values into default
+    Object.values(mergedData).forEach(module => {
+      Object.values(module.module_access).forEach(access => {
+        const key = `${module.module_category}-${module.module_value}-${access.access_value}`;
+        const userData = dbMap[key];
+        if (userData) {
+          access.useracc_id = userData.useracc_id;
+          access.access_checked = parseInt(userData.useracc_grant);
+          access.access_viewing = parseInt(userData.useracc_viewing);
+          access.access_modifying = parseInt(userData.useracc_modifying);
+        } else {
+          // Reset to default if no DB entry
+          access.useracc_id = 0;
+          access.access_checked = 0;
+          access.access_viewing = 0;
+          access.access_modifying = 0;
         }
+      });
+    });
 
-        // console.log(accessModuleData.value)
-    })        
-})
+    accessModuleData.value = mergedData;
+
+    console.log('Merged access module data:', accessModuleData.value);
+
+  } catch (error) {
+    console.error('Error fetching access data:', error);
+  }
+});
+
+
 
 const handleAccess = async () => {
     // console.log(accessModuleData.value)

@@ -56,7 +56,7 @@ const semester = ref([])
 const section = ref([])
 const booting = ref('')
 const bootingCount = ref(0)
-const emit = defineEmits(['fetchUser'])
+const emit = defineEmits(['fetchUser', 'doneLoading'])
 
 const booter = async () => {
 
@@ -152,6 +152,7 @@ onMounted(async () => {
                     })
                   
                     preLoading.value = false
+                    emit('doneLoading', false)
                 })
             })
 
@@ -165,6 +166,7 @@ onMounted(async () => {
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
             }).then(()=>{
                 preLoading.value = false
+                emit('doneLoading', false)
             });
         }
     }).catch((err) => {
