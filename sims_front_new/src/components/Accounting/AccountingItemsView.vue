@@ -255,7 +255,7 @@ const itemModal = (type, data) => {
                 <thead>
                     <tr>
                         <th style="background-color: #237a5b;" class="text-white">Fee ID</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
+                        <th style="background-color: #237a5b;" class="text-white">Item Name</th>
                         <th style="background-color: #237a5b;" class="text-white">Price</th>
                         <th style="background-color: #237a5b;" class="text-white">Commands</th>
                     </tr>

@@ -638,12 +638,14 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen"/>
                                 </button>
+                                <!-- v-if="stud.acs_payment > 0" -->
                                 <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Grades" data-bs-toggle="modal" data-bs-target="#printmodal"
                                     @click="showForm(3, stud, 1)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
                                 </button>
-                                <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                <!-- v-if="stud.acs_payment > 0" -->
+                                <button tabindex="-1" title="Print Receipt" data-bs-toggle="modal" data-bs-target="#printmodal"
                                     @click="showForm(3, stud, 2)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
@@ -652,7 +654,8 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                 </button>
-                                <button v-if="stud.acs_payment > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
+                                <!-- v-if="stud.acs_payment > 0" -->
+                                <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
                                     type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/>
                                 </button>
@@ -695,7 +698,7 @@ const getData = (result) =>{
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Application</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Subjects</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showTaggingModal = false"></button>
                 </div>

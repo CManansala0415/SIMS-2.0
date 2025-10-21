@@ -97,7 +97,7 @@ const booter = async () => {
     })
 
 }
- 
+  
 const accessData = ref([])
 onMounted(async () => {
     getUserID().then(async (results1) => {

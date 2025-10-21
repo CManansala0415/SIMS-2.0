@@ -438,6 +438,7 @@ class CommandController extends Controller
                         'def_program.prog_name as coursename',
                         'def_program.prog_code as coursecode',
                         'def_student_identification.ident_identification as studentid',
+                        'def_student_identification.ident_lrn as studentlrn',
                         'def_section.sec_name as section',
                         'def_curriculum.curr_code as curriculum',
 
@@ -451,6 +452,7 @@ class CommandController extends Controller
                 $load = 'arc-' .$defdmy.  '-' . $details->per_personid. '-' .$randomizer;
                 $primary = DB::table('server_archive_persons')->insert([
                     'arc_studentid' => $details->studentid,
+                    'arc_studentlrn' => $details->studentlrn,
                     'arc_personid' => $details->per_id,
                     'arc_firstname' => $details->per_firstname,
                     'arc_middlename' => $details->per_middlename,

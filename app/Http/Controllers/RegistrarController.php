@@ -1316,36 +1316,55 @@ class RegistrarController extends Controller
                     ->where('sched_id','=', $request['sched_id'])
                     ->update([
                         "sched_time" => $request['sched_time'],
+                        "sched_mergeable" => $request['sched_mergeable'],
                         
                         "sched_mon" => $request['sched_mon'],
                         "sched_mon_code" => $request['sched_mon_code'],
                         "sched_mon_bid" => $request['sched_mon_bid'],
                         "sched_mon_classrid" => $request['sched_mon_classrid'],
+                        "sched_mon_mergeable" => $request['sched_mon_mergeable'],
+                        "sched_mon_mergedto" => $request['sched_mon_mergedto'],
+                        "sched_mon_faculty" => $request['sched_mon_faculty'],
 
                         "sched_tue" => $request['sched_tue'],
                         "sched_tue_code" => $request['sched_tue_code'],
                         "sched_tue_bid" => $request['sched_tue_bid'],
                         "sched_tue_classrid" => $request['sched_tue_classrid'],
+                        "sched_tue_mergeable" => $request['sched_tue_mergeable'],
+                        "sched_tue_mergedto" => $request['sched_tue_mergedto'],
+                        "sched_tue_faculty" => $request['sched_tue_faculty'],
 
                         "sched_wed" => $request['sched_wed'],
                         "sched_wed_code" => $request['sched_wed_code'],
                         "sched_wed_bid" => $request['sched_wed_bid'],
                         "sched_wed_classrid" => $request['sched_wed_classrid'],
+                        "sched_wed_mergeable" => $request['sched_wed_mergeable'],
+                        "sched_wed_mergedto" => $request['sched_wed_mergedto'],
+                        "sched_wed_faculty" => $request['sched_wed_faculty'],
 
                         "sched_thurs" => $request['sched_thurs'],
                         "sched_thurs_code" => $request['sched_thurs_code'],
                         "sched_thurs_bid" => $request['sched_thurs_bid'],
                         "sched_thurs_classrid" => $request['sched_thurs_classrid'],
+                        "sched_thurs_mergeable" => $request['sched_thurs_mergeable'],
+                        "sched_thurs_mergedto" => $request['sched_thurs_mergedto'],
+                        "sched_thurs_faculty" => $request['sched_thurs_faculty'],
 
                         "sched_fri" => $request['sched_fri'],
                         "sched_fri_code" => $request['sched_fri_code'],
                         "sched_fri_bid" => $request['sched_fri_bid'],
                         "sched_fri_classrid" => $request['sched_fri_classrid'],
+                        "sched_fri_mergeable" => $request['sched_fri_mergeable'],
+                        "sched_fri_mergedto" => $request['sched_fri_mergedto'],
+                        "sched_fri_faculty" => $request['sched_fri_faculty'],
 
                         "sched_sat" => $request['sched_sat'],
                         "sched_sat_code" => $request['sched_sat_code'],
                         "sched_sat_bid" => $request['sched_sat_bid'],
                         "sched_sat_classrid" => $request['sched_sat_classrid'],
+                        "sched_sat_mergeable" => $request['sched_sat_mergeable'],
+                        "sched_sat_mergedto" => $request['sched_sat_mergedto'],
+                        "sched_sat_faculty" => $request['sched_sat_faculty'],
 
                         "sched_lnid" => $request['sched_lnid'],
                 ]);
@@ -1365,13 +1384,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if($request['sched_mon_mergedto'] == ''){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_mon_bid','=', $request['sched_mon_bid'])
                         ->where('occ_mon_classrid','=', $request['sched_mon_classrid'])
                         ->update([
                             "occ_mon_schedid" =>  $request->input('sched_id')
                         ]);
+                    }
 
                     if($request['sched_mon_faculty_occid']){
                         $s2 = DB::table('def_launch_occupancy_faculty')
@@ -1409,13 +1431,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                   // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_tue_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_tue_bid','=', $request['sched_tue_bid'])
                         ->where('occ_tue_classrid','=', $request['sched_tue_classrid'])
                         ->update([
                             "occ_tue_schedid" =>  $request->input('sched_id')
                         ]);
+                    }
 
                     if($request['sched_tue_faculty_occid']){
                         $s2 = DB::table('def_launch_occupancy_faculty')
@@ -1452,13 +1477,16 @@ class RegistrarController extends Controller
                     }
                    
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_wed_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_wed_bid','=', $request['sched_wed_bid'])
                         ->where('occ_wed_classrid','=', $request['sched_wed_classrid'])
                         ->update([
                             "occ_wed_schedid" =>  $request->input('sched_id')
                         ]);
+                    }
                     
                     if($request['sched_wed_faculty_occid']){
                         $s2 = DB::table('def_launch_occupancy_faculty')
@@ -1496,13 +1524,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_thurs_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_thurs_bid','=', $request['sched_thurs_bid'])
                         ->where('occ_thurs_classrid','=', $request['sched_thurs_classrid'])
                         ->update([
                             "occ_thurs_schedid" =>  $request->input('sched_id')
                         ]);
+                    }
                     
                     if($request['sched_thurs_faculty_occid']){
                         $s2 = DB::table('def_launch_occupancy_faculty')
@@ -1541,13 +1572,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_fri_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_fri_bid','=', $request['sched_fri_bid'])
                         ->where('occ_fri_classrid','=', $request['sched_fri_classrid'])
                         ->update([
                             "occ_fri_schedid" =>  $request->input('sched_id')
                         ]);
+                    }
                     
                     if($request['sched_fri_faculty_occid']){
                         $s2 = DB::table('def_launch_occupancy_faculty')
@@ -1585,13 +1619,16 @@ class RegistrarController extends Controller
                     }
                 
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_sat_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_sat_bid','=', $request['sched_sat_bid'])
                         ->where('occ_sat_classrid','=', $request['sched_sat_classrid'])
                         ->update([
                             "occ_sat_schedid" =>  $request->input('sched_id')
                         ]);
+                    }
                     
                     if($request['sched_sat_faculty_occid']){
                         $s2 = DB::table('def_launch_occupancy_faculty')
@@ -1625,32 +1662,50 @@ class RegistrarController extends Controller
                     'sched_mon_code' => $request->input('sched_mon_code'),
                     'sched_mon_bid' => $request->input('sched_mon_bid'),
                     'sched_mon_classrid' => $request->input('sched_mon_classrid'),
+                    'sched_mon_mergeable' => $request->input('sched_mon_mergeable'),
+                    "sched_mon_mergedto" => $request['sched_mon_mergedto'],
+                    "sched_mon_faculty" => $request['sched_mon_faculty'],
 
                     'sched_tue' => $request->input('sched_tue'),
                     'sched_tue_code' => $request->input('sched_tue_code'),
                     'sched_tue_bid' => $request->input('sched_tue_bid'),
                     'sched_tue_classrid' => $request->input('sched_tue_classrid'),
+                    'sched_tue_mergeable' => $request->input('sched_tue_mergeable'),
+                    "sched_tue_mergedto" => $request['sched_tue_mergedto'],
+                    "sched_tue_faculty" => $request['sched_tue_faculty'],
 
                     'sched_wed' => $request->input('sched_wed'),
                     'sched_wed_code' => $request->input('sched_wed_code'),
                     'sched_wed_bid' => $request->input('sched_wed_bid'),
                     'sched_wed_classrid' => $request->input('sched_wed_classrid'),
+                    'sched_wed_mergeable' => $request->input('sched_wed_mergeable'),
+                    "sched_wed_mergedto" => $request['sched_wed_mergedto'],
+                    "sched_wed_faculty" => $request['sched_wed_faculty'],
 
                     'sched_thurs' => $request->input('sched_thurs'),
                     'sched_thurs_code' => $request->input('sched_thurs_code'),
                     'sched_thurs_bid' => $request->input('sched_thurs_bid'),
                     'sched_thurs_classrid' => $request->input('sched_thurs_classrid'),
+                    'sched_thurs_mergeable' => $request->input('sched_thurs_mergeable'),
+                    "sched_thurs_mergedto" => $request['sched_thurs_mergedto'],
+                    "sched_thurs_faculty" => $request['sched_thurs_faculty'],
 
                     'sched_fri' => $request->input('sched_fri'),
                     'sched_fri_code' => $request->input('sched_fri_code'),
                     'sched_fri_bid' => $request->input('sched_fri_bid'),
                     'sched_fri_classrid' => $request->input('sched_fri_classrid'),
+                    'sched_fri_mergeable' => $request->input('sched_fri_mergeable'),
+                    "sched_fri_mergedto" => $request['sched_fri_mergedto'],
+                    "sched_fri_faculty" => $request['sched_fri_faculty'],
 
                     'sched_sat' => $request->input('sched_sat'),
                     'sched_sat_code' => $request->input('sched_sat_code'),
                     'sched_sat_bid' => $request->input('sched_sat_bid'),
                     'sched_sat_classrid' => $request->input('sched_sat_classrid'),
-
+                    'sched_sat_mergeable' => $request->input('sched_sat_mergeable'),
+                    "sched_sat_mergedto" => $request['sched_sat_mergedto'],
+                    "sched_sat_faculty" => $request['sched_sat_faculty'],
+  
                     
                     'sched_addedby' => $request->input('sched_addedby'),
                     'sched_dateadded' => $date
@@ -1678,13 +1733,17 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_mon_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_mon_bid','=', $request['sched_mon_bid'])
                         ->where('occ_mon_classrid','=', $request['sched_mon_classrid'])
                         ->update([
                             "occ_mon_schedid" =>  $schedid->sched_id
                         ]);
+                    }
+                   
                     
                     $s2 = DB::table('def_launch_occupancy_faculty')
                     ->insert([
@@ -1710,13 +1769,16 @@ class RegistrarController extends Controller
                     }
 
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_tue_bid','=', $request['sched_tue_bid'])
-                        ->where('occ_tue_classrid','=', $request['sched_tue_classrid'])
-                        ->update([
-                            "occ_tue_schedid" =>  $schedid->sched_id
-                        ]);
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_tue_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $request['sched_time'])
+                            ->where('occ_tue_bid','=', $request['sched_tue_bid'])
+                            ->where('occ_tue_classrid','=', $request['sched_tue_classrid'])
+                            ->update([
+                                "occ_tue_schedid" =>  $schedid->sched_id
+                            ]);
+                    }
                     
                     $s2 = DB::table('def_launch_occupancy_faculty')
                     ->insert([
@@ -1742,6 +1804,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_wed_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
+                        ->where('occ_time','=', $request['sched_time'])
+                        ->where('occ_wed_bid','=', $request['sched_wed_bid'])
+                        ->where('occ_wed_classrid','=', $request['sched_wed_classrid'])
+                        ->update([
+                            "occ_wed_schedid" =>  $schedid->sched_id
+                        ]);
+                    }
                     $s1 = DB::table('def_launch_occupancy_subjects')
                         ->where('occ_time','=', $request['sched_time'])
                         ->where('occ_wed_bid','=', $request['sched_wed_bid'])
@@ -1774,13 +1846,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_thurs_bid','=', $request['sched_thurs_bid'])
-                        ->where('occ_thurs_classrid','=', $request['sched_thurs_classrid'])
-                        ->update([
-                            "occ_thurs_schedid" =>  $schedid->sched_id
-                        ]);
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_thurs_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $request['sched_time'])
+                            ->where('occ_thurs_bid','=', $request['sched_thurs_bid'])
+                            ->where('occ_thurs_classrid','=', $request['sched_thurs_classrid'])
+                            ->update([
+                                "occ_thurs_schedid" =>  $schedid->sched_id
+                            ]);
+                    }
                         
                     $s2 = DB::table('def_launch_occupancy_faculty')
                     ->insert([
@@ -1806,13 +1881,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_fri_bid','=', $request['sched_fri_bid'])
-                        ->where('occ_fri_classrid','=', $request['sched_fri_classrid'])
-                        ->update([
-                            "occ_fri_schedid" =>  $schedid->sched_id
-                        ]);
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_fri_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $request['sched_time'])
+                            ->where('occ_fri_bid','=', $request['sched_fri_bid'])
+                            ->where('occ_fri_classrid','=', $request['sched_fri_classrid'])
+                            ->update([
+                                "occ_fri_schedid" =>  $schedid->sched_id
+                            ]);
+                    }
                     
                     $s2 = DB::table('def_launch_occupancy_faculty')
                     ->insert([
@@ -1838,13 +1916,16 @@ class RegistrarController extends Controller
                     }
                     
                 }else{
-                    $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_sat_bid','=', $request['sched_sat_bid'])
-                        ->where('occ_sat_classrid','=', $request['sched_sat_classrid'])
-                        ->update([
-                            "occ_sat_schedid" =>  $schedid->sched_id
-                        ]);
+                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    if(empty($request['sched_sat_mergedto'])){
+                        $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $request['sched_time'])
+                            ->where('occ_sat_bid','=', $request['sched_sat_bid'])
+                            ->where('occ_sat_classrid','=', $request['sched_sat_classrid'])
+                            ->update([
+                                "occ_sat_schedid" =>  $schedid->sched_id
+                            ]);
+                    }
 
                     $s2 = DB::table('def_launch_occupancy_faculty')
                     ->insert([
@@ -1859,6 +1940,59 @@ class RegistrarController extends Controller
 
         }
         
+        catch (Exception $ex) {
+            return 500;
+        }
+    }
+
+    public function getMergedClass($schedid, $day)
+    {
+        try{
+            switch($day){
+                case 'Monday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_mon_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
+                case 'Tuesday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_tue_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
+                case 'Wednesday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_wed_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
+                case 'Thursday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_thurs_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
+                case 'Friday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_fri_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
+                case 'Saturday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_sat_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
+            }
+        }
         catch (Exception $ex) {
             return 500;
         }
@@ -1953,6 +2087,9 @@ class RegistrarController extends Controller
                 'mon_gradelvl.grad_name as mon_gradelvl_name',
                 'mon_course.prog_id as mon_course_id',
                 'mon_course.prog_name as mon_course_name',
+                'mon_sched.sched_mon_mergeable',
+                'mon_sched.sched_id as mon_sched_id',
+                'mon_sched.sched_mon_faculty as mon_sched_faculty',
                  
                 'tue_sched.sched_lnid as tue_sched_lnid',
                 'tue_sched.sched_tue_code as tue_subj_code',
@@ -1964,6 +2101,9 @@ class RegistrarController extends Controller
                 'tue_gradelvl.grad_name as tue_gradelvl_name',
                 'tue_course.prog_id as tue_course_id',
                 'tue_course.prog_name as tue_course_name',
+                'tue_sched.sched_tue_mergeable',
+                'tue_sched.sched_id as tue_sched_id',
+                'tue_sched.sched_tue_faculty as tue_sched_faculty',
                 
                 'wed_sched.sched_lnid as wed_sched_lnid',
                 'wed_sched.sched_wed_code as wed_subj_code',
@@ -1975,6 +2115,9 @@ class RegistrarController extends Controller
                 'wed_gradelvl.grad_name as wed_gradelvl_name',
                 'wed_course.prog_id as wed_course_id',
                 'wed_course.prog_name as wed_course_name',
+                'wed_sched.sched_wed_mergeable',
+                'wed_sched.sched_id as wed_sched_id',
+                'wed_sched.sched_wed_faculty as wed_sched_faculty',
     
                 'thurs_sched.sched_lnid as thurs_sched_lnid',
                 'thurs_sched.sched_thurs_code as thurs_subj_code',
@@ -1986,6 +2129,9 @@ class RegistrarController extends Controller
                 'thurs_gradelvl.grad_name as thurs_gradelvl_name',
                 'thurs_course.prog_id as thurs_course_id',
                 'thurs_course.prog_name as thurs_course_name',
+                'thurs_sched.sched_thurs_mergeable',
+                'thurs_sched.sched_id as thurs_sched_id',
+                'thurs_sched.sched_thurs_faculty as thurs_sched_faculty',
     
                 'fri_sched.sched_lnid as fri_sched_lnid',
                 'fri_sched.sched_fri_code as fri_subj_code',
@@ -1997,6 +2143,9 @@ class RegistrarController extends Controller
                 'fri_gradelvl.grad_name as fri_gradelvl_name',
                 'fri_course.prog_id as fri_course_id',
                 'fri_course.prog_name as fri_course_name',
+                'fri_sched.sched_fri_mergeable',
+                'fri_sched.sched_id as fri_sched_id',
+                'fri_sched.sched_fri_faculty as fri_sched_faculty',
     
                 'sat_sched.sched_lnid as sat_sched_lnid',
                 'sat_sched.sched_sat_code as sat_subj_code',
@@ -2008,6 +2157,9 @@ class RegistrarController extends Controller
                 'sat_gradelvl.grad_name as sat_gradelvl_name',
                 'sat_course.prog_id as sat_course_id',
                 'sat_course.prog_name as sat_course_name',
+                'sat_sched.sched_sat_mergeable',
+                'sat_sched.sched_id as sat_sched_id',
+                'sat_sched.sched_sat_faculty as sat_sched_faculty',
             )
             ->orderBy('sched_occ.occ_id','ASC')
             ->where('sched_occ.occ_mon_bid', '=', $bid)

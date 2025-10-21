@@ -211,7 +211,9 @@ onMounted(() => {
         <div class="d-flex justify-content-around gap-1">
             <div class="w-100 d-flex gap-2 flex-column text-start">
                 <span class="">Choose Building</span>
-                <select @change="filterClassroom()" class="form-control form-select-sm" v-model="buildingId">
+                <select @change="filterClassroom()"
+                    class="form-control form-select-sm"
+                    v-model="buildingId">
                     <option value="" disabled>
                         Select Here--
                     </option>
@@ -222,7 +224,9 @@ onMounted(() => {
             </div>
             <div class="w-100 d-flex gap-2 flex-column text-start">
                 <span class="">Choose Classroom</span>
-                <select class="form-control form-select-sm" v-model="classroomId" :disabled="buildingId ? false : true">
+                <select
+                    class="form-control form-select-sm"
+                    v-model="classroomId" :disabled="buildingId ? false : true">
                     <option value="" disabled>
                         --Select Here--
                     </option>
@@ -241,7 +245,8 @@ onMounted(() => {
                 </select>
             </div> -->
             <div class="align-content-end w-25">
-                <button @click="filterOccupancy" class="btn btn-sm btn-dark w-100">
+                <button @click="filterOccupancy"
+                    class="btn btn-sm btn-dark w-100">
                     Load
                 </button>
             </div>
@@ -249,164 +254,79 @@ onMounted(() => {
 
         <div>
             <div class="mt-3 overflow-auto">
-                <div class="schedule-calendar p-3 border rounded-3 bg-white shadow-sm">
-
-                    <!-- Empty or Loading -->
-                    <div v-if="!Object.keys(mappedSched).length && !preloading" class="text-center py-5">
-                        <p class="text-danger fw-bold fs-5 mb-1">No Schedule Found</p>
-                        <p class="text-muted">Select a building and classroom to access schedule list.</p>
-                    </div>
-
-                    <div v-if="!Object.keys(mappedSched).length && preloading" class="text-center py-5">
-                        <Loader />
-                        <p class="text-muted mt-2">Loading schedules, please wait...</p>
-                    </div>
-
-                    <!-- Calendar Grid -->
-                    <div v-if="Object.keys(mappedSched).length && !preloading" class="calendar-grid">
-                        <!-- Calendar Header -->
-                        <div class="calendar-header">
-                            <!-- <div class="time-header"></div> -->
-                            <div v-for="(hd, idx) in headers" :key="idx" class="day-header text-center fw-bold">
-                                {{ hd.title }}
-                            </div>
-                        </div>
-
-                        <!-- Calendar Body -->
-                        <div v-for="(tm, index) in mappedSched" :key="index" class="calendar-row align-items-stretch">
-                            <!-- Time Slot Label -->
-                            <div class="time-cell text-center fw-semibold bg-light">{{ tm.timename }}</div>
-
-                            <!-- Monday -->
-                            <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.mon_subj_code" class="sched-tile bg-primary-subtle border-primary">
-                                    <div class="fw-bold text-primary small">{{ tm.mon_subj_code }}</div>
-                                    <div class="small text-dark">{{ tm.mon_sec_name }}</div>
-                                    <div class="small text-muted">{{ tm.mon_faculty }}</div>
+                <table class="w-100 table-fixed table">
+                    <thead>
+                        <th v-for="(hd, index) in headers" class="p-3">{{ hd.title }}</th>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!Object.keys(mappedSched).length && !preloading">
+                            <td class="p-5 text-center border" :colspan="Object.keys(headers).length">
+                                <p class="text-danger fw-bold">No Schedule Found</p>
+                                <p class="fs-6">Select building and classroom to access schedule list</p>
+                            </td>
+                        </tr>
+                        <tr v-if="!Object.keys(mappedSched).length && preloading">
+                            <td class="p-2 text-center border" :colspan="Object.keys(headers).length">
+                                <Loader/>
+                                <p class="">Loading schedules please wait...</p>
+                            </td>
+                        </tr>
+                        <tr v-if="Object.keys(mappedSched).length && !preloading" v-for="(tm, index) in mappedSched" class="p-3">
+                            <td :class="tm.classname">
+                                <p class="p-2">{{ tm.timename }}</p>
+                            </td>
+                            <td :class="tm.classname" >
+                                <div class="p-2 d-flex flex-column gap-1 text-start">
+                                    <p class="fw-6">Subject: <span class="fst-italic fw-bold">{{ tm.mon_subj_code }}</span></p>
+                                    <p class="fw-6">Section: <span class="fst-italic fw-bold">{{ tm.mon_sec_name }}</span></p>
+                                    <p class="fw-6">Year: <span class="fst-italic fw-bold">{{ tm.mon_gradelvl_name }}</span></p>
+                                    <p class="fw-6">Faculty: <span class="fst-italic fw-bold">{{ tm.mon_faculty }}</span></p>
                                 </div>
-                                <div v-else class="empty-tile text-muted small">—</div>
-                            </div>
-
-                            <!-- Tuesday -->
-                            <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.tue_subj_code" class="sched-tile bg-success-subtle border-success">
-                                    <div class="fw-bold text-success small">{{ tm.tue_subj_code }}</div>
-                                    <div class="small text-dark">{{ tm.tue_sec_name }}</div>
-                                    <div class="small text-muted">{{ tm.tue_faculty }}</div>
+                            </td>
+                            <td :class="tm.classname" >
+                                <div class="p-2 d-flex flex-column gap-1 text-start">
+                                    <p class="fw-6">Subject: <span class="fst-italic fw-bold">{{ tm.tue_subj_code }}</span></p>
+                                    <p class="fw-6">Section: <span class="fst-italic fw-bold">{{ tm.tue_sec_name }}</span></p>
+                                    <p class="fw-6">Year: <span class="fst-italic fw-bold">{{ tm.tue_gradelvl_name }}</span></p>
+                                    <p class="fw-6">Faculty: <span class="fst-italic fw-bold">{{ tm.tue_faculty }}</span></p>
                                 </div>
-                                <div v-else class="empty-tile text-muted small">—</div>
-                            </div>
-
-                            <!-- Wednesday -->
-                            <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.wed_subj_code" class="sched-tile bg-info-subtle border-info">
-                                    <div class="fw-bold text-info small">{{ tm.wed_subj_code }}</div>
-                                    <div class="small text-dark">{{ tm.wed_sec_name }}</div>
-                                    <div class="small text-muted">{{ tm.wed_faculty }}</div>
+                            </td>
+                            <td :class="tm.classname" >
+                                <div class="p-2 d-flex flex-column gap-1 text-start">
+                                    <p class="fw-6">Subject: <span class="fst-italic fw-bold">{{ tm.wed_subj_code }}</span></p>
+                                    <p class="fw-6">Section: <span class="fst-italic fw-bold">{{ tm.wed_sec_name }}</span></p>
+                                    <p class="fw-6">Year: <span class="fst-italic fw-bold">{{ tm.wed_gradelvl_name }}</span></p>
+                                    <p class="fw-6">Faculty: <span class="fst-italic fw-bold">{{ tm.wed_faculty }}</span></p>
                                 </div>
-                                <div v-else class="empty-tile text-muted small">—</div>
-                            </div>
-
-                            <!-- Thursday -->
-                            <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.thurs_subj_code" class="sched-tile bg-warning-subtle border-warning">
-                                    <div class="fw-bold text-warning small">{{ tm.thurs_subj_code }}</div>
-                                    <div class="small text-dark">{{ tm.thurs_sec_name }}</div>
-                                    <div class="small text-muted">{{ tm.thurs_faculty }}</div>
+                            </td>
+                            <td :class="tm.classname" >
+                                <div class="p-2 d-flex flex-column gap-1 text-start">
+                                    <p class="fw-6">Subject: <span class="fst-italic fw-bold">{{ tm.thurs_subj_code }}</span></p>
+                                    <p class="fw-6">Section: <span class="fst-italic fw-bold">{{ tm.thurs_sec_name }}</span></p>
+                                    <p class="fw-6">Year: <span class="fst-italic fw-bold">{{ tm.thurs_gradelvl_name }}</span></p>
+                                    <p class="fw-6">Faculty: <span class="fst-italic fw-bold">{{ tm.thurs_faculty }}</span></p>
                                 </div>
-                                <div v-else class="empty-tile text-muted small">—</div>
-                            </div>
-
-                            <!-- Friday -->
-                            <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.fri_subj_code" class="sched-tile bg-danger-subtle border-danger">
-                                    <div class="fw-bold text-danger small">{{ tm.fri_subj_code }}</div>
-                                    <div class="small text-dark">{{ tm.fri_sec_name }}</div>
-                                    <div class="small text-muted">{{ tm.fri_faculty }}</div>
+                            </td>
+                            <td :class="tm.classname" >
+                                <div class="p-2 d-flex flex-column gap-1 text-start">
+                                    <p class="fw-6">Subject: <span class="fst-italic fw-bold">{{ tm.fri_subj_code }}</span></p>
+                                    <p class="fw-6">Section: <span class="fst-italic fw-bold">{{ tm.fri_sec_name }}</span></p>
+                                    <p class="fw-6">Year: <span class="fst-italic fw-bold">{{ tm.fri_gradelvl_name }}</span></p>
+                                    <p class="fw-6">Faculty: <span class="fst-italic fw-bold">{{ tm.fri_faculty }}</span></p>
                                 </div>
-                                <div v-else class="empty-tile text-muted small">—</div>
-                            </div>
-
-                            <!-- Saturday -->
-                            <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.sat_subj_code" class="sched-tile bg-secondary-subtle border-secondary">
-                                    <div class="fw-bold text-secondary small">{{ tm.sat_subj_code }}</div>
-                                    <div class="small text-dark">{{ tm.sat_sec_name }}</div>
-                                    <div class="small text-muted">{{ tm.sat_faculty }}</div>
+                            </td>
+                            <td :class="tm.classname" >
+                                <div class="p-2 d-flex flex-column gap-1 text-start">
+                                    <p class="fw-6">Subject: <span class="fst-italic fw-bold">{{ tm.sat_subj_code }}</span></p>
+                                    <p class="fw-6">Section: <span class="fst-italic fw-bold">{{ tm.sat_sec_name }}</span></p>
+                                    <p class="fw-6">Year: <span class="fst-italic fw-bold">{{ tm.sat_gradelvl_name }}</span></p>
+                                    <p class="fw-6">Faculty: <span class="fst-italic fw-bold">{{ tm.sat_faculty }}</span></p>
                                 </div>
-                                <div v-else class="empty-tile text-muted small">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </template>
-<style scoped>
-.calendar-grid {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.calendar-header,
-.calendar-row {
-    display: grid;
-    grid-template-columns: 120px repeat(6, 1fr);
-    align-items: stretch;
-}
-
-.calendar-header {
-    background: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-}
-
-.time-header {
-    border-right: 2px solid #dee2e6;
-}
-
-.time-cell {
-    padding: 0.75rem;
-    border-right: 2px solid #dee2e6;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.day-header {
-    padding: 0.75rem;
-    border-right: 1px solid #dee2e6;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    background-color: #fdfdfd;
-}
-
-.day-cell {
-    padding: 0.5rem;
-    border-right: 1px solid #e9ecef;
-    border-bottom: 1px solid #e9ecef;
-    min-height: 80px;
-    position: relative;
-}
-
-.sched-tile {
-    border: 1px solid transparent;
-    border-radius: 0.5rem;
-    padding: 0.4rem 0.6rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
-
-.sched-tile:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: scale(1.02);
-}
-
-.empty-tile {
-    text-align: center;
-    line-height: 60px;
-}
-</style>

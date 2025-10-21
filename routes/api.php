@@ -89,6 +89,8 @@ Route::middleware(['auth:sanctum'])->post('/add-schedule', [RegistrarController:
 Route::middleware(['auth:sanctum'])->get('/get-schedule/{launchid}', [RegistrarController::class,'getSchedule']);
 Route::middleware(['auth:sanctum'])->get('/get-occupancy/{bird}/{classrid}', [RegistrarController::class,'getOccupancy']);
 Route::middleware(['auth:sanctum'])->get('/get-occupancy-others/{othersid}', [RegistrarController::class,'getOccupancyOthers']);
+Route::middleware(['auth:sanctum'])->get('/get-merged-class/{schedid}/{day}', [RegistrarController::class,'getMergedClass']);
+
 
 Route::middleware(['auth:sanctum'])->get('/get-employee/{limit}/{offset}/{fname}/{mname}/{lname}', [RegistrarController::class,'getEmployee']);
 Route::middleware(['auth:sanctum'])->post('/update-employee', [RegistrarController::class,'updateEmployee']);

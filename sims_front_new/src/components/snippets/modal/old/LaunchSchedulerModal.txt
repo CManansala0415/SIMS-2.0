@@ -1,0 +1,718 @@
+<script setup>
+import { ref, onMounted, computed } from 'vue';
+import {
+    getOccupancy,
+    getCurriculumSubject,
+    getScheduledFaculty,
+    getFacultyAvailability,
+    getMergedClass
+} from "../../Fetchers.js";
+import Loader from '../loaders/Loading1.vue';
+const props = defineProps({
+    subjectData: {
+    },
+    timeidData: {
+    },
+    timedayData: {
+    },
+    subjidData: {
+    },
+    buildingData: {
+    },
+    classroomData: {
+    },
+    buildingIdData: {
+    },
+    classroomIdData: {
+    },
+    curriculumData: {
+    },
+    curriculumIdData: {
+    },
+    launchIdData: {
+    },
+    launchdata: {
+    },
+    mergeableData: {
+    },
+    schedData: {
+    }
+    
+
+})
+
+const launch = computed(() => {
+    return props.launchdata
+});
+
+const subject = computed(() => {
+    return props.subjectData
+});
+
+const timeId = computed(() => {
+    return props.timeidData
+});
+
+const timeDay = computed(() => {
+    return props.timedayData
+});
+
+const subjId = computed(() => {
+    return props.subjidData
+});
+
+const classroom = computed(() => {
+    return props.classroomData
+});
+
+const building = computed(() => {
+    return props.buildingData
+});
+
+const curriculum = computed(() => {
+    return props.curriculumData
+});
+
+const currId = computed(() => {
+    return props.curriculumIdData
+});
+
+const bid = computed(() => {
+    return props.buildingIdData
+});
+
+const classrid = computed(() => {
+    return props.classroomIdData
+});
+
+const launchId = computed(() => {
+    return props.launchIdData
+});
+
+const mergeable = computed(() => {
+    return props.mergeableData
+});
+
+const schedule = computed(() => {
+    return props.schedData
+});
+ 
+const emit = defineEmits(['close-modal', 'assign-sched'])
+const assign = (id, name, bldg, classr, remove) => {
+    // alert('Successful')
+    // emit('assign-sched', id, name, bldg, classr, remove, facultyId.value)
+
+    // console.log(occupier.value)
+    Swal.fire({
+        title: "Update Successful",
+        text: "Changes applied",
+        icon: "success"
+    }).then(()=>{
+        emit('assign-sched', id, name, bldg, classr, remove, facultyId.value, mergeClass.value, enableClassMerge.value, occupier.value.sched_id)
+    });
+}
+
+const activeID = ref('')
+const activeName = ref('')
+const curriculumId = ref('')
+
+const mergeClass = ref(0)
+const buildingId = ref('')
+const facultyId = ref('')
+const classroomId = ref('')
+const searchValue = ref('')
+const filteredClassroom = ref([])
+const occupancy = ref([])
+const loading = ref(false)
+const forMerge = ref(false)
+const filteredSubject = ref([])
+const availability = ref([])
+const curriculumSubject = ref([])
+const faculty = ref([])
+const occupier = ref({
+    sched_id: '',
+    subj_id: '',
+    subj_code: '',
+    sec_name: '',
+    gradelvl_name: '',
+    course_name: 'test',
+    can_merge:0,
+    faculty:''
+})
+const occupied = ref(false)
+const checking = ref(false)
+
+const filterClassroom = () => {
+    classroomId.value = ''
+    filteredClassroom.value = classroom.value.filter(e => {
+        if (
+            (buildingId.value == e.classr_bid)
+        ) {
+            return e
+        }
+    })
+}
+
+const tempFacultId = ref('') // para to sa icocompare na current faculty vs existing faculty na nasa sched for merging
+const filterSubject = (data) => {
+    if(data){
+        filteredSubject.value = curriculumSubject.value.filter(e => {
+            if (
+                (e.subj_id == data)
+            ) {
+                return e
+            }
+        })
+
+        if(filteredSubject.value[0].faculty_id == tempFacultId.value){
+            occupied.value = false
+            forMerge.value = true
+        }else{
+             Swal.fire({
+                title: "Notice",
+                text: 'The subject you are trying to merge has a different faculty assigned. Please assign the same faculty to proceed with merging.',
+                icon: "question"
+            })
+        }
+    }else{
+        filteredSubject.value = curriculumSubject.value.filter(e => {
+            if (
+                (e.subj_name.toUpperCase().includes(searchValue.value.toUpperCase())) ||
+                (e.subj_code.toUpperCase().includes(searchValue.value.toUpperCase()))
+            ) {
+                return e
+            }
+        })
+
+        forMerge.value = false
+    }
+
+}
+
+const filterOccupancy = (id) => {
+    classroomId.value = id
+    occupied.value = false
+    checking.value = true
+    getOccupancy(buildingId.value, classroomId.value).then((results) => {
+        occupancy.value = results.filter((e) => {
+            
+
+            if (e.occ_time == timeId.value) {
+                // console.log(e)
+                switch (timeDay.value) {
+                    case 'Monday':
+                        !e.mon_subj_code ? occupied.value = false : occupied.value = true
+                        occupier.value = {
+                            sched_id:e.mon_sched_id,
+                            subj_id: e.mon_subj_id,
+                            subj_code: e.mon_subj_code,
+                            subj_name: e.mon_subj_name,
+                            sec_name: e.mon_sec_name,
+                            gradelvl_name: e.mon_gradelvl_name,
+                            course_name:e.mon_course_name,
+                            can_merge:e.sched_mon_mergeable,
+                            faculty:e.mon_sched_faculty
+                        }
+                        break;
+                    case 'Tuesday':
+                        !e.tue_subj_code ? occupied.value = false : occupied.value = true
+                        occupier.value = {
+                            sched_id:e.tue_sched_id,
+                            subj_id: e.tue_subj_id,
+                            subj_code: e.tue_subj_code,
+                            subj_name: e.tue_subj_name,
+                            sec_name: e.tue_sec_name,
+                            gradelvl_name: e.tue_gradelvl_name,
+                            course_name:e.tue_course_name,
+                            can_merge:e.sched_tue_mergeable,
+                            faculty:e.tue_sched_faculty
+                        }
+                        break;
+                    case 'Wednesday':
+                        !e.wed_subj_code ? occupied.value = false : occupied.value = true
+                        occupier.value = {
+                            sched_id:e.wed_sched_id,
+                            subj_id: e.wed_subj_id,
+                            subj_code: e.wed_subj_code,
+                            subj_name: e.wed_subj_name,
+                            sec_name: e.wed_sec_name,
+                            gradelvl_name: e.wed_gradelvl_name,
+                            course_name:e.wed_course_name,
+                            can_merge:e.sched_wed_mergeable,
+                            faculty:e.wed_sched_faculty
+                        }
+                        break;
+                    case 'Thursday':
+                        !e.thurs_subj_code ? occupied.value = false : occupied.value = true
+                        occupier.value = {
+                            sched_id:e.thurs_sched_id,
+                            subj_id: e.thurs_subj_id,
+                            subj_code: e.thurs_subj_code,
+                            subj_name: e.thurs_subj_name,
+                            sec_name: e.thurs_sec_name,
+                            gradelvl_name: e.thurs_gradelvl_name,
+                            course_name:e.thurs_course_name,
+                            can_merge:e.sched_thurs_mergeable,
+                            faculty:e.thurs_sched_faculty
+                        }
+                        break;
+                    case 'Friday':
+                        !e.fri_subj_code ? occupied.value = false : occupied.value = true
+                        occupier.value = {
+                            sched_id:e.fri_sched_id,
+                            subj_id: e.fri_subj_id,
+                            subj_code: e.fri_subj_code,
+                            subj_name: e.fri_subj_name,
+                            sec_name: e.fri_sec_name,
+                            gradelvl_name: e.fri_gradelvl_name,
+                            course_name:e.fri_course_name,
+                            can_merge:e.sched_fri_mergeable,
+                            faculty:e.fri_sched_faculty
+                        }
+                        break;
+                    case 'Saturday':
+                        !e.sat_subj_code ? occupied.value = false : occupied.value = true
+                        occupier.value = {
+                            sched_id:e.sat_sched_id,
+                            subj_id: e.sat_subj_id,
+                            subj_code: e.sat_subj_code,
+                            sec_name: e.sat_sec_name,
+                            gradelvl_name: e.sat_gradelvl_name,
+                            course_name:e.sat_course_name,
+                            can_merge:e.sched_sat_mergeable,
+                            faculty:e.sat_sched_faculty
+                        }
+                        break;
+                }
+            }
+        })
+        checking.value = false
+    })
+}
+
+
+const removeSubject = ref(false)
+const hasMergedClass = ref(false)
+const detectingMergedClass = ref(true)
+onMounted(async () => {
+    //if may subject na remove nalang dapat ang options to avoid
+    if(subjId.value){
+        removeSubject.value = true
+        if (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].includes(timeDay.value)) {
+            getMergedClass(schedule.value.sched_id, timeDay.value).then((results) => {
+                let hasResults = Object.keys(results).length > 0
+                hasMergedClass.value = hasResults
+                detectingMergedClass.value = false
+            })
+        }else{
+            detectingMergedClass.value = false
+        }
+    }else{
+        activeID.value = subjId.value
+        mergeClass.value = mergeable.value == 1? 1 : 0
+
+        curriculumId.value = currId.value
+        loading.value = true
+        checking.value = true
+        getFacultyAvailability().then((results) => {
+            availability.value = results
+
+            getScheduledFaculty().then((results) => {
+                faculty.value = results
+
+                
+                getCurriculumSubject(curriculumId.value, launch.value.ln_quarter, launch.value.ln_gradelvl).then((results) => {
+                    curriculumSubject.value = results
+
+                    let empid = ''
+                    curriculumSubject.value = results.map((e, index) => {
+
+                        let indexer = faculty.value.findIndex(object => {
+                            empid = object.emp_id
+                            return ((object.lf_subjid === e.subj_id) && (object.lf_lnid == launchId.value));
+                        });
+
+                        if (indexer !== -1) {
+                            return {
+                                ...e,
+                                faculty_id: empid,
+                            }
+                        } else {
+
+                            return {
+                                ...e,
+                                faculty_id: '',
+                            }
+                        }
+                    })
+
+                    filteredSubject.value = curriculumSubject.value
+
+                    loading.value = false
+                    checking.value = false
+
+
+                })
+            })
+        })
+
+
+        if (bid.value) {
+            buildingId.value = bid.value
+            filterClassroom()
+            classroomId.value = classrid.value
+
+        } else {
+            buildingId.value = ''
+            classroomId.value = ''
+        }
+    }
+    
+    
+})
+
+const assignSubject = (subj_id, subj_code, faculty_id, pass) => {
+    let msg = 'The faculty assigned for this subject has already a schedule for this time slot. These are the actions you can perform: \n\n- Change the assigned instructor for the subject. \n- Assign this subject to a different time slot'
+    let data = availability.value.filter((e) => {
+        if (
+            (e.occ_time === timeId.value) &&
+            (e.occ_day == timeDay.value) &&
+            (e.occ_faculty == faculty_id) &&
+            (pass != 1) // means ojt or practicum, should not overlap
+            // ((e.occ_subjid == subj_id))
+        ) {
+            return e
+        }
+    })
+    // console.log(forMerge.value)
+    // console.log(timeId.value)
+    // console.log(timeDay.value)
+    // console.log(subj_id)
+    // console.log(faculty_id)
+    // console.log(availability.value)
+    // data[0].occ_faculty === faculty_id && object.occ_day == 'tuesday'
+    switch (timeDay.value) {
+        case 'Monday':
+            if (Object.keys(data).length > 0 && !forMerge.value ) {
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
+            } else {
+                activeID.value = subj_id
+                activeName.value = subj_code
+                facultyId.value = faculty_id
+            }
+            break;
+        case 'Tuesday':
+            if (Object.keys(data).length > 0 && !forMerge.value ) {
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
+            } else {
+                activeID.value = subj_id
+                activeName.value = subj_code
+                facultyId.value = faculty_id
+            }
+            break;
+        case 'Wednesday':
+            if (Object.keys(data).length > 0 && !forMerge.value ) {
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
+            } else {
+                activeID.value = subj_id
+                activeName.value = subj_code
+                facultyId.value = faculty_id
+            }
+            break;
+        case 'Thursday':
+            if (Object.keys(data).length > 0 && !forMerge.value ) {
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
+            } else {
+                activeID.value = subj_id
+                activeName.value = subj_code
+                facultyId.value = faculty_id
+            }
+            break;
+        case 'Friday':
+            if (Object.keys(data).length > 0 && !forMerge.value ) {
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
+            } else {
+                activeID.value = subj_id
+                activeName.value = subj_code
+                facultyId.value = faculty_id
+            }
+            break;
+        case 'Saturday':
+            if (Object.keys(data).length > 0 && !forMerge.value ) {
+                // alert(msg)
+                Swal.fire({
+                    title: "Notice",
+                    text: msg,
+                    icon: "question"
+                })
+            } else {
+                activeID.value = subj_id
+                activeName.value = subj_code
+                facultyId.value = faculty_id
+            }
+            break;
+    }
+
+}
+
+
+const setOthers = (value) => {
+    // para sa class merging
+    if(value == 91){
+        if(!mergeable.value || mergeable.value == 0){
+            mergeClass.value = !mergeClass.value
+        } 
+    }else{
+        filterClassroom()
+        buildingId.value = value
+        classroomId.value = value
+        checking.value = false
+    }
+   
+}
+
+
+const enableClassMerge = ref(false)
+const mergeClassTo = (from) => {
+    enableClassMerge.value = true
+    tempFacultId.value = from.faculty
+    filterSubject(from.subj_id)
+}
+</script>
+<template>
+    <div class="w-100 text-center p-3" v-if="checking">
+        <Loader />
+    </div>
+    <div v-else class="container">
+        <div v-if="!removeSubject" class="row">
+            <div class="col overflow-auto small-font" style="height: 40rem;">
+                <div class="text-start border mb-2 card shadow p-3">
+                    <p class="col-span-3 font-semibold">Other Alternatives</p>
+                    <div class="d-flex flex-column gap-2">
+                        <!-- 90 means ol class -->
+                        <button @click="buildingId = 90, setOthers(90)" :disabled="buildingId == 90 ? true : false"
+                            :class="buildingId == 90 ? 'btn btn-sm btn-primary w-100' : 'btn btn-sm btn-dark w-100'">
+                            Online Class
+                        </button>
+                        <!-- mergeable means can be merged -->
+                        <button @click="setOthers(91)"
+                            :class="mergeClass == 1 ? 'btn btn-sm btn-primary w-100' : 'btn btn-sm btn-dark w-100'">
+                            Can be Merged with other Class
+                        </button>
+                        <!-- 92 means others -->
+                        <!-- <button @click="buildingId = 92, setOthers(92)" :disabled="buildingId == 92 ? true : false"
+                            :class="buildingId == 92 ? 'btn btn-sm btn-primary w-100' : 'btn btn-sm btn-dark w-100'">
+                            Others
+                        </button> -->
+                    </div>
+                </div>
+                <div class="text-start border mb-2 card shadow p-3">
+                    <p class="col-span-3 font-semibold">Choose Building</p>
+                    <div class="d-flex flex-column gap-2">
+                        <button v-for="(bl, index) in building" @click="buildingId = bl.buil_id, filterClassroom()"
+                            :disabled="buildingId == bl.buil_id ? true : false"
+                            :class="buildingId == bl.buil_id ? 'btn btn-sm btn-primary w-100' : 'btn btn-sm btn-dark w-100'">
+                            {{ bl.buil_name }}
+                        </button>
+                    </div>
+                </div>
+                <div class="text-start border mb-2 card shadow p-3">
+                    <p class="col-span-3 font-semibold">Choose Classroom</p>
+                    <div class="d-flex flex-column gap-2">
+                        <button v-if="Object.keys(filteredClassroom).length" v-for="(cl, index) in filteredClassroom"
+                            @click="filterOccupancy(cl.classr_id)"
+                            :disabled="classroomId == cl.classr_id ? true : false"
+                            :class="classroomId == cl.classr_id ? 'btn btn-sm btn-primary w-100' : 'btn btn-sm btn-dark w-100'">
+                            {{ cl.classr_name }}
+                        </button>
+                        <p v-else class="text-danger fw-bold text-center">
+                            Select Building First to view classroom.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col overflow-auto" style="height: 40rem;">
+                <div class="d-flex flex-column gap-2 h-100">
+                    <div v-if="(!buildingId || !classroomId) && !loading" class=" border align-content-center p-3 h-100">
+                        <div class="card bg-primary bg-opacity-50">
+                            <div class="card-header">
+                                Notice
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title">Verification</h5>
+                                <p class="card-text">To initialize occupancy detection, select building and classroom first.</p>
+                                <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="(!buildingId || !classroomId) && loading" class=" border align-content-center p-3 h-100">
+                        <Loader/>
+                    </div>
+                    <div v-if="(buildingId && classroomId) && !loading" class="border align-content-center h-100 bg-secondary-subtle">
+                        <div v-if="occupied" class="p-3 w-100 align-content-center">
+                            <div class="card bg-warning bg-opacity-50 shadow-sm border-0">
+                                <div class="card-header fw-bold text-dark">
+                                ⚠️ Schedule Notice
+                                </div>
+
+                                <div class="card-body">
+                                <h5 class="card-title mb-1">{{ occupier.subj_name }} ({{ occupier.subj_code }})</h5>
+                                <h6 class="card-subtitle mb-1 text-muted">
+                                    {{ occupier.sec_name }} – {{ occupier.gradelvl_name }}
+                                </h6>
+                                <h6 class="card-subtitle mb-3 text-muted">
+                                    {{ occupier.course_name }}
+                                </h6>
+
+                                <p class="card-text mb-3">
+                                    This room is already <strong>occupied</strong> during the selected timeslot.  
+                                    Please choose a different <strong>room</strong> or <strong>timeslot</strong> to proceed.
+                                </p>
+
+                                
+
+                                <button
+                                    v-if="(buildingId && classroomId && occupier.can_merge == 1)"
+                                    @click="mergeClassTo(occupier)"
+                                    class="btn btn-sm btn-primary"
+                                >
+                                    Merge Class Here
+                                </button>
+
+                                <div v-else class="alert alert-info py-2 small mb-3">
+                                    <p class="mb-1">
+                                    <strong>ℹ️ Note:</strong> This schedule does not currently allow merging.
+                                    </p>
+                                    <p class="mb-0">
+                                    If you are trying to merge the <strong>same subject</strong>, please enable merging from the
+                                    <strong>original schedule holder</strong>.
+                                    </p>
+                                </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div v-if="!occupied" class="border p-2">
+                            <div class="">
+                                <input v-if="!forMerge" v-model="searchValue" @keyup="filterSubject()" class="form-control mb-1"
+                                    placeholder="Search Subjects Here..." />
+                                <div class="p-3 card">
+                                    <div class="table-responsive border p-2 small-font" v-if="!loading">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Select Subjects</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-if="!Object.keys(filteredSubject).length">
+                                                    <td class="align-middle text-start">
+                                                        No Data Found
+                                                    </td>
+                                                </tr>
+                                                <tr v-else v-for="(subj, index) in filteredSubject"
+                                                    @click="assignSubject(subj.subj_id, subj.subj_code, subj.faculty_id, subj.subj_schedpass)"
+                                                    :class="activeID == subj.subj_id ? 'pe-none' : 'pe-auto'"
+                                                    :disabled="activeID == subj.subj_id ? true : false">
+                                                    <td
+                                                        :class="activeID == subj.subj_id ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                                        <p class="fw-bold ">{{ subj.subj_code }}</p>
+                                                        <p class=" fst-italic">{{ subj.subj_name }}</p>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="p-3" v-else>
+                                        <Loader />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex gap-1">
+                                    <button
+                                        :disabled="!activeID || !activeName || !buildingId || !classroomId ? true : false"
+                                        @click="assign(activeID, activeName, buildingId, classroomId, false)"
+                                        tabindex="-1" title="Assign Schedule" type="button"
+                                        class="btn btn-sm btn-primary w-100">
+                                        Assign Subject
+                                    </button>
+                                    <button @click="assign('', '', '', '', true)" tabindex="-1" title="Assign Schedule"
+                                        type="button" class="btn btn-sm btn-danger w-100">
+                                        Remove Subject
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+       <div v-else class="p-3 rounded border bg-light-subtle">
+            <div v-if="detectingMergedClass" class="w-100 text-center p-3">
+                <Loader />
+            </div>
+            <div v-else>
+                <div v-if="!hasMergedClass" class="text-center">
+                    <p class="small-font mb-3">
+                        <span class="fw-bold text-danger fst-italic">⚠️ Note:</span>
+                        This subject is already assigned to the selected timeslot.
+                    </p>
+                    <p class="text-muted small mb-3">
+                    Removing this will unassign the subject from this time slot.
+                    </p>
+                    <button
+                    @click="assign('', '', '', '', true)"
+                    type="button"
+                    class="btn btn-sm btn-danger w-50"
+                    tabindex="-1"
+                    title="Remove this subject from the schedule"
+                    >
+                    🗑️ Yes, Remove This Subject
+                    </button>
+                </div>
+
+                <div v-else class="alert alert-warning py-2 small mb-0">
+                    <p class="mb-1">
+                    <strong>Heads up!</strong> This time slot includes a <strong>merged class schedule</strong>.
+                    </p>
+                    <p class="mb-0">
+                    Please remove all merged schedules <em>before</em> deleting this one.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>

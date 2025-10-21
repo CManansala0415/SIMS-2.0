@@ -103,7 +103,7 @@ const formatAmount = (val) => {
           </div>
           <div class="col right">
             <label>Date:</label>
-            <div>Test</div>
+            <div>{{ new Date().toLocaleDateString() }}</div>
           </div>
         </div>
 

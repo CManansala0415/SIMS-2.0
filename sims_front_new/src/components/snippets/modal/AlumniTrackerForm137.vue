@@ -175,7 +175,7 @@ onMounted(async () => {
         });
     }
 })
-
+ 
 
 const downloadPdf = (filetype) => {
     // var element = document.getElementById('printform');
@@ -239,37 +239,37 @@ const downloadPdf = (filetype) => {
                                             <div class="d-flex">
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>Last Name</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_lastname"/>
                                                 </div>
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>First Name</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_firstname"/>
                                                 </div>
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>Middle Name</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_middlename"/>
                                                 </div>
                                                 <div class="p-0 w-25 d-flex flex-column text-start">
                                                     <span>Suffix Name</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_suffixname"/>
                                                 </div>
                                             </div>
                                             <div class="d-flex">
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>LRN</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" value=""/>
                                                 </div>
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>Date of Birth (MM/DD/YYYY)</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_birthday"/>
                                                 </div>
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>Sex</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_gender == 1? 'Male':'Female'"/>
                                                 </div>
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>Date of SHS Admission (MM/DD/YYYY)</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold fst-italic" :value="milestoneCompHeader[0].arc_dateenrolled"/>
                                                 </div>
                                             </div>
                                             <div class="d-flex">
@@ -366,7 +366,7 @@ const downloadPdf = (filetype) => {
                                                 </div>
                                                 <div class="p-0 w-100 d-flex flex-column text-start">
                                                     <span>Track/Strand</span>
-                                                    <input type="text" class="border-0 border-bottom fw-bold w-100 fst-italic"/>
+                                                    <input type="text" class="border-0 border-bottom fw-bold w-100 fst-italic" :value="milestoneCompHeader[0].arc_coursename"/>
                                                 </div>
                                                 <div class="p-0 w-50 d-flex flex-column text-start">
                                                     <span>School ID</span>

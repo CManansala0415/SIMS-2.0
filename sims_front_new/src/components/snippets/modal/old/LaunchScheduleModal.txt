@@ -309,7 +309,7 @@ onMounted(async () => {
                 let checker = arr => arr.every(v => v === true);
                 allow.value = checker(scheduledFaculty.value)
                 loadSched()
-
+                
             })
         })
     } catch (err) {
@@ -320,7 +320,7 @@ onMounted(async () => {
             title: "Oops...",
             text: "Something went wrong!",
             footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
-        }).then(() => {
+        }).then(()=>{
             preLoading.value = false
         });
     }
@@ -359,7 +359,7 @@ const getSched = (subjid, subjname, building, classroom, remove, facultyid, merg
     classroomId.value = classroom
     // showScheduler.value = false
     facultyId.value = facultyid
-    let schedId = schedid ? schedid : '' // need maging string na empty para madetect ni backend
+    let schedId = schedid? schedid : '' // need maging string na empty para madetect ni backend
     // console.log(schedId)
     //id na pinapasa sa scheduler if may nadd kanang subject
     switch (timeDay.value) {
@@ -931,7 +931,7 @@ const saveSched = () => {
                     title: "Update Successful",
                     text: "Changes applied",
                     icon: "success"
-                }).then(() => {
+                }).then(()=>{
                     // saving.value = false
                     // savingCount.value = 0
                     // scheduleList.value = []
@@ -1100,7 +1100,7 @@ const loadSched = () => {
 
             })
 
-
+ 
             loadedSched.value.forEach(async (e) => {
                 if (e.sched_id) {
                     scheduleList.value.push(e)
@@ -1134,11 +1134,12 @@ const loadFaculty = () => {
 <template>
     <div v-if="!preLoading" class="p-1 d-flex gap-2 justify-content-end mb-3">
         <div class="d-flex flex-wrap w-50 justify-content-end">
-            <button tabindex="-1" @click="close" type="button" class="btn btn-sm btn-primary"
-                :disabled="preLoading ? true : false"> <font-awesome-icon icon="fa-solid fa-rotate-left" /> Back
+            <button tabindex="-1"
+                @click="close" type="button" class="btn btn-sm btn-primary"
+                :disabled="preLoading ? true : false"> <font-awesome-icon icon="fa-solid fa-rotate-left"/> Back
             </button>
         </div>
-    </div>
+    </div> 
     <div class="border p-3">
         <div class="w-100">
             <div class="w-100 align-content-center p-3">
@@ -1146,15 +1147,11 @@ const loadFaculty = () => {
             </div>
             <div class="d-flex gap-2 p-2 small-font mb-3">
                 <div class="w-100 border d-flex align-content-center justify-content-evenly rounded-2 shadow p-3">
-                    <span class="">Semester: &nbsp;<span class="text-success fw-bold">{{ launch.quar_code
-                            }}</span></span>
-                    <span class="">Degree: &nbsp;<span class="text-success fw-bold">{{ launch.dtype_desc
-                            }}</span></span>
-                    <span class="">Grade Level: &nbsp;<span class="text-success fw-bold">{{ launch.grad_name
-                            }}</span></span>
-                    <span class="">Section: &nbsp;<span class="text-success fw-bold">{{ launch.sec_name }}</span></span>
-                    <span class="">Academic Year: &nbsp;<span class="text-success fw-bold">{{ launch.ln_year
-                            }}</span></span>
+                    <span class="">Semester: &nbsp;<span class="text-success fw-bold">{{ launch.quar_code }}</span></span>
+                    <span class="">Degree: &nbsp;<span class="text-success fw-bold">{{ launch.dtype_desc }}</span></span> 
+                    <span class="">Grade Level: &nbsp;<span class="text-success fw-bold">{{ launch.grad_name }}</span></span> 
+                    <span class="">Section: &nbsp;<span class="text-success fw-bold">{{ launch.sec_name }}</span></span> 
+                    <span class="">Academic Year: &nbsp;<span class="text-success fw-bold">{{ launch.ln_year }}</span></span> 
                     <span class="">Slots: &nbsp;<span class="text-success fw-bold">{{ launch.ln_slots }}</span></span>
 
                 </div>
@@ -1177,7 +1174,7 @@ const loadFaculty = () => {
                     data-bs-target="#occupancymodal" class="btn btn-sm btn-dark">
                     View Occupancy
                 </button>
-
+               
             </div>
             <div v-if="!preLoading && !Object.keys(curriculum).length" class="w-100 mt-4 p-4">
                 <p class="text-danger fw-bold">No Curriculum Found</p>
@@ -1194,145 +1191,68 @@ const loadFaculty = () => {
                     <p class="small-font">Please assign corresponding faculty for each subject first to access schedule
                         editor.</p>
                 </div>
-                <table v-else class="w-100 table-fixed calendar-table">
+                <table v-else class="w-100 table-fixed">
                     <thead>
-                        <tr>
-                            <th v-for="(hd, index) in headers" :key="index"
-                                class="p-3 text-center text-uppercase fw-bold">
-                                {{ hd.title }}
-                            </th>
-                        </tr>
+                        <th v-for="(hd, index) in headers" class="p-3">{{
+                            hd.title }}</th>
                     </thead>
-
                     <tbody>
-                        <tr v-for="(tm, index) in loadedSched" :key="index">
-                            <!-- Time Column -->
-                            <td class="time-cell text-center fw-semibold bg-light">
+                        <tr v-for="(tm, index) in loadedSched" class="p-3">
+                            <td class="w-25 bg-success-subtle">
                                 {{ tm.timename }} {{ tm.daytime }}
                             </td>
-
-                            <!-- Monday -->
-                            <td class="day-cell" :class="tm.classname">
-                                <template v-if="tm.sched_mon_code">
-                                    <div class="sched-tile" data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid, tm.sched_mon_mergeable, tm)">
-                                        <div class="tile-code">{{ tm.sched_mon_code }}</div>
-                                        <div class="tile-sec">{{ tm.mon_sec_name }}</div>
-                                        <div class="tile-fac text-muted small">{{ tm.mon_faculty }}</div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <input class="form-control form-control-sm border-0 empty-input"
-                                        data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid, tm.sched_mon_mergeable, tm)"
-                                        readonly placeholder="—" />
-                                </template>
+                            <td :class="tm.classname">
+                                <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
+                                    data-bs-target="#schedulermodal"
+                                    @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid, tm.sched_mon_mergeable, tm)"
+                                    readonly v-model="tm.sched_mon_code" />
                                 <input type="hidden" readonly v-model="tm.sched_mon" />
+                                <!-- {{ tm.sched_id }} -->
                             </td>
-
-                            <!-- Tuesday -->
-                            <td class="day-cell" :class="tm.classname">
-                                <template v-if="tm.sched_tue_code">
-                                    <div class="sched-tile bg-success-subtle border-success" data-bs-toggle="modal"
-                                        data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Tuesday', index, tm.sched_tue, tm.sched_tue_bid, tm.sched_tue_classrid, tm.sched_tue_mergeable, tm)">
-                                        <div class="tile-code text-success">{{ tm.sched_tue_code }}</div>
-                                        <div class="tile-sec">{{ tm.tue_sec_name }}</div>
-                                        <div class="tile-fac text-muted small">{{ tm.tue_faculty }}</div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <input class="form-control form-control-sm border-0 empty-input"
-                                        data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Tuesday', index, tm.sched_tue, tm.sched_tue_bid, tm.sched_tue_classrid, tm.sched_tue_mergeable, tm)"
-                                        readonly placeholder="—" />
-                                </template>
+                            <td :class="tm.classname">
+                                <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
+                                    data-bs-target="#schedulermodal"
+                                    @click="assignSubject(tm.timeid, 'Tuesday', index, tm.sched_tue, tm.sched_tue_bid, tm.sched_tue_classrid, tm.sched_tue_mergeable, tm)"
+                                    readonly v-model="tm.sched_tue_code" />
                                 <input type="hidden" readonly v-model="tm.sched_tue" />
+                                <!-- {{ tm.sched_id }} -->
                             </td>
-
-                            <!-- Wednesday -->
-                            <td class="day-cell" :class="tm.classname">
-                                <template v-if="tm.sched_wed_code">
-                                    <div class="sched-tile bg-info-subtle border-info" data-bs-toggle="modal"
-                                        data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Wednesday', index, tm.sched_wed, tm.sched_wed_bid, tm.sched_wed_classrid, tm.sched_wed_mergeable, tm)">
-                                        <div class="tile-code text-info">{{ tm.sched_wed_code }}</div>
-                                        <div class="tile-sec">{{ tm.wed_sec_name }}</div>
-                                        <div class="tile-fac text-muted small">{{ tm.wed_faculty }}</div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <input class="form-control form-control-sm border-0 empty-input"
-                                        data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Wednesday', index, tm.sched_wed, tm.sched_wed_bid, tm.sched_wed_classrid, tm.sched_wed_mergeable, tm)"
-                                        readonly placeholder="—" />
-                                </template>
+                            <td :class="tm.classname">
+                                <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
+                                    data-bs-target="#schedulermodal"
+                                    @click="assignSubject(tm.timeid, 'Wednesday', index, tm.sched_wed, tm.sched_wed_bid, tm.sched_wed_classrid, tm.sched_wed_mergeable, tm)"
+                                    readonly v-model="tm.sched_wed_code" />
                                 <input type="hidden" readonly v-model="tm.sched_wed" />
+                                <!-- {{ tm.sched_id }} -->
                             </td>
-
-                            <!-- Thursday -->
-                            <td class="day-cell" :class="tm.classname">
-                                <template v-if="tm.sched_thurs_code">
-                                    <div class="sched-tile bg-warning-subtle border-warning" data-bs-toggle="modal"
-                                        data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Thursday', index, tm.sched_thurs, tm.sched_thurs_bid, tm.sched_thurs_classrid, tm.sched_thurs_mergeable, tm)">
-                                        <div class="tile-code text-warning">{{ tm.sched_thurs_code }}</div>
-                                        <div class="tile-sec">{{ tm.thurs_sec_name }}</div>
-                                        <div class="tile-fac text-muted small">{{ tm.thurs_faculty }}</div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <input class="form-control form-control-sm border-0 empty-input"
-                                        data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Thursday', index, tm.sched_thurs, tm.sched_thurs_bid, tm.sched_thurs_classrid, tm.sched_thurs_mergeable, tm)"
-                                        readonly placeholder="—" />
-                                </template>
+                            <td :class="tm.classname">
+                                <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
+                                    data-bs-target="#schedulermodal"
+                                    @click="assignSubject(tm.timeid, 'Thursday', index, tm.sched_thurs, tm.sched_thurs_bid, tm.sched_thurs_classrid, tm.sched_thurs_mergeable, tm)"
+                                    readonly v-model="tm.sched_thurs_code" />
                                 <input type="hidden" readonly v-model="tm.sched_thurs" />
+                                <!-- {{ tm.sched_id }} -->
                             </td>
-
-                            <!-- Friday -->
-                            <td class="day-cell" :class="tm.classname">
-                                <template v-if="tm.sched_fri_code">
-                                    <div class="sched-tile bg-danger-subtle border-danger" data-bs-toggle="modal"
-                                        data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Friday', index, tm.sched_fri, tm.sched_fri_bid, tm.sched_fri_classrid, tm.sched_fri_mergeable, tm)">
-                                        <div class="tile-code text-danger">{{ tm.sched_fri_code }}</div>
-                                        <div class="tile-sec">{{ tm.fri_sec_name }}</div>
-                                        <div class="tile-fac text-muted small">{{ tm.fri_faculty }}</div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <input class="form-control form-control-sm border-0 empty-input"
-                                        data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Friday', index, tm.sched_fri, tm.sched_fri_bid, tm.sched_fri_classrid, tm.sched_fri_mergeable, tm)"
-                                        readonly placeholder="—" />
-                                </template>
+                            <td :class="tm.classname">
+                                <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
+                                    data-bs-target="#schedulermodal"
+                                    @click="assignSubject(tm.timeid, 'Friday', index, tm.sched_fri, tm.sched_fri_bid, tm.sched_fri_classrid, tm.sched_fri_mergeable, tm)"
+                                    readonly v-model="tm.sched_fri_code" />
                                 <input type="hidden" readonly v-model="tm.sched_fri" />
+                                <!-- {{ tm.sched_id }} -->
                             </td>
-
-                            <!-- Saturday -->
-                            <td class="day-cell" :class="tm.classname">
-                                <template v-if="tm.sched_sat_code">
-                                    <div class="sched-tile bg-secondary-subtle border-secondary" data-bs-toggle="modal"
-                                        data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Saturday', index, tm.sched_sat, tm.sched_sat_bid, tm.sched_sat_classrid, tm.sched_sat_mergeable, tm)">
-                                        <div class="tile-code text-secondary">{{ tm.sched_sat_code }}</div>
-                                        <div class="tile-sec">{{ tm.sat_sec_name }}</div>
-                                        <div class="tile-fac text-muted small">{{ tm.sat_faculty }}</div>
-                                    </div>
-                                </template>
-                                <template v-else>
-                                    <input class="form-control form-control-sm border-0 empty-input"
-                                        data-bs-toggle="modal" data-bs-target="#schedulermodal"
-                                        @click="assignSubject(tm.timeid, 'Saturday', index, tm.sched_sat, tm.sched_sat_bid, tm.sched_sat_classrid, tm.sched_sat_mergeable, tm)"
-                                        readonly placeholder="—" />
-                                </template>
+                            <td :class="tm.classname">
+                                <input class="form-control form-control-sm border-0" data-bs-toggle="modal"
+                                    data-bs-target="#schedulermodal"
+                                    @click="assignSubject(tm.timeid, 'Saturday', index, tm.sched_sat, tm.sched_sat_bid, tm.sched_sat_classrid, tm.sched_sat_mergeable, tm)"
+                                    readonly v-model="tm.sched_sat_code" />
                                 <input type="hidden" readonly v-model="tm.sched_sat" />
+                                <!-- {{ tm.sched_id }} -->
                             </td>
                         </tr>
+
                     </tbody>
                 </table>
-
                 <div v-if="allow" class="mt-3 mb-3 w-100 d-flex gap-2 justify-content-end">
                     <button @click="clearSched()" tabindex="-1" title="Assign Schedule" type="button"
                         class="btn btn-sm btn-dark">
@@ -1427,7 +1347,7 @@ const loadFaculty = () => {
     <!-- Faculty Modal -->
     <div class="modal fade" id="facultymodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable custom-modal">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Faculty Assignment</h5>
@@ -1435,9 +1355,11 @@ const loadFaculty = () => {
                         @click="showFaculty = false"></button>
                 </div>
                 <div class="modal-body">
-                    <LaunchFacultyModal :subjectData="filteredSubjects" :curriculumIdData="launch.ln_curriculum"
-                        :launchIdData="launch.ln_id" :semIdData="launch.ln_quarter"
-                        :gradelvlData="launch.ln_gradelvl" />
+                    <LaunchFacultyModal :subjectData="filteredSubjects"
+                           :curriculumIdData="launch.ln_curriculum"
+                           :launchIdData="launch.ln_id"
+                           :semIdData="launch.ln_quarter"
+                           :gradelvlData="launch.ln_gradelvl"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -1456,78 +1378,3 @@ const loadFaculty = () => {
     </div>
 
 </template>
-<style scoped>
-input:focus {
-  outline: none; /* Removes the default browser outline */
-  box-shadow: none; /* Removes Bootstrap's focus shadow */
-}
-.calendar-table {
-    border-collapse: collapse;
-    width: 100%;
-    background-color: #f5f8ff;
-}
-
-.time-cell {
-    width: 120px;
-    border-right: 2px solid #dee2e6;
-    border-bottom: 1px solid #e9ecef;
-    font-size: 0.9rem;
-    background-color: #fff !important;
-}
-
-.day-cell {
-    border: 1px solid #e9ecef;
-    min-height: 70px;
-    text-align: center;
-    position: relative;
-    vertical-align: middle;
-    background-color: transparent;
-}
-
-/* Schedule tiles (for occupied cells) */
-.sched-tile {
-    background: #f0f6ff;
-    border: 1.4px solid #2f80ed;
-    border-radius: 10px;
-    padding: 10px 12px;
-    width: 95%;
-    margin: 0 auto;
-    box-shadow: 0 2px 0 rgba(47, 128, 237, 0.06);
-    cursor: pointer;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.sched-tile:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 18px rgba(47, 128, 237, 0.12);
-}
-
-.tile-code {
-    font-weight: 600;
-}
-
-.tile-sec {
-    font-size: 0.8rem;
-    color: #333;
-}
-
-/* Empty slots: transparent, still clickable */
-.empty-input {
-    background: transparent !important;
-    text-align: center;
-    color: #bbb;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    padding: 0.6rem;
-}
-
-.empty-input:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-}
-
-.custom-modal {
-  max-width: 95% !important; /* or 100% for full width */
-  width: 95% !important;
-}
-</style>

@@ -11,6 +11,7 @@ import AcademicSemester from './commandcenterforms/AcademicSemester.vue';
 import AcademicSection from './commandcenterforms/AcademicSection.vue';
 import AcademicDownpayment from './commandcenterforms/AcademicDownpayment.vue';
 import AcademicCurriculum from './commandcenterforms/AcademicCurriculum.vue';
+import AcademicGrades from './commandcenterforms/AcademicGrades.vue';
 
 const props = defineProps({
     subjectData: {
@@ -219,7 +220,7 @@ const execute = (type, mode) => {
                                     <span class="fw-bold mt-3" id="percentage">0</span><span>% Completed</span>
                                 `,
                                 showConfirmButton: false,
-                                allowOutsideClick: false
+                                allowOutsideClick: false6
                             });
                             
                             resetStopwatch()
@@ -250,6 +251,60 @@ const execute = (type, mode) => {
                                             alertNotice.value = 2
                                         }
                                     })
+                                }
+                            })
+                        }
+                    });
+                    break;
+                case 6:
+                    Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to trigger encoding of grades?",
+                        showCancelButton: true,
+                        confirmButtonText: "Activate",
+                        confirmButtonColor: '#237a5b',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            preLoading.value=true
+                            let x = {
+                                mode:1,//means activate,
+                                userid:userID.value,
+                                code:'cs_07'
+                            }
+                            setAcademicStatus(x).then((result)=>{
+                                if (result.status == 200) {
+                                    Swal.fire("Activated!", "", "success");
+                                    preLoading.value=false
+                                } else {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                    preLoading.value=false
+                                }
+                            })
+                        }
+                    });
+                    break;
+                case 7:
+                    Swal.fire({
+                        title: "Warning",
+                        text: "Do you want to trigger encoding of grades?",
+                        showCancelButton: true,
+                        confirmButtonText: "Activate",
+                        confirmButtonColor: '#237a5b',
+                    }).then((confirm) => {
+                        if(confirm.isConfirmed){
+                            preLoading.value=true
+                            let x = {
+                                mode:2,//means deactivate,
+                                userid:userID.value,
+                                code:'cs_07'
+                            }
+                            setAcademicStatus(x).then((result)=>{
+                                if (result.status == 200) {
+                                    Swal.fire("deactivated!", "", "success");
+                                    preLoading.value=false
+                                } else {
+                                    Swal.fire("Changes are not saved", "", "info");
+                                    preLoading.value=false
                                 }
                             })
                         }
@@ -492,6 +547,28 @@ const resetStopwatch = () => {
                                         <button type="button" class="btn btn-dark small-font" @click="execute(2, 5)">Execute</button>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td class="align-middle">
+                                        Enable Encoding of Grades
+                                    </td>
+                                    <td class="align-middle">
+                                        Allow encoding of grades.
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 6)">Execute</button>
+                                    </td>
+                                </tr>
+                                 <tr>
+                                    <td class="align-middle">
+                                        Disable Encoding of Grades
+                                    </td>
+                                    <td class="align-middle">
+                                        Restrict encoding of grades.
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 7)">Execute</button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -592,6 +669,7 @@ const resetStopwatch = () => {
                     <AcademicCurriculum v-if="formValue == 4 && showCommandCenterModal" :userIdData="userID" :courseData="course" 
                         :curriculumData="curriculum" :programData="program" :gradelvlData="gradelvl"/>
                     <AcademicSection v-if="formValue == 5 && showCommandCenterModal" :userIdData="userID" />
+                    <AcademicGrades v-if="formValue == 6 && showCommandCenterModal" :userIdData="userID" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

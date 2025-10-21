@@ -97,18 +97,22 @@ onMounted(async () => {
             let prog = enrolleeData.value[0].enr_program
             let grad = enrolleeData.value[0].enr_gradelvl
             let cour = enrolleeData.value[0].enr_course
-
+            
             getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
                 settingscurr.value = results
                 //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
-                if (Object.keys(results).length == 0) {
-                    curr = 0
-                } else {
-                    curr = settingscurr.value[0].sett_course_currid
+                if(!curr){
+                    if (Object.keys(results).length == 0) {
+                        curr = 0
+                    } else {
+                        curr = settingscurr.value[0].sett_course_currid
+                    }
                 }
+
                 // if(!enrolleeData.value[0].enr_curriculum){
                 //    curr = settingscurr.value[0].sett_course_currid
                 // }
+
                 enr_curriculum.value = curr
                 getCurriculumSubject(curr, 0, 0).then((results) => {
                     currSubject.value = results
@@ -134,6 +138,12 @@ onMounted(async () => {
                             addedSubject.value.push(e)
                             addedSubjectId.value.push(e.subj_id)
                         })
+                            console.log('program: ', prog)
+                            console.log('semester: ', studentSemId.value)
+                            console.log('course: ', cour)
+                            console.log('gradelevel: ', grad)
+                            console.log('curriculum: ', curr)
+                            console.log('section: ', enr_section.value)
 
                         getLaunchChecker(
                             prog,
@@ -142,14 +152,15 @@ onMounted(async () => {
                             grad,
                             curr,
                             enr_section.value
-                        ).then(async (results) => {
+                        ).then(async (results1) => {
 
-                            getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results.ln_id).then((results) => {
-                                scheduleData.value = results.data
+                            // console.log(results1)
+                            getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results1.ln_id).then((results2) => {
+                                scheduleData.value = results2.data
                                 preloading.value = false
                                 milestoneLoading.value = false
 
-                                console.log(scheduleData.value)
+                                // console.log(results2)
                             })
                         })
 

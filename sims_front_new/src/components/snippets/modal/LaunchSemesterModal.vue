@@ -57,7 +57,7 @@ const launch = ref({
     ln_gradelvl: '',
     ln_curriculum: '',
     ln_section: '',
-    ln_slots: '',
+    ln_slots: 0,
     ln_year: '',
 })
 
@@ -273,98 +273,108 @@ const saveLaunch = async () => {
 
 </script>
 <template>
-    <form @submit.prevent="saveLaunch" class="d-flex flex-column p-2 gap-2" v-if="!isLoading">
-        <div class="d-flex flex-wrap flex-column">
-            <p class="text-success fw-bold">Initialize Semester</p>
-            <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
-                </span><span class="italic">Ensure that the details of the following launch are correct
-                    because once this item is created it <span class="text-danger fw-bold">cannot be editable</span>.
-                    To create a semester launch, select the appropiate academic status and refresh the page
-                </span></p>
-        </div>
-
-        <div class="d-flex flex-wrap form-group">
-            <label for="slot">Slots</label>
-            <input v-model="launch.ln_slots" required type="text" class="form-control form-control-sm"
-                title="Click Edit to modify details" id="slot" aria-describedby="slot" />
-        </div>
-        <div class="d-flex flex-column text-start form-group">
-            <label for="year">Academic Year (From/To)</label>
-            <div class="d-flex gap-1" id="year">
-                <input class="form-control form-control-sm" type="number" min="1900" max="2099" step="1"
-                    v-model="launch.ln_year" required disabled/>
-                <input class="form-control form-control-sm pe-none" type="number" min="1900" max="2099" step="1"
-                    :value="launch.ln_year + 1" disabled />
+    <div v-if="!isLoading">
+        <div class="row">
+            <div class="col">
+                <form @submit.prevent="saveLaunch" class="d-flex flex-column p-2 gap-2 border rounded-3 shadow-lg p-4" >
+                    <div class="d-flex flex-wrap flex-column">
+                        <p class="text-success fw-bold">Initialize Semester</p>
+                        <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+                            </span><span class="italic">Ensure that the details of the following launch are correct
+                                because once this item is created it <span class="text-danger fw-bold">cannot be editable</span>.
+                                To create a semester launch, select the appropiate academic status and refresh the page
+                            </span></p>
+                    </div>
+                    <!-- <div class="d-flex flex-wrap form-group">
+                        <label for="slot">Slots</label>
+                        <input v-model="launch.ln_slots" required type="text" class="form-control form-control-sm"
+                            title="Click Edit to modify details" id="slot" aria-describedby="slot" />
+                    </div> -->
+                    <div class="d-flex flex-column text-start form-group">
+                        <label for="year">Academic Year (From/To)</label>
+                        <div class="d-flex gap-1" id="year">
+                            <input class="form-control form-control-sm" type="number" min="1900" max="2099" step="1"
+                                v-model="launch.ln_year" required disabled/>
+                            <input class="form-control form-control-sm pe-none" type="number" min="1900" max="2099" step="1"
+                                :value="launch.ln_year + 1" disabled />
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap form-group">
+                        <label for="sem">Semester</label>
+                        <select class="form-control form-select-sm" v-model="launch.ln_quarter" required disabled
+                            title="Click Edit to modify details" id="sem" aria-describedby="sem">
+                            <option v-for="(sem, index) in filteredSemester" :value="sem.quar_id">
+                                {{ sem.quar_desc }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-wrap form-group">
+                        <label for="degree">Degree</label>
+                        <select @change="filterGradelvl()"
+                            class="form-control form-select-sm"
+                            title="Click Edit to modify details" id="degree" aria-describedby="degree"
+                            v-model="launch.ln_dtype" :disabled="launch.ln_quarter ? false : true" required>
+                            <option v-for="(deg, index) in degree" :value="deg.dtype_id">
+                                {{ deg.dtype_desc }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-wrap form-group">
+                        <label for="gradelvl">Year / Grade Level</label>
+                        <select @change="filterCourse()"
+                            class="form-control form-select-sm"
+                            title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                            v-model="launch.ln_gradelvl" :disabled="launch.ln_dtype ? false : true" required>
+                            <option v-for="(gr, index) in filteredGradelvl" :value="gr.grad_id">
+                                {{ gr.grad_name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-wrap form-group">
+                        <label for="gradelvl">Program / Strand</label>
+                        <select @change="filterCurriculum(launch.ln_course)"
+                            class="form-control form-select-sm"
+                            title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                            v-model="launch.ln_course" :disabled="launch.ln_gradelvl ? false : true" required>
+                            <option v-for="(c, index) in filteredCourse" :value="c.prog_id">
+                                {{ c.prog_name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-wrap form-group">
+                        <label for="gradelvl">Curriculum</label>
+                        <select 
+                            class="form-control form-select-sm"
+                            title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                            v-model="launch.ln_curriculum" :disabled="launch.ln_course ? false : true" required>
+                            <option v-for="(curr, index) in filteredCurriculum" :value="curr.curr_id">
+                                {{ curr.curr_code }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-wrap form-group">
+                        <label for="gradelvl">Section</label>
+                        <select @change="filterCourse()"
+                            class="form-control form-select-sm"
+                            title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
+                            v-model="launch.ln_section" :disabled="launch.ln_curriculum ? false : true" required>
+                            <option v-for="(sc, index) in section" :value="sc.sec_id">
+                                {{ sc.sec_name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="d-flex flex-wrap form-group mt-3">
+                        <button :disabled="saving? true:false" type="submit" class="btn btn-sm btn-success w-100">Create launch</button>
+                    </div>
+                </form>
             </div>
+            <!-- <div class="col">   
+                <div class="d-flex flex-column p-2 gap-2 border rounded-3 shadow-lg p-4" >
+                        asd
+                </div>
+            </div> -->
         </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="sem">Semester</label>
-            <select class="form-control form-select-sm" v-model="launch.ln_quarter" required disabled
-                title="Click Edit to modify details" id="sem" aria-describedby="sem">
-                <option v-for="(sem, index) in filteredSemester" :value="sem.quar_id">
-                    {{ sem.quar_desc }}
-                </option>
-            </select>
-        </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="degree">Degree</label>
-            <select @change="filterGradelvl()"
-                class="form-control form-select-sm"
-                title="Click Edit to modify details" id="degree" aria-describedby="degree"
-                v-model="launch.ln_dtype" :disabled="launch.ln_quarter ? false : true" required>
-                <option v-for="(deg, index) in degree" :value="deg.dtype_id">
-                    {{ deg.dtype_desc }}
-                </option>
-            </select>
-        </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="gradelvl">Year / Grade Level</label>
-            <select @change="filterCourse()"
-                class="form-control form-select-sm"
-                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
-                v-model="launch.ln_gradelvl" :disabled="launch.ln_dtype ? false : true" required>
-                <option v-for="(gr, index) in filteredGradelvl" :value="gr.grad_id">
-                    {{ gr.grad_name }}
-                </option>
-            </select>
-        </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="gradelvl">Program / Strand</label>
-            <select @change="filterCurriculum(launch.ln_course)"
-                class="form-control form-select-sm"
-                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
-                v-model="launch.ln_course" :disabled="launch.ln_gradelvl ? false : true" required>
-                <option v-for="(c, index) in filteredCourse" :value="c.prog_id">
-                    {{ c.prog_name }}
-                </option>
-            </select>
-        </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="gradelvl">Curriculum</label>
-            <select 
-                class="form-control form-select-sm"
-                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
-                v-model="launch.ln_curriculum" :disabled="launch.ln_course ? false : true" required>
-                <option v-for="(curr, index) in filteredCurriculum" :value="curr.curr_id">
-                    {{ curr.curr_code }}
-                </option>
-            </select>
-        </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="gradelvl">Section</label>
-            <select @change="filterCourse()"
-                class="form-control form-select-sm"
-                title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl"
-                v-model="launch.ln_section" :disabled="launch.ln_curriculum ? false : true" required>
-                <option v-for="(sc, index) in section" :value="sc.sec_id">
-                    {{ sc.sec_name }}
-                </option>
-            </select>
-        </div>
-        <div class="d-flex flex-wrap form-group mt-3">
-            <button :disabled="saving? true:false" type="submit" class="btn btn-sm btn-success w-100">Create launch</button>
-        </div>
-    </form>
+    </div>
     <div v-else>
         <LoaderMini></LoaderMini>
     </div>

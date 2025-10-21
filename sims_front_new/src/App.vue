@@ -347,13 +347,21 @@ const showItems = (item) => {
 }
 
 const switchItem = (access, item) => {
+ 
   fetchingUserAccess.value = true
-  isLoading.value = true 
+  isLoading.value = true
 
-  switch (access) {
+
+
+  if(accessSelected.value == access && itemSelected.value == item){
+      fetchingUserAccess.value = false
+      isLoading.value = false
+  }
+    switch (access) {
     case 0:
       accessSelected.value = access
       itemSelected.value = item
+      
       break;
     case 1:
       accessSelected.value = access
@@ -370,10 +378,12 @@ const switchItem = (access, item) => {
     default:
       return false;
   }
+  
 
 }
 
 const checkPath = (data) =>{
+
   if(path.value != data){
     fetchingUserAccess.value = true
     isLoading.value = true

@@ -21,7 +21,8 @@ import {
     getGradingSheetGrade,
     addGradingSheet,
     addGradingGrade,
-    getAcademicDefaults
+    getAcademicDefaults,
+    getAcademicStatus
 } from "../Fetchers.js";
 
 
@@ -56,6 +57,7 @@ const semester = ref([])
 const section = ref([])
 const booting = ref('')
 const bootingCount = ref(0)
+const activeGradingSheet = ref(false)
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 
 const booter = async () => {
@@ -111,6 +113,10 @@ const booter = async () => {
         section.value = results.section
         booting.value = 'Loading Academic Information'
         bootingCount.value += 1
+    })
+
+    getAcademicStatus(1,'cs_07').then((results) => {
+        results[0].sett_status == 1? activeGradingSheet.value = true: activeGradingSheet.value = false
     })
 
 }
@@ -597,7 +603,7 @@ const openTip = () => {
                 
             </table>
         </div>
-        <div v-if="!preLoading && Object.keys(finalStudentList).length " class="w-100 mt-2">
+        <div v-if="!preLoading && Object.keys(finalStudentList).length && activeGradingSheet" class="w-100 mt-2">
             <div class="d-flex shadow rounded-3 border w-100 justify-content-between p-3 gap-2">
                 <div class="w-75 align-content-center text-md-start">
                     <span class="fw-bold text-primary">Note: </span><span class="italic">Once

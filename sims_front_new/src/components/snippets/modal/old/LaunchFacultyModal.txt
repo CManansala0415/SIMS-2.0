@@ -125,7 +125,7 @@ const saveFaculty = (index, subjid, mode) => {
                         title: "Update Successful",
                         text: "Changes applied",
                         icon: "success"
-                    }).then(() => {
+                    }).then(()=>{
                         checking.value = false
                         close()
                     });
@@ -159,7 +159,7 @@ const saveFaculty = (index, subjid, mode) => {
                         title: "Update Successful",
                         text: "Changes applied",
                         icon: "success"
-                    }).then(() => {
+                    }).then(()=>{
                         checking.value = false
                         close()
                     });
@@ -192,7 +192,7 @@ const saveFaculty = (index, subjid, mode) => {
                         title: "Update Successful",
                         text: "Changes applied",
                         icon: "success"
-                    }).then(() => {
+                    }).then(()=>{
                         checking.value = false
                         close()
                     });
@@ -274,7 +274,7 @@ const saveFaculty = (index, subjid, mode) => {
                             title: "Successfully Removed",
                             text: "Changes applied",
                             icon: "success"
-                        }).then(() => {
+                        }).then(()=>{
                             checking.value = false
                             close()
                         });
@@ -348,7 +348,7 @@ onMounted(async () => {
                         //     (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid)
                         // );
                         return (
-                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) && (obj.occ_lnid == launchId.value)
+                            (e.subj_id == obj.occ_subjid) && (obj.occ_faculty == empid) && (obj.occ_lnid == launchId.value) 
                         );
                     })
 
@@ -392,7 +392,7 @@ onMounted(async () => {
             title: "Oops...",
             text: "Something went wrong!",
             footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
-        }).then(() => {
+        }).then(()=>{
             preLoading.value = false
         });
     }
@@ -400,165 +400,57 @@ onMounted(async () => {
 
 </script>
 <template>
-    <div class="p-7">
+    <div class="p-7 ">
         <div v-if="preLoading" class="w-100 flex flex-col gap-2 justify-center items-center">
-            <Loader />
+            <Loader/>
         </div>
-
-        <div v-else class="overflow-auto border rounded-3 bg-body-secondary small-font p-3">
-            <!-- Header -->
-            <div class="table-header d-flex fw-bold text-white d-none d-md-flex">
-                <div class="col-code text-center flex-fill">Code</div>
-                <div class="col-name text-center flex-fill">Subject</div>
-                <div class="col-faculty text-center flex-fill">Faculty</div>
-                <div class="col-action text-center flex-fill">Action</div>
-            </div>
-
-            <!-- Rows -->
-            <div v-for="(sj, index) in curriculumSubject" :key="index"
-                class="table-row d-flex flex-column flex-md-row align-items-stretch">
-                <!-- Code -->
-                <div class="col-code flex-fill text-center fw-semibold">
-                    <span class="d-md-none fw-bold text-success">Code: </span>{{ sj.subj_code }}
-                </div>
-
-                <!-- Subject -->
-                <div class="col-name flex-fill text-center">
-                    <span class="d-md-none fw-bold text-success">Subject: </span>{{ sj.subj_name }}
-                </div>
-
-                <!-- Faculty Selector -->
-                <div class="col-faculty flex-fill">
-                    <span class="d-md-none fw-bold text-success">Faculty: </span>
-                    <select @change="detectLoad(index, sj.subj_id, sj.lock)" :id="'assignedFaculty' + index"
-                        :value="sj.faculty_id" :disabled="sj.lock" class="form-select form-select-sm w-100 text-center"
-                        title="Click Edit to modify details">
-                        <option value="" disabled>-- Select Faculty --</option>
-                        <option v-for="(emp, i) in employee" :key="i" :value="emp.emp_id">
-                            {{ emp.emp_lastname }}, {{ emp.emp_firstname }}
-                            {{ emp.emp_middlename ? emp.emp_middlename : '' }}
-                            {{ emp.emp_suffixname ? emp.emp_suffixname : '' }}
-                        </option>
-                    </select>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="col-action flex-fill text-center mt-2 mt-md-0">
-                    <template v-if="!sj.lock">
-                        <div class="action-btns d-flex gap-2 justify-content-center">
-                            <button :disabled="checking" @click="saveFaculty(index, sj.subj_id, 'add')" type="button"
-                                class="btn btn-sm btn-success flex-fill" title="Assign Faculty">
+        <div v-else class="d-flex flex-column gap-1 overflow-auto border p-3 bg-body-secondary small-font">
+            <div v-for="(sj, index) in curriculumSubject" class="">
+                <div class="card">
+                    <div class="card-header">
+                        {{ sj.subj_code }}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ sj.subj_name }}</h5>
+                        <p class="card-text">Select the faculty from options below then click the assign button to save. </p>
+                        <!-- Once schedule is made and instructor is already assigned, 
+                            you will not be able to change the assigned faculty unless you remove the created schedule. -->
+                        <select @change="detectLoad(index, sj.subj_id, sj.lock)" :id="'assignedFaculty' + index"
+                            :value="sj.faculty_id" :disabled="sj.lock == true ? true : false"
+                            class="form-control form-select-sm w-100"
+                            title="Click Edit to modify details">
+                            <option value="" disabled>-- Select Faculty --</option>
+                            <option v-for="(emp, index) in employee" :value="emp.emp_id">
+                                {{ emp.emp_lastname }}, {{ emp.emp_firstname }} {{ emp.emp_middlename ? emp.emp_middlename : '' }}  {{
+                                    emp.emp_suffixname ? emp.emp_suffixname : '' }}
+                            </option>
+                        </select>
+                        <div v-if="sj.lock == false" class="d-flex gap-2 mt-3">
+                            <button :disabled="checking ? true : false" @click="saveFaculty(index, sj.subj_id, 'add')"
+                                tabindex="-1" title="Assign Faculty" type="button" class="btn btn-sm btn-primary w-100">
                                 Assign
                             </button>
-                            <button :disabled="checking" @click="saveFaculty(index, sj.subj_id, 'remove')" type="button"
-                                class="btn btn-sm btn-danger flex-fill" title="Remove Faculty">
+                            <button :disabled="checking ? true : false"
+                                @click="saveFaculty(index, sj.subj_id, 'remove')" tabindex="-1" title="Remove Faculty"
+                                type="button" class="btn btn-sm btn-danger w-100">
                                 Remove
                             </button>
                         </div>
-                    </template>
-
-                    <template v-else>
-                        <p class="text-danger small fw-semibold mb-0 mt-2">
-                            Locked — remove all schedules first
-                        </p>
-                    </template>
+                        <div v-else class="align-content-center justify-content-center mt-3">
+                            <p class="text-danger fw-bold">Unable to update faculty. Remove all active
+                                schedules for this subject first</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <!-- <select 
+                        class="w-100 border border-gray-300 p-2 disabled:shadow-inner rounded-md disabled:bg-gray-50 disabled:cursor-not-allowed " 
+                        title="Click Edit to modify details">
+                    <option value="" disabled>-- Select Type --</option>
+                    <option v-for="(sj, index) in curriculumSubject" :value="sj.subj_id">
+                        {{ sj.subj_name }} ({{ sj.subj_code }})
+                    </option>
+                </select> -->
         </div>
     </div>
 </template>
-
-<style scoped>
-.table-header {
-    background-color: #198754;
-    /* green accent */
-    padding: 10px;
-    border-radius: 6px 6px 0 0;
-}
-
-.table-row {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid #dee2e6;
-    transition: background 0.2s ease;
-}
-
-.table-row:hover {
-    background-color: rgba(25, 135, 84, 0.05);
-}
-
-.table-row>div {
-    flex: 1 1 0;
-    padding: 5px;
-    text-align: center;
-}
-
-/* Equal width columns */
-
-.col-name,
-.col-faculty,
-.col-action {
-    width: 25%;
-}
-
-.col-code{
-    width: 5%;
-}
-
-/* Action buttons inline */
-.action-btns {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-}
-
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 991px) {
-
-    .col-code,
-    .col-name,
-    .col-faculty,
-    .col-action {
-        width: 100%;
-    }
-
-    .table-row {
-        flex-wrap: wrap;
-    }
-}
-
-/* ---------- MOBILE ---------- */
-@media (max-width: 767px) {
-    .table-header {
-        display: none;
-    }
-
-    .table-row {
-        border: 1px solid #dee2e6;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        background: #fff;
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 12px;
-    }
-
-    .table-row>div {
-        text-align: left;
-        width: 100%;
-        padding: 6px 0;
-    }
-
-    /* Stack buttons vertically on mobile */
-    .action-btns {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .btn {
-        font-size: 0.85rem;
-        width: 100%;
-    }
-}
-</style>

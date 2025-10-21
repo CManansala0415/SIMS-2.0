@@ -48,7 +48,7 @@ const filteredCourse = ref([])
 const filteredQuarter = ref([])
 const filteredGradelvl = ref([])
 const settings = ref([])
-const enrollChecker = ref(false)
+const enrollChecker = ref(true)
 const saving = ref(false)
 const search = ref('')
 const preLoading = ref(true)
@@ -81,8 +81,6 @@ onMounted(async () => {
         filteredGradelvl.value = gradelvl.value
         filteredQuarter.value = quarter.value
 
-        enrollChecker.value = true
-
         await booter().then(() => {
             getEnrollment(personID.value).then((results) => {
                 if (results.length != 0) {
@@ -95,10 +93,12 @@ onMounted(async () => {
                     enrollData.value.lrn = enrolleeData.value.enr_lrn
                 } else {
                     enrolleeData.value = []
+                    enrollData.value.quarter = settings.value[0].sett_semester
                 }
                 enrollChecker.value = false
                 preLoading.value = false
             })
+
         })
         
     } catch (err) {
@@ -216,7 +216,7 @@ const enroll = () => {
         <div class="d-flex flex-wrap form-group">
             <label for="type">Type</label>
             <select v-model="enrollData.program" class="form-control" title="Click Edit to modify details"
-                @change="filterQuarter(), filterGradelvl(), filterCourses(), enrollData.lrn = ''"
+                @change="filterGradelvl(), filterCourses(), enrollData.lrn = ''"
                 :disabled="enrollChecker || enrolleeData.enr_id ? true : false" id="type" aria-describedby="type">
                 <option value="" disabled>-- Select Type --</option>
                 <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
@@ -228,10 +228,19 @@ const enroll = () => {
                 :disabled="enrollChecker || enrolleeData.enr_id || enrollData.program == 2 ? true : false"
                 title="Click Edit to modify details" id="lrn" aria-describedby="lrn" />
         </div> -->
+        <!-- <div class="d-flex flex-wrap form-group">
+            <label for="sem">Semester / Quarter</label>
+            <select v-model="enrollData.quarter" class="form-control"
+                :disabled="!enrollData.program || enrolleeData.enr_id || enrollData.quarter  ? true : false"
+                title="Click Edit to modify details" id="sem" aria-describedby="sem">
+                <option value="" disabled>-- Select Type --</option>
+                <option v-for="(q, index) in filteredQuarter" :value="q.quar_id">{{ q.quar_desc }}</option>
+            </select>
+        </div> -->
         <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester / Quarter</label>
             <select v-model="enrollData.quarter" class="form-control"
-                :disabled="!enrollData.program || enrolleeData.enr_id ? true : false"
+                disabled
                 title="Click Edit to modify details" id="sem" aria-describedby="sem">
                 <option value="" disabled>-- Select Type --</option>
                 <option v-for="(q, index) in filteredQuarter" :value="q.quar_id">{{ q.quar_desc }}</option>

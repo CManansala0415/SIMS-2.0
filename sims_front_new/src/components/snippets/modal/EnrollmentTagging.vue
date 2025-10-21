@@ -65,7 +65,7 @@ onMounted(async () => {
     sectionFilter.value = sectionData.value
     curriculumFilter.value = curriculumData.value
 
-    console.log(studentData.value)
+    // console.log(studentData.value)
 
     try {
         
@@ -105,12 +105,19 @@ onMounted(async () => {
             getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
                 settingscurr.value=results
 
-                //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
-                if(Object.keys(results).length == 0 || !Object.keys(results).length){
-                    curr = 0
+                if(studentData.value.enr_curriculum){
+                    // console.log('yes')
+                    curr = studentData.value.enr_curriculum
                 }else{
-                    curr = settingscurr.value[0].sett_course_currid
+                    // console.log('no')
+                     //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
+                    if(Object.keys(results).length == 0 || !Object.keys(results).length){
+                        curr = 0
+                    }else{
+                        curr = settingscurr.value[0].sett_course_currid
+                    }
                 }
+               
                 // if(!enrolleeData.value[0].enr_curriculum){
                 //    curr = settingscurr.value[0].sett_course_currid
                 // }
@@ -127,8 +134,8 @@ onMounted(async () => {
                             return e
                         }
                     })
-                    console.log(milestoneSubject.value)
-                    
+
+                    // console.log(milestoneSubject.value)
 
                     getMilestone(studentData.value.enr_id).then((results) => {
                         
@@ -355,8 +362,8 @@ const filterCurriculum = () => {
             class="d-flex w-100 mt-4 justify-content-center align-content-center">
             <Loader />
         </div>
-        <div v-else>
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <div v-else class="w-100">
+            <ul v-if="!saving" class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#ctab1" type="button"
                         role="tab" aria-controls="ctab1" aria-selected="true">Current Academic Track</button>
@@ -380,160 +387,165 @@ const filterCurriculum = () => {
                      </div>
                 </div>
                 <div v-else class="tab-pane fade show active" id="ctab1" role="tabpanel" aria-labelledby="tab1">
-                    <div class="container overflow-hidden p-3">
-                        <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2">
-                            <div class="col-12 border-bottom">
-                                <div class="p-3">
-                                    <span class="fw-bold border bg-info text-white p-2 rounded-3">SUBJECTS TO BE ENROLLED</span>
+                    <div v-if="!saving">
+                        <div class="container overflow-hidden p-3">
+                            <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2">
+                                <div class="col-12 border-bottom">
+                                    <div class="p-3">
+                                        <span class="fw-bold border bg-info text-white p-2 rounded-3">SUBJECTS TO BE ENROLLED</span>
+                                    </div>
+                                </div> 
+                                <div class="col-12">
+                                    <div class="p-3 d-flex flex-column">
+                                        <span class="fw-bold">Course</span>{{ e.prog_name }}
+                                    </div>
                                 </div>
+                                <div class="col-6">
+                                    <div class="p-3 border shadow d-flex flex-column gap-2 card">
+                                        <span class="fw-bold">Curriculum</span>
+                                        <select class="form-control form-select-sm w-100" v-model="enr_curriculum"
+                                            @change="setData('curriculum', enr_curriculum)">
+                                            <option>-- Select Here --</option>
+                                            <option v-for="(c, index) in curriculumFilter" :value="c.curr_id">{{ c.curr_code
+                                                }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-3 border shadow d-flex flex-column gap-2 card">
+                                        <span class="fw-bold">Section</span>
+                                        <select class="form-control form-select-sm w-100" v-model="enr_section"
+                                            @change="setData('section', enr_section)">
+                                            <option>-- Select Here --</option>
+                                            <option v-for="(s, index) in sectionFilter" :value="s.sec_id">{{ s.sec_name }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <!-- <div class="col-4">
+                                    <div class="p-3 border bg-body-secondary d-flex flex-column">
+                                        <span class="fw-bold">Relevant</span>
+                                    </div>
+                                </div> -->
                             </div>
-                            <div class="col-12">
-                                <div class="p-3 d-flex flex-column">
-                                    <span class="fw-bold">Course</span>{{ e.prog_name }}
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 border shadow d-flex flex-column gap-2 card">
-                                    <span class="fw-bold">Curriculum</span>
-                                    <select class="form-control form-select-sm w-100" v-model="enr_curriculum"
-                                        @change="setData('curriculum', enr_curriculum)">
-                                        <option>-- Select Here --</option>
-                                        <option v-for="(c, index) in curriculumFilter" :value="c.curr_id">{{ c.curr_code
-                                            }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="p-3 border shadow d-flex flex-column gap-2 card">
-                                    <span class="fw-bold">Section</span>
-                                    <select class="form-control form-select-sm w-100" v-model="enr_section"
-                                        @change="setData('section', enr_section)">
-                                        <option>-- Select Here --</option>
-                                        <option v-for="(s, index) in sectionFilter" :value="s.sec_id">{{ s.sec_name }}
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <!-- <div class="col-4">
-                                <div class="p-3 border bg-body-secondary d-flex flex-column">
-                                    <span class="fw-bold">Relevant</span>
-                                </div>
-                            </div> -->
                         </div>
-                    </div>
-                    <div class="container overflow-hidden p-3">
-                        <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2">
-                            <div class="col-12 mb-2">
-                                <div class="p-3 border bg-body-secondary">
-                                    <span class="fw-bold">Subjects Enrolled</span>
+                        <div class="container overflow-hidden p-3">
+                            <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2">
+                                <div class="col-12 mb-2">
+                                    <div class="p-3 border bg-body-secondary">
+                                        <span class="fw-bold">Subjects Enrolled</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-5">
-                                <div class="d-flex flex-column gap-2 ">
-                                    <input v-model="searchSubject" class="form-control form-control-sm" @keyup="filteredSubject"
-                                        placeholder="Search Subjects Here..." />
-                                    <div class="p-3 card">
-                                        <div class="table-responsive border p-2 small-font" style="height: 500px;">
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Select Subjects</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-if="!Object.keys(subjectFilter).length">
-                                                        <td class="align-middle text-start">
-                                                            No Data Found
-                                                        </td>
-                                                    </tr>
-                                                    <tr v-else v-for="(s, index) in subjectFilter"
-                                                        @click="addSubject(s)">
-                                                        <td
-                                                            :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
-                                                            <p class="fw-bold ">{{ s.subj_code }}</p>
-                                                            <p class=" fst-italic">{{ s.subj_name }}</p>
-                                                        </td>
-                                                    </tr>
+                                <div class="col-5">
+                                    <div class="d-flex flex-column gap-2 ">
+                                        <input v-model="searchSubject" class="form-control form-control-sm" @keyup="filteredSubject"
+                                            placeholder="Search Subjects Here..." />
+                                        <div class="p-3 card">
+                                            <div class="table-responsive border p-2 small-font" style="height: 500px;">
+                                                <table class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Select Subjects</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-if="!Object.keys(subjectFilter).length">
+                                                            <td class="align-middle text-start">
+                                                                No Data Found
+                                                            </td>
+                                                        </tr>
+                                                        <tr v-else v-for="(s, index) in subjectFilter"
+                                                            @click="addSubject(s)">
+                                                            <td
+                                                                :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                                                <p class="fw-bold ">{{ s.subj_code }}</p>
+                                                                <p class=" fst-italic">{{ s.subj_name }}</p>
+                                                            </td>
+                                                        </tr>
 
-                                                </tbody>
-                                            </table>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-7">
-                                <div class="d-flex flex-column">
-                                    <div class="d-flex flex-column card">
-                                        <!-- <div class="shadow p-3">
-                                            <span class="fw-bold">Subjects and Units Applied</span>
-                                        </div> -->
-                                        <div class="container overflow-auto p-3" style="height: 578px;">
-                                            <div v-if="!Object.keys(addedSubject).length && !loadCurrItems" class="p-1">
-                                               <div class="shadow p-3 rounded-3 text-center border small-font fw-bold text-danger">
-                                                No Subjects Added
-                                               </div>
-                                            </div>
-                                            <div v-if="!Object.keys(addedSubject).length && loadCurrItems" class="p-1">
-                                               <div class="shadow p-3 rounded-3 text-center border small-font fw-bold">
-                                                <Loader/>
-                                               </div>
-                                            </div>
-                                            <div v-if="Object.keys(addedSubject).length && !loadCurrItems" v-for="(a, index) in addedSubject" class="row gy-1 gx-1 mb-1">
-                                                <div class="col-12">
-                                                    <div class="p-3 border text-start">
-                                                        <div class="w-100 small-font">
-                                                            <div class="d-flex flex-column">
-                                                                <div class="border-bottom d-flex flex-column text-start mb-3">
-                                                                    <span class="mt-3 fw-bold">{{ a.subj_code }}</span>
-                                                                    <span class="mb-3 fst-italic">{{ a.subj_name }}</span>
-                                                                </div>
-                                                                <div class="input-group input-group-sm mb-1">
-                                                                    <span class=" input-group-text">Lecture Units</span>
-                                                                    <input v-model="a.subj_lec" type="text" class="form-control form-control-sm" disabled>
-                                                                </div>
-                                                                <div class="input-group input-group-sm mb-1">
-                                                                    <span class=" input-group-text">Laboratory Units</span>
-                                                                    <input v-model="a.subj_lab" type="text" class="form-control form-control-sm" disabled>
-                                                                </div>
-                                                                <div class="input-group input-group-sm mb-3">
-                                                                    <span class=" input-group-text">Total Units / Hours</span>
-                                                                    <input :value="a.subj_lab + a.subj_lec" type="text" class="form-control form-control-sm" disabled>
-                                                                </div>
-                                                                <div class="mb-1">
-                                                                    <label for="cross" class="form-label">Cross Enrolled (School)</label>
-                                                                    <input class="form-control form-control-sm" type="text" v-model="addedSubject[index].mi_crossenr">
-                                                                </div>
-                                                                <div class="mb-1">
-                                                                    <label for="cross" class="form-label">Subject Completion</label>
-                                                                    <select class="form-select form-select-sm" v-model="addedSubject[index].mi_tag">
-                                                                        <option value="">-- Select Type --</option>
-                                                                        <option :value="1">Already Taken</option>
-                                                                        <option :value="2">Advance</option>
-                                                                        <option :value="3">Re-take / Back Subject</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="mt-3 mb-1">
-                                                                    <button @click="removeSubject(index)" type="button"
-                                                                    class="btn btn-sm btn-danger w-100">Remove this Subject</button>
+                                <div class="col-7">
+                                    <div class="d-flex flex-column">
+                                        <div class="d-flex flex-column card">
+                                            <!-- <div class="shadow p-3">
+                                                <span class="fw-bold">Subjects and Units Applied</span>
+                                            </div> -->
+                                            <div class="container overflow-auto p-3" style="height: 578px;">
+                                                <div v-if="!Object.keys(addedSubject).length && !loadCurrItems" class="p-1">
+                                                <div class="shadow p-3 rounded-3 text-center border small-font fw-bold text-danger">
+                                                    No Subjects Added
+                                                </div>
+                                                </div>
+                                                <div v-if="!Object.keys(addedSubject).length && loadCurrItems" class="p-1">
+                                                <div class="shadow p-3 rounded-3 text-center border small-font fw-bold">
+                                                    <Loader/>
+                                                </div>
+                                                </div>
+                                                <div v-if="Object.keys(addedSubject).length && !loadCurrItems" v-for="(a, index) in addedSubject" class="row gy-1 gx-1 mb-1">
+                                                    <div class="col-12">
+                                                        <div class="p-3 border text-start">
+                                                            <div class="w-100 small-font">
+                                                                <div class="d-flex flex-column">
+                                                                    <div class="border-bottom d-flex flex-column text-start mb-3">
+                                                                        <span class="mt-3 fw-bold">{{ a.subj_code }}</span>
+                                                                        <span class="mb-3 fst-italic">{{ a.subj_name }}</span>
+                                                                    </div>
+                                                                    <div class="input-group input-group-sm mb-1">
+                                                                        <span class=" input-group-text">Lecture Units</span>
+                                                                        <input v-model="a.subj_lec" type="text" class="form-control form-control-sm" disabled>
+                                                                    </div>
+                                                                    <div class="input-group input-group-sm mb-1">
+                                                                        <span class=" input-group-text">Laboratory Units</span>
+                                                                        <input v-model="a.subj_lab" type="text" class="form-control form-control-sm" disabled>
+                                                                    </div>
+                                                                    <div class="input-group input-group-sm mb-3">
+                                                                        <span class=" input-group-text">Total Units / Hours</span>
+                                                                        <input :value="a.subj_lab + a.subj_lec" type="text" class="form-control form-control-sm" disabled>
+                                                                    </div>
+                                                                    <div class="mb-1">
+                                                                        <label for="cross" class="form-label">Cross Enrolled (School)</label>
+                                                                        <input class="form-control form-control-sm" type="text" v-model="addedSubject[index].mi_crossenr">
+                                                                    </div>
+                                                                    <div class="mb-1">
+                                                                        <label for="cross" class="form-label">Subject Completion</label>
+                                                                        <select class="form-select form-select-sm" v-model="addedSubject[index].mi_tag">
+                                                                            <option value="">-- Select Type --</option>
+                                                                            <option :value="1">Already Taken</option>
+                                                                            <option :value="2">Advance</option>
+                                                                            <option :value="3">Re-take / Back Subject</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="mt-3 mb-1">
+                                                                        <button @click="removeSubject(index)" type="button"
+                                                                        class="btn btn-sm btn-danger w-100">Remove this Subject</button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            
                                         </div>
-                                        
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex flex-column gap-2 border p-3">
+                                        <p class="fst-italic"><span class="fw-bold text-primary">Note: </span> Ensure that the information encoded here are correct and validations based on the actual data of the student to avoid records mismatch.</p>   
+                                        <button @click="saveData()" :disabled="saving || !Object.keys(addedSubject).length? true:false" type="button" class="btn btn-success btn-md">Save Taggings</button> 
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-12">
-                                <div class="d-flex flex-column gap-2 border p-3">
-                                    <p class="fst-italic"><span class="fw-bold text-primary">Note: </span> Ensure that the information encoded here are correct and validations based on the actual data of the student to avoid records mismatch.</p>   
-                                    <button @click="saveData()" :disabled="saving || !Object.keys(addedSubject).length? true:false" type="button" class="btn btn-success btn-md">Save Taggings</button> 
-                                </div>
-                            </div>
-                        </div>
+                        </div>    
+                    </div>
+                    <div v-else class="container overflow-hidden p-3">
+                        <Loader>Saving Items Please Wait...</Loader>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="ctab2" role="tabpanel" aria-labelledby="tab2">

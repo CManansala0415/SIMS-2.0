@@ -258,7 +258,7 @@ onMounted(async () => {
                         <th style="background-color: #237a5b;" class="text-white">Course</th>
                         <th style="background-color: #237a5b;" class="text-white">Section</th>
                         <th style="background-color: #237a5b;" class="text-white">Grade Level</th>
-                        <th style="background-color: #237a5b;" class="text-white">Slots</th>
+                        <!-- <th style="background-color: #237a5b;" class="text-white">Slots</th> -->
                         <th style="background-color: #237a5b;" class="text-white">Commands</th>
                     </tr>
                 </thead>
@@ -282,9 +282,9 @@ onMounted(async () => {
                         <td class="align-middle">
                             {{ ln.grad_name }}
                         </td>
-                        <td class="align-middle">
+                        <!-- <td class="align-middle">
                             {{ ln.ln_slots }}
-                        </td>
+                        </td> -->
                         <td v-if="accessData[3].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button 
@@ -322,12 +322,12 @@ onMounted(async () => {
             </div>
         </div>
     </div>
-
+ 
 
     <!-- Launch Modal -->
     <div class="modal fade" id="adddatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Semester Launch</h5>

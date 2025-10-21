@@ -2509,6 +2509,22 @@ const getEnrollmentSchedule = async (curr,prog,grad,cour,sec,lnid) => {
     }
 }
 
+let getmergedclass = {}
+const getMergedClass = async (schedid, day) => {
+    try{
+        await axios({
+            method: "GET",
+            url: 'api/get-merged-class/'+schedid+'/'+day,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getmergedclass = results.data
+        })
+        return getmergedclass
+    }catch(err){
+        return err
+    }
+}
+
 export {
 
     getApplicant,
@@ -2662,6 +2678,7 @@ export {
     getAcademicStatus,
     getArchiveMerge,
     updateArchiveDetails,
-    getEnrollmentSchedule
+    getEnrollmentSchedule,
+    getMergedClass
 }
 
