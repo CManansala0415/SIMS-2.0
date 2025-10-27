@@ -22,7 +22,8 @@ import {
     addGradingSheet,
     addGradingGrade,
     getAcademicDefaults,
-    getAcademicStatus
+    getAcademicStatus,
+    getCommandUpdate
 } from "../Fetchers.js";
 
 
@@ -55,9 +56,12 @@ const course = ref([])
 const dtype = ref([])
 const semester = ref([])
 const section = ref([])
+const commands = ref([])
 const booting = ref('')
 const bootingCount = ref(0)
 const activeGradingSheet = ref(false)
+
+
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 
 const booter = async () => {
@@ -104,6 +108,12 @@ const booter = async () => {
     //     bootingCount.value += 1
     // })
 
+    getCommandUpdate().then((results) => {
+        commands.value = results
+        booting.value = 'Loading Settings'
+        bootingCount.value += 1
+    })
+    
     getAcademicDefaults().then((results) => {
         gradelvl.value = results.gradelvl
         degree.value = results.program
@@ -156,7 +166,7 @@ onMounted(async () => {
                             // console.log(studentSubjects.value)
                         })
                     })
-                  
+                    
                     preLoading.value = false
                     emit('doneLoading', false)
                 })
@@ -199,7 +209,6 @@ const filterSubject = () => {
         let enrids = []
         let students = []
 
-        console.log(studentSubjects.value)
 
         // filter muna yung subjects na enrolled ni students
         studentSubjects.value.forEach((e, index) => {
@@ -220,13 +229,17 @@ const filterSubject = () => {
 
         // match students array vs subjects nila
         let exist = enrids.filter(element => list.includes(element));
-        let filtration1 = []
-        let filtration2 = []
+        let students_filtration = []
+        let section_filtration = []
+        let gradelvl_filtration = []
+        let program_filtration = []
+        let grades_filtration = []
+
         // run yung correct matches then filter naten students masterlist then push if match yung enr_id
         exist.forEach((e) => {
             students.filter((f) => {
                 if (f.enr_id == e) {
-                    filtration1.push(f)
+                    students_filtration.push(f)
                 }
             })
         })
@@ -234,17 +247,28 @@ const filterSubject = () => {
 
         //find lf_lnid para dun sa fetcher ng header ni grading sheet
         let sectionId = ''
+        let programId = ''
+        let gradelvlId = ''
+        let courseId = ''
         let lflnid = ''
+
+
         groupedAssignmentSubject.value[filterSubjectId.value].filter(e => {
             if (e.lf_lnid === filterLnid.value) {
                 sectionId = e.sec_id
+                programId = e.ln_dtype
+                gradelvlId = e.ln_gradelvl
                 lflnid = e.lf_lnid
+                courseId = e.ln_course 
             }
         });
 
+        // console.log(groupedAssignmentSubject.value)
+
+
         // catch if walang laman list ng students para di mag error
         if (!sectionId && !lflnid) {
-            filtration1 = []
+            students_filtration = []
         }
 
         gradingHeader.value = []
@@ -257,7 +281,7 @@ const filterSubject = () => {
                     gradingGrades.value = results
 
                     let y = []
-                    filtration1.forEach(e => {
+                    students_filtration.forEach(e => {
                         let enrid = gradingGrades.value.findIndex(f => {
                             return e.enr_id === f.grs_enrid
                         });
@@ -269,14 +293,22 @@ const filterSubject = () => {
                         y.push(z)
                     })
 
-                    filtration2 = Object.groupBy(y, section => section.enr_section);
-                    finalStudentList.value = filtration2[sectionId]
+                    program_filtration = Object.groupBy(y, program => program.enr_program);
+                    gradelvl_filtration = Object.groupBy(program_filtration[programId], gradelvl => gradelvl.enr_gradelvl);
+                    section_filtration = Object.groupBy(gradelvl_filtration[gradelvlId], section => section.enr_section);
+
+                    let final_data = section_filtration
+                    finalStudentList.value = final_data[sectionId]
+
+                    // section_filtration = Object.groupBy(y, section => section.enr_section); //old code
+                    // finalStudentList.value = section_filtration[sectionId] //old code
                     filteringData.value = false
+
                 })
             } else {
 
                 //filter by lnid ang ginamit natin dahil para unique sya na di mag merge sa ibang section
-                if (!Object.keys(filtration1).length) {
+                if (!Object.keys(students_filtration).length) {
                     finalStudentList.value = []
                     // alert('Records are Empty')
                     Swal.fire({
@@ -285,8 +317,20 @@ const filterSubject = () => {
                         icon: "question"
                     });
                 } else {
-                    filtration2 = Object.groupBy(filtration1, section => section.enr_section);
-                    finalStudentList.value = filtration2[sectionId]
+
+                    // console.log(sectionId)
+                    // console.log(programId)
+                    // console.log(gradelvlId)
+
+                    program_filtration = Object.groupBy(students_filtration, program => program.enr_program);
+                    gradelvl_filtration = Object.groupBy(program_filtration[programId], gradelvl => gradelvl.enr_gradelvl);
+                    section_filtration = Object.groupBy(gradelvl_filtration[gradelvlId], section => section.enr_section);
+                    // console.log(section_filtration)
+
+                    let final_data = section_filtration
+                    finalStudentList.value = final_data[sectionId]
+                    // section_filtration = Object.groupBy(students_filtration, section => section.enr_section); //old code
+                    // finalStudentList.value = section_filtration[sectionId] // old code
                     // alert('Records Loaded Successfully')
                     Swal.fire({
                         title: "Notice",
@@ -543,38 +587,256 @@ const openTip = () => {
                         <td class="align-middle p-3">
                             {{ app.grad_dtypeid == 2 ? 'College' : 'SHS' }}
                         </td>
-                        <td class="align-middle" p-3>
+                        <td class="align-middle p-3">
                             {{ app.per_lastname ? app.per_lastname : '' }}
                         </td>
-                        <td class="align-middle" p-3>
+                        <td class="align-middle p-3">
                             {{ app.per_firstname ? app.per_firstname : '' }}
                         </td>
-                        <td class="align-middle" p-3>
+                        <td class="align-middle p-3">
                             {{ app.per_middlename ? app.per_middlename : 'N/A' }}
                         </td>
-                        <td class="align-middle" p-3>
+                        <td class="align-middle p-3">
                             {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
                         </td>
-                        <td class="align-middle" p-3>
-                            <input type="number" :id="'prelims' + app.enr_id" min="60" max="100" required
+                        <td class="align-middle p-3">
+                            <!-- {{ app.grad_id }}
+                            {{ app.grad_dtypeid }}
+                            {{ app.prog_id }}
+
+                            {{ commands[8].sett_gradelvl}}
+                            {{ commands[8].sett_program}} 
+                            {{ commands[8].sett_course }} -->
+                            <input v-if="
+                            (commands[7].sett_status == 1) &&
+                                (
+                                    (
+                                            app.grad_id == commands[7].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[7].sett_program &&
+                                            app.prog_id == commands[7].sett_course
+                                    )||
+                                    (
+                                            app.grad_id == commands[7].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[7].sett_program &&
+                                            commands[7].sett_course == 0
+                                    )||
+                                    (
+                                            app.grad_id == commands[7].sett_gradelvl &&
+                                            commands[7].sett_program == 0 &&
+                                            app.prog_id == commands[7].sett_course
+                                    )||
+                                    (
+                                            commands[7].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[7].sett_program &&
+                                            app.prog_id == commands[7].sett_course
+                                    )||
+
+                                    (
+                                            app.grad_id == commands[7].sett_gradelvl &&
+                                            commands[7].sett_program == 0 &&
+                                            commands[7].sett_course == 0
+                                    )||
+                                    (
+                                            commands[7].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[7].sett_program &&
+                                            commands[7].sett_course == 0
+                                    )||
+                                    (
+                                            commands[7].sett_gradelvl == 0 &&
+                                            commands[7].sett_program == 0 &&
+                                            app.prog_id == commands[7].sett_course
+                                    )||
+
+
+                                    (
+                                            commands[7].sett_gradelvl == 0 &&
+                                            commands[7].sett_program == 0 &&
+                                            commands[7].sett_course == 0
+                                    )
+                                )      
+                            " 
+                                type="number" :id="'prelims' + app.enr_id" min="60" max="100" required
+                                :value="app.grs_prelims ? app.grs_prelims : 60"
+                                oninput="this.value = Math.abs(this.value)"
+                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                            
+                            <input v-else type="number" :id="'prelims' + app.enr_id" min="60" max="100" disabled
                                 :value="app.grs_prelims ? app.grs_prelims : 60"
                                 oninput="this.value = Math.abs(this.value)"
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
                         </td>
-                        <td class="align-middle" p-3>
-                            <input type="number" :id="'midterms' + app.enr_id" min="60" max="100" required
+                        <td class="align-middle p-3">
+                            <input v-if="
+                                (commands[8].sett_status == 1) &&
+                                (
+                                    (
+                                            app.grad_id == commands[8].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[8].sett_program &&
+                                            app.prog_id == commands[8].sett_course
+                                    )||
+                                    (
+                                            app.grad_id == commands[8].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[8].sett_program &&
+                                            commands[8].sett_course == 0
+                                    )||
+                                    (
+                                            app.grad_id == commands[8].sett_gradelvl &&
+                                            commands[8].sett_program == 0 &&
+                                            app.prog_id == commands[8].sett_course
+                                    )||
+                                    (
+                                            commands[8].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[8].sett_program &&
+                                            app.prog_id == commands[8].sett_course
+                                    )||
+
+                                    (
+                                            app.grad_id == commands[8].sett_gradelvl &&
+                                            commands[8].sett_program == 0 &&
+                                            commands[8].sett_course == 0
+                                    )||
+                                    (
+                                            commands[8].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[8].sett_program &&
+                                            commands[8].sett_course == 0
+                                    )||
+                                    (
+                                            commands[8].sett_gradelvl == 0 &&
+                                            commands[8].sett_program == 0 &&
+                                            app.prog_id == commands[8].sett_course
+                                    )||
+
+
+                                    (
+                                            commands[8].sett_gradelvl == 0 &&
+                                            commands[8].sett_program == 0 &&
+                                            commands[8].sett_course == 0
+                                    )
+                                )                                
+                                " 
+
+                                type="number" :id="'midterms' + app.enr_id" min="60" max="100" required
                                 :value="app.grs_midterms ? app.grs_midterms : 60"
                                 oninput="this.value = Math.abs(this.value)"
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                            <input v-else type="number" :id="'midterms' + app.enr_id" min="60" max="100" disabled
+                                :value="app.grs_midterms ? app.grs_midterms : 60"
+                                oninput="this.value = Math.abs(this.value)"
+                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
                         </td>
-                        <td class="align-middle" p-3>
-                            <input type="number" :id="'prefinals' + app.enr_id" min="60" max="100" required
+                        <td class="align-middle p-3">
+                            <input v-if="
+                                (commands[9].sett_status == 1) &&
+                                (
+                                    (
+                                            app.grad_id == commands[9].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[9].sett_program &&
+                                            app.prog_id == commands[9].sett_course
+                                    )||
+                                    (
+                                            app.grad_id == commands[9].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[9].sett_program &&
+                                            commands[9].sett_course == 0
+                                    )||
+                                    (
+                                            app.grad_id == commands[9].sett_gradelvl &&
+                                            commands[9].sett_program == 0 &&
+                                            app.prog_id == commands[9].sett_course
+                                    )||
+                                    (
+                                            commands[9].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[9].sett_program &&
+                                            app.prog_id == commands[9].sett_course
+                                    )||
+
+                                    (
+                                            app.grad_id == commands[9].sett_gradelvl &&
+                                            commands[9].sett_program == 0 &&
+                                            commands[9].sett_course == 0
+                                    )||
+                                    (
+                                            commands[9].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[9].sett_program &&
+                                            commands[9].sett_course == 0
+                                    )||
+                                    (
+                                            commands[9].sett_gradelvl == 0 &&
+                                            commands[9].sett_program == 0 &&
+                                            app.prog_id == commands[9].sett_course
+                                    )||
+
+
+                                    (
+                                            commands[9].sett_gradelvl == 0 &&
+                                            commands[9].sett_program == 0 &&
+                                            commands[9].sett_course == 0
+                                    )
+                                )      
+                            " 
+                                type="number" :id="'prefinals' + app.enr_id" min="60" max="100" required
                                 :value="app.grs_prefinals ? app.grs_prefinals : 60"
                                 oninput="this.value = Math.abs(this.value)"
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                            <input v-else type="number" :id="'prefinals' + app.enr_id" min="60" max="100" disabled
+                                :value="app.grs_prefinals ? app.grs_prefinals : 60"
+                                oninput="this.value = Math.abs(this.value)"
+                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
                         </td>
-                        <td class="align-middle" p-3>
-                            <input type="number" :id="'finals' + app.enr_id" min="60" max="100" required
+                        <td class="align-middle p-3">
+                            <input v-if="
+                                (commands[10].sett_status == 1) &&
+                                (
+                                    (
+                                            app.grad_id == commands[10].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[10].sett_program &&
+                                            app.prog_id == commands[10].sett_course
+                                    )||
+                                    (
+                                            app.grad_id == commands[10].sett_gradelvl &&
+                                            app.grad_dtypeid == commands[10].sett_program &&
+                                            commands[10].sett_course == 0
+                                    )||
+                                    (
+                                            app.grad_id == commands[10].sett_gradelvl &&
+                                            commands[10].sett_program == 0 &&
+                                            app.prog_id == commands[10].sett_course
+                                    )||
+                                    (
+                                            commands[10].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[10].sett_program &&
+                                            app.prog_id == commands[10].sett_course
+                                    )||
+
+                                    (
+                                            app.grad_id == commands[10].sett_gradelvl &&
+                                            commands[10].sett_program == 0 &&
+                                            commands[10].sett_course == 0
+                                    )||
+                                    (
+                                            commands[10].sett_gradelvl == 0 &&
+                                            app.grad_dtypeid == commands[10].sett_program &&
+                                            commands[10].sett_course == 0
+                                    )||
+                                    (
+                                            commands[10].sett_gradelvl == 0 &&
+                                            commands[10].sett_program == 0 &&
+                                            app.prog_id == commands[10].sett_course
+                                    )||
+
+
+                                    (
+                                            commands[10].sett_gradelvl == 0 &&
+                                            commands[10].sett_program == 0 &&
+                                            commands[10].sett_course == 0
+                                    )
+                                )      
+                            " 
+                                type="number" :id="'finals' + app.enr_id" min="60" max="100" required
+                                :value="app.grs_finals ? app.grs_finals : 60"
+                                oninput="this.value = Math.abs(this.value)"
+                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+
+                            <input v-else type="number" :id="'finals' + app.enr_id" min="60" max="100" disabled
                                 :value="app.grs_finals ? app.grs_finals : 60"
                                 oninput="this.value = Math.abs(this.value)"
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
@@ -603,7 +865,7 @@ const openTip = () => {
                 
             </table>
         </div>
-        <div v-if="!preLoading && Object.keys(finalStudentList).length && activeGradingSheet" class="w-100 mt-2">
+        <div v-if="!preLoading && Object.keys(finalStudentList).length" class="w-100 mt-2">
             <div class="d-flex shadow rounded-3 border w-100 justify-content-between p-3 gap-2">
                 <div class="w-75 align-content-center text-md-start">
                     <span class="fw-bold text-primary">Note: </span><span class="italic">Once

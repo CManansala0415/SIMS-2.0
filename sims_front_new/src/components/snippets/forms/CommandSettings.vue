@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import {
-    addCurriculum, addCurriculumTagging, getCurriculumSubject, setAcademicStatus, getAcademicStatus
+    addCurriculum, addCurriculumTagging, getCurriculumSubject, setAcademicStatus, getAcademicStatus, setCommandUpdate
 } from "../../Fetchers.js";
 import Loading1 from '../loaders/Loading1.vue';
 import Loader1 from '../loaders/Loader1.vue';
@@ -12,6 +12,7 @@ import AcademicSection from './commandcenterforms/AcademicSection.vue';
 import AcademicDownpayment from './commandcenterforms/AcademicDownpayment.vue';
 import AcademicCurriculum from './commandcenterforms/AcademicCurriculum.vue';
 import AcademicGrades from './commandcenterforms/AcademicGrades.vue';
+import AcademicGradingTerm from './commandcenterforms/AcademicGradingTerm.vue';
 
 const props = defineProps({
     subjectData: {
@@ -81,6 +82,10 @@ const execute = (type, mode) => {
                     break;
                 case 5:
                     formValue.value = 5
+                    preLoading.value=false
+                    break;
+                case 6:
+                    formValue.value = 6
                     preLoading.value=false
                     break;
                 default:
@@ -259,7 +264,7 @@ const execute = (type, mode) => {
                 case 6:
                     Swal.fire({
                         title: "Warning",
-                        text: "Do you want to trigger encoding of grades?",
+                        text: "Do you want to enable encoding of grades?",
                         showCancelButton: true,
                         confirmButtonText: "Activate",
                         confirmButtonColor: '#237a5b',
@@ -269,9 +274,9 @@ const execute = (type, mode) => {
                             let x = {
                                 mode:1,//means activate,
                                 userid:userID.value,
-                                code:'cs_07'
+                                sett_code:'cs_07'
                             }
-                            setAcademicStatus(x).then((result)=>{
+                            setCommandUpdate(x).then((result)=>{
                                 if (result.status == 200) {
                                     Swal.fire("Activated!", "", "success");
                                     preLoading.value=false
@@ -286,21 +291,21 @@ const execute = (type, mode) => {
                 case 7:
                     Swal.fire({
                         title: "Warning",
-                        text: "Do you want to trigger encoding of grades?",
+                        text: "Do you want to disable encoding of grades?",
                         showCancelButton: true,
-                        confirmButtonText: "Activate",
-                        confirmButtonColor: '#237a5b',
+                        confirmButtonText: "Dectivate",
+                        confirmButtonColor: '#c91c22',
                     }).then((confirm) => {
                         if(confirm.isConfirmed){
                             preLoading.value=true
                             let x = {
                                 mode:2,//means deactivate,
                                 userid:userID.value,
-                                code:'cs_07'
+                                sett_code:'cs_07'
                             }
-                            setAcademicStatus(x).then((result)=>{
+                            setCommandUpdate(x).then((result)=>{
                                 if (result.status == 200) {
-                                    Swal.fire("deactivated!", "", "success");
+                                    Swal.fire("Deactivated!", "", "success");
                                     preLoading.value=false
                                 } else {
                                     Swal.fire("Changes are not saved", "", "info");
@@ -549,24 +554,36 @@ const resetStopwatch = () => {
                                 </tr>
                                 <tr>
                                     <td class="align-middle">
-                                        Enable Encoding of Grades
+                                        Enable Encoding of Grades (All Terms)
                                     </td>
                                     <td class="align-middle">
-                                        Allow encoding of grades.
+                                        Allow encoding of grades (All Terms)
                                     </td>
                                     <td class="align-middle">
                                         <button type="button" class="btn btn-dark small-font" @click="execute(2, 6)">Execute</button>
                                     </td>
                                 </tr>
-                                 <tr>
+                                <tr>
                                     <td class="align-middle">
-                                        Disable Encoding of Grades
+                                        Disable Encoding of Grades (All Terms)
                                     </td>
                                     <td class="align-middle">
-                                        Restrict encoding of grades.
+                                        Restrict encoding of grades (All Terms)
                                     </td>
                                     <td class="align-middle">
                                         <button type="button" class="btn btn-dark small-font" @click="execute(2, 7)">Execute</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle">
+                                        Encoding of Grades
+                                    </td>
+                                    <td class="align-middle">
+                                        Encoding of Grades to a specific term
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                            @click="execute(1, 6)">Execute</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -655,7 +672,7 @@ const resetStopwatch = () => {
     <!-- Edit Medical Modal -->
     <div class="modal fade" id="executemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Execute</h5>
@@ -669,7 +686,9 @@ const resetStopwatch = () => {
                     <AcademicCurriculum v-if="formValue == 4 && showCommandCenterModal" :userIdData="userID" :courseData="course" 
                         :curriculumData="curriculum" :programData="program" :gradelvlData="gradelvl"/>
                     <AcademicSection v-if="formValue == 5 && showCommandCenterModal" :userIdData="userID" />
-                    <AcademicGrades v-if="formValue == 6 && showCommandCenterModal" :userIdData="userID" />
+                    <!-- <AcademicGrades v-if="formValue == 6 && showCommandCenterModal" :userIdData="userID" /> -->
+                    <AcademicGradingTerm v-if="formValue == 6 && showCommandCenterModal" :userIdData="userID" :courseData="course" 
+                        :programData="program" :gradelvlData="gradelvl"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

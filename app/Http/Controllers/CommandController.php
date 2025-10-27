@@ -83,6 +83,56 @@ class CommandController extends Controller
                         'status' => 200,
                     ];
                 break;
+
+                case 'cs_07':
+                    $codes = ['cs_08', 'cs_09', 'cs_10', 'cs_11'];
+                    $userid = $req->input('userid');
+                    $mode   = $req->input('mode');
+
+                    // Define the base update fields depending on mode
+                    $updateData = [
+                        'sett_program'   => $mode == 1 ? 0 : null,
+                        'sett_gradelvl'  => $mode == 1 ? 0 : null,
+                        'sett_course'    => $mode == 1 ? 0 : null,
+                        'sett_updatedby' => $userid,
+                        'sett_status'    => $mode == 1 ? 1 : 0,
+                        'sett_dateupdated' => $date,
+                    ];
+
+                    // Loop through each code and update
+                    foreach ($codes as $code) {
+                        DB::table('def_command_center')
+                            ->where('sett_code', $code)
+                            ->update($updateData);
+                    }
+
+                    return [
+                        'status' => 200,
+                    ];
+                break;
+
+
+                case 'cs_08':
+                case 'cs_09':
+                case 'cs_10':
+                case 'cs_11':
+
+                    $s1 = DB::table('def_command_center')
+                    ->where('sett_code','=', $req['sett_code'])
+                    ->update([
+                        'sett_program' => $req->input('sett_course_progid'),
+                        'sett_gradelvl' => $req->input('sett_course_gradelvl'),
+                        'sett_course' => $req->input('sett_course_cid'),
+                        'sett_updatedby' => $req->input('sett_course_addedby'),
+                        'sett_status' => $req->input('sett_status'),
+                        'sett_dateupdated' => $date,
+
+                    ]);
+        
+                    return $data = [
+                        'status' => 200,
+                    ];
+                break;
             }
         }catch(Exception $ex) {
             return $data = [
