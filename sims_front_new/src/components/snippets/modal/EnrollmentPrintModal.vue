@@ -364,7 +364,7 @@ const downloadPdf = () => {
                     <tr>
                         <td colspan="3">
                             <div class="d-flex flex-column text-center w-100">
-                                <span class="fw-bold">OFFICIAL STUDY LOAD</span>
+                                <span class="fw-bold">CERTIFICATE OF GRADES</span>
                                 <span class="fw-bold">STUDENT'S COPY</span>
                                 <span>Subject Grades</span>
                             </div>
@@ -440,10 +440,12 @@ const downloadPdf = () => {
                         <th style="background-color: #000000;" class="text-white">Lecture</th>
                         <th style="background-color: #000000;" class="text-white">Laboratory</th>
                         <!-- <th style="background-color: #000000;" class="text-white">Total</th> -->
-                        <th style="background-color: #000000;" class="text-white">Prelim</th>
-                        <th style="background-color: #000000;" class="text-white">Midterm</th>
-                        <th style="background-color: #000000;" class="text-white">Pre-Final</th>
-                        <th style="background-color: #000000;" class="text-white">Final</th>
+                        <!-- <th style="background-color: #000000;" class="text-white">Prelim</th> -->
+                        <!-- <th style="background-color: #000000;" class="text-white">Midterm</th> -->
+                        <!-- <th style="background-color: #000000;" class="text-white">Pre-Final</th> -->
+                        <!-- <th style="background-color: #000000;" class="text-white">Final</th> -->
+                        <th style="background-color: #000000;" class="text-white">Final Grade</th>
+                        <th style="background-color: #000000;" class="text-white">Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -463,7 +465,7 @@ const downloadPdf = () => {
                         <!-- <td class="align-middle p-2">
                             {{ c.subj_lec + c.subj_lab }}
                         </td> -->
-                        <td class="align-middle p-2">
+                        <!-- <td class="align-middle p-2">
                             {{ c.grs_prelims? c.grs_prelims:'N/A' }}
                         </td>
                         <td class="align-middle p-2">
@@ -474,6 +476,15 @@ const downloadPdf = () => {
                         </td>
                         <td class="align-middle p-2">
                             {{ c.grs_finals? c.grs_finals:'N/A' }}
+                        </td> -->
+                        <td v-if="c.grs_prelims && c.grs_midterms && c.grs_prefinals && c.grs_finals" class="align-middle p-2">
+                            {{ (c.grs_prelims + c.grs_midterms + c.grs_prefinals + c.grs_finals)/4 }}
+                        </td>
+                        <td v-else class="align-middle p-2">
+                            Term is not completed yet
+                        </td>
+                        <td class="align-middle p-2">
+                            N/A
                         </td>
                     </tr>
                 </tbody>

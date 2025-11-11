@@ -138,12 +138,12 @@ onMounted(async () => {
                             addedSubject.value.push(e)
                             addedSubjectId.value.push(e.subj_id)
                         })
-                            console.log('program: ', prog)
-                            console.log('semester: ', studentSemId.value)
-                            console.log('course: ', cour)
-                            console.log('gradelevel: ', grad)
-                            console.log('curriculum: ', curr)
-                            console.log('section: ', enr_section.value)
+                            // console.log('program: ', prog)
+                            // console.log('semester: ', studentSemId.value)
+                            // console.log('course: ', cour)
+                            // console.log('gradelevel: ', grad)
+                            // console.log('curriculum: ', curr)
+                            // console.log('section: ', enr_section.value)
 
                         getLaunchChecker(
                             prog,
@@ -508,7 +508,7 @@ function getScheduleGroupsForSubject(subjId) {
                     <tr>
                         <td colspan="3">
                             <div class="d-flex flex-column text-center w-100">
-                                <span class="fw-bold">OFFICIAL STUDY LOAD</span>
+                                <span class="fw-bold">CERTIFICATE OF REGISTRATION</span>
                                 <span v-if="formType == 1" class="fw-bold">REGISTRAR'S COPY</span>
                                 <span v-if="formType == 2" class="fw-bold">CASHIER'S COPY</span>
                                 <span>No. SF-12606</span>
@@ -663,7 +663,7 @@ function getScheduleGroupsForSubject(subjId) {
                     class="p-1 d-flex flex-column gap-1 justify-content-center align-content-center align-items-center border border-dark-subtle rounded bg-body-tertiary shadow-sm">
                     <span class="text-danger fw-bold mt-1"> IMPORTANT </span>
                     <span class="fw-bold mt-1">
-                        OFFICIAL STUDY LOAD - means officially enrolled subjects and it will serve as an admission slip
+                        CERTIFICATE OF REGISTRATION - means officially enrolled subjects and it will serve as an admission slip
                         to the
                         classroom.
                     </span>

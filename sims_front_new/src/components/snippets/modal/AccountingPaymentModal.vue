@@ -4,7 +4,7 @@ import Loader from '../loaders/Loading1.vue';
 import { getUserID } from "../../../routes/user";
 import {
     addPayment,
-    getRequestDetails,
+    getTransactionDetails,
     getPaymentDetails,
 } from "../../Fetchers.js";
 
@@ -92,30 +92,46 @@ onMounted(() => {
             payment.value = results.data
             let x = payment.value.slice(-1).pop()
 
-            balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acr_amount
+            
+            if(billType.value == 1){ // means tuition = 1 ,  request = 2
+                balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acs_amount
+            }else{
+                balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acr_amount
+            }
+
             amountTobePaid.value = balance.value
 
             payment.value.forEach((e) => {
                 paid.value += e.acy_payment
             })
 
-            getRequestDetails(0, 0, '', '', '', 2, accountId.value).then((results) => {
-                
-                if(results.data[0].acr_docstamp === 'underfined'){
-                    Swal.fire({
-                        title: "Error",
-                        text: "Unknown error occured, try again later",
-                        icon: "error"
-                    }).then(() => {
-                        location.reload()
-                    });
-                }else{
-                    !results.data[0].acr_docstamp?receiptType.value=1:receiptType.value=2
-                    checking.value = false
-                }
-            })
 
-            console.log(account.value)
+                getTransactionDetails(0, 0, '', '', '', 2, accountId.value, billType.value).then((results) => {
+
+                    if(billType.value == 1){
+
+                        // console.log(results.data[0])
+                        checking.value = false
+
+                    }else{
+
+                        if(results.data[0].acr_docstamp === 'underfined'){
+                            Swal.fire({
+                                title: "Error",
+                                text: "Unknown error occured, try again later",
+                                icon: "error"
+                            }).then(() => {
+                                location.reload()
+                            });
+                        }else{
+                            !results.data[0].acr_docstamp?receiptType.value=1:receiptType.value=2
+                            checking.value = false
+                        }
+                    }
+                    
+                })
+
+            // console.log(account.value)
         })
     })
 
@@ -149,31 +165,67 @@ const initPayment = () => {
 
     if (amountPaid.value && receiptType.value && paymentMode.value) {
         if (billType.value == 1) {
-            addPayment(x).then((results) => {
-                if (results.status != 204) {
-                    // alert('Saving Failed')
-                    // location.reload()
-                    Swal.fire({
-                        title: "Update Failed",
-                        text: "Unknown error occured, try again later",
-                        icon: "error"
-                    }).then(() => {
-                        location.reload()
-                    });
+            getTransactionDetails(0, 0, '', '', '', 2, accountId.value,1).then((results) => {
+                if (results.data[0].acs_status == 1) {
+                    addPayment(x).then((results) => {
+                        if (results.status == 204) {
+                            Swal.fire({
+                                title: "Update Successful",
+                                text: "Changes applied, preparing receipt...",
+                                icon: "success",
+                                confirmButtonText: "Ok, Got it!"
+                            }).then(async (result) => {
+                                // console.log(result)
+                                if (result.isConfirmed) {
+                                    // 🔄 Show loading Swal
+                                    Swal.fire({
+                                        title: "Generating PDF...",
+                                        text: "Please wait while we prepare your receipt.",
+                                        allowOutsideClick: false,
+                                        didOpen: () => {
+                                            Swal.showLoading();
+                                        }
+                                    });
+
+                                    let name = "receipt" + '-' + accountId.value;
+                                    let size = [6.823, 4.25];
+                                    // let size = [8.5, 4.25];
+
+                                    // Wait until PDF is generated
+                                    await pdfGenerator(name, size, "landscape", 0.03);
+
+                                    // ⏳ Keep loader for 1.5s more before closing + reloading
+                                    setTimeout(() => {
+                                        Swal.close();
+                                        location.reload();
+                                    }, 1000);
+                                }
+                            });
+
+
+                        } else {
+                            Swal.fire({
+                                title: "Payment Failed",
+                                text: "Cannot proceed payment. /n Error occured, try again later",
+                                icon: "question"
+                            }).then(() => {
+                                location.reload()
+                            });
+                        }
+                    })
                 } else {
-                    // alert('Saving Successful')
-                    // location.reload()
+                    // alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
                     Swal.fire({
-                        title: "Update Successful",
-                        text: "Changes applied, refreshing the page",
-                        icon: "success"
-                    }).then(() => {
+                        title: "Changes in the system detected",
+                        text: "Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page",
+                        icon: "question"
+                    }).then(()=>{
                         location.reload()
                     });
                 }
             })
         } else {
-            getRequestDetails(0, 0, '', '', '', 2, accountId.value).then((results) => {
+            getTransactionDetails(0, 0, '', '', '', 2, accountId.value,2).then((results) => {
                 if (results.data[0].acr_status == 1) {
                     addPayment(x).then((results) => {
                         if (results.status == 204) {
@@ -450,8 +502,23 @@ const initPayment = () => {
                     <span style="position:absolute;top:160px; left: 280px; font-size:8.5px;">
                         {{ personName }}
                     </span>
-                    <span style="position:absolute;top:181px; left: 280px; font-size:8.5px;"> 
-                        {{account.per_curr_home}}, {{account.currbarangayname}}, {{account.currcityname}}, {{account.currprovincename}}
+                    <span style="position:absolute;top:181px; left:280px; font-size:8.5px;">
+                        {{
+                            [
+                            account.per_curr_home,
+                            account.currbarangayname,
+                            account.currcityname,
+                            account.currprovincename
+                            ].filter(Boolean).join(', ')
+                        }}
+                    </span>
+
+                    <span v-if="paymentMode == 1" style="position:absolute;top:265px; left:25px; font-size:8.5px;">
+                        &#8369; &nbsp;{{ amountPaid }} 
+                    </span>
+
+                    <span v-if="paymentMode == 3" style="position:absolute;top:300px; left:25px; font-size:8.5px;">
+                       Check Here 
                     </span>
                 </div>
                 <div v-if="generateDefault == 2 && receiptType == 1" style="height: 100%; width: 100%;">

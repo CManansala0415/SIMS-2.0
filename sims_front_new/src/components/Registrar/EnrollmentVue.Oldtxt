@@ -629,7 +629,7 @@ const getData = (result) =>{
                             {{ stud.enr_dateenrolled }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ stud.acs_payment > 0 ? 'Yes' : 'No' }}
+                            {{ stud.acs_amount > 0 ? 'Yes' : 'No' }}
                         </td>
                         <td v-if="accessData[1].useracc_modifying == 1" class="align-middle p-2">
                             <div class="d-flex gap-2 justify-content-center">
@@ -638,13 +638,13 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen"/>
                                 </button>
-                                <!-- v-if="stud.acs_payment > 0" -->
-                                <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Grades" data-bs-toggle="modal" data-bs-target="#printmodal"
+                                <!-- v-if="stud.acs_amount > 0" -->
+                                <button v-if="stud.acs_amount > 0" tabindex="-1" title="Print Grades" data-bs-toggle="modal" data-bs-target="#printmodal"
                                     @click="showForm(3, stud, 1)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print"/>
                                 </button>
-                                <!-- v-if="stud.acs_payment > 0" -->
+                                <!-- v-if="stud.acs_amount > 0" -->
                                 <button tabindex="-1" title="Print Receipt" data-bs-toggle="modal" data-bs-target="#printmodal"
                                     @click="showForm(3, stud, 2)"
                                     class="btn btn-secondary btn-sm">
@@ -654,7 +654,7 @@ const getData = (result) =>{
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                 </button>
-                                <!-- v-if="stud.acs_payment > 0" -->
+                                <!-- v-if="stud.acs_amount > 0" -->
                                 <button data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
                                     type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/>

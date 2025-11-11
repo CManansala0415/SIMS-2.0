@@ -86,7 +86,7 @@ class TransactionsController extends Controller
     }
 
     
-    public function getRequestDetails($limit, $offset, $fname, $mname, $lname, $mode, $id)
+    public function getTransactionDetails($limit, $offset, $fname, $mname, $lname, $mode, $id, $type)
     {   
         if($mode == 1){
                 $request = DB::table('def_accounts_request as dr')
@@ -125,12 +125,25 @@ class TransactionsController extends Controller
                 ->count();
 
         }elseif ($mode == 2){
-            $request = DB::table('def_accounts_request')
-                    ->where('acr_id', '=', $id)
-                    ->get();
-            $count = DB::table('def_accounts_request')
-                    ->where('acr_id', '=', $id)
-                    ->count();
+
+            if($type == 1){
+                // means bill for tuition
+                $request = DB::table('def_accounts_settlement')
+                        ->where('acs_id', '=', $id)
+                        ->get();
+                $count = DB::table('def_accounts_settlement')
+                        ->where('acs_id', '=', $id)
+                        ->count();
+            }else{
+                // means request
+                $request = DB::table('def_accounts_request')
+                        ->where('acr_id', '=', $id)
+                        ->get();
+                $count = DB::table('def_accounts_request')
+                        ->where('acr_id', '=', $id)
+                        ->count();
+            }
+           
         }
         elseif ($mode == 3){ //qr search
             $request = DB::table('def_accounts_request')
@@ -263,7 +276,7 @@ class TransactionsController extends Controller
                 ->update([
                     "acs_mode" => $request['acy_mode'],
                     "acs_receipt" => $request['acy_receipt'],
-                    "acs_payment" => $request['acy_payment'],
+                    // "acs_amount" => $request['acy_payment'],
                     "acs_datesettled" => $date,
                     "acs_cashier" => $request['acy_cashier'],
                     "acs_updatedby" => $request['acy_cashier'],

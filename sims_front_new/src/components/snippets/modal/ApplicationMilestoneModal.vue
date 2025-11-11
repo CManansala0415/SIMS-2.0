@@ -213,6 +213,9 @@ const viewType = ref(0)
                                     <th class="border p-2">
                                         <span class="fw-bold">Faculty</span>
                                     </th>
+                                    <th class="border p-2">
+                                        <span class="fw-bold">Remarks</span>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -259,13 +262,16 @@ const viewType = ref(0)
                                     </td>
 
                                     <td class="align-middle" v-if="mtc.arc_migtype == 2">
-                                        <span class="text-primary">{{ c.arc_units }}</span>
+                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ c.arc_units }}</span>
                                     </td>
                                     <td class="align-middle" v-if="mtc.arc_migtype == 2">
-                                        <span class="text-primary">{{ c.arc_grade }}</span>
+                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ c.arc_grade }}</span>
                                     </td>
                                     <td class="align-middle">
-                                        <span class="text-primary">{{ c.arc_facultyname }}</span>
+                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ c.arc_facultyname }}</span>
+                                    </td>
+                                     <td class="align-middle">
+                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ parseInt(c.arc_grade) >= 3.00? 'Failed':'Passed' }}</span>
                                     </td>
                                 </tr>
                             </tbody>

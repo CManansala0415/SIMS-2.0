@@ -159,7 +159,7 @@ onMounted(async () => {
                         preloading.value = false
                         milestoneLoading.value = false
                         loadCurrItems.value = false
-                    
+                        // console.log(milestone.value)
                     })
 
                 })
@@ -366,15 +366,15 @@ const filterCurriculum = () => {
             <ul v-if="!saving" class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#ctab1" type="button"
-                        role="tab" aria-controls="ctab1" aria-selected="true">Current Academic Track</button>
+                        role="tab" aria-controls="ctab1" aria-selected="true">Academic Track</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="tab2" data-bs-toggle="tab" data-bs-target="#ctab2" type="button"
-                        role="tab" aria-controls="ctab2" aria-selected="false">Course Tracking</button>
+                        role="tab" aria-controls="ctab2" aria-selected="false">Currently Taking</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="tab3" data-bs-toggle="tab" data-bs-target="#ctab3" type="button"
-                        role="tab" aria-controls="ctab3" aria-selected="false">Course Taken</button>
+                        role="tab" aria-controls="ctab3" aria-selected="false">Permanent Record / Already Taken</button>
                 </li>
             </ul>
             <!-- <div v-if="activeEnrollment">

@@ -1358,7 +1358,7 @@ const getFeeDetails = async (limit, offset, id) => {
 }
 
 let requestdetails = {}
-const getRequestDetails = async (limit, offset, fname, mname, lname, mode, id) => {
+const getTransactionDetails = async (limit, offset, fname, mname, lname, mode, id, type) => {
     let firstname = !fname?'404':fname
     let middlename = !mname?'404':mname
     let lastname = !lname?'404':lname
@@ -1366,7 +1366,7 @@ const getRequestDetails = async (limit, offset, fname, mname, lname, mode, id) =
     try{
         await axios({
             method: "GET",
-            url: 'api/get-accounts-request/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode+'/'+id,
+            url: 'api/get-accounts-request/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode+'/'+id+'/'+type,
         }).then(async (results) => {
             // console.log(results.data)
             requestdetails = results.data
@@ -2610,7 +2610,7 @@ export {
     getAccountsDetails,
     getPriceDetails,
     getFeeDetails,
-    getRequestDetails,
+    getTransactionDetails,
     addItemRequest,
     deleteItemRequest,
     addPayment,

@@ -663,6 +663,15 @@ const openTip = () => {
                             <input v-else type="number" :id="'prelims' + app.enr_id" min="60" max="100" disabled
                                 :value="app.grs_prelims ? app.grs_prelims : 60"
                                 oninput="this.value = Math.abs(this.value)"
+                                @focusout="
+                                     e => {
+                                        let v = Number(e.target.value);
+                                        if (v < 60) v = 60;
+                                        if (v > 100) v = 100;
+                                        e.target.value = v;
+                                        app.grs_prelims = v;
+                                    }
+                                "
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
                         </td>
                         <td class="align-middle p-3">
@@ -718,6 +727,15 @@ const openTip = () => {
                                 type="number" :id="'midterms' + app.enr_id" min="60" max="100" required
                                 :value="app.grs_midterms ? app.grs_midterms : 60"
                                 oninput="this.value = Math.abs(this.value)"
+                                @focusout="
+                                     e => {
+                                        let v = Number(e.target.value);
+                                        if (v < 60) v = 60;
+                                        if (v > 100) v = 100;
+                                        e.target.value = v;
+                                        app.grs_midterms = v;
+                                    }
+                                "
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
                             <input v-else type="number" :id="'midterms' + app.enr_id" min="60" max="100" disabled
                                 :value="app.grs_midterms ? app.grs_midterms : 60"
@@ -776,6 +794,15 @@ const openTip = () => {
                                 type="number" :id="'prefinals' + app.enr_id" min="60" max="100" required
                                 :value="app.grs_prefinals ? app.grs_prefinals : 60"
                                 oninput="this.value = Math.abs(this.value)"
+                                @focusout="
+                                     e => {
+                                        let v = Number(e.target.value);
+                                        if (v < 60) v = 60;
+                                        if (v > 100) v = 100;
+                                        e.target.value = v;
+                                        app.grs_prefinals = v;
+                                    }
+                                "
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
                             <input v-else type="number" :id="'prefinals' + app.enr_id" min="60" max="100" disabled
                                 :value="app.grs_prefinals ? app.grs_prefinals : 60"
@@ -834,6 +861,15 @@ const openTip = () => {
                                 type="number" :id="'finals' + app.enr_id" min="60" max="100" required
                                 :value="app.grs_finals ? app.grs_finals : 60"
                                 oninput="this.value = Math.abs(this.value)"
+                                @focusout="
+                                     e => {
+                                        let v = Number(e.target.value);
+                                        if (v < 60) v = 60;
+                                        if (v > 100) v = 100;
+                                        e.target.value = v;
+                                        app.grs_finals = v;
+                                    }
+                                "
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
 
                             <input v-else type="number" :id="'finals' + app.enr_id" min="60" max="100" disabled

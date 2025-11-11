@@ -63,6 +63,18 @@ const studentID = ref('')
 const profileId = ref('')
 
 
+const active_arc_fullname = ref('')
+const active_arc_address = ref('')
+const active_arc_birthday = ref('')
+const active_arc_curr_home = ref('')
+const active_arc_curr_barangay = ref('')
+const active_arc_curr_city = ref('')
+const active_arc_curr_province = ref('')
+const active_arc_curr_zipcode = ref('')
+const active_arc_email = ref('')
+const active_arc_contact = ref('')
+const active_arc_coursename = ref('')
+
 const pagesContent = ref([])
 const pagesCount = ref(0)
 
@@ -162,11 +174,28 @@ onMounted(async () => {
 
             preloading.value = false
             // console.log(pagesContent.value)
+
+
+            let active_data = milestoneCompHeader.value.pop()
+            active_arc_fullname.value = active_data.arc_firstname? active_data.arc_firstname + ' ' + (active_data.arc_middlename ? active_data.arc_middlename + ' ' : ' ') + active_data.arc_lastname + ' ' + (active_data.arc_suffixname ? active_data.arc_suffixname : ' ') : ''
+            active_arc_address.value = active_data.arc_curr_home? active_data.arc_curr_home: ' ' + ', ' + active_data.arc_curr_barangay? active_data.arc_curr_barangay: ' ' + ', ' + active_data.arc_curr_city? active_data.arc_curr_city: ' ' + ', ' + active_data.arc_curr_province? active_data.arc_curr_province: ' ' + ', ' + active_data.arc_curr_zipcode? active_data.arc_curr_zipcode: ' '
+            active_arc_birthday.value = active_data.arc_birthday
+            active_arc_curr_home.value = active_data.arc_curr_home
+            active_arc_curr_barangay.value = active_data.arc_curr_barangay
+            active_arc_curr_city.value = active_data.arc_curr_city
+            active_arc_curr_province.value = active_data.arc_curr_province
+            active_arc_curr_zipcode.value = active_data.arc_curr_zipcode
+            active_arc_email.value = active_data.arc_email
+            active_arc_contact.value = active_data.arc_contact
+            active_arc_coursename.value = active_data.arc_coursename
+            
         })
 
         getUserID().then((results) => {
             userID.value = results.account.data.id
         })
+
+        
 
     } catch (err) {
         // alert('error loading the list default components')
@@ -266,41 +295,28 @@ const downloadPdf = (filetype) => {
                                                 <div class="h-100 w-75 p-2">
                                                     <div class="px-3">
                                                         <p class="m-0 p-0">
-                                                            <span class="fw-bold">Name:</span> &nbsp;{{
-                                                                milestoneCompHeader[0].arc_firstname
-                                                            }}
-                                                            {{ milestoneCompHeader[0].arc_middlename ?
-                                                                milestoneCompHeader[0].arc_middlename
-                                                                : ' ' }}
-                                                            {{ milestoneCompHeader[0].arc_lastname }}
-                                                            {{ milestoneCompHeader[0].arc_suffixname ?
-                                                                milestoneCompHeader[0].arc_suffixname
-                                                                : ' ' }}
+                                                            <span class="fw-bold">Name:</span> &nbsp;{{active_arc_fullname}}
                                                         </p>
                                                         <p class="m-0 p-0">
                                                             <span class="fw-bold">Date of Birth:</span> &nbsp;
-                                                            {{ milestoneCompHeader[0].arc_birthday }}
+                                                            {{ active_arc_birthday }}
                                                         </p>
                                                         <p class="m-0 p-0">
                                                             <span class="fw-bold">Address: &nbsp;</span>
-                                                            {{ milestoneCompHeader[0].arc_curr_home }},
-                                                            {{ milestoneCompHeader[0].arc_curr_barangay }},
-                                                            {{ milestoneCompHeader[0].arc_curr_city }},
-                                                            {{ milestoneCompHeader[0].arc_curr_province }},
-                                                            {{ milestoneCompHeader[0].arc_curr_zipcode }}
+                                                            {{ active_arc_address }}
                                                         </p>
 
                                                         <p class="m-0 p-0">
                                                             <span class="fw-bold">Email: &nbsp;</span>
-                                                            {{ milestoneCompHeader[0].arc_email }}
+                                                            {{ active_arc_email }}
                                                         </p>
                                                         <p class="m-0 p-0">
                                                             <span class="fw-bold">Contact No: &nbsp;</span>
-                                                            0{{ milestoneCompHeader[0].arc_contact }}
+                                                            0{{ active_arc_contact }}
                                                         </p>
                                                         <p class="m-0 p-0">
                                                             <span class="fw-bold">Course: &nbsp;</span>
-                                                            {{ milestoneCompHeader[0].arc_coursename }}
+                                                            {{ active_arc_coursename }}
                                                         </p>
                                                         <p class="m-0 p-0">
                                                             <span class="fw-bold">Date of Graduation: &nbsp;</span>

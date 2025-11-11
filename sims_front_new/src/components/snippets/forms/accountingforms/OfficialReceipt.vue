@@ -45,11 +45,19 @@ const props = defineProps({
 const account = computed(() => props.data)
 
 const formatAmount = (val) => {
-  return Number(val).toLocaleString("en-PH", {
+  let num = Number(val);
+
+  if (!num) {
+    return "0.00"; // or return "N/A" if you prefer
+  }
+
+  return num.toLocaleString("en-PH", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  })
-}
+  });
+};
+
+
 </script>
 
 <template>

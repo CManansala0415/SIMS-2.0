@@ -2644,6 +2644,10 @@ class RegistrarController extends Controller
     public function getArchiveMerge ($id){
         $data = DB::table('server_archive_subjects as sj')
         ->leftJoin('server_archive_persons as sp', 'sj.arc_archiveid', '=', 'sp.arc_subjects') 
+        ->select(  
+                    'sj.*',
+                    'sp.*',
+        )
         ->orderBy('sj.arc_takenid')
         ->where('sj.arc_personid','=', $id)
         ->get();

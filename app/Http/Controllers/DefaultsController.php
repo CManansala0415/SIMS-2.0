@@ -774,7 +774,7 @@ class DefaultsController extends Controller
             break;
             case 3: // billing request by personid
                 $controller = new TransactionsController();
-                $response = $controller->getRequestDetails(0, 0, 0, 0, 0, 3, $id);
+                $response = $controller->getTransactionDetails(0, 0, 0, 0, 0, 3, $id);
             break;
             case 4: // alumni tracker
                 $controller = new RegistrarController();
@@ -782,7 +782,7 @@ class DefaultsController extends Controller
             break;
             case 5: // billing request header
                 $controller = new TransactionsController();
-                $response = $controller->getRequestDetails(0, 0, 0, 0, 0, 5, $id);
+                $response = $controller->getTransactionDetails(0, 0, 0, 0, 0, 5, $id);
             break;
         }
 

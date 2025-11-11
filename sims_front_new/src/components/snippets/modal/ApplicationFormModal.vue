@@ -317,7 +317,7 @@ const downloadPdf = (filetype) => {
     <div v-else>
         <div class="d-flex justify-content-center mb-2" id="printform" style="font-size: 9.5px;">
             <div class="bg-opaque"
-                style="width: 770px; height: 1095px; border:2px solid black;padding:1px; text-align: center;">
+                style="width: 770px; height: 1155px; border:2px solid black;padding:1px; text-align: center;">
                 <div style="height: 100%; width: 100%; border:1px solid black">
                     <div class="p-2 d-flex gap-1">
                         <div class="w-25">
@@ -726,24 +726,24 @@ const downloadPdf = (filetype) => {
                             <div class="d-flex gap-1 justify-content-around w-100" style="margin-top: 50px;">
                                 <div class="d-flex flex-column position-relative">
                                     <img src="/img/sig1.png" height="100px" width="100px"
-                                        style="position: absolute;top:-55px; left: 15px;" />
-                                    <span class="fw-bold">RENATO P. LEGASPI, Ph.D.</span>
-                                    <span>Pangulo/Punong Tagapagpaganap</span>
-                                    <span class="fst-italic">President / CEO</span>
+                                        style="position: absolute;top:-55px; left: -10px;" />
+                                    <span class="fw-bold">Ma. Faustine Dumlao</span>
+                                    <!-- <span>Pangulo/Punong Tagapagpaganap</span> -->
+                                    <span class="fst-italic">Admission</span>
                                 </div>
                                 <div class="d-flex flex-column position-relative">
                                     <img src="/img/sig1.png" height="100px" width="100px"
-                                        style="position: absolute;top:-55px; left: 15px;" />
-                                    <span class="fw-bold">RENE PAULO M. LEGASPI, Ph.D.</span>
-                                    <span>Punong-Guro</span>
-                                    <span class="fst-italic">Principal</span>
+                                        style="position: absolute;top:-55px; left: -10px;" />
+                                    <span class="fw-bold">Maila Masangcay</span>
+                                    <!-- <span>Punong-Guro</span> -->
+                                    <span class="fst-italic">Registrar</span>
                                 </div>
                                 <div class="d-flex flex-column position-relative">
                                     <img src="/img/sig1.png" height="100px" width="100px"
-                                        style="position: absolute;top:-55px; left: 15px;" />
-                                    <span class="fw-bold">RENE PAULO M. LEGASPI, Ph.D.</span>
-                                    <span>Punong-Guro</span>
-                                    <span class="fst-italic">Principal</span>
+                                        style="position: absolute;top:-55px; left: -10px;" />
+                                    <span class="fw-bold">Andrea Isabel Galang</span>
+                                    <!-- <span>Punong-Guro</span> -->
+                                    <span class="fst-italic">Academic</span>
                                 </div>
                             </div>
                         </div>
@@ -752,7 +752,7 @@ const downloadPdf = (filetype) => {
             </div>
         </div>
         <form @submit.prevent="downloadPdf('application-form')"
-            class="form-group border p-4 rounded d-flex flex-column justify-content-center gap-2 bg-secondary-subtle">
+            class="mt-5 form-group border p-4 rounded d-flex flex-column justify-content-center gap-2 bg-secondary-subtle">
             <div class="form-group border rounded d-flex justify-content-center gap-2">
                 <input type="checkbox" class="form-check-input" required :disabled="saving ? true : false">
                 <label class="form-check-label" for="agreeChecker">I have read and accepted the terms and

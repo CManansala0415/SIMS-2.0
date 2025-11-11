@@ -14,7 +14,8 @@ import {
     getMilestone,
     getPriceDetails,
     getAcademicDefaults,
-    getStudentFiltering
+    getStudentFiltering,
+    getPaymentDetails
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
@@ -137,7 +138,7 @@ onMounted(async () => {
                     emit('doneLoading', false)
 
                     // console.log(accounts.value)
-                    // let x = studentAccount.value.map((e) => {
+                    // let x = student.value.map((e) => {
                     //     let y = accounts.value.findIndex((f) => {
                     //         return f.acs_enrid === e.enr_id
                     //     })
@@ -148,6 +149,8 @@ onMounted(async () => {
                     // })
 
                     // studentAccount.value = x
+                    // console.log(studentAccount.value)
+
                 })
             })
         } catch (err) {
@@ -273,6 +276,42 @@ const excelDownload = () => {
 const settlement = (stud) => {
     balance.value = true
     billLoading.value = true
+
+    //get account first
+    let a = student.value.map((e) => {
+    let b = accounts.value.findIndex((f) => {
+        return f.acs_enrid === e.enr_id
+    })
+    return {
+        ...e,
+        ...accounts.value[b],
+    }
+    })
+
+    studentAccount.value = a
+
+    // get latest balance
+    try{
+        
+        getPaymentDetails(studentAccount.value[0].acs_id, 1).then((results) => {
+            let x = results.data.slice(-1).pop()
+            grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : studentAccount.value.acs_amount
+        })
+
+    }catch(err){
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            preLoading.value = false
+            emit('doneLoading', false)
+        });
+    }
+
+
+
     let x = accounts.value.filter((e) => {
         if (e.acs_personid == stud.enr_personid) {
             return {
@@ -284,10 +323,11 @@ const settlement = (stud) => {
 
 
     getMilestone(stud.enr_id).then((results) => {
-        grandTotal.value = 0
+        // grandTotal.value = 0
         milestone.value = results
         billLoading.value = false
 
+       
         milestone.value = results.map((e, index) => {
             let lab_amount = 0
             let lec_amount = 0
@@ -449,7 +489,7 @@ const getData = (result) =>{
                             {{ stud.enr_dateenrolled }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ stud.acs_payment > 0 ? 'Yes' : 'No' }}
+                            {{ stud.acs_amount > 0 ? 'Yes' : 'No' }}
                         </td>
                         <td v-if="accessData[13].useracc_modifying == 1" class="align-middle p-2">
                             <div  class="d-flex gap-2 justify-content-center">
@@ -499,13 +539,16 @@ const getData = (result) =>{
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">
                                 Name:
-                                <input class="form-control form-control-sm"
-                                    :value="studentAccount.per_firstname + ' ' + studentAccount.per_middlename + ' ' + studentAccount.per_lastname + ' ' + studentAccount.per_suffixname"
-                                    disabled />
+                               <input 
+                                    class="form-control form-control-sm text-uppercase"
+                                    :value="`${studentAccount.per_firstname || ''} ${studentAccount.per_middlename || ''} ${studentAccount.per_lastname || ''} ${studentAccount.per_suffixname || ''}`.trim()"
+                                    disabled
+                                    />
+
                             </li>
                             <li class="list-group-item">
                                 Contact:
-                                <input class="form-control form-control-sm" :value="studentAccount.per_contact"
+                                <input class="form-control form-control-sm" :value="'0'+studentAccount.per_contact"
                                     disabled />
                             </li>
                             <li class="list-group-item">
@@ -671,7 +714,7 @@ const getData = (result) =>{
         </div>
     </div>
 
-    <!-- Dlownload Modal -->
+    <!-- Download Modal -->
     <div class="modal fade" id="downloadmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">

@@ -7,6 +7,7 @@ const props = defineProps({
         acr_personname: '',
         acr_reqitem: 0,
         acr_amount: 0,
+        acy_payment:0,
         acy_cashiername:'',
         acr_paystatus: 0,
         acr_addedby: 0,
@@ -41,13 +42,93 @@ const props = defineProps({
 const account = computed(() => {
     return props.data
 });
-
 const formatAmount = (val) => {
-    return Number(val).toLocaleString("en-PH", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    })
+  let num = Number(val);
+
+  if (!num) {
+    return "0.00"; // or return "N/A" if you prefer
+  }
+
+  return num.toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
+
+const numberToWords = (num) => {
+  if (isNaN(num) || num === null ||!num) return "Zero Pesos Only";
+
+  const ones = [
+    "", "One", "Two", "Three", "Four", "Five", "Six",
+    "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve",
+    "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen",
+    "Eighteen", "Nineteen"
+  ];
+
+  const tens = [
+    "", "", "Twenty", "Thirty", "Forty", "Fifty",
+    "Sixty", "Seventy", "Eighty", "Ninety"
+  ];
+
+  const scales = ["", "Thousand", "Million", "Billion"];
+
+  function convertChunk(num) {
+    let words = "";
+    const hundreds = Math.floor(num / 100);
+    const remainder = num % 100;
+
+    if (hundreds > 0) {
+      words += ones[hundreds] + " Hundred ";
+    }
+
+    if (remainder > 0) {
+      if (remainder < 20) {
+        words += ones[remainder] + " ";
+      } else {
+        words += tens[Math.floor(remainder / 10)] + " ";
+        if (remainder % 10 > 0) {
+          words += ones[remainder % 10] + " ";
+        }
+      }
+    }
+
+    return words.trim();
+  }
+
+  const parts = num.toString().split(".");
+  let wholePart = Math.floor(parts[0]);
+  let decimalPart = parts[1] ? parseInt(parts[1].padEnd(2, "0").slice(0, 2)) : 0;
+
+  if (wholePart === 0 && decimalPart === 0) return "Zero Pesos Only";
+
+  let words = "";
+  let scaleIndex = 0;
+
+  while (wholePart > 0) {
+    const chunk = wholePart % 1000;
+    if (chunk > 0) {
+      words = convertChunk(chunk) + " " + scales[scaleIndex] + " " + words;
+    }
+    wholePart = Math.floor(wholePart / 1000);
+    scaleIndex++;
+  }
+
+  words = words.trim() + " Peso" + (num >= 2 ? "s" : "");
+
+  if (decimalPart > 0) {
+    words +=
+      " and " +
+      convertChunk(decimalPart) +
+      " Centavo" +
+      (decimalPart > 1 ? "s" : "");
+  }
+
+  words += " Only";
+
+  return words.trim();
 }
+
+
 </script>
 <template>
   <div class="receipt-wrapper">
@@ -84,11 +165,11 @@ const formatAmount = (val) => {
         <div class="row amounts">
           <div class="col">
             <label>Amount (Figures):</label>
-            <div class="big">₱ {{ formatAmount(account.acy_amount) }}</div>
+            <div class="big">₱ {{ formatAmount(account.acy_payment) }}</div>
           </div>
           <div class="col">
             <label>Amount (In Words):</label>
-            <div class="print-small">Test</div>
+            <div class="print-small">{{ numberToWords(account.acy_payment)}}</div>
           </div>
         </div>
       </div>

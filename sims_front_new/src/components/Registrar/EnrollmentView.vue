@@ -727,11 +727,11 @@ const getData = (result) => {
                             </div>
                             <!-- Team Details-->
                             <div class="single_advisor_details_info border-0 border-bottom border-top">
-                                <h6 class="text-uppercase"> {{ stud.per_firstname }} {{ stud.per_middlename }} {{
+                                <h6 class="text-uppercase fw-bold"  style="font-size: 13px;"> {{ stud.per_firstname }} {{ stud.per_middlename }} {{
                                     stud.per_lastname }} {{
                                         stud.per_suffixname }}</h6>
-                                <p v-if="stud.acs_payment > 0" class="designation">Officially Enrolled</p>
-                                <p v-else class="designation">Not Officially Enrolled</p>
+                                <p v-if="stud.acs_amount > 0" class="text-success fw-bold" style="font-size: 10px;">Officially Enrolled</p>
+                                <p v-else class="text-danger fw-bold" style="font-size: 10px;">Not Officially Enrolled</p>
                                 <div class="d-flex flex-column gap-1 mt-3">
                                     <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_program"
                                         :id="index + 'program'">
@@ -807,28 +807,28 @@ const getData = (result) => {
                             <div v-if="accessData[1].useracc_modifying == 1" class="d-flex gap-2 justify-content-center border p-3 bg-secondary-subtle">
                                 <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
                                     data-bs-toggle="modal" data-bs-target="#taggingmodal"
-                                    class="btn btn-secondary btn-sm w-100">
+                                    class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen" />
                                 </button>
-                                <!-- v-if="stud.acs_payment > 0" -->
-                                <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Grades"
+                                <!-- v-if="stud.acs_amount > 0" -->
+                                <button v-if="stud.acs_amount > 0" tabindex="-1" title="Print Grades"
                                     data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
-                                    class="btn btn-secondary btn-sm w-100">
+                                    class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print" />
                                 </button>
-                                <!-- v-if="stud.acs_payment > 0" -->
-                                <button v-if="stud.acs_payment > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal"
+                                <!-- v-if="stud.acs_amount > 0" -->
+                                <button v-if="stud.acs_amount > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal"
                                     data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
-                                    class="btn btn-secondary btn-sm w-100">
+                                    class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print" />
                                 </button>
                                 <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
-                                    class="btn btn-secondary btn-sm w-100">
+                                    class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash" />
                                 </button>
-                                <!-- v-if="stud.acs_payment > 0" -->
-                                <button v-if="stud.acs_payment > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
-                                    type="button" title="print ID" class="btn btn-secondary btn-sm w-100">
+                                <!-- v-if="stud.acs_amount > 0" -->
+                                <button v-if="stud.acs_amount > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
+                                    type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip" />
                                 </button>
                             </div>

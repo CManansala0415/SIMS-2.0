@@ -115,7 +115,7 @@ Route::middleware(['auth:sanctum'])->get('/get-alumni-students/{limit}/{offset}/
 Route::middleware(['auth:sanctum'])->get('/get-accounts-details', [TransactionsController::class,'getAccountsDetails']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-price', [TransactionsController::class,'getPriceDetails']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-fee/{limit}/{offset}/{search}', [TransactionsController::class,'getFeeDetails']);
-Route::middleware(['auth:sanctum'])->get('/get-accounts-request/{limit}/{offset}/{fname}/{mname}/{lname}/{mode}/{id}', [TransactionsController::class,'getRequestDetails']);
+Route::middleware(['auth:sanctum'])->get('/get-accounts-request/{limit}/{offset}/{fname}/{mname}/{lname}/{mode}/{id}/{type}', [TransactionsController::class,'getTransactionDetails']);
 Route::middleware(['auth:sanctum'])->post('/add-requested-item', [TransactionsController::class,'addItemRequest']);
 Route::middleware(['auth:sanctum'])->post('/delete-requested-item', [TransactionsController::class,'deleteItemRequest']);
 Route::middleware(['auth:sanctum'])->post('/add-payment', [TransactionsController::class,'addPayment']);

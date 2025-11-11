@@ -514,7 +514,7 @@ const downloadPdf = (filetype) => {
                                             </div>
                                         </div>
 
-                                        <div>
+                                        <!-- <div>
                                             <div class="d-flex">
                                                 <div class="p-0 border w-100 d-flex flex-column bg-secondary-subtle">
                                                     <span class="fw-bold">Scholastic Records</span>
@@ -673,7 +673,7 @@ const downloadPdf = (filetype) => {
                                                     <input type="text" class="border-0 border-bottom fw-bold fst-italic"/>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
 
                                     </div>
                                 </div>

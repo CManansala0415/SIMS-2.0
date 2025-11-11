@@ -8,7 +8,7 @@ import {
     getSection,
     getPriceDetails,
     getFeeDetails,
-    getRequestDetails,
+    getTransactionDetails,
     deleteItemRequest,
     getApplicant,
     getAcademicDefaults
@@ -150,8 +150,8 @@ onMounted(async () => {
         try {
             preLoading.value = true
             await booter().then(() => {
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
-                    console.log(results2)
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
+                    // console.log(results2)
                     mapper(results2)
                 })
             })
@@ -197,7 +197,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     mapper(results)
                 })
             }
@@ -211,7 +211,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     mapper(results)
                 })
             }
@@ -223,7 +223,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     mapper(results)
                 }).catch((err) => {
                     // console.log(err)

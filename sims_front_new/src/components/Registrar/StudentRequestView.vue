@@ -8,7 +8,7 @@ import {
     getSection,
     getPriceDetails,
     getFeeDetails,
-    getRequestDetails,
+    getTransactionDetails,
     deleteItemRequest,
     getApplicant,
     getAcademicDefaults
@@ -109,7 +109,7 @@ onMounted(async () => {
         try {
             preLoading.value = true
             await booter().then(() => {
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, 1).then((results2) => {
                     requestedItems.value = results2.data.map((e) => {
                         let itemdesc = ''
                         let paystat = ''
@@ -192,7 +192,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     requestedItems.value = results.data
                     requestedItemsCount.value = results.count
                     preLoading.value = false
@@ -208,7 +208,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     requestedItems.value = results.data
                     requestedItemsCount.value = results.count
                     preLoading.value = false
@@ -222,7 +222,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 requestedItemsCount.value = 0
                 preLoading.value = true
-                getRequestDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
+                getTransactionDetails(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,3).then((results) => {
                     requestedItems.value = results.data
                     requestedItemsCount.value = results.count
                     preLoading.value = false
@@ -269,7 +269,7 @@ const settlement = (data, mode) => {
         //         acr_updatedby: userID.value,
         //     }
 
-        //     // getRequestDetails(0,0, data.acr_id).then((results)=>{
+        //     // getTransactionDetails(0,0, data.acr_id).then((results)=>{
         //     //     if(results.data[0].acr_status == 1){
         //     //       deleteItemRequest(del, 2).then((results)=>{
         //     //           alert('Successfully Removed')
