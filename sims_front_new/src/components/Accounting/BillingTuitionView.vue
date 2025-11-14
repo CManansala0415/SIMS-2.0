@@ -491,7 +491,7 @@ const getData = (result) =>{
                         <td class="align-middle p-2">
                             {{ stud.acs_amount > 0 ? 'Yes' : 'No' }}
                         </td>
-                        <td v-if="accessData[13].useracc_modifying == 1" class="align-middle p-2">
+                        <td v-if="accessData[18].useracc_modifying == 1" class="align-middle p-2">
                             <div  class="d-flex gap-2 justify-content-center">
                                 <button tabindex="-1" title="Balance" @click="settlement(stud)"
                                     class="btn btn-secondary btn-sm">

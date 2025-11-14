@@ -208,7 +208,7 @@ const accessModuleData = ref(
                     access_modifying:0
                 },
             }
-        },
+        },    
         3: {
             user_id:0,
             sett_addedby:userID.value,
@@ -216,14 +216,14 @@ const accessModuleData = ref(
             module_value: 1,
             module_category: 2,
             module_category_desc: 'Transactions',
-            module_description: 'Billing/Cashier Module',
+            module_description: 'Accounting Module',
             module_grant: 0,
             module_access: {
                 0: {
                     useracc_id:0,
                     access_id: 1,
                     access_value: 1,
-                    access_description: 'Billing/Cashier Tuition',
+                    access_description: 'Daily Collections',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,
@@ -233,7 +233,17 @@ const accessModuleData = ref(
                     useracc_id:0,
                     access_id: 2,
                     access_value: 2,
-                    access_description: 'Billing/Cashier Request',
+                    access_description: 'Miscellaneous',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                },
+                2: {
+                    useracc_id:0,
+                    access_id: 3,
+                    access_value: 3,
+                    access_description: 'Tuition Setup',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,
@@ -248,14 +258,14 @@ const accessModuleData = ref(
             module_value: 2,
             module_category: 2,
             module_category_desc: 'Transactions',
-            module_description: 'Accounting Module',
+            module_description: 'Billing/Cashier Module',
             module_grant: 0,
             module_access: {
                 0: {
                     useracc_id:0,
                     access_id: 1,
                     access_value: 1,
-                    access_description: 'Miscellaneous',
+                    access_description: 'Billing / Daily Collections',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,
@@ -265,7 +275,17 @@ const accessModuleData = ref(
                     useracc_id:0,
                     access_id: 2,
                     access_value: 2,
-                    access_description: 'Tuition Setup',
+                    access_description: 'Billing / Cashier Request',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                },
+                2: {
+                    useracc_id:0,
+                    access_id: 3,
+                    access_value: 3,
+                    access_description: 'Billing / Cashier Tuition',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,

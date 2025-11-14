@@ -272,7 +272,7 @@ const itemModal = (type, data) => {
                         <td class="align-middle">
                             {{ f.acf_price }}
                         </td>
-                        <td v-if="accessData[15].useracc_modifying == 1" class="align-middle">
+                        <td v-if="accessData[16].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
                                 <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
                                     data-bs-target="#editdatamodal" title="Edit Data"

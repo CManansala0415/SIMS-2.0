@@ -335,7 +335,7 @@ const getData = (result) =>{
                         <td class="align-middle">
                             <span :class="req.paystat_color">{{ req.acr_paystatusdesc }}</span>
                         </td>
-                        <td v-if="accessData[14].useracc_modifying == 1" class="align-middle p-2">
+                        <td v-if="accessData[19].useracc_modifying == 1" class="align-middle p-2">
                             <div class="d-flex gap-2 justify-content-center align-content-center">
                                 <div v-if="req.acr_status == 0" class="text-center">
                                     <span class="text-danger fw-bold">Cancelled</span>

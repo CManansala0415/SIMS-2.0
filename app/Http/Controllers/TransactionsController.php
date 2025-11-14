@@ -332,40 +332,185 @@ class TransactionsController extends Controller
         ];
     }
 
-    public function getAllPayments($billtype, $dfrom, $dto, $paystat)
+    public function getAllPayments($billtype, $dfrom, $dto, $cashier, $access)
     {   
-
-        $datefrom = date('Y-m-d h:i:s', strtotime($dfrom));
-        $dateto = date('Y-m-d h:i:s', strtotime($dto));
-
-        $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
-        ->leftJoin('def_accounts_request as ar', function($join)
-                         {
-                             $join->on('ac.acy_accid', '=', 'ar.acr_id');
-                             $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
-                         })
-        ->leftJoin('def_accounts_settlement as at', function($join)
-                         {
-                             $join->on('ac.acy_accid', '=', 'at.acs_id');
-                             $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
-                         })
-        ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_id')
-        ->leftJoin('def_person as prn', 'at.acs_personid', '=', 'prn.per_id')
-
-        ->select(  
-            'ac.*',
-            'ar.*',
-            'at.*',
-            'emp.*',
-            'prn.*',
-        )
-        ->where('ac.acy_status', '=',  1)
-        ->where('ac.acy_billtype', '=',  $billtype)
-        ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
-        ->orderBy('ac.acy_id','DESC')
-        ->get();
-
         
+        // $datefrom = date('Y-m-d h:i:s', strtotime($dfrom));
+        // $dateto = date('Y-m-d h:i:s', strtotime($dto));
+
+        $datefrom = date('Y-m-d 00:00:00', strtotime($dfrom));
+        $dateto = date('Y-m-d H:i:s', strtotime($dto . ' +1 hour'));
+
+        if($access == 1){
+            //accountant
+            switch ($billtype) {
+                case 1:
+                    $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
+                    ->leftJoin('def_accounts_settlement as at', function($join)
+                                    {
+                                        $join->on('ac.acy_accid', '=', 'at.acs_id');
+                                        $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
+                                    })
+                    ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_accid')
+                    ->leftJoin('def_person as prn', 'at.acs_personid', '=', 'prn.per_id')
+
+                    ->select(  
+                        'ac.*',
+                        'at.*',
+                        'emp.*',
+                        'prn.*',
+                    )
+                    ->where('ac.acy_status', '=',  1)
+                    ->where('ac.acy_billtype', '=',  $billtype)
+                    ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
+                    ->orderBy('ac.acy_id','DESC')
+                    ->get();
+                    break;
+
+                case 2:
+                    $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
+                    ->leftJoin('def_accounts_request as ar', function($join)
+                                    {
+                                        $join->on('ac.acy_accid', '=', 'ar.acr_id');
+                                        $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
+                                    })
+                    ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_accid')
+                    ->leftJoin('def_person as prn', 'ar.acr_personid', '=', 'prn.per_id')
+                    ->leftJoin('def_accounts_fee as acf', 'ar.acr_reqitem', '=', 'acf.acf_id')
+
+                    ->select(  
+                        'ac.*',
+                        'ar.*',
+                        'emp.*',
+                        'prn.*',
+                        'acf.*',
+                    )
+                    ->where('ac.acy_status', '=',  1)
+                    ->where('ac.acy_billtype', '=',  $billtype)
+                    ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
+                    ->orderBy('ac.acy_id','DESC')
+                    ->get();
+                    break;
+
+
+                default:
+                        $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
+                        ->leftJoin('def_accounts_request as ar', function($join)
+                                        {
+                                            $join->on('ac.acy_accid', '=', 'ar.acr_id');
+                                            $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
+                                        })
+                        ->leftJoin('def_accounts_settlement as at', function($join)
+                                        {
+                                            $join->on('ac.acy_accid', '=', 'at.acs_id');
+                                            $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
+                                        })
+                        ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_accid')
+                        ->leftJoin('def_person as prn', 'at.acs_personid', '=', 'prn.per_id')
+                        ->leftJoin('def_accounts_fee as acf', 'ar.acr_reqitem', '=', 'acf.acf_id')                
+                        ->select(   
+                            'ac.*',
+                            'ar.*',
+                            'at.*',
+                            'emp.*',
+                            'prn.*',
+                            'acf.*',
+                        )
+                        ->where('ac.acy_status', '=',  1)
+                        ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
+                        ->orderBy('ac.acy_id','DESC')
+                        ->get();
+                    break;
+            }
+        }else{
+            //cashier
+            switch ($billtype) {
+                case 1:
+                    $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
+                    ->leftJoin('def_accounts_settlement as at', function($join)
+                                    {
+                                        $join->on('ac.acy_accid', '=', 'at.acs_id');
+                                        $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
+                                    })
+                    ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_accid')
+                    ->leftJoin('def_person as prn', 'at.acs_personid', '=', 'prn.per_id')
+
+                    ->select(  
+                        'ac.*',
+                        'at.*',
+                        'emp.*',
+                        'prn.*',
+                    )
+                    ->where('ac.acy_status', '=',  1)
+                    ->where('ac.acy_billtype', '=',  $billtype)
+                    ->where('ac.acy_cashier', '=',  $cashier)
+                    ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
+                    ->orderBy('ac.acy_id','DESC')
+                    ->get();
+                    break;
+
+                case 2:
+                    $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.emp_accid','DESC')
+                    ->leftJoin('def_accounts_request as ar', function($join)
+                                    {
+                                        $join->on('ac.acy_accid', '=', 'ar.acr_id');
+                                        $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
+                                    })
+                    ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_id')
+                    ->leftJoin('def_person as prn', 'ar.acr_personid', '=', 'prn.per_id')
+                    ->leftJoin('def_accounts_fee as acf', 'ar.acr_reqitem', '=', 'acf.acf_id')
+
+                    ->select(  
+                        'ac.*',
+                        'ar.*',
+                        'emp.*',
+                        'prn.*',
+                        'acf.*',
+                    )
+                    ->where('ac.acy_status', '=',  1)
+                    ->where('ac.acy_billtype', '=',  $billtype)
+                    ->where('ac.acy_cashier', '=',  $cashier)
+                    ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
+                    ->orderBy('ac.acy_id','DESC')
+                    ->get();
+                    break;
+
+
+                default:
+                        $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
+                        ->leftJoin('def_accounts_request as ar', function($join)
+                                        {
+                                            $join->on('ac.acy_accid', '=', 'ar.acr_id');
+                                            $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
+                                        })
+                        ->leftJoin('def_accounts_settlement as at', function($join)
+                                        {
+                                            $join->on('ac.acy_accid', '=', 'at.acs_id');
+                                            $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
+                                        })
+                        ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_accid')
+                        ->leftJoin('def_person as prn', 'at.acs_personid', '=', 'prn.per_id')
+                        ->leftJoin('def_accounts_fee as acf', 'ar.acr_reqitem', '=', 'acf.acf_id')                
+                        ->select(   
+                            'ac.*',
+                            'ar.*',
+                            'at.*',
+                            'emp.*',
+                            'prn.*',
+                            'acf.*',
+                        )
+                        ->where('ac.acy_status', '=',  1)
+                        ->where('ac.acy_cashier', '=',  $cashier)
+                        ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
+                        ->orderBy('ac.acy_id','DESC')
+                        ->get();
+                    break;
+            }
+        }
+
+
+  
+
 
         return $data = [
             'data' => $payment,

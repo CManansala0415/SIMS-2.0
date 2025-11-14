@@ -2,83 +2,83 @@ import axios from 'axios';
 
 let applicant = {}
 const getApplicant = async (limit, offset, fname, mname, lname, mode) => {
-    let firstname = !fname?'404':fname
-    let middlename = !mname?'404':mname
-    let lastname = !lname?'404':lname
-    try{
+    let firstname = !fname ? '404' : fname
+    let middlename = !mname ? '404' : mname
+    let lastname = !lname ? '404' : lname
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-applicant/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode,
+            url: 'api/get-applicant/' + limit + '/' + offset + '/' + firstname + '/' + middlename + '/' + lastname + '/' + mode,
         }).then(async (results) => {
             // console.log(results.data)
             applicant = results.data
         })
         return applicant
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let person = {}
 const getPerson = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-person/'+id,
+            url: 'api/get-person/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             person = results.data
         })
         return person
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let family = {}
-const getFamily = async (id,mode) => {
-    try{
+const getFamily = async (id, mode) => {
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-family/'+id+'/'+mode,
+            url: 'api/get-family/' + id + '/' + mode,
         }).then(async (results) => {
             // console.log(results.data)
             family = results.data
         })
         return family
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let award = {}
 const getAward = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-award/'+id,
+            url: 'api/get-award/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             award = results.data
         })
         return award
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let attainment = {}
 const getAttainment = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-attainment/'+id,
+            url: 'api/get-attainment/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             attainment = results.data
         })
         return attainment
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -86,7 +86,7 @@ const getAttainment = async (id) => {
 let gender = {}
 const getGender = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-gender/',
@@ -95,7 +95,7 @@ const getGender = async () => {
             gender = results.data
         })
         return gender
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -103,7 +103,7 @@ const getGender = async () => {
 let nationality = {}
 const getNationality = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-nationality/',
@@ -112,7 +112,7 @@ const getNationality = async () => {
             nationality = results.data
         })
         return nationality
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -120,7 +120,7 @@ const getNationality = async () => {
 let civilstatus = {}
 const getCivilStatus = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-civilstatus/',
@@ -129,7 +129,7 @@ const getCivilStatus = async () => {
             civilstatus = results.data
         })
         return civilstatus
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -137,7 +137,7 @@ const getCivilStatus = async () => {
 let region = {}
 const getRegion = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-region/',
@@ -146,7 +146,7 @@ const getRegion = async () => {
             region = results.data
         })
         return region
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -154,7 +154,7 @@ const getRegion = async () => {
 let demograph = {}
 const getDemograph = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-demograph/',
@@ -163,7 +163,7 @@ const getDemograph = async () => {
             demograph = results.data
         })
         return demograph
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -171,7 +171,7 @@ const getDemograph = async () => {
 let academicdefaults = {}
 const getAcademicDefaults = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-academicdefaults/',
@@ -180,7 +180,7 @@ const getAcademicDefaults = async () => {
             academicdefaults = results.data
         })
         return academicdefaults
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -188,7 +188,7 @@ const getAcademicDefaults = async () => {
 let country = {}
 const getCountry = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-country/',
@@ -197,7 +197,7 @@ const getCountry = async () => {
             country = results.data
         })
         return country
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -205,7 +205,7 @@ const getCountry = async () => {
 let province = {}
 const getProvince = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-province/',
@@ -214,7 +214,7 @@ const getProvince = async () => {
             province = results.data
         })
         return province
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -222,7 +222,7 @@ const getProvince = async () => {
 let city = {}
 const getCity = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-city/',
@@ -231,7 +231,7 @@ const getCity = async () => {
             city = results.data
         })
         return city
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -239,7 +239,7 @@ const getCity = async () => {
 let barangay = {}
 const getBarangay = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-barangay/',
@@ -248,14 +248,14 @@ const getBarangay = async () => {
             barangay = results.data
         })
         return barangay
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let gradelvl = {}
 const getGradelvl = async (type) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-gradelvl/',
@@ -264,7 +264,7 @@ const getGradelvl = async (type) => {
             gradelvl = results.data
         })
         return gradelvl
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -272,7 +272,7 @@ const getGradelvl = async (type) => {
 let program = {}
 const getProgram = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-program/',
@@ -281,7 +281,7 @@ const getProgram = async () => {
             program = results.data
         })
         return program
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -289,7 +289,7 @@ const getProgram = async () => {
 let specialization = {}
 const getSpecialization = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-specialization/',
@@ -298,7 +298,7 @@ const getSpecialization = async () => {
             specialization = results.data
         })
         return specialization
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -306,7 +306,7 @@ const getSpecialization = async () => {
 let quarter = {}
 const getQuarter = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-quarter/',
@@ -315,7 +315,7 @@ const getQuarter = async () => {
             quarter = results.data
         })
         return quarter
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -323,7 +323,7 @@ const getQuarter = async () => {
 let semester = {}
 const getSemester = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-semester/',
@@ -332,14 +332,14 @@ const getSemester = async () => {
             semester = results.data
         })
         return semester
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let section = {}
 const getSection = async (type) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-section/',
@@ -348,7 +348,7 @@ const getSection = async (type) => {
             section = results.data
         })
         return section
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -356,7 +356,7 @@ const getSection = async (type) => {
 let degree = {}
 const getDegree = async () => {
 
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-degree/',
@@ -364,15 +364,15 @@ const getDegree = async () => {
             degree = results.data
         })
         return degree
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let programlist = {}
 const getProgramList = async () => {
-    
-    try{
+
+    try {
         await axios({
             method: "GET",
             url: 'api/get-program-list/',
@@ -381,7 +381,7 @@ const getProgramList = async () => {
             programlist = results.data
         })
         return programlist
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -390,115 +390,115 @@ const getProgramList = async () => {
 
 let response = {}
 const addApplicant = async (data, type) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/add-applicant/'+type,
-            data:data
+            url: 'api/add-applicant/' + type,
+            data: data
 
         }).then(async (results) => {
             response = results.data
         })
         return response
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let updateResponse = {}
 const updateApplicant = async (data, type) => {
-    try{
-        if(type == 1){// 1 means update, 2 means delete
+    try {
+        if (type == 1) {// 1 means update, 2 means delete
             await axios({
                 method: "POST",
                 url: 'api/update-applicant/',
-                data:data
-    
+                data: data
+
             }).then(async (results) => {
                 updateResponse = results.data
             })
-        }else{
+        } else {
             await axios({
                 method: "POST",
                 url: 'api/delete-applicant/',
-                data:data
-    
+                data: data
+
             }).then(async (results) => {
                 updateResponse = results.data
             })
         }
         return updateResponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let detailsresponse = {}
 const updatePersonDetails = async (data, type) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/update-perdetails/'+type,
-            data:data
+            url: 'api/update-perdetails/' + type,
+            data: data
 
         }).then(async (results) => {
             detailsresponse = results.data
         })
         return detailsresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let deleteresponse = {}
 const deleteFamAwrAtt = async (data, type) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/delete-perdetails/'+type,
-            data:data
+            url: 'api/delete-perdetails/' + type,
+            data: data
 
         }).then(async (results) => {
             deleteresponse = results.data
         })
         return deleteresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let enroll = {}
 const enrollApplicant = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/enroll-applicant/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             enroll = results.data
         })
         return enroll
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let enrollment = {}
 const getEnrollment = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-enrollment/'+id,
+            url: 'api/get-enrollment/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             enrollment = results.data
         })
         return enrollment
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -506,54 +506,54 @@ const getEnrollment = async (id) => {
 let student = {}
 const getStudent = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-student/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-student/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             student = results.data
         })
         return student
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let studentfiltering = {}
 const getStudentFiltering = async (limit, offset, fname, mname, lname, program, gradelvl, course, mode) => {
-    let firstname = !fname?'404':fname
-    let middlename = !mname?'404':mname
-    let lastname = !lname?'404':lname
-    try{
+    let firstname = !fname ? '404' : fname
+    let middlename = !mname ? '404' : mname
+    let lastname = !lname ? '404' : lname
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-student-filtering/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+program+'/'+gradelvl+'/'+course+'/'+mode,
+            url: 'api/get-student-filtering/' + limit + '/' + offset + '/' + firstname + '/' + middlename + '/' + lastname + '/' + program + '/' + gradelvl + '/' + course + '/' + mode,
         }).then(async (results) => {
             // console.log(results.data)
             studentfiltering = results.data
         })
         return studentfiltering
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let studentiddetails = {}
 const getStudentIdDetails = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-student-id-details/'+id
+            url: 'api/get-student-id-details/' + id
         }).then(async (results) => {
             // console.log(results.data)
             studentiddetails = results.data
         })
         return studentiddetails
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -561,87 +561,87 @@ const getStudentIdDetails = async (id) => {
 let studentbycourse = {}
 const getStudentByCourse = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-student-by-course/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-student-by-course/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             studentbycourse = results.data
         })
         return studentbycourse
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let uploadprofile = {}
-const uploadProfile = async (data,old,folder) => {
-    try{
+const uploadProfile = async (data, old, folder) => {
+    try {
         await axios({
             method: "POST",
-            url: 'api/upload-profile/'+old+'/'+folder,
-            data:data
+            url: 'api/upload-profile/' + old + '/' + folder,
+            data: data
 
         }).then(async (results) => {
             uploadprofile = results.data
         })
         return uploadprofile
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let uploadlinkprofile = {}
 const uploadLinkProfile = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/upload-link-profile/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             uploadlinkprofile = results.data
         })
         return uploadlinkprofile
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let uploadsignature = {}
 const uploadSignature = async (data, old) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/upload-signature/'+old,
-            data:data
+            url: 'api/upload-signature/' + old,
+            data: data
 
         }).then(async (results) => {
             uploadsignature = results.data
         })
         return uploadsignature
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let uploadlinksignature = {}
 const uploadLinkSignature = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/upload-link-signature/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             uploadlinksignature = results.data
         })
         return uploadlinksignature
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -649,19 +649,19 @@ const uploadLinkSignature = async (data) => {
 let curriculum = {}
 const getCurriculum = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-curriculum/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-curriculum/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             curriculum = results.data
         })
         return curriculum
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -669,7 +669,7 @@ const getCurriculum = async (limit, offset, id) => {
 
 let curriculumsett = {}
 const getCurriculumSett = async () => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-curriculum-sett',
@@ -678,30 +678,30 @@ const getCurriculumSett = async () => {
             curriculumsett = results.data
         })
         return curriculumsett
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let curriculumstudent = {}
 const getCurriculumStudent = async (prog, type) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-curriculum-student/'+prog+'/'+type,
+            url: 'api/get-curriculum-student/' + prog + '/' + type,
         }).then(async (results) => {
             // console.log(results.data)
             curriculumstudent = results.data
         })
         return curriculumstudent
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let taggedsubject = {}
 const getTaggedSubject = async (type) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-tagged-subject/',
@@ -710,14 +710,14 @@ const getTaggedSubject = async (type) => {
             taggedsubject = results.data
         })
         return taggedsubject
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let subject = {}
 const getSubject = async (type) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-subject/',
@@ -726,7 +726,7 @@ const getSubject = async (type) => {
             subject = results.data
         })
         return subject
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -734,102 +734,102 @@ const getSubject = async (type) => {
 let studentmaster = {}
 const getStudentMaster = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-student-master/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-student-master/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             studentmaster = results.data
         })
         return studentmaster
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let currsubj = {}
 const getCurriculumSubject = async (curr, sem, gradelvl) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-curriculum-subject/'+curr+'/'+sem+'/'+gradelvl,
+            url: 'api/get-curriculum-subject/' + curr + '/' + sem + '/' + gradelvl,
         }).then(async (results) => {
             // console.log(results.data)
             currsubj = results.data
         })
         return currsubj
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let milestone = {}
 const getMilestone = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-milestone/'+id,
+            url: 'api/get-milestone/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             milestone = results.data
         })
         return milestone
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addmilestone = {}
 const addMilestone = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-milestone/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addmilestone = results.data
         })
         return addmilestone
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let updateenrollment = {}
 const updateEnrollment = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/update-enrollment/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             updateenrollment = results.data
         })
         return updateenrollment
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let updatemilestone = {}
 const updateMilestone = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/update-milestone/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             updatemilestone = results.data
         })
         return updatemilestone
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -837,7 +837,7 @@ const updateMilestone = async (data) => {
 // launch
 let buildings = {}
 const getBuilding = async (type) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-building/',
@@ -846,14 +846,14 @@ const getBuilding = async (type) => {
             buildings = results.data
         })
         return buildings
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let classrooms = {}
 const getClassroom = async (type) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-classroom/',
@@ -862,7 +862,7 @@ const getClassroom = async (type) => {
             classrooms = results.data
         })
         return classrooms
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -870,161 +870,161 @@ const getClassroom = async (type) => {
 let launch = {}
 const getLaunch = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-launch/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-launch/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             launch = results.data
         })
         return launch
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let launchchecker = {}
 const getLaunchChecker = async (ln_dtype, ln_quarter, ln_course, ln_gradelvl, ln_curriculum, ln_section, ln_year) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-launch-checker/',
-            params: { 
-                ln_dtype:ln_dtype,
-                ln_quarter:ln_quarter,
-                ln_course:ln_course,
-                ln_gradelvl:ln_gradelvl,
-                ln_curriculum:ln_curriculum,
-                ln_section:ln_section,
-                ln_year:ln_year? ln_year:0
+            params: {
+                ln_dtype: ln_dtype,
+                ln_quarter: ln_quarter,
+                ln_course: ln_course,
+                ln_gradelvl: ln_gradelvl,
+                ln_curriculum: ln_curriculum,
+                ln_section: ln_section,
+                ln_year: ln_year ? ln_year : 0
             },
         }).then(async (results) => {
             // console.log(results.data)
             launchchecker = results.data
         })
         return launchchecker
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let launchresponse = {}
 const addLaunch = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-launch/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             launchresponse = results.data
         })
         return launchresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let scheduleresponse = {}
 const addSchedule = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-schedule/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             scheduleresponse = results.data
         })
         return scheduleresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let schedule = {}
 const getSchedule = async (launchid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-schedule/'+launchid,
+            url: 'api/get-schedule/' + launchid,
         }).then(async (results) => {
             // console.log(results.data)
             schedule = results.data
         })
         return schedule
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let occupancy = {}
 const getOccupancy = async (bid, classrid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-occupancy/'+bid+'/'+classrid,
+            url: 'api/get-occupancy/' + bid + '/' + classrid,
         }).then(async (results) => {
             // console.log(results.data)
             occupancy = results.data
         })
         return occupancy
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let occupancyothers = {}
 const getOccupancyOthers = async (othersid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-occupancy-others/'+othersid,
+            url: 'api/get-occupancy-others/' + othersid,
         }).then(async (results) => {
             // console.log(results.data)
             occupancyothers = results.data
         })
         return occupancyothers
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let employee = {}
 const getEmployee = async (limit, offset, fname, mname, lname) => {
-    let firstname = !fname?'404':fname
-    let middlename = !mname?'404':mname
-    let lastname = !lname?'404':lname
-    try{
+    let firstname = !fname ? '404' : fname
+    let middlename = !mname ? '404' : mname
+    let lastname = !lname ? '404' : lname
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-employee/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname,
+            url: 'api/get-employee/' + limit + '/' + offset + '/' + firstname + '/' + middlename + '/' + lastname,
         }).then(async (results) => {
             // console.log(results.data)
             employee = results.data
         })
         return employee
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let scheduledsubjects = {}
 const getScheduledSubjects = async (schedid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-scheduled-subjects/'+schedid,
+            url: 'api/get-scheduled-subjects/' + schedid,
         }).then(async (results) => {
             // console.log(results.data)
             scheduledsubjects = results.data
         })
         return scheduledsubjects
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -1032,213 +1032,213 @@ const getScheduledSubjects = async (schedid) => {
 
 let addemployeeresponse = {}
 const addEmployee = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-employee/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addemployeeresponse = results.data
         })
         return addemployeeresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let updateemployeeresponse = {}
 const updateEmployee = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/update-employee/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             updateemployeeresponse = results.data
         })
         return updateemployeeresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addemployeeloadresponse = {}
 const addEmployeeLoad = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-employee-load/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addemployeeloadresponse = results.data
         })
         return addemployeeloadresponse
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let employeeload = {}
 const getEmployeeLoad = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-employee-load/'+id,
+            url: 'api/get-employee-load/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             employeeload = results.data
         })
         return employeeload
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let deleteemployeeload = {}
 const deleteEmployeeLoad = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/delete-employee-load/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             deleteemployeeload = results.data
         })
         return deleteemployeeload
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let deleteemployee = {}
 const deleteEmployee = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/delete-employee/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             deleteemployee = results.data
         })
         return deleteemployee
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let deleteenrollment = {}
 const deleteEnrollment = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/delete-enrollment/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             deleteenrollment = results.data
         })
         return deleteenrollment
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let addprogram = {}
 const addProgram = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-program',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addprogram = results.data
         })
         return addprogram
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addsection = {}
 const addSection = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-section',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addsection = results.data
         })
         return addsection
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addsubject = {}
 const addSubject = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-subject',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addsubject = results.data
         })
         return addsubject
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addcurriculum = {}
 const addCurriculum = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-curriculum',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addcurriculum = results.data
         })
         return addcurriculum
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addcurriculumtagging = {}
 const addCurriculumTagging = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-curriculum-tagging',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addcurriculumtagging = results.data
         })
         return addcurriculumtagging
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let scheduledfaculty = {}
 const getScheduledFaculty = async () => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-scheduled-faculty/',
@@ -1247,49 +1247,49 @@ const getScheduledFaculty = async () => {
             scheduledfaculty = results.data
         })
         return scheduledfaculty
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addscheduledfaculty = {}
 const addScheduledFaculty = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-scheduled-faculty',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addscheduledfaculty = results.data
         })
         return addscheduledfaculty
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let deletescheduledfaculty = {}
 const deleteScheduledFaculty = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/delete-scheduled-faculty/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             deletescheduledfaculty = results.data
         })
         return deletescheduledfaculty
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let facultyavilability = {}
 const getFacultyAvailability = async () => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-faculty-availability/',
@@ -1298,7 +1298,7 @@ const getFacultyAvailability = async () => {
             facultyavilability = results.data
         })
         return facultyavilability
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -1307,7 +1307,7 @@ const getFacultyAvailability = async () => {
 // accounting billing and cashier
 let accountsdetails = {}
 const getAccountsDetails = async () => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-accounts-details/',
@@ -1316,14 +1316,14 @@ const getAccountsDetails = async () => {
             accountsdetails = results.data
         })
         return accountsdetails
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let pricedetails = {}
 const getPriceDetails = async () => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-accounts-price/',
@@ -1332,190 +1332,190 @@ const getPriceDetails = async () => {
             pricedetails = results.data
         })
         return pricedetails
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
- 
+
 let feedetails = {}
 const getFeeDetails = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-accounts-fee/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-accounts-fee/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             feedetails = results.data
         })
         return feedetails
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let requestdetails = {}
 const getTransactionDetails = async (limit, offset, fname, mname, lname, mode, id, type) => {
-    let firstname = !fname?'404':fname
-    let middlename = !mname?'404':mname
-    let lastname = !lname?'404':lname
+    let firstname = !fname ? '404' : fname
+    let middlename = !mname ? '404' : mname
+    let lastname = !lname ? '404' : lname
 
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-accounts-request/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode+'/'+id+'/'+type,
+            url: 'api/get-accounts-request/' + limit + '/' + offset + '/' + firstname + '/' + middlename + '/' + lastname + '/' + mode + '/' + id + '/' + type,
         }).then(async (results) => {
             // console.log(results.data)
             requestdetails = results.data
         })
         return requestdetails
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let addrequesteditem = {}
 const addItemRequest = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-requested-item',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addrequesteditem = results.data
         })
         return addrequesteditem
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let deleteitemrequest = {}
 const deleteItemRequest = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/delete-requested-item/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             deleteitemrequest = results.data
         })
         return deleteitemrequest
-    }catch(err){
+    } catch (err) {
         return 500
     }
-    
+
 }
 
 let addpayment = {}
 const addPayment = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-payment/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addpayment = results.data
         })
         return addpayment
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let paymentdetails = {}
-const getPaymentDetails = async (id, billtype)  => {
-    try{
+const getPaymentDetails = async (id, billtype) => {
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-accounts-payment/'+id+'/'+billtype,
+            url: 'api/get-accounts-payment/' + id + '/' + billtype,
         }).then(async (results) => {
             // console.log(results.data)
             paymentdetails = results.data
         })
         return paymentdetails
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let allpaymentdetails = {}
-const getAllPayments = async (billtype, datefrom, dateto, paystat)  => {
-    try{
+const getAllPayments = async (billtype, datefrom, dateto, cashier, access) => {
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-accounts-payment-all/'+billtype+'/'+datefrom+'/'+dateto+'/'+paystat,
+            url: 'api/get-accounts-payment-all/' + billtype + '/' + datefrom + '/' + dateto + '/' + cashier  + '/' + access,
         }).then(async (results) => {
             // console.log(results.data)
             allpaymentdetails = results.data
         })
         return allpaymentdetails
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let addaccountingitem = {}
 const addAccountingItem = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-accounting-item',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addaccountingitem = results.data
         })
         return addaccountingitem
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let clinicalStudents = {}
 const addStudentClinicalRecord = async (data, type) => {
-    if(type == 1){
-        try{
+    if (type == 1) {
+        try {
             await axios({
                 method: "POST",
                 url: 'api/add-clinical-students/',
-                data:data
-    
+                data: data
+
             }).then(async (results) => {
                 clinicalStudents = results.data
             })
             return clinicalStudents
-        }catch(err){
+        } catch (err) {
             return 500
         }
-    }else{
+    } else {
 
     }
 }
 
 let clinicalEmployee = {}
 const addEmployeeClinicalRecord = async (data, type) => {
-    if(type == 1){
-        try{
+    if (type == 1) {
+        try {
             await axios({
                 method: "POST",
                 url: 'api/add-clinical-employee/',
-                data:data
-    
+                data: data
+
             }).then(async (results) => {
                 clinicalEmployee = results.data
             })
             return clinicalEmployee
-        }catch(err){
+        } catch (err) {
             return 500
         }
-    }else{
+    } else {
 
     }
 }
@@ -1524,16 +1524,16 @@ const addEmployeeClinicalRecord = async (data, type) => {
 let studentclinicalrecords = {}
 const getStudentClinicalRecords = async (mode, id) => {
 
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-students/'+mode+'/'+id,
+            url: 'api/get-clinical-students/' + mode + '/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             studentclinicalrecords = results.data
         })
         return studentclinicalrecords
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -1541,16 +1541,16 @@ const getStudentClinicalRecords = async (mode, id) => {
 let employeeclinicalrecords = {}
 const getEmployeeClinicalRecords = async (mode, id) => {
 
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-employees/'+mode+'/'+id,
+            url: 'api/get-clinical-employees/' + mode + '/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             employeeclinicalrecords = results.data
         })
         return employeeclinicalrecords
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -1560,36 +1560,36 @@ const getEmployeeClinicalRecords = async (mode, id) => {
 let medicalsupplies = {}
 const getMedicalSupplies = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-medical-supplies/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-clinical-medical-supplies/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             medicalsupplies = results.data
         })
         return medicalsupplies
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let medicalsupply = {}
 const updateMedicalSupply = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-clinical-medical-supply/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             medicalsupply = results.data
         })
         return medicalsupply
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -1598,66 +1598,66 @@ const updateMedicalSupply = async (data) => {
 
 let dispensesupplystudent = {}
 const dispenseMedicalSupplyStudent = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-clinical-medical-supply-dispense-student/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             dispensesupplystudent = results.data
         })
         return dispensesupplystudent
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let dispensedsuppliesstudent = {}
 const getDispensedMedicalSupplyStudent = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-dispensed-supplies-student/'+id,
+            url: 'api/get-clinical-dispensed-supplies-student/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             dispensedsuppliesstudent = results.data
         })
         return dispensedsuppliesstudent
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let dispensesupplyemployee = {}
 const dispenseMedicalSupplyEmployee = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-clinical-medical-supply-dispense-employee/',
-            data:data
+            data: data
 
         }).then(async (results) => {
             dispensesupplyemployee = results.data
         })
         return dispensesupplyemployee
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let dispensedsuppliesemployee = {}
 const getDispensedMedicalSupplyEmployee = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-dispensed-supplies-employee/'+id,
+            url: 'api/get-clinical-dispensed-supplies-employee/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             dispensedsuppliesemployee = results.data
         })
         return dispensedsuppliesemployee
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -1665,34 +1665,34 @@ const getDispensedMedicalSupplyEmployee = async (id) => {
 
 let examinationishihara = {}
 const addClinicIshihara = async (data, type, id, personid) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/add-clinical-examination-ishihara/'+type+'/'+id+'/'+personid,
-            data:data
+            url: 'api/add-clinical-examination-ishihara/' + type + '/' + id + '/' + personid,
+            data: data
 
         }).then(async (results) => {
             examinationishihara = results.data
         })
         return examinationishihara
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let examinationhearing = {}
 const addClinicHearing = async (data, type, id, personid) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/add-clinical-examination-hearing/'+type+'/'+id+'/'+personid,
-            data:data
+            url: 'api/add-clinical-examination-hearing/' + type + '/' + id + '/' + personid,
+            data: data
 
         }).then(async (results) => {
             examinationhearing = results.data
         })
         return examinationhearing
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -1700,131 +1700,131 @@ const addClinicHearing = async (data, type, id, personid) => {
 
 let medicalheaders = {}
 const getMedicalHeader = async (id, type) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-examination-header/'+id+'/'+type,
+            url: 'api/get-clinical-examination-header/' + id + '/' + type,
         }).then(async (results) => {
             // console.log(results.data)
             medicalheaders = results.data
         })
         return medicalheaders
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let medicalishihara = {}
 const getMedicalIshihara = async (id, headerid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-examination-ishihara/'+id+'/'+headerid,
+            url: 'api/get-clinical-examination-ishihara/' + id + '/' + headerid,
         }).then(async (results) => {
             // console.log(results.data)
             medicalishihara = results.data
         })
         return medicalishihara
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let medicalhearing = {}
 const getMedicalHearing = async (id, headerid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-examination-hearing/'+id+'/'+headerid,
+            url: 'api/get-clinical-examination-hearing/' + id + '/' + headerid,
         }).then(async (results) => {
             // console.log(results.data)
             medicalhearing = results.data
         })
         return medicalhearing
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let medicalfiles = {}
 const getMedicalFiles = async (id, folder) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-medical-files/'+id+'/'+folder,
+            url: 'api/get-clinical-medical-files/' + id + '/' + folder,
         }).then(async (results) => {
             // console.log(results.data)
             medicalfiles = results.data
         })
         return medicalfiles
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let medicalfilheaders = {}
 const getMedicalFileHeaders = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-clinical-medical-files-headers/'+id,
+            url: 'api/get-clinical-medical-files-headers/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             medicalfilheaders = results.data
         })
         return medicalfilheaders
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let medicalfilesheader = {}
 const addMedicalFileHeader = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-clinical-medical-files-headers',
-            data:data
+            data: data
 
         }).then(async (results) => {
             medicalfilesheader = results.data
         })
         return medicalfilesheader
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let medicalfileimage = {}
 const uploadMedicalFileImage = async (data, location) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/add-clinical-medical-files-image/'+location,
-            data:data
+            url: 'api/add-clinical-medical-files-image/' + location,
+            data: data
 
         }).then(async (results) => {
             medicalfileimage = results.data
         })
         return medicalfileimage
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let medicalfileimagelink = {}
 const uploadMedicalFileLink = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-clinical-medical-files-image-upload',
-            data:data
+            data: data
 
         }).then(async (results) => {
             medicalfileimagelink = results.data
         })
         return medicalfileimagelink
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -1832,19 +1832,19 @@ const uploadMedicalFileLink = async (data) => {
 let booksaccession = {}
 const getBooksAccession = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-library-books-accession/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-library-books-accession/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             booksaccession = results.data
         })
         return booksaccession
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
@@ -1852,60 +1852,60 @@ const getBooksAccession = async (limit, offset, id) => {
 let booksddc = {}
 const getBooksDdc = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-library-books-ddc/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-library-books-ddc/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             booksddc = results.data
         })
         return booksddc
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let addbooksddc = {}
 const addBooksDdc = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-library-books-ddc',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addbooksddc = results.data
         })
         return addbooksddc
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addbookinformation = {}
 const addBookInformation = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-library-books-information',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addbookinformation = results.data
         })
         return addbookinformation
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let enlistment = {}
 const getEnlistment = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-enlistment/',
@@ -1914,24 +1914,24 @@ const getEnlistment = async (id) => {
             enlistment = results.data
         })
         return enlistment
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let addborrowedbooks = {}
 const addBorrowedBooks = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-library-books-borrowed',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addborrowedbooks = results.data
         })
         return addborrowedbooks
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -1939,306 +1939,306 @@ const addBorrowedBooks = async (data) => {
 let getborrowedbooks = {}
 const getBorrowedBooks = async (limit, offset, id) => {
     let search = id
-    if(!id){
+    if (!id) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-library-books-borrowed/'+limit+'/'+offset+'/'+search,
+            url: 'api/get-library-books-borrowed/' + limit + '/' + offset + '/' + search,
         }).then(async (results) => {
             // console.log(results.data)
             getborrowedbooks = results.data
         })
         return getborrowedbooks
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let updateborrowedbooks = {}
 const updateBorrowedBooks = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/update-library-books-borrowed',
-            data:data
+            data: data
 
         }).then(async (results) => {
             updateborrowedbooks = results.data
         })
         return updateborrowedbooks
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let getlibrarycardissue = {}
 const getLibraryCardIssue = async (personid, enrid, active) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-library-card-issue/'+personid+'/'+enrid+'/'+active,
+            url: 'api/get-library-card-issue/' + personid + '/' + enrid + '/' + active,
         }).then(async (results) => {
             // console.log(results.data)
             getlibrarycardissue = results.data
         })
         return getlibrarycardissue
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let borrowedby = {}
 const getBorrowedBooksBy = async (cardid, personid, enrid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-library-books-borrowed-by/'+cardid+'/'+personid+'/'+enrid,
+            url: 'api/get-library-books-borrowed-by/' + cardid + '/' + personid + '/' + enrid,
         }).then(async (results) => {
             // console.log(results.data)
             borrowedby = results.data
         })
         return borrowedby
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let deactivatelibrarycard = {}
 const deactivateLibraryCard = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/deactivate-library-card',
-            data:data
+            data: data
 
         }).then(async (results) => {
             deactivatelibrarycard = results.data
         })
         return deactivatelibrarycard
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addlibrarycard = {}
 const addLibraryCard = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-library-card',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addlibrarycard = results.data
         })
         return addlibrarycard
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let facultyclass = {}
 const getFacultyClass = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-faculty-class/'+id,
+            url: 'api/get-faculty-class/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             facultyclass = results.data
         })
         return facultyclass
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let facultyassignment = {}
 const getFacultyAssignment = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-faculty-assignment/'+id,
+            url: 'api/get-faculty-assignment/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             facultyassignment = results.data
         })
         return facultyassignment
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let facultystudent = {}
 const getFacultyStudent = async (section, gradelvl, course) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-faculty-student/'+section+'/'+gradelvl+'/'+course,
+            url: 'api/get-faculty-student/' + section + '/' + gradelvl + '/' + course,
         }).then(async (results) => {
             // console.log(results.data)
             facultystudent = results.data
         })
         return facultystudent
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let facultystudentmilestone = {}
 const getFacultyStudentMilestone = async (section, gradelvl, course) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-faculty-student-milestone/'+section+'/'+gradelvl+'/'+course,
+            url: 'api/get-faculty-student-milestone/' + section + '/' + gradelvl + '/' + course,
         }).then(async (results) => {
             // console.log(results.data)
             facultystudentmilestone = results.data
         })
         return facultystudentmilestone
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let gradingsheetheader = {}
 const getGradingSheetHeader = async (lnid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-faculty-grading-sheet-header/'+lnid,
+            url: 'api/get-faculty-grading-sheet-header/' + lnid,
         }).then(async (results) => {
             // console.log(results.data)
             gradingsheetheader = results.data
         })
         return gradingsheetheader
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let gradingsheetgrade = {}
 const getGradingSheetGrade = async (hid, subjid) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-faculty-grading-sheet-grade/'+hid+'/'+subjid,
+            url: 'api/get-faculty-grading-sheet-grade/' + hid + '/' + subjid,
         }).then(async (results) => {
             // console.log(results.data)
             gradingsheetgrade = results.data
         })
         return gradingsheetgrade
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addgradingheader = {}
 const addGradingSheet = async (data, type) => {
-    try{
+    try {
         await axios({
             method: "POST",
-            url: 'api/add-faculty-grading-header/'+type,
-            data:data
+            url: 'api/add-faculty-grading-header/' + type,
+            data: data
 
         }).then(async (results) => {
             addgradingheader = results.data
         })
         return addgradingheader
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addgradinggrade = {}
 const addGradingGrade = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-faculty-grading-grade',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addgradinggrade = results.data
         })
         return addgradinggrade
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let commanddropapplicant = {}
 const commandDropApplicant = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/command-drop-applicant',
-            data:data
+            data: data
 
         }).then(async (results) => {
             commanddropapplicant = results.data
         })
         return commanddropapplicant
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let studentidentification = {}
 const getStudentIdentification = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-student-identification/'+id,
+            url: 'api/get-student-identification/' + id,
         }).then(async (results) => {
             // console.log(results.data)
             studentidentification = results.data
         })
         return studentidentification
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let addstudentidentity = {}
 const addStudentIdentification = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-student-identification',
-            data:data
+            data: data
 
         }).then(async (results) => {
             addstudentidentity = results.data
         })
         return addstudentidentity
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let commandsettings = {}
 const setCommandUpdate = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-command-update',
-            data:data
+            data: data
 
         }).then(async (results) => {
             commandsettings = results.data
         })
         return commandsettings
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let commandsettingsdata = {}
 const getCommandUpdate = async () => {
-    try{
+    try {
         await axios({
             method: "GET",
             url: 'api/get-command-update/',
@@ -2247,23 +2247,23 @@ const getCommandUpdate = async () => {
             commandsettingsdata = results.data
         })
         return commandsettingsdata
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let commandsettingsdatacurr = {}
 const getCommandUpdateCurriculum = async (prog, grad, course) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-command-update-curriculum/'+prog+'/'+grad+'/'+course,
+            url: 'api/get-command-update-curriculum/' + prog + '/' + grad + '/' + course,
         }).then(async (results) => {
             // console.log(results.data)
             commandsettingsdatacurr = results.data
         })
         return commandsettingsdatacurr
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -2271,69 +2271,69 @@ const getCommandUpdateCurriculum = async (prog, grad, course) => {
 let commandsettingusers = {}
 const getCommandUsers = async (userid) => {
     let search = userid
-    if(!userid){
+    if (!userid) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-command-users/'+search,
+            url: 'api/get-command-users/' + search,
         }).then(async (results) => {
             commandsettingusers = results.data
         })
         return commandsettingusers
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let commandsettingsuserupdate = {}
 const updateCommandUsers = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/update-command-user',
-            data:data
+            data: data
 
         }).then(async (results) => {
             commandsettingsuserupdate = results.data
         })
         return commandsettingsuserupdate
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let commandsettingregister = {}
 const addCommandUsers = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-command-user',
-            data:data
+            data: data
 
         }).then(async (results) => {
             commandsettingregister = results.data
         })
         return commandsettingregister
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let commandsettingaccess = {}
 const saveCommandAccess = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/add-command-access',
-            data:data
+            data: data
 
         }).then(async (results) => {
             commandsettingaccess = results.data
         })
         return commandsettingaccess
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -2341,35 +2341,35 @@ const saveCommandAccess = async (data) => {
 let commandaccess = {}
 const getCommandAccess = async (userid) => {
     let search = userid
-    if(!userid){
+    if (!userid) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-command-access/'+search,
+            url: 'api/get-command-access/' + search,
         }).then(async (results) => {
             commandaccess = results.data
         })
         return commandaccess
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let tagempacc = {}
 const employeeAccountTag = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/tag-employee-account',
-            data:data
+            data: data
 
         }).then(async (results) => {
             tagempacc = results.data
         })
         return tagempacc
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
@@ -2377,150 +2377,238 @@ const employeeAccountTag = async (data) => {
 let employeeaccount = {}
 const getEmployeeAccount = async (userid) => {
     let search = userid
-    if(!userid){
+    if (!userid) {
         search = 204
     }
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-employee-account/'+search,
+            url: 'api/get-employee-account/' + search,
         }).then(async (results) => {
             employeeaccount = results.data
         })
         return employeeaccount
-    }catch(err){
-        return err 
+    } catch (err) {
+        return err
     }
 }
 
 let qrdata = {}
-const getQRData = async (userid,mode) => {
-    try{
+const getQRData = async (userid, mode) => {
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-qr-data/'+userid+'/'+mode,
+            url: 'api/get-qr-data/' + userid + '/' + mode,
         }).then(async (results) => {
             qrdata = results.data.data
         })
         return qrdata
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let setacademicstatus = {}
 const setAcademicStatus = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/set-academic-status',
-            data:data
+            data: data
 
         }).then(async (results) => {
             setacademicstatus = results.data
         })
         return setacademicstatus
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let getacademic = {}
-const getAcademicStatus = async (mode,code) => {
-    try{
+const getAcademicStatus = async (mode, code) => {
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-academic-status/'+mode+'/'+code,
+            url: 'api/get-academic-status/' + mode + '/' + code,
 
         }).then(async (results) => {
             getacademic = results.data
         })
         return getacademic
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let getarchivemerge = {}
 const getArchiveMerge = async (id) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-archive-merge/'+id,
+            url: 'api/get-archive-merge/' + id,
 
         }).then(async (results) => {
             getarchivemerge = results.data
         })
         return getarchivemerge
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let alumni = {}
 const getAlumniStudents = async (limit, offset, fname, mname, lname, mode) => {
-    let firstname = !fname?'404':fname
-    let middlename = !mname?'404':mname
-    let lastname = !lname?'404':lname
-    try{
+    let firstname = !fname ? '404' : fname
+    let middlename = !mname ? '404' : mname
+    let lastname = !lname ? '404' : lname
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-alumni-students/'+limit+'/'+offset+'/'+firstname+'/'+middlename+'/'+lastname+'/'+mode,
+            url: 'api/get-alumni-students/' + limit + '/' + offset + '/' + firstname + '/' + middlename + '/' + lastname + '/' + mode,
         }).then(async (results) => {
             // console.log(results.data)
             alumni = results.data
         })
         return alumni
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let updatearchivedetails = {}
 const updateArchiveDetails = async (data) => {
-    try{
+    try {
         await axios({
             method: "POST",
             url: 'api/update-archive-details',
-            data:data
+            data: data
 
         }).then(async (results) => {
             updatearchivedetails = results.data
         })
         return updatearchivedetails
-    }catch(err){
+    } catch (err) {
         return 500
     }
 }
 
 let getenrollmentschedule = {}
-const getEnrollmentSchedule = async (curr,prog,grad,cour,sec,lnid) => {
-    try{
+const getEnrollmentSchedule = async (curr, prog, grad, cour, sec, lnid) => {
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-enrollment-schedule/'+curr+'/'+prog+'/'+grad+'/'+cour+'/'+sec+'/'+lnid,
+            url: 'api/get-enrollment-schedule/' + curr + '/' + prog + '/' + grad + '/' + cour + '/' + sec + '/' + lnid,
         }).then(async (results) => {
             // console.log(results.data)
             getenrollmentschedule = results.data
         })
         return getenrollmentschedule
-    }catch(err){
+    } catch (err) {
         return err
     }
 }
 
 let getmergedclass = {}
 const getMergedClass = async (schedid, day) => {
-    try{
+    try {
         await axios({
             method: "GET",
-            url: 'api/get-merged-class/'+schedid+'/'+day,
+            url: 'api/get-merged-class/' + schedid + '/' + day,
         }).then(async (results) => {
             // console.log(results.data)
             getmergedclass = results.data
         })
         return getmergedclass
-    }catch(err){
+    } catch (err) {
+        return err
+    }
+}
+
+const getCurrentWeekDailyCollection = async () => {
+    // 🗓 Get start (Monday) and end (Sunday) of the current week
+    const getCurrentWeekRange = () => {
+        const now = new Date();
+        const day = now.getDay(); // Sunday = 0, Monday = 1, ...
+        const diffToMonday = (day === 0 ? -6 : 1) - day; // adjust to Monday start
+
+        const monday = new Date(now);
+        monday.setDate(now.getDate() + diffToMonday);
+        monday.setHours(0, 0, 0, 0);
+
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        sunday.setHours(23, 59, 59, 999);
+
+        return { monday, sunday };
+    };
+
+    // 🧮 Format date as YYYY-MM-DD HH:mm:ss
+    const formatDate = (d) => {
+        const pad = (num) => String(num).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    };
+
+    // 📅 Day names
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // 🕒 Get week range and formatted values
+    const weekRange = getCurrentWeekRange();
+    const formattedWeekStart = formatDate(weekRange.monday);
+    const formattedWeekEnd = formatDate(weekRange.sunday);
+    const currentDay = days[new Date().getDay()];
+
+   
+    // Return everything in one object
+    return {
+        weekRange,
+        formattedWeekStart,
+        formattedWeekEnd,
+        currentDay,
+        days,
+    };
+};
+
+const getBarHeights = async (collections) => {
+    // 💰 Example: daily total collections
+    // const dailyCollections = [120, 300, 250, 400, 180, 220, 100]; // Mon → Sun
+    // 📊 Normalize heights (so the tallest bar = 100%)
+    const maxCollection = Math.max(...collections);
+    const barHeights = collections.map((val) =>
+        Math.round((val / maxCollection) * 100)
+    );
+
+    return{
+        barHeights,
+        collections
+    };
+
+}
+
+const dateFormatterWord = async (toBeFormatted) => {
+    // Convert to a Date object
+    let date = new Date(toBeFormatted);
+    // Format it
+    let options = { year: 'numeric', month: 'long', day: 'numeric' };
+    let formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+
+    return{
+        formattedDate
+    }
+}
+
+let setseries = {}
+const getSetSeries = async (id) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-set-series/' + id,
+        }).then(async (results) => {
+            // console.log(results.data)
+            setseries = results.data
+        })
+        return setseries
+    } catch (err) {
         return err
     }
 }
@@ -2546,7 +2634,7 @@ export {
     getProvince,
     getCity,
     getBarangay,
-    
+
     addApplicant,
     getPerson,
     getFamily,
@@ -2638,7 +2726,7 @@ export {
     addMedicalFileHeader,
     uploadMedicalFileImage,
     uploadMedicalFileLink,
-    
+
     getBooksAccession,
     getBooksDdc,
     addBooksDdc,
@@ -2679,6 +2767,10 @@ export {
     getArchiveMerge,
     updateArchiveDetails,
     getEnrollmentSchedule,
-    getMergedClass
+    getMergedClass,
+    getCurrentWeekDailyCollection,
+    dateFormatterWord,
+    getBarHeights,
+    getSetSeries
 }
 

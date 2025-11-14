@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RegistrarController;
 use App\Http\Controllers\DefaultsController;
 use App\Http\Controllers\TransactionsController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\ClinicController;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\FacultyController;
@@ -120,9 +121,9 @@ Route::middleware(['auth:sanctum'])->post('/add-requested-item', [TransactionsCo
 Route::middleware(['auth:sanctum'])->post('/delete-requested-item', [TransactionsController::class,'deleteItemRequest']);
 Route::middleware(['auth:sanctum'])->post('/add-payment', [TransactionsController::class,'addPayment']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-payment/{id}/{billtype}', [TransactionsController::class,'getPaymentDetails']);
-Route::middleware(['auth:sanctum'])->get('/get-accounts-payment-all/{billtype}/{datefrom}/{dateto}/{paystat}', [TransactionsController::class,'getAllPayments']);
+Route::middleware(['auth:sanctum'])->get('/get-accounts-payment-all/{billtype}/{datefrom}/{dateto}/{cashier}/{access}', [TransactionsController::class,'getAllPayments']);
 Route::middleware(['auth:sanctum'])->post('/add-accounting-item', [TransactionsController::class,'addAccountingItem']);
-
+Route::middleware(['auth:sanctum'])->get('/get-set-series/{id}', [FinanceController::class,'getSetSeries']);
 
 Route::middleware(['auth:sanctum'])->post('/add-clinical-students', [ClinicController::class,'addStudentClinicalRecord']);
 Route::middleware(['auth:sanctum'])->post('/add-clinical-employee', [ClinicController::class,'addEmployeeClinicalRecord']);

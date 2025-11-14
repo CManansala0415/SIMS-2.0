@@ -11,6 +11,8 @@ import BillingTuitionView from '../components/Accounting/BillingTuitionView.vue'
 import StudentRequestView from '../components/Registrar/StudentRequestView.vue';
 import AccountingItemsView from '../components/Accounting/AccountingItemsView.vue';
 import AccountingTuitionView from '../components/Accounting/AccountingTuitionView.vue';
+import CashierDailyCollections from '../components/Accounting/CashierDailyCollections.vue';
+import AccountingDailyCollections from '../components/Accounting/AccountingDailyCollections.vue';
 // import AccountingPackage from '../components/Accounting/AccountingPackage.vue';
 import ClinicalStudentRecordsView from '../components/Clinic/ClinicalStudentRecordsView.vue';
 import ClinicalMedicalSupplies from '../components/Clinic/ClinicalMedicalSuppliesView.vue';
@@ -90,6 +92,12 @@ const routes = [
         path: '/accounting-tuition', name:'/accounting-tuition', component: AccountingTuitionView
     },
     {
+        path: '/daily-collections-accounting', name:'/daily-collections-accounting', component: AccountingDailyCollections
+    },
+    {
+        path: '/daily-collections-cashier', name:'/daily-collections-cashier', component: CashierDailyCollections
+    },
+    {
         path: '/faculty-classes', name:'/faculty-classes', component: FacultyClassView
     },
     {
@@ -98,6 +106,7 @@ const routes = [
     {
         path: '/faculty-student', name:'/faculty-student', component: FacultyMasterlist
     },
+
     
     
 ];
