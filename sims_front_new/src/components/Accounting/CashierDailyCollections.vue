@@ -4,11 +4,14 @@ import {
     getAllPayments,
     getCurrentWeekDailyCollection,
     dateFormatterWord,
-    getBarHeights
+    getBarHeights,
+    getSetSeries
 } from "../Fetchers.js";
 
 import Loader from '../snippets/loaders/Loading1.vue';
 import LineChart from '../snippets/tech/LineChart.vue';
+import ExcelDownloaderDCR from  '../snippets/modal/ExcelDownloaderDCR.vue';
+
 import { getUserID } from "../../routes/user.js";
 import { useRouter, useRoute } from 'vue-router'
 
@@ -38,6 +41,9 @@ const currentDay = ref('')
 const days = ref([])
 const barHeights = ref([])
 const weekCollection = ref([])
+const receiptOrSeries = ref([])
+const receiptPrSeries = ref([])
+const receiptSeries = ref([])
 
 const booter = async () => {
     // getAllPayments(transactionType.value, '2025-10-05', '2025-11-05', userID.value).then((results) => {
@@ -50,6 +56,12 @@ const booter = async () => {
             totalTuitionPayment.value += pay.acy_billtype == 1 ? 1: 0
             totalMiscPayment.value += pay.acy_billtype == 2 ? 1: 0
         })
+    })
+
+    getSetSeries(userID.value).then((results) => {
+        receiptOrSeries.value.push(...results.or_series)
+        receiptPrSeries.value.push(...results.pr_series)
+        receiptSeries.value.push(...results.or_series, ...results.pr_series)    
     })
 }
 
@@ -71,6 +83,8 @@ const getDateToday = () =>{
     dateToday.value = formattedDateTimeToday;
 }
 
+const cashierId = ref('')
+const cashierName = ref('')
 
 onMounted(async () => {
 
@@ -86,7 +100,14 @@ onMounted(async () => {
     getUserID().then(async (results1) => {
         // user.value = results.account.data.name
         userID.value = results1.account.data.id
-        accessData.value = results1.access
+        cashierId.value = results1.account.data.accid
+        cashierId.value = results1.account.data.name
+        cashierName.value = [
+            results1.employee.emp_firstname,
+            results1.employee.emp_middlename || "",
+            results1.employee.emp_lastname,
+            results1.employee.emp_suffixname || ""
+        ].filter(Boolean).join(" ");
 
         emit('fetchUser', results1)
         try {
@@ -228,6 +249,32 @@ const filterDcr = () =>{
    
 }
 
+const showExcelModal = ref(false)
+const downloadExcel = () =>{
+
+    let date = new Date(selectDateFrom.value);
+    let formattedDateTo = selectDateTo.value.replace("T", " ");
+    // Format as YYYY-MM-DD HH:MM:SS, convert yung may T
+    let formattedDateFrom = date.getFullYear() + "-" +
+    String(date.getMonth() + 1).padStart(2, '0') + "-" +
+    String(date.getDate()).padStart(2, '0') + " " +
+    String(date.getHours()).padStart(2, '0') + ":" +
+    String(date.getMinutes()).padStart(2, '0') + ":" +
+    String(date.getSeconds()).padStart(2, '0');
+
+    if(formattedDateFrom > formattedDateTo){
+        Swal.fire({
+            icon: "warning",
+            title: "Invalid Date Range",
+            text: "The 'From' date cannot be later than the 'To' date. Select date first before generating excel ",
+        });
+    }else{
+        showExcelModal.value = !showExcelModal.value
+        document.getElementById('triggerModal').click();
+    }
+    
+}
+
 </script>
 <template>
     <div>
@@ -275,11 +322,16 @@ const filterDcr = () =>{
                        </div>
                     </div>
 
-                    <div class=" col-lg-3 d-flex align-content-center justify-content-end">
+                    <div class=" col-lg-3 d-flex align-content-center justify-content-end gap-2">
                         <div class="d-inline align-content-end justify-content-end">
                             <button class="btn btn-primary btn-sm" @click="filterDcr()">Load Collection</button>
                         </div>
+                        <div class="d-inline align-content-end justify-content-end">
+                            <button class="btn btn-success btn-sm" @click="downloadExcel()">Download Report</button>
+                            <button v-show="false" id="triggerModal" data-bs-toggle="modal" data-bs-target="#dcrexcelmodal"></button>
+                        </div>
                     </div>
+                    
                 </div>
 
                 <div class="row g-3">
@@ -309,11 +361,11 @@ const filterDcr = () =>{
                         <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
                             <div class="card-body d-flex flex-column align-content-center justify-content-center">
                                 <p class="fw-semibold mb-3">
-                                Total Collection (Current Week on your Counter)
+                                Total Collection (Current Week on your Counter)</p>
                                 <p class="text-muted small mt-2">
                                     [{{ formattedWeekStart }} → {{ formattedWeekEnd }}]
                                 </p>
-                                </p>
+                                
 
                                 <!-- Bars -->
                                 <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
@@ -343,13 +395,13 @@ const filterDcr = () =>{
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-sm-6">
+                    <div class="col-lg-5 col-sm-12">
                         <div class="row g-3 mt-4 mb-4">
                             <div class="col-md-12 col-sm-6">
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Total Earnings</p>
-                                        <h2 class="fw-bold mb-0 text-success">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
+                                        <h2 class="fw-bold mb-0">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
                                         <small class="text-secondary">as of the date</small>
                                     </div>
                                 </div>
@@ -367,7 +419,7 @@ const filterDcr = () =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Tuition Payment</p>
-                                        <h2 class="fw-bold mb-0 text-primary">{{ totalTuitionPayment }}</h2>
+                                        <h2 class="fw-bold mb-0">{{ totalTuitionPayment }}</h2>
                                         <small class="text-secondary">transactions</small>
                                     </div>
                                 </div>
@@ -376,8 +428,36 @@ const filterDcr = () =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Misc Payment</p>
-                                        <h2 class="fw-bold mb-0 text-warning">{{ totalMiscPayment }}</h2>
+                                        <h2 class="fw-bold mb-0">{{ totalMiscPayment }}</h2>
                                         <small class="text-secondary">transactions</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-6">
+                                <div class="card shadow border-0 rounded-3">
+                                    <div class="card-body">
+                                        <p class="text-muted small mb-1">Receipt Series</p>
+                                        <div class="p-2">
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Receipt Type</th>
+                                                        <th>Start Series</th>
+                                                        <th>End Series</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(rs, index) in receiptSeries">
+                                                        <td>
+                                                            <span v-if="rs.sr_receipt == 1">Official Receipt</span>
+                                                            <span v-if="rs.sr_receipt == 2">Provisional Receipt</span>
+                                                        </td>
+                                                        <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_start }}</td>
+                                                        <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_end }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -455,19 +535,27 @@ const filterDcr = () =>{
     </div>
 
 
-    <!-- Settlement Modal
-    <div class="modal fade" id="settlementmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <!-- Report Modal -->
+    <div class="modal fade" id="dcrexcelmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Payment Settlement</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Daily Collection Report Download</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        @click="showPaymentModal = false"></button>
+                        @click="showExcelModal = false"></button>
                 </div>
-                <div class="modal-body">
-                    <AccountingPaymentModal v-if="showPaymentModal" :accountData="studentsAccount" :billTypeData="2" />
+
+                <div class="modal-body small-font">
+                    <ExcelDownloaderDCR v-if="showExcelModal"
+                        :datefrom="selectDateFrom"
+                        :dateto="selectDateTo"
+                        :cashierid="cashierId"
+                        :cashiername="cashierName"
+                    />
                 </div>
+
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
                         <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
@@ -476,10 +564,11 @@ const filterDcr = () =>{
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="showPaymentModal = false">Close</button>
+                            @click="showExcelModal = false">Close</button>
                     </div>
                 </div>
+
             </div>
         </div>
-    </div> -->
+    </div>
 </template>

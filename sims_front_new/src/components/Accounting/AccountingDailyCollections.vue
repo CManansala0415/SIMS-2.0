@@ -5,7 +5,11 @@ import {
     getCurrentWeekDailyCollection,
     dateFormatterWord,
     getBarHeights,
-    getSetSeries
+    getSetSeries,
+    saveSetSeries,
+    getCashiersDetails,
+    turnOffCollection,
+    getCollectionStatus
 } from "../Fetchers.js";
 
 import Loader from '../snippets/loaders/Loading1.vue';
@@ -42,6 +46,13 @@ const days = ref([])
 const barHeights = ref([])
 const weekCollection = ref([])
 const showSeriesModal = ref(false)
+const receiptOrSeries = ref([])
+const receiptPrSeries = ref([])
+const receiptSeries = ref([])
+const employeeCashier = ref([])
+const graphColor = ref('bg-success')
+const textColorHead = ref('enabled-text')
+
 
 const booter = async () => {
     // getAllPayments(transactionType.value, '2025-10-05', '2025-11-05', userID.value, 1).then((results) => {
@@ -56,10 +67,18 @@ const booter = async () => {
         })
     })
 
-    getSetSeries(1).then((results) => {
-        console.log(results.data)
+    getSetSeries(0).then((results) => {
+        receiptOrSeries.value.push(...results.or_series)
+        receiptPrSeries.value.push(...results.pr_series)
+        receiptSeries.value.push(...results.or_series, ...results.pr_series)    
+        // console.log(receiptOrSeries.value)
+        // console.log(receiptPrSeries.value)
     })
 
+    getCashiersDetails(3).then((results) => {
+        employeeCashier.value = results.data
+    })
+    
     
 }
 
@@ -82,6 +101,11 @@ const getDateToday = () =>{
 }
 
 
+
+const checkHighlights = () =>{
+  graphColor.value = counterStatus.value == false? 'bg-secondary-subtle':'bg-success'
+  textColorHead.value = counterStatus.value == false? 'disabled-text':'enabled-text'
+}
 onMounted(async () => {
 
     // var date = new Date();
@@ -92,6 +116,12 @@ onMounted(async () => {
 
     getDateToday()
     selectDateTo.value = dateToday.value
+
+    getCollectionStatus().then((results)=>{
+        counterStatus.value = results.data.sett_status == 0? false : true
+        checkHighlights()
+        
+    })
 
     getUserID().then(async (results1) => {
         // user.value = results.account.data.name
@@ -114,7 +144,7 @@ onMounted(async () => {
 
 
                     getAllPayments(transactionType.value, formattedWeekStart.value, formattedWeekEnd.value, userID.value, 1).then((results) => {
-
+                        
                         // group counters per cashier para makuha yung collections per counter
                         let raw = results.data;
                         let counters = Object.groupBy(raw, r => r.acy_cashier);
@@ -132,11 +162,13 @@ onMounted(async () => {
                             return {
                                 cashier: cashierName,
                                 cashierId: cashierId,
-                                amount: totalAmount
+                                amount: totalAmount,
                             };
                         });
 
+
                         countersData.value = cashierTotals
+                        
                         // get lahat ng total collections amount ng counters
                         totalCountersAmount.value = countersData.value.reduce((sum, item) => sum + item.amount, 0);
 
@@ -218,6 +250,7 @@ const maxDateTime = computed(() => {
   return now.toISOString().slice(0, 19) // includes seconds: "YYYY-MM-DDTHH:MM:SS"
 })
 
+const textColor = ref('')
 
 const filterDcr = () =>{
     
@@ -265,41 +298,229 @@ const filterDcr = () =>{
    
 }
 
-const seriesPrYear = new Date().getFullYear();
-const seriesPrPrefix = ref('PR')
-const seriesPrStart = ref('000001')
-const seriesPrEnd = ref('001000')
+const seriesPrYear = ref('');
+const seriesPrPrefix = ref('')
+const seriesPrStart = ref('')
+const seriesPrEnd = ref('')
 
-const seriesOrYear = new Date().getFullYear();
-const seriesOrPrefix = ref('OR')
-const seriesOrStart = ref('000001')
-const seriesOrEnd = ref('001000')
+const seriesOrYear = ref('')
+const seriesOrPrefix = ref('')
+const seriesOrStart = ref('')
+const seriesOrEnd = ref('')
 // const seriesStartNumber = ref('')
 // const seriesEndNumber = ref('')
 
 const editSeriesCashierName = ref('')
-const seriesData = ref([])
+const editSeriesCashierId = ref('')
+const seriesPrData = ref([])
+const seriesOrData = ref([])
 const showSeries = ref(false)
+
 const getSeries = (data) =>{
+    // console.log(data)
     showSeriesModal.value = !showSeriesModal.value
     showSeries.value = true
-    editSeriesCashierName.value = data.cashier
+    editSeriesCashierName.value = [
+        data.emp_firstname,
+        data.emp_middlename || "",
+        data.emp_lastname,
+        data.emp_suffixname || ""
+    ].filter(Boolean).join(" ");
+    editSeriesCashierId.value = data.emp_accid
 
-    getSetSeries(data.cashierId).then((results) => {
-        seriesData.value = results.data
-        console.log(seriesData.value)
+    getSetSeries(data.emp_accid).then((results) => {
+
+        let year = new Date().getFullYear();
+
+        seriesOrData.value = results.or_series.length > 0 ? results.or_series[0] : {}
+        seriesPrData.value = results.pr_series.length > 0 ? results.pr_series[0] : {}
+
+        seriesOrPrefix.value = seriesOrData.value.sr_prefix?seriesOrData.value.sr_prefix:'OR'
+        seriesOrYear.value = seriesOrData.value.sr_year?seriesOrData.value.sr_year:year
+        seriesOrStart.value = seriesOrData.value.sr_start?seriesOrData.value.sr_start:null
+        seriesOrEnd.value = seriesOrData.value.sr_end?seriesOrData.value.sr_end:null
+
+        seriesPrPrefix.value = seriesPrData.value.sr_prefix?seriesPrData.value.sr_prefix:'PR'
+        seriesPrYear.value = seriesPrData.value.sr_year?seriesPrData.value.sr_year:year
+        seriesPrStart.value = seriesPrData.value.sr_start?seriesPrData.value.sr_start:null
+        seriesPrEnd.value = seriesPrData.value.sr_end?seriesPrData.value.sr_end:null
+
         showSeries.value = false
     })
 }
 
+
+const savingSeries = ref(false)
 const saveSeries = (data) =>{
-    console.log(data)
+
+    savingSeries.value = true
+
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all series details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    var x = {}
+    let ormode = Object.keys(seriesOrData.value).length > 0 ? 2 : 1 // 1 for insert, 2 for update
+    let prmode = Object.keys(seriesPrData.value).length > 0 ? 2 : 1 // 1 for insert, 2 for update
+
+    if(data == 1){
+
+        //OR Series
+        let srid = ''
+        if(ormode == 2 && seriesOrData.value.sr_receipt == data){
+            srid = seriesOrData.value.sr_id
+        }else{
+            srid = null
+            ormode = 1
+        }
+
+        var x = {
+            cashierId: editSeriesCashierId.value,
+            sr_receipt:data,
+            sr_or_prefix: seriesOrPrefix.value,
+            sr_or_year: seriesOrYear.value,
+            sr_or_start: seriesOrStart.value,
+            sr_or_end: seriesOrEnd.value,
+            sr_user: userID.value,
+            sr_mode:ormode,
+            sr_id: srid
+        }
+
+    }else{
+
+        //PR Series
+        let srid = ''
+        if(prmode == 2 && seriesPrData.value.sr_receipt == data){
+            srid = seriesPrData.value.sr_id
+        }else{
+            srid = null
+            prmode = 1
+        }
+
+        var x = {
+            cashierId: editSeriesCashierId.value,
+            sr_receipt: data,
+            sr_pr_prefix: seriesPrPrefix.value,
+            sr_pr_year: seriesPrYear.value,
+            sr_pr_start: seriesPrStart.value,
+            sr_pr_end: seriesPrEnd.value,
+            sr_user: userID.value,
+            sr_mode: prmode,
+            sr_id: srid
+        }
+
+    }
+
+    saveSetSeries(x, data).then((results) => {
+        Swal.close();
+        if(results.status == 200){
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "Series saved successfully.",
+            }).then(() => {
+                hideMyModal()
+                savingSeries.value = false
+            })
+        }else{
+            Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to save series. Please try again.",
+            })
+        }
+    })
 }
+
+const hideMyModal = () => {
+    document.getElementById('closeSeriesBtn').click();
+};
+
+
+const counterStatus = ref(false)
+const turnOffCounters = () => {
+    let title = counterStatus.value == true?'Notice on Turning OFF Counters':'Notice on Turning ON Counters'
+    let confirmationtext = counterStatus.value == true?'Yes, turn OFF Counters':'Yes, turn ON Counters'
+    let canceltext = counterStatus.value == true?'No, dont turn OFF Counters':'No, dont turn ON Counters'
+    let btncolor = counterStatus.value == true?'#cc103c':'#07db6a'
+    let successtext =  counterStatus.value == true?'Turn Off Successful':'Turn On Successful'
+
+    Swal.fire({
+        title: title,
+        html: `Are you sure to update counters from collecting payments?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: btncolor,
+        cancelButtonText: canceltext,
+        confirmButtonText: confirmationtext
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+
+            // Show loading alert first
+            Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we update all counters.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            try {
+                // Flip status locally
+                let newStatus = !counterStatus.value;
+                let payload = {
+                    status: newStatus ? 1 : 0,
+                    user_id: userID.value
+                };
+
+                // Wait for async request
+                const results = await turnOffCollection(payload);
+
+                // Update counter status based on server response
+                counterStatus.value = results.data == 1;
+
+                // Close loading alert
+                Swal.close();
+
+                // Show success or error alert
+                if (results.status == 200) {
+                    Swal.fire({
+                        title: successtext,
+                        text: "Counters status is updated",
+                        icon: "success"
+                    });
+
+                    checkHighlights()
+                } else {
+                    Swal.fire({
+                        title: "Error",
+                        text: "Server Error, Try Again Later",
+                        icon: "error"
+                    });
+                }
+            } catch (error) {
+                Swal.close();
+                Swal.fire({
+                    title: "Error",
+                    text: "Something went wrong. Please try again.",
+                    icon: "error"
+                });
+            }
+        }
+    });
+}
+
 
 
 </script>
 <template>
-    <div>
+    <div id="main-component">
         <div class="p-3 mb-4 border-bottom">
             <h5 class="text-uppercase fw-bold">Counters Daily Collection</h5>
         </div>
@@ -347,6 +568,19 @@ const saveSeries = (data) =>{
                     <div class=" col-lg-3 d-flex align-content-center justify-content-end">
                        <div class="d-inline align-content-end justify-content-end">
                             <button class="btn btn-primary btn-sm me-2" @click="filterDcr()">Load Collection</button>
+                            <!-- <div class="form-check form-switch">
+                                <input 
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    id="counterSwitch"
+                                    :checked="counterStatus"
+                                    @change="onSwitchToggle"
+                                >
+                                <label class="form-check-label" for="counterSwitch">
+                                    {{ counterStatus ? 'Counters are ON' : 'Counters are OFF' }}
+                                </label>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -374,22 +608,38 @@ const saveSeries = (data) =>{
                             </div>
                         </div>
                     </div> -->
-                    <div class="col-lg-7 d-flex flex-column align-content-center justify-content-center">
-                        <div class="row g-3 mt-4 mb-4">
-                            <div class="col-md-4 col-sm-6">
+                    <div class="col-lg-7 d-flex flex-column align-content-center justify-content-start">
+                        
+                        <div class="row g-3 mt-4 mb-3">
+                            <div class="col-md-3 col-sm-6">
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
-                                        <p class="text-muted small mb-1">Total Counters</p>
-                                        <h2 class="fw-bold mb-0" >{{ Object.keys(countersData).length }}</h2>
-                                        <small class="text-secondary">actively working</small>
+                                        <button :class="counterStatus == true? 'btn btn-success btn-sm':'btn btn-danger btn-sm'" @click="turnOffCounters()">
+                                            <font-awesome-icon icon="fa-solid fa-power-off" />
+                                        </button>
+                                        <p :class="counterStatus == true? 'small mb-1 mt-2 fw-bold enabled-text':'small mb-1 mt-2 fw-bold text-danger'">
+                                            {{ counterStatus == true ?'ACTIVATED': 'DEACTIVATED' }}</p>
+                                        <small class="text-secondary">{{ counterStatus == true ?'Counters are Active': 'Counters are Inactive' }}</small>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-8 col-sm-6">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="card shadow border-0 rounded-3">
+                                    <div class="card-body">
+                                        <p class="text-muted small mb-1">Total Counters</p> 
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ Object.keys(countersData).length }}</h2>
+                                        <small class="text-secondary">
+                                            {{ counterStatus == true? 'actively working' : 'are inactive' }}
+                                        </small>
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-6">
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Total Payment collected</p>
-                                        <h2 class="fw-bold mb-0 text-primary">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalCountersAmount) }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalCountersAmount) }}</h2>
                                         <small class="text-secondary">All Counters this week</small>
                                     </div>
                                 </div>
@@ -398,20 +648,20 @@ const saveSeries = (data) =>{
                         <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
                             <div class="card-body d-flex flex-column align-content-center justify-content-center">
                                 <p class="fw-semibold mb-3">
-                                Total Collection (all counters week collection)
+                                    Total Collection (all counters week collection)
+                                </p>
                                 <p class="text-muted small mt-2">
                                     [{{ formattedWeekStart }} → {{ formattedWeekEnd }}]
                                 </p>
-                                </p>
 
                                 <!-- Bars -->
-                                <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
+                                <div class="d-flex align-items-end justify-content-between" style="height: 191px;">
                                     <div
                                         v-for="(height, index) in barHeights"
                                         :key="index"
                                         class="rounded-2 transition-all"
                                         :class="[
-                                        'bg-success',
+                                        graphColor,
                                         days[index] === currentDay ? 'opacity-100' : 'bg-opacity-50'
                                         ]"
                                         :style="{ width: '10%', height: height + '%' }"
@@ -431,13 +681,13 @@ const saveSeries = (data) =>{
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-5 col-sm-6">
+                    <div class="col-lg-5 col-sm-12">
                         <div class="row g-3 mt-4 mb-4">
                             <div class="col-md-12 col-sm-6">
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Total Earnings</p>
-                                        <h2 class="fw-bold mb-0 text-success">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
                                         <small class="text-secondary">as of the date</small>
                                     </div>
                                 </div>
@@ -446,7 +696,7 @@ const saveSeries = (data) =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Total Collections</p>
-                                        <h2 class="fw-bold mb-0">{{ Object.keys(payment).length }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ Object.keys(payment).length }}</h2>
                                         <small class="text-secondary">transactions</small>
                                     </div>
                                 </div>
@@ -455,7 +705,7 @@ const saveSeries = (data) =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Tuition Payment</p>
-                                        <h2 class="fw-bold mb-0 text-primary">{{ totalTuitionPayment }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ totalTuitionPayment }}</h2>
                                         <small class="text-secondary">transactions</small>
                                     </div>
                                 </div>
@@ -464,7 +714,7 @@ const saveSeries = (data) =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Misc Payment</p>
-                                        <h2 class="fw-bold mb-0 text-warning">{{ totalMiscPayment }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ totalMiscPayment }}</h2>
                                         <small class="text-secondary">transactions</small>
                                     </div>
                                 </div>
@@ -477,18 +727,89 @@ const saveSeries = (data) =>{
                                             <ul class="list-group text-uppercase">
                                                 <li class="list-group-item">
                                                    <div class="d-flex justify-content-between fw-bold">
-                                                        <small>Name</small> <small>This Week Collection</small>
+                                                        <small>Name</small> <small>This Week Collection</small> 
                                                    </div>
                                                 </li>
                                                 <li class="list-group-item" v-for="(cd, index) in countersData">
                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <span>{{ cd.cashier }}</span> → <span class="fw-bold text-primary">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cd.amount) }}</span>
-                                                        <button @click="getSeries(cd)" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#seriesmodal">Edit Series</button>
+                                                        <span>{{ cd.cashier }}</span> → 
+                                                        <span class="fw-bold text-primary">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cd.amount) }}</span>
+                                                        <!-- <button @click="getSeries(cd)" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#seriesmodal">Edit Series</button> -->
                                                     </div>
                                                 </li>
                                             </ul>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-8 col-sm-6">
+                        <div class="card shadow border-0 rounded-3">
+                            <div class="card-body">
+                                <p class="text-muted small mb-1">Counters w/ Corresponding Receipt Series</p>
+                                <div style="height:200px; overflow: auto;" class="p-2">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                           <tr>
+                                                <th>Cashier</th>
+                                                <th>Start Series</th>
+                                                <th>End Series</th>
+                                                <th>Receipt Type</th>
+                                           </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(rs, index) in receiptSeries">
+                                                <td class="text-uppercase">{{ rs.fullname }}</td>
+                                                <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_start }}</td>
+                                                <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_end }}</td>
+                                                <td>
+                                                    <span v-if="rs.sr_receipt == 1">Official Receipt</span>
+                                                    <span v-if="rs.sr_receipt == 2">Provisional Receipt</span>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="!Object.keys(receiptSeries).length">
+                                                <td colspan="4">
+                                                    No Active Counters with Updated Series
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>     
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card shadow border-0 rounded-3">
+                            <div class="card-body">
+                                <p class="text-muted small mb-1">Cashiers</p>
+                                <div style="height:200px; overflow: auto;" class="p-2">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Cashier</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="(emp, index) in employeeCashier">
+                                                <td class="text-uppercase align-middle">
+                                                    <span>{{ emp.emp_firstname }} {{ emp.emp_lastname }}</span>
+                                                </td>
+                                                <td>
+                                                    <span v-if="!counterStatus" class="btn btn-sm btn-success" @click="getSeries(emp)" data-bs-toggle="modal" data-bs-target="#seriesmodal">Edit Series</span>
+                                                    <span v-else class="fw-bold text-success" title="to edit series, deactivate all counters first">Active</span>
+                                                </td>
+                                            </tr>
+                                            <tr v-if="!Object.keys(receiptSeries).length">
+                                                <td colspan="4">
+                                                    No Active Counters with Updated Series
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>     
                                 </div>
                             </div>
                         </div>
@@ -607,13 +928,29 @@ const saveSeries = (data) =>{
                                                 <label class="form-label"><small>Official Receipt Series Start</small></label>
                                                 <div class="row g-1">
                                                     <div class="col-3">
-                                                        <input type="text" class="form-control form-control-sm text-center" :value="seriesOrPrefix + '-' + seriesOrYear " disabled/>
+                                                        <input type="text" class="form-control form-control-sm text-center"  :value="seriesOrPrefix + '-' + seriesOrYear " disabled/>
                                                     </div>
                                                     <div class="col-1 text-center d-flex justify-content-center align-items-center">
                                                         -
                                                     </div>
                                                     <div class="col-8">
-                                                        <input type="number" class="form-control form-control-sm text-center" v-model="seriesOrStart" required>
+                                                        <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesOrStart" required> -->
+                                                        <input 
+                                                            v-model.number="seriesOrStart"
+                                                            required
+                                                            step="0" 
+                                                            min="0"
+                                                            :max="seriesOrEnd"
+                                                            :disabled="savingSeries"
+                                                            @focusout="
+                                                            if (seriesOrStart <= 0) seriesOrStart = Number(seriesOrEnd) - 10;
+                                                            "
+                                                            @input="
+                                                            if (seriesOrStart >= seriesOrEnd) seriesOrStart = (Number(seriesOrEnd)-10);
+                                                            "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -623,18 +960,31 @@ const saveSeries = (data) =>{
                                                 <label class="form-label"><small>Official Receipt Series End</small></label>
                                                 <div class="row g-1">
                                                     <div class="col-3">
-                                                        <input type="text" class="form-control form-control-sm text-center" :value="seriesOrPrefix + '-' + seriesOrYear " disabled/>
+                                                        <input type="text" class="form-control form-control-sm text-center"  :value="seriesOrPrefix + '-' + seriesOrYear " disabled/>
                                                     </div>
                                                     <div class="col-1 text-center d-flex justify-content-center align-items-center">
                                                         -
                                                     </div>
                                                     <div class="col-8">
-                                                        <input type="number" class="form-control form-control-sm text-center" v-model="seriesOrEnd" required>
+                                                        <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesOrEnd" required> -->
+                                                        <input 
+                                                            v-model.number="seriesOrEnd"
+                                                            required
+                                                            step="0" 
+                                                            :min="Number(seriesOrStart) + 10"
+                                                            :disabled="savingSeries"
+                                                            @focusout="
+                                                            if (seriesOrStart <= 0 || !seriesOrStart) seriesOrStart = Number(seriesOrEnd) - 10;
+                                                            if (seriesOrEnd <= seriesOrStart ) seriesOrEnd = Number(seriesOrStart) + 10;
+                                                            "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="mt-3">
-                                                <button type="submit" class="btn btn-sm btn-success w-100">Save Official Receipt Series</button>
+                                                <button v-show="!savingSeries" type="submit" class="btn btn-sm btn-success w-100">Save Official Receipt Series</button>
                                             </div>
                                         </form>
                                     </div>
@@ -645,13 +995,29 @@ const saveSeries = (data) =>{
                                                 <label class="form-label"><small>Provisional Receipt Series Start</small></label>
                                                 <div class="row g-1">
                                                     <div class="col-3">
-                                                        <input type="text" class="form-control form-control-sm text-center" :value="seriesPrPrefix + '-' + seriesPrYear " disabled/>
+                                                        <input type="text" class="form-control form-control-sm text-center"  :value="seriesPrPrefix + '-' + seriesPrYear " disabled/>
                                                     </div>
                                                     <div class="col-1 text-center d-flex justify-content-center align-items-center">
                                                         -
                                                     </div>
                                                     <div class="col-8">
-                                                        <input type="number" class="form-control form-control-sm text-center" v-model="seriesPrStart" required>
+                                                        <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesPrStart" required> -->
+                                                        <input 
+                                                            v-model.number="seriesPrStart"
+                                                            required
+                                                            step="0" 
+                                                            min="0"
+                                                            :max="seriesPrEnd"
+                                                            :disabled="savingSeries"
+                                                            @focusout="
+                                                            if (seriesPrStart <= 0) seriesPrStart = Number(seriesPrEnd) - 10;
+                                                            "
+                                                            @input="
+                                                            if (seriesPrStart >= seriesPrEnd) seriesPrStart = (Number(seriesPrEnd)-10);
+                                                            "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
@@ -661,21 +1027,35 @@ const saveSeries = (data) =>{
                                                 <label class="form-label"><small>Provisional Receipt Series End</small></label>
                                                 <div class="row g-1">
                                                     <div class="col-3">
-                                                        <input type="text" class="form-control form-control-sm text-center" :value="seriesPrPrefix + '-' + seriesPrYear " disabled/>
+                                                        <input type="text" class="form-control form-control-sm text-center"  :value="seriesPrPrefix + '-' + seriesPrYear " disabled/>
                                                     </div>
                                                     <div class="col-1 text-center d-flex justify-content-center align-items-center">
                                                         -
                                                     </div>
                                                     <div class="col-8">
-                                                        <input type="number" class="form-control form-control-sm text-center" v-model="seriesPrEnd" required>
+                                                        <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesPrEnd" required> -->
+                                                        <input 
+                                                            v-model.number="seriesPrEnd"
+                                                            required
+                                                            step="0" 
+                                                            :min="Number(seriesPrStart) + 10"
+                                                            :disabled="savingSeries"
+                                                            @focusout="
+                                                            if (seriesPrStart <= 0 || !seriesPrStart) seriesPrStart = Number(seriesPrEnd) - 10;
+                                                            if (seriesPrEnd <= seriesPrStart ) seriesPrEnd = Number(seriesPrStart) + 10;
+                                                            "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="mt-3">
-                                                <button type="submit" class="btn btn-sm btn-success w-100">Save Provisional Receipt Series</button>
+                                                <button v-show="!savingSeries" type="submit" class="btn btn-sm btn-success w-100">Save Provisional Receipt Series</button>
                                             </div>
                                         </form>
                                     </div>
+                                    <p class="fw-bold" v-show="savingSeries">Saving Series...</p>
                                 </div>
 
                             </div>
@@ -694,7 +1074,7 @@ const saveSeries = (data) =>{
                             else (Data Privacy Act of 2012)</small>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        <button type="button" class="btn btn-secondary" id="closeSeriesBtn" data-bs-dismiss="modal"
                             @click="showSeriesModal = false">Close</button>
                     </div>
                 </div>
@@ -702,3 +1082,20 @@ const saveSeries = (data) =>{
         </div>
     </div>
 </template>
+
+<style scoped>
+
+.disabled-text {
+    color: #b5b5b5;
+}
+.disabled-bg {
+    background-color: #b5b5b5;
+}
+
+.enabled-text{
+    color:#2b2b2b;
+}
+.enabled-bg {
+    background-color: #2b2b2b;
+}
+</style>

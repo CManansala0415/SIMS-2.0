@@ -15,7 +15,9 @@ import {
     getPriceDetails,
     getAcademicDefaults,
     getStudentFiltering,
-    getPaymentDetails
+    getPaymentDetails,
+
+
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
@@ -104,6 +106,8 @@ const booter = async () => {
         booting.value = 'Loading Prices...'
         bootingCount.value += 1
     })
+
+
     // getUserID().then((results) => {
     //     userID.value = results.account.data.id
     //     emit('fetchUser', results)
@@ -120,6 +124,8 @@ const searchLname = ref('')
 const paramsProgram = ref(0)
 const paramsGradelvl = ref(0)
 const paramsCourse = ref(0)
+
+
 onMounted(async () => {
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
@@ -136,7 +142,6 @@ onMounted(async () => {
                     studentCount.value = results.count
                     preLoading.value = false
                     emit('doneLoading', false)
-
                     // console.log(accounts.value)
                     // let x = student.value.map((e) => {
                     //     let y = accounts.value.findIndex((f) => {

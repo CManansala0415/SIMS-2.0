@@ -307,6 +307,12 @@ class TransactionsController extends Controller
                     'acy_cheque_bank' => $request->input('acy_cheque_bank'),
                     'acy_bank_no' => $request->input('acy_bank_no'),
                     'acy_transferred_bank' => $request->input('acy_transferred_bank'),
+
+                    'acy_series' => $request->input('acy_series'),
+                    'acy_series_prefix' => $request->input('acy_series_prefix'),
+                    'acy_series_year' => $request->input('acy_series_year'),
+                    'acy_series_pattern' => $request->input('acy_series_pattern'),
+
                 ]);
                 return $data = [
                     'status' => 204,
@@ -394,32 +400,78 @@ class TransactionsController extends Controller
 
 
                 default:
-                        $payment = DB::table('def_accounts_payment as ac')->orderBy('ac.acy_accid','DESC')
-                        ->leftJoin('def_accounts_request as ar', function($join)
-                                        {
-                                            $join->on('ac.acy_accid', '=', 'ar.acr_id');
-                                            $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
-                                        })
-                        ->leftJoin('def_accounts_settlement as at', function($join)
-                                        {
-                                            $join->on('ac.acy_accid', '=', 'at.acs_id');
-                                            $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
-                                        })
+
+                    $payment = DB::table('def_accounts_payment as ac')
+                        ->orderBy('ac.acy_accid','DESC')
+                        
+                        ->leftJoin('def_accounts_request as ar', function($join) {
+                            $join->on('ac.acy_accid', '=', 'ar.acr_id');
+                            $join->on('ac.acy_billtype', '=', 'ar.acr_billtype');
+                        })
+                        ->leftJoin('def_accounts_settlement as at', function($join) {
+                            $join->on('ac.acy_accid', '=', 'at.acs_id');
+                            $join->on('ac.acy_billtype', '=', 'at.acs_billtype');
+                        })
+
+                        // payments
                         ->leftJoin('def_employee as emp', 'ac.acy_cashier', '=', 'emp.emp_accid')
-                        ->leftJoin('def_person as prn', 'at.acs_personid', '=', 'prn.per_id')
-                        ->leftJoin('def_accounts_fee as acf', 'ar.acr_reqitem', '=', 'acf.acf_id')                
+                        ->leftJoin('def_accounts_fee as acf', 'ar.acr_reqitem', '=', 'acf.acf_id')  
+
+                        // academic details
+                        ->leftJoin('def_person as prnsettle', 'at.acs_personid', '=', 'prnsettle.per_id')
+                        ->leftJoin('def_person as prnrequest', 'ar.acr_personid', '=', 'prnrequest.per_id')
+                        ->leftJoin('def_enrollment as enr', 'at.acs_enrid', '=', 'enr.enr_id')   
+                        ->leftJoin('def_program as course', 'enr.enr_course', '=', 'course.prog_id')
+                        ->leftJoin('sett_degree_types as program', 'enr.enr_program', '=', 'program.dtype_id')
+                        ->leftJoin('def_gradelvl as gradelvl', 'enr.enr_gradelvl', '=', 'gradelvl.grad_id')
+                        ->leftJoin('def_section as section', 'enr.enr_section', '=', 'section.sec_id')        
+
                         ->select(   
                             'ac.*',
                             'ar.*',
                             'at.*',
                             'emp.*',
-                            'prn.*',
-                            'acf.*',
+                            'prnsettle.*',
+                            'acf .*',
+                            // Course / Arc course
+                            DB::raw("(COALESCE(course.prog_code, 
+                                    (SELECT arc.arc_course 
+                                    FROM server_archive_persons as arc
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id ASC
+                                    LIMIT 1), 'N/A')) as prog_code"),
+                            // Grade level: use joined gradelvl or first fallback from subquery
+                            DB::raw("(COALESCE(gradelvl.grad_name, 
+                                    (SELECT sc.grad_name 
+                                    FROM server_archive_persons as arc
+                                    LEFT JOIN def_gradelvl sc ON arc.arc_gradelvl = sc.grad_id
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id ASC
+                                    LIMIT 1), 'N/A')) as gradelvl_desc"),
+                            // Section: use joined section or first fallback from subquery
+                            DB::raw("(COALESCE(section.sec_name, 
+                                    (SELECT sc.sec_name 
+                                    FROM server_archive_persons as arc
+                                    LEFT JOIN def_section sc ON arc.arc_section = sc.sec_id
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id ASC
+                                    LIMIT 1), 'N/A')) as sec_desc"),
+                            // program type
+                            DB::raw("(COALESCE(program.dtype_desc, 
+                                    (SELECT dt.dtype_desc 
+                                    FROM server_archive_persons as arc
+                                    LEFT JOIN sett_degree_types dt ON arc.arc_program = dt.dtype_id
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id ASC
+                                    LIMIT 1), 'N/A')) as prog_desc")
                         )
-                        ->where('ac.acy_status', '=',  1)
+                        ->distinct()
+                        ->where('ac.acy_status', 1)
                         ->whereBetween('ac.acy_datepaid', [$datefrom, $dateto])
                         ->orderBy('ac.acy_id','DESC')
                         ->get();
+
+
                     break;
             }
         }else{

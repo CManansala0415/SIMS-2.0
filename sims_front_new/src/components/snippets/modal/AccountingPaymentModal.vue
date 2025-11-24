@@ -6,6 +6,9 @@ import {
     addPayment,
     getTransactionDetails,
     getPaymentDetails,
+    getSetSeries,
+    getUsedSeries,
+    getCollectionStatus
 } from "../../Fetchers.js";
 
 import {
@@ -30,6 +33,9 @@ const billType = computed(() => {
 const generateDefault = ref(1)
 const disabler = ref(false)
 const receiptType = ref(1)
+const seriesNoStart = ref('')
+const seriesNoLimit = ref('')
+const seriesNoActual = ref('')
 const paymentMode = ref('')
 const amountPaid = ref('')
 const amountTobePaid = ref(0)
@@ -57,7 +63,20 @@ const setValues = () => {
 }
 
 const personName = ref('')
+
+const receiptOrSeries = ref([])
+const receiptPrSeries = ref([])
+const receiptSeries = ref([])
+
 onMounted(() => {
+
+    //prevent e and negative
+    document.querySelector(".amount-text").addEventListener("keypress", function (evt) {
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57)
+        {
+            evt.preventDefault();
+        }
+    });
 
     checking.value = true
     // amountTobePaid.value = account.value.acr_amount? account.value.acr_amount:''
@@ -106,28 +125,57 @@ onMounted(() => {
             })
 
 
-                getTransactionDetails(0, 0, '', '', '', 2, accountId.value, billType.value).then((results) => {
+                getTransactionDetails(0, 0, '', '', '', 2, accountId.value, billType.value).then((transact) => {
 
-                    if(billType.value == 1){
+                    getSetSeries(userID.value).then(async(series) => {
+                        receiptOrSeries.value.push(...series.or_series)
+                        receiptPrSeries.value.push(...series.pr_series)
+                        receiptSeries.value.push(...series.or_series, ...series.pr_series)  
 
-                        // console.log(results.data[0])
-                        checking.value = false
+                        if(billType.value == 1){
+                            seriesNoStart.value = receiptPrSeries.value[0].sr_prefix+ '-' + receiptPrSeries.value[0].sr_year+ '-' + receiptPrSeries.value[0].sr_start
+                            seriesNoLimit.value = receiptPrSeries.value[0].sr_prefix+ '-' + receiptPrSeries.value[0].sr_year+ '-' + receiptPrSeries.value[0].sr_end
 
-                    }else{
+                            let exist = await getUsedSeries(receiptPrSeries.value[0].sr_start, receiptPrSeries.value[0].sr_end, receiptPrSeries.value[0].sr_year);
+                            let latestpattern = receiptPrSeries.value[0].sr_start; // default if no data found
 
-                        if(results.data[0].acr_docstamp === 'underfined'){
-                            Swal.fire({
-                                title: "Error",
-                                text: "Unknown error occured, try again later",
-                                icon: "error"
-                            }).then(() => {
-                                location.reload()
-                            });
-                        }else{
-                            !results.data[0].acr_docstamp?receiptType.value=1:receiptType.value=2
+                            if (exist.data && exist.data.length > 0) {
+                                latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
+                            }
+                            
+                            seriesNoActual.value =receiptPrSeries.value[0].sr_prefix + '-' +receiptPrSeries.value[0].sr_year + '-' + (Number(latestpattern) + 1);
                             checking.value = false
+
+                        }else{
+
+                            if(transact.data[0].acr_docstamp === 'underfined'){
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Unknown error occured, try again later",
+                                    icon: "error"
+                                }).then(() => {
+                                    location.reload()
+                                });
+                            }else{
+                                !transact.data[0].acr_docstamp?receiptType.value=1:receiptType.value=2
+                                seriesNoStart.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + receiptOrSeries.value[0].sr_start
+                                seriesNoLimit.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + receiptOrSeries.value[0].sr_end
+                                
+                                let exist = await getUsedSeries(receiptOrSeries.value[0].sr_start, receiptOrSeries.value[0].sr_end, receiptOrSeries.value[0].sr_year);
+                                let latestpattern = receiptOrSeries.value[0].sr_start; // default if no data found
+
+                                if (exist.data && exist.data.length > 0) {
+                                    latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
+                                }
+                                
+                                seriesNoActual.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + (Number(latestpattern) + 1)
+                                checking.value = false
+
+                            }
                         }
-                    }
+                    })
+
+                    
                     
                 })
 
@@ -138,155 +186,154 @@ onMounted(() => {
 })
 
 
+const verifyReceiptSeries = async () => {
+
+    var startseries = ''
+    var limitseries = ''
+    var status = 204
+    var addedpattern = ''
+    var finalseries = ''
+    var date = new Date();
+    var curryear = date.getFullYear();
+    var start = ''
+    var startpattern = ''
+    var end = ''
+    var endpattern = ''
+    var exist = ''
+    var latestpattern = ''
+
+    await getSetSeries(userID.value).then(async(results) => {
+
+        let orseries = results.or_series
+        let prseries = results.pr_series
+
+        if(billType.value == 1){
+            startseries = prseries[0].sr_prefix+ '-' + prseries[0].sr_year+ '-' + prseries[0].sr_start
+            limitseries = prseries[0].sr_prefix+ '-' + prseries[0].sr_year+ '-' + prseries[0].sr_end
+        }else{
+            startseries = orseries[0].sr_prefix+ '-' + orseries[0].sr_year+ '-' + orseries[0].sr_start
+            limitseries = orseries[0].sr_prefix+ '-' + orseries[0].sr_year+ '-' + orseries[0].sr_end
+        }
+
+        start = startseries.split('-'); // splits by the hyphen
+        startpattern = Number(start[2]); // make sure it's a number
+
+        end = limitseries.split('-'); // splits by the hyphen
+        endpattern = Number(end[2]); // make sure it's a number
+
+        exist = await getUsedSeries(startpattern, endpattern, curryear);
+        latestpattern = startpattern; // default if no data found
+
+        if (exist.data && exist.data.length > 0) {
+            latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
+            addedpattern=latestpattern+1
+        }else{
+            addedpattern=latestpattern
+        }
+
+        if((addedpattern > endpattern)||(addedpattern < startpattern)){
+            status = 500
+            Swal.fire({
+                title: "Transaction Declined",
+                html: `<span class="fw-bold">${start[0]}-${curryear}-${addedpattern}</span> is already out for the series sequence, try to change the series set or contact the administrator for verification`,
+                icon: "warning",
+                confirmButtonText: "Ok, Got it!"
+            });
+            disabler.value = false;
+        }else{
+            status = 200
+            finalseries = `${start[0]}-${curryear}-${addedpattern}`;
+        }
+
+    })
+
+    // return finalseries; // <-- this returns the value from verifyReceiptSe`ries
+    return {
+        series: finalseries,
+        year: curryear,
+        pattern: addedpattern,
+        prefix: start[0],
+        status: status
+    };
+   
+};
+
+
+const checkCounterStatus = () =>{
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all transaction details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    getCollectionStatus().then((results)=>{
+        if(results.data.sett_status == 0){
+            Swal.close();
+            Swal.fire({
+                title: "Transaction Declined",
+                html: `Counter has been set inactive during this transaction, please contact the accountant or the administrator for verification.`,
+                icon: "warning",
+                confirmButtonText: "Ok, Got it!"
+            })
+        }else{
+            setTimeout(() => {
+                initPayment();
+            }, 2000);
+        }
+    })
+}
+
 const initPayment = () => {
+
     disabler.value = true
-    let balance = amountTobePaid.value - amountPaid.value
-    let x = {
-        ...account.value,
-        acy_accid: accountId.value,
-        acy_mode: paymentMode.value,
-        acy_receipt: receiptType.value,
-        acy_payment: amountPaid.value,
-        acy_amount: amountTobePaid.value,
-        acr_paystatus: amountTobePaid.value == amountPaid.value ? 2 : 1,
-        acy_partial: amountTobePaid.value == amountPaid.value ? 2 : 1,
-        acy_cashier: userID.value,
-        acy_cashiername: userName.value,
-        acy_balance: balance,
-        acy_billtype: billType.value,
-
-        acy_cheque_no: chequeNo.value,
-        acy_cheque_bank: chequeBankName.value,
-        acy_bank_no: bankTransferNo.value,
-        acy_transferred_bank: bankTransferName.value,
-    }
-
-    latestPayment.value = x
+    var balance = amountTobePaid.value - amountPaid.value
+    var x = {}
 
     if (amountPaid.value && receiptType.value && paymentMode.value) {
-        if (billType.value == 1) {
-            getTransactionDetails(0, 0, '', '', '', 2, accountId.value,1).then((results) => {
-                if (results.data[0].acs_status == 1) {
-                    addPayment(x).then((results) => {
-                        if (results.status == 204) {
-                            Swal.fire({
-                                title: "Update Successful",
-                                text: "Changes applied, preparing receipt...",
-                                icon: "success",
-                                confirmButtonText: "Ok, Got it!"
-                            }).then(async (result) => {
-                                // console.log(result)
-                                if (result.isConfirmed) {
-                                    // 🔄 Show loading Swal
-                                    Swal.fire({
-                                        title: "Generating PDF...",
-                                        text: "Please wait while we prepare your receipt.",
-                                        allowOutsideClick: false,
-                                        didOpen: () => {
-                                            Swal.showLoading();
-                                        }
-                                    });
+        verifyReceiptSeries().then((seriesno) => {
 
-                                    let name = "receipt" + '-' + accountId.value;
-                                    let size = [6.823, 4.25];
-                                    // let size = [8.5, 4.25];
+        // console.log(seriesno); // now this will log the correct series
+            if(seriesno.status == 200){
+                var x = {
+                    ...account.value,
+                    acy_accid: accountId.value,
+                    acy_mode: paymentMode.value,
+                    acy_receipt: receiptType.value,
+                    acy_payment: amountPaid.value,
+                    acy_amount: amountTobePaid.value,
+                    acr_paystatus: amountTobePaid.value == amountPaid.value ? 2 : 1,
+                    acy_partial: amountTobePaid.value == amountPaid.value ? 2 : 1,
+                    acy_cashier: userID.value,
+                    acy_cashiername: userName.value,
+                    acy_balance: balance,
+                    acy_billtype: billType.value,
 
-                                    // Wait until PDF is generated
-                                    await pdfGenerator(name, size, "landscape", 0.03);
+                    acy_series:seriesno.series,
+                    acy_series_prefix:seriesno.prefix,
+                    acy_series_year:seriesno.year,
+                    acy_series_pattern:seriesno.pattern,
 
-                                    // ⏳ Keep loader for 1.5s more before closing + reloading
-                                    setTimeout(() => {
-                                        Swal.close();
-                                        location.reload();
-                                    }, 1000);
-                                }
-                            });
-
-
-                        } else {
-                            Swal.fire({
-                                title: "Payment Failed",
-                                text: "Cannot proceed payment. /n Error occured, try again later",
-                                icon: "question"
-                            }).then(() => {
-                                location.reload()
-                            });
-                        }
-                    })
-                } else {
-                    // alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
-                    Swal.fire({
-                        title: "Changes in the system detected",
-                        text: "Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page",
-                        icon: "question"
-                    }).then(()=>{
-                        location.reload()
-                    });
+                    acy_cheque_no: chequeNo.value,
+                    acy_cheque_bank: chequeBankName.value,
+                    acy_bank_no: bankTransferNo.value,
+                    acy_transferred_bank: bankTransferName.value,
                 }
-            })
-        } else {
-            getTransactionDetails(0, 0, '', '', '', 2, accountId.value,2).then((results) => {
-                if (results.data[0].acr_status == 1) {
-                    addPayment(x).then((results) => {
-                        if (results.status == 204) {
-                            Swal.fire({
-                                title: "Update Successful",
-                                text: "Changes applied, preparing receipt...",
-                                icon: "success",
-                                confirmButtonText: "Ok, Got it!"
-                            }).then(async (result) => {
-                                // console.log(result)
-                                if (result.isConfirmed) {
-                                    // 🔄 Show loading Swal
-                                    Swal.fire({
-                                        title: "Generating PDF...",
-                                        text: "Please wait while we prepare your receipt.",
-                                        allowOutsideClick: false,
-                                        didOpen: () => {
-                                            Swal.showLoading();
-                                        }
-                                    });
 
-                                    let name = "receipt";
-                                    let size = [6.823, 4.25];
-                                    // let size = [8.5, 4.25];
+                // console.log(seriesno.series)
+                // console.log(x)
 
-                                    // Wait until PDF is generated
-                                    await pdfGenerator(name, size, "landscape", 0.03);
-
-                                    // ⏳ Keep loader for 1.5s more before closing + reloading
-                                    setTimeout(() => {
-                                        Swal.close();
-                                        location.reload();
-                                    }, 1000);
-                                }
-                            });
+                latestPayment.value = x
+                renderPayment(x)
+            }
+        });
 
 
-                        } else {
-                            Swal.fire({
-                                title: "Payment Failed",
-                                text: "Cannot proceed payment. /n Error occured, try again later",
-                                icon: "question"
-                            }).then(() => {
-                                location.reload()
-                            });
-                        }
-                    })
-                } else {
-                    // alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
-                    Swal.fire({
-                        title: "Changes in the system detected",
-                        text: "Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page",
-                        icon: "question"
-                    }).then(()=>{
-                        location.reload()
-                    });
-                }
-            })
-        }
     } else {
         // alert('Please fill out all the fields')
+        Swal.close();
         Swal.fire({
             title: "Requirements",
             text: "Please fill out all the fields",
@@ -296,7 +343,141 @@ const initPayment = () => {
             disabler.value = false
         });
     }
+   
+
 }
+
+const renderPayment = (paymentdata) =>{
+    if (billType.value == 1) {
+        getTransactionDetails(0, 0, '', '', '', 2, accountId.value,1).then((results) => {
+            if (results.data[0].acs_status == 1) {
+                addPayment(paymentdata).then((results) => {
+                    if (results.status == 204) {
+                        Swal.close();
+                        Swal.fire({
+                            title: "Update Successful",
+                            text: "Changes applied, preparing receipt...",
+                            icon: "success",
+                            confirmButtonText: "Ok, Got it!"
+                        }).then(async (result) => {
+                            // console.log(result)
+                            if (result.isConfirmed) {
+                                // 🔄 Show loading Swal
+                                Swal.fire({
+                                    title: "Generating PDF...",
+                                    text: "Please wait while we prepare your receipt.",
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                                let name = "receipt" + '-' + accountId.value;
+                                let size = [6.823, 4.25];
+                                // let size = [8.5, 4.25];
+
+                                // Wait until PDF is generated
+                                await pdfGenerator(name, size, "landscape", 0.03);
+
+                                // ⏳ Keep loader for 1.5s more before closing + reloading
+                                setTimeout(() => {
+                                    Swal.close();
+                                    location.reload();
+                                }, 1000);
+                            }
+                        });
+
+
+                    } else {
+
+                        Swal.close();
+                        Swal.fire({
+                            title: "Payment Failed",
+                            text: "Cannot proceed payment. Error occured, try again later",
+                            icon: "question"
+                        }).then(() => {
+                            location.reload()
+                        });
+                    }
+                })
+            } else {
+                // alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
+                Swal.close();
+                Swal.fire({
+                    title: "Changes in the system detected",
+                    text: "Cannot proceed payment. This Item is removed from registrar. Please refresh the page",
+                    icon: "question"
+                }).then(()=>{
+                    location.reload()
+                });
+            }
+        })
+    } else {
+        getTransactionDetails(0, 0, '', '', '', 2, accountId.value,2).then((results) => {
+            if (results.data[0].acr_status == 1) {
+                addPayment(paymentdata).then((results) => {
+                    if (results.status == 204) {
+                        Swal.fire({
+                            title: "Update Successful",
+                            text: "Changes applied, preparing receipt...",
+                            icon: "success",
+                            confirmButtonText: "Ok, Got it!"
+                        }).then(async (result) => {
+                            // console.log(result)
+                            if (result.isConfirmed) {
+                                // 🔄 Show loading Swal
+                                Swal.fire({
+                                    title: "Generating PDF...",
+                                    text: "Please wait while we prepare your receipt.",
+                                    allowOutsideClick: false,
+                                    didOpen: () => {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                                let name = "receipt";
+                                let size = [6.823, 4.25];
+                                // let size = [8.5, 4.25];
+
+                                // Wait until PDF is generated
+                                await pdfGenerator(name, size, "landscape", 0.03);
+
+                                // ⏳ Keep loader for 1.5s more before closing + reloading
+                                setTimeout(() => {
+                                    Swal.close();
+                                    location.reload();
+                                }, 1000);
+                            }
+                        });
+
+
+                    } else {
+                        Swal.fire({
+                            title: "Payment Failed",
+                            text: "Cannot proceed payment. Error occured, try again later",
+                            icon: "question"
+                        }).then(() => {
+                            location.reload()
+                        });
+                    }
+                })
+            } else {
+                // alert('Cannot proceed payment. /n This Item is removed from registrar. Please refresh the page')
+                Swal.fire({
+                    title: "Changes in the system detected",
+                    text: "Cannot proceed payment. This Item is removed from registrar. Please refresh the page",
+                    icon: "question"
+                }).then(()=>{
+                    location.reload()
+                });
+            }
+        })
+    }
+    
+}
+
+
+
 
 </script>
 
@@ -313,7 +494,13 @@ const initPayment = () => {
             <Loader v-if="checking" />
             <div v-else class="d-flex gap-1 w-100 ">
 
-                <form @submit.prevent="initPayment" class="card p-3 text-start w-25">
+                <form @submit.prevent="checkCounterStatus" class="card p-3 text-start w-25">
+                    <div class="form-group p-1">
+                        <label class="text-xs">Series No.</label>
+                        <input class="form-control form-control-sm" type="text"
+                            required v-model="seriesNoActual" disabled
+                        />
+                    </div>
                     <div class="form-group p-1">
                         <label class="text-xs">Receipt Type</label>
                         <select class="form-control form-select-sm" required v-model="receiptType" disabled="">
@@ -339,7 +526,8 @@ const initPayment = () => {
                         <input 
                             v-model.number="amountPaid"
                             required
-                            min="0"
+                            step="0.01" 
+                            min="0.00"
                             :max="amountTobePaid"
                             :disabled="balance == 0"
                             @input="
@@ -347,7 +535,7 @@ const initPayment = () => {
                             if (amountPaid > amountTobePaid) amountPaid = amountTobePaid;
                             "
                             type="number"
-                            class="form-control form-control-sm"
+                            class="form-control form-control-sm amount-text"
                         />
                         <!-- Helper message -->
                         <small v-if="amountPaid === amountTobePaid" class="text-red-500">
@@ -396,7 +584,7 @@ const initPayment = () => {
                     </div>
                     <div class="form-group p-1">
                         <label class="text-xs">Remaining Balance</label>
-                        <input :value="amountTobePaid - amountPaid" onkeydown="return /[a-z, ]/i.test(event.key)"
+                        <input :value="(amountTobePaid - amountPaid).toFixed(2)" onkeydown="return /[a-z, ]/i.test(event.key)"
                             type="text" class="form-control form-control-sm" disabled />
                     </div>
                     <div class="mt-3 d-flex justify-content-center align-content-center">

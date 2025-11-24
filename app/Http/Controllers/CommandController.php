@@ -487,6 +487,7 @@ class CommandController extends Controller
                         'sett_degree_types.dtype_desc as program',
                         'def_program.prog_name as coursename',
                         'def_program.prog_code as coursecode',
+                        'def_program.prog_id as courseid',
                         'def_student_identification.ident_identification as studentid',
                         'def_student_identification.ident_lrn as studentlrn',
                         'def_section.sec_name as section',
@@ -537,6 +538,10 @@ class CommandController extends Controller
                     'arc_subjects' => $load,
                     'arc_gradelvl' => $details->gradelvl,
                     'arc_semester' => $details->semester,
+                    'arc_course' => $details->coursecode,
+                    'arc_courseid' => $details->courseid,
+                    'arc_degree' => $details->enr_program,
+                    'arc_section' => $details->enr_section,
                     'arc_schoolyear' => 'SY '.$getschoolyear->sett_yearfrom.'-'.$getschoolyear->sett_yearto,
                     'arc_fullname' => $details->per_lastname.', '.$details->per_firstname.' '.$details->per_middlename.' '.$details->per_suffixname,
 

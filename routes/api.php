@@ -124,6 +124,13 @@ Route::middleware(['auth:sanctum'])->get('/get-accounts-payment/{id}/{billtype}'
 Route::middleware(['auth:sanctum'])->get('/get-accounts-payment-all/{billtype}/{datefrom}/{dateto}/{cashier}/{access}', [TransactionsController::class,'getAllPayments']);
 Route::middleware(['auth:sanctum'])->post('/add-accounting-item', [TransactionsController::class,'addAccountingItem']);
 Route::middleware(['auth:sanctum'])->get('/get-set-series/{id}', [FinanceController::class,'getSetSeries']);
+Route::middleware(['auth:sanctum'])->post('/add-set-series/{mode}', [FinanceController::class,'saveSetSeries']);
+Route::middleware(['auth:sanctum'])->get('/get-used-series/{seriestart}/{seriesend}/{year}/{prefix}', [FinanceController::class,'getUsedSeries']);
+Route::middleware(['auth:sanctum'])->get('/get-cashier-details/{id}', [FinanceController::class,'getCashiersDetails']);
+Route::middleware(['auth:sanctum'])->post('/set-collection-status', [FinanceController::class,'turnOffCollection']);
+Route::middleware(['auth:sanctum'])->get('/get-collection-status', [FinanceController::class,'getCollectionStatus']);
+Route::middleware(['auth:sanctum'])->get('/get-accounts-fee/{id}/{item}', [FinanceController::class,'getAccountsFee']);
+
 
 Route::middleware(['auth:sanctum'])->post('/add-clinical-students', [ClinicController::class,'addStudentClinicalRecord']);
 Route::middleware(['auth:sanctum'])->post('/add-clinical-employee', [ClinicController::class,'addEmployeeClinicalRecord']);

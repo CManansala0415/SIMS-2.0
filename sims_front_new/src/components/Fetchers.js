@@ -2613,6 +2613,105 @@ const getSetSeries = async (id) => {
     }
 }
 
+let savesetseries = {}
+const saveSetSeries = async (data, mode) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/add-set-series/' + mode,
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)
+            savesetseries = results.data
+        })
+        return savesetseries
+    } catch (err) {
+        return err
+    }
+}
+
+let usedseries = {}
+const getUsedSeries = async (seriesstart, serieslimit, year, prefix) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-used-series/' + seriesstart + '/'+ serieslimit + '/'+ year + '/'+ prefix,
+        }).then(async (results) => {
+            // console.log(results.data)
+            usedseries = results.data
+        })
+        return usedseries
+    } catch (err) {
+        return err
+    }
+}
+
+let cashiersdata = {}
+const getCashiersDetails = async (id) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-cashier-details/' + id,
+        }).then(async (results) => {
+            // console.log(results.data)
+            cashiersdata = results.data
+        })
+        return cashiersdata
+    } catch (err) {
+        return err
+    }
+}
+
+let collectionstatus = {}
+const turnOffCollection = async (data) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/set-collection-status/',
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)
+            collectionstatus = results.data
+        })
+        return collectionstatus
+    } catch (err) {
+        return err
+    }
+}
+
+const getCollectionStatus = async () => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-collection-status/',
+        }).then(async (results) => {
+            // console.log(results.data)
+            collectionstatus = results.data
+        })
+        return collectionstatus
+    } catch (err) {
+        return err
+    }
+}
+
+let accountitems = {}
+const getAccountsFee = async (id, item) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-accounts-fee/' + id + '/' + item,
+        }).then(async (results) => {
+            // console.log(results.data)
+            accountitems = results.data
+        })
+        return accountitems
+    } catch (err) {
+        return err
+    }
+}
+
+
+
 export {
 
     getApplicant,
@@ -2771,6 +2870,12 @@ export {
     getCurrentWeekDailyCollection,
     dateFormatterWord,
     getBarHeights,
-    getSetSeries
+    getSetSeries,
+    saveSetSeries,
+    getUsedSeries,
+    getCashiersDetails,
+    turnOffCollection,
+    getCollectionStatus,
+    getAccountsFee
 }
 
