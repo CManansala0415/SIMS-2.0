@@ -130,7 +130,12 @@ Route::middleware(['auth:sanctum'])->get('/get-cashier-details/{id}', [FinanceCo
 Route::middleware(['auth:sanctum'])->post('/set-collection-status', [FinanceController::class,'turnOffCollection']);
 Route::middleware(['auth:sanctum'])->get('/get-collection-status', [FinanceController::class,'getCollectionStatus']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-fee/{id}/{item}', [FinanceController::class,'getAccountsFee']);
-
+Route::middleware(['auth:sanctum'])->get('/get-accounts-tuition/{limit}/{offset}/{mode}/{item}', [FinanceController::class,'getTuitionInformation']);
+Route::middleware(['auth:sanctum'])->post('/set-accounts-tuition', [FinanceController::class,'editAccountingTuition']);
+Route::middleware(['auth:sanctum'])->post('/set-account-tuition-template/{mode}', [FinanceController::class,'saveTuitionTemplate']);
+Route::middleware(['auth:sanctum'])->get('/get-accounts-tuition-template/{id}', [FinanceController::class,'getTuitionTemplate']);
+Route::middleware(['auth:sanctum'])->get('/get-accounts-subjects/{course}/{gradelvl}/{sem}/{curr}', [FinanceController::class,'getSubjectsFromRegistrar']);
+Route::middleware(['auth:sanctum'])->get('/get-charge-header/{curriculum}/{sem}/{program}/{course}/{gradelvl}/{section}', [FinanceController::class,'getChargesTemplateHeader']);
 
 Route::middleware(['auth:sanctum'])->post('/add-clinical-students', [ClinicController::class,'addStudentClinicalRecord']);
 Route::middleware(['auth:sanctum'])->post('/add-clinical-employee', [ClinicController::class,'addEmployeeClinicalRecord']);

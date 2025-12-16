@@ -16,6 +16,7 @@ import {
     getAcademicDefaults,
     getStudentFiltering,
     getPaymentDetails,
+    getChargesTemplateHeader,
 
 
 } from "../Fetchers.js";
@@ -55,7 +56,8 @@ const grandTotal = ref(0)
 const showPaymentModal = ref(false)
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
-
+const templatePricesData = ref([])
+const totalCost = ref(0)
 const booter = async () => {
     // getProgram().then((results) => {
     //     program.value = results
@@ -281,7 +283,7 @@ const excelDownload = () => {
 const settlement = (stud) => {
     balance.value = true
     billLoading.value = true
-
+    templatePricesData.value = []
     //get account first
     let a = student.value.map((e) => {
     let b = accounts.value.findIndex((f) => {
@@ -300,7 +302,18 @@ const settlement = (stud) => {
         
         getPaymentDetails(studentAccount.value[0].acs_id, 1).then((results) => {
             let x = results.data.slice(-1).pop()
-            grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : studentAccount.value.acs_amount
+            grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : studentAccount.value[0].acs_amount
+        })
+
+        getChargesTemplateHeader (stud.enr_curriculum, stud.enr_quarter, stud.enr_program, stud.enr_course, stud.enr_gradelvl, stud.enr_section).then((results)=>{
+            // console.log(results.template)
+
+            for (const key in results.template) {
+                 templatePricesData.value.push({
+                    ...results.template[key].data
+                })
+            }
+            console.log(results)
         })
 
     }catch(err){
@@ -331,7 +344,7 @@ const settlement = (stud) => {
         // grandTotal.value = 0
         milestone.value = results
         billLoading.value = false
-
+        totalCost.value = 0
        
         milestone.value = results.map((e, index) => {
             let lab_amount = 0
@@ -375,6 +388,68 @@ const settlement = (stud) => {
             ...stud,
             acr_amount: grandTotal.value
         }
+
+
+        let mergedData = []
+        // let totalCost = 0
+
+        // Convert template object to array
+        let templateArray = Object.values(templatePricesData.value[0] || {})
+
+        milestone.value.forEach((ms) => {
+            let template = templateArray.find(tp =>
+                Number(tp.tuitemp_subjid) === Number(ms.mi_subjid)
+            )
+
+            let total_price = 0
+            let mergedItem = { ...ms }
+
+            if (template) {
+                // Merge template fields
+                Object.keys(template).forEach(key => {
+                    mergedItem[key] = template[key]
+                })
+
+                // Compute from template
+                total_price =
+                    ((template.tuitemp_lec_price || 0) * (template.tuitemp_lec || 0)) +
+                    ((template.tuitemp_lab_price || 0) * (template.tuitemp_lab || 0))
+
+                mergedItem.tuitemp_id = template.tuitemp_id
+            } else {
+                // Fallback to milestone rates
+                total_price =
+                    ((ms.subj_lec_rate || 0) * (ms.subj_lec || 0)) +
+                    ((ms.subj_lab_rate || 0) * (ms.subj_lab || 0))
+            }
+
+            // ✅ APPLY CONDITION HERE
+            // If mi_tag != 1, include in total cost
+            if (Number(ms.mi_tag) !== 1) {
+                totalCost.value += total_price
+            }
+
+            mergedItem.total_price = total_price
+            mergedData.push(mergedItem)
+        })
+
+        /*
+        |--------------------------------------------------------------------------
+        | Items & miscellaneous charges
+        |--------------------------------------------------------------------------
+        */
+        templateArray.forEach((tp) => {
+            if (tp.tuitemp_subjid == null) {
+                totalCost.value += Number(tp.tuitemp_price || 0)
+            }
+        })
+
+
+
+        templatePricesData.value = mergedData
+        console.log(templatePricesData.value)
+        console.log(milestone.value)
+        console.log(mergedData)
 
     })
 
@@ -610,18 +685,18 @@ const getData = (result) =>{
                             <span class="fw-bold">Subjects Enrolled</span>
                         </div>
                     </div>
-                    <div v-if="!Object.keys(milestone).length && !milestoneLoading" class="p-1">
+                    <div v-if="!Object.keys(templatePricesData).length && !milestoneLoading" class="p-1">
                         <div class="shadow p-3 rounded-3 text-center border fw-bold text-danger">
                             No Subjects Added
                         </div>
                     </div>
-                    <div v-if="!Object.keys(milestone).length && milestoneLoading" class="p-1">
+                    <div v-if="!Object.keys(templatePricesData).length && milestoneLoading" class="p-1">
                         <div class="shadow p-3 rounded-3 text-center border fw-bold text-danger">
                             <Loader />
                         </div>
                     </div>
-                    <div v-if="Object.keys(milestone).length && !milestoneLoading" class="col-12"
-                        v-for="(c, index) in milestone">
+                    <div v-if="Object.keys(templatePricesData).length && !milestoneLoading" class="col-12"
+                        v-for="(c, index) in templatePricesData">
                         <div class="container">
                             <div class="row">
                                 <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
@@ -629,6 +704,20 @@ const getData = (result) =>{
                                     <p class="">{{ c.subj_name }}</p>
                                     <p v-if="c.mi_crossenr" class="mt-3">Cross Enrolled to: <span class=" text-red-500">
                                             {{ c.mi_crossenr }}</span></p>
+                                </div>
+                                <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
+                                    <p><span class="fw-bold">Per Week: </span>{{ c.subj_hrs_week }}</p>
+                                    <p v-if="c.mi_tag == 1"><span class="fw-bold">Tags: </span>
+                                        Taken</p>
+                                    <p v-else-if="c.mi_tag == 2"><span class="fw-bold">Tags:
+                                        </span>Advance</p>
+                                    <p v-else-if="c.mi_tag == 3"><span class="fw-bold">Tags:
+                                        </span>Re-take / Back Subject</p>
+                                    <p v-else="c.mi_tag == 3"><span class="fw-bold">Tags:
+                                        </span>N/A</p>
+                                    <p><span class="fw-bold">Pre-requisite: </span>{{
+                                        c.subj_preq_code ? c.subj_preq_code : 'N/A' }}</p>
+                                    <p><span class="fw-bold">Grade: --</span></p>
                                 </div>
                                 <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
                                     <div class="input-group mb-1">
@@ -651,35 +740,40 @@ const getData = (result) =>{
                                             :value="c.subj_lec + c.subj_lab" disabled>
                                     </div>
                                 </div>
-                                <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <p><span class="fw-bold">Per Week: </span>{{ c.subj_hrs_week }}</p>
-                                    <p v-if="c.mi_tag == 1"><span class="fw-bold">Tags: </span>
-                                        Taken</p>
-                                    <p v-else-if="c.mi_tag == 2"><span class="fw-bold">Tags:
-                                        </span>Advance</p>
-                                    <p v-else-if="c.mi_tag == 3"><span class="fw-bold">Tags:
-                                        </span>Re-take / Back Subject</p>
-                                    <p v-else="c.mi_tag == 3"><span class="fw-bold">Tags:
-                                        </span>N/A</p>
-                                    <p><span class="fw-bold">Pre-requisite: </span>{{
-                                        c.subj_preq_code ? c.subj_preq_code : 'N/A' }}</p>
-                                    <p><span class="fw-bold">Grade: --</span></p>
+                                
+                                <!-- if may tuitemp_id means may data from acct tuition template -->
+                                <div v-if="c.tuitemp_id"  class="col p-3 border bg-white shadow d-flex flex-column text-start">
+                                    <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.tuitemp_lec_price) }}/Unit</p>
+                                    <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.tuitemp_lab_price) }}/Unit</p>
+                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.tuitemp_lec_price || 0) * (c.tuitemp_lec || 0)) + ((c.tuitemp_lab_price || 0) * (c.tuitemp_lab || 0))) }}</p>
                                 </div>
-
+                                <div v-else class="col p-3 border bg-white shadow d-flex flex-column text-start">
+                                    <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lec_rate) }}/Unit</p>
+                                    <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lab_rate) }}/Unit</p>
+                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.subj_lec_rate || 0) * (c.subj_lec || 0)) + ((c.subj_lab_rate || 0) * (c.subj_lab || 0))) }}</p>
+                                </div>
+                                
                             </div>
                         </div>
                     </div>
-                    <div class="col-12" v-if="Object.keys(milestone).length">
+                    <div class="col-12" v-if="Object.keys(templatePricesData).length">
                         <div class=" d-flex justify-content-end gap-2 mt-3">
-                            <div class="form-group text-start">
-                                <label class="fw-bold">Total Cost</label>
-                                <input class="form-control form-control-sm" :value="grandTotal" disabled />
+                            <div class="d-flex gap-2 ">
+                                <div class="form-group text-start">
+                                    <label class="fw-bold">Total Cost</label>
+                                    <input class="form-control form-control-sm" :value="new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalCost.toFixed(2))" disabled />
+                                </div>
                             </div>
-                            <div class="form-group align-content-end">
-                                <button type="button" data-bs-toggle="modal" data-bs-target="#settlementmodal"
-                                @click="settlePayments()" class="btn btn-sm btn-dark">Add Payment</button>
+                            <div class="d-flex gap-2 ">
+                                <div class="form-group text-start">
+                                    <label class="fw-bold">Remaining Balance</label>
+                                    <input class="form-control form-control-sm" :value="new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(grandTotal)" disabled />
+                                </div>
+                                <div class="form-group align-content-end">
+                                    <button type="button" data-bs-toggle="modal" data-bs-target="#settlementmodal"
+                                    @click="settlePayments()" class="btn btn-sm btn-dark">Add Payment</button>
+                                </div>
                             </div>
-                           
                         </div>
                     </div>
                 </div>

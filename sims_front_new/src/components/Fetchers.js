@@ -2710,6 +2710,103 @@ const getAccountsFee = async (id, item) => {
     }
 }
 
+let tuitioninfo = {}
+const getTuitionInformation = async (limit, offset, mode, item) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-accounts-tuition/' + limit + '/' + offset + '/' + mode + '/' + item,
+        }).then(async (results) => {
+            // console.log(results.data)
+            tuitioninfo = results.data
+        })
+        return tuitioninfo
+    } catch (err) {
+        return err
+    }
+}
+
+let edittuitionresponse = {}
+const editAccountingTuition = async (data) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/set-accounts-tuition/',
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)
+            edittuitionresponse = results.data
+        })
+        return edittuitionresponse
+    } catch (err) {
+        return err
+    }
+}
+
+let tuitiontemplate = {}
+const saveTuitionTemplate = async (data, mode) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/set-account-tuition-template/'+ mode,
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)
+            tuitiontemplate = results.data
+        })
+        return tuitiontemplate
+    } catch (err) {
+        return err
+    }
+}
+
+let gettuitiontemplate = {}
+const getTuitionTemplate = async (id) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-accounts-tuition-template/' + id,
+        }).then(async (results) => {
+            // console.log(results.data)
+            gettuitiontemplate = results.data
+        })
+        return gettuitiontemplate
+    } catch (err) {
+        return err
+    }
+}
+
+let getaccountsubjects = {}
+const getSubjectsFromRegistrar = async (course, gradelvl, sem, curr) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-accounts-subjects/' + course + '/' + gradelvl+ '/' + sem + '/' + curr,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getaccountsubjects = results.data
+        })
+        return getaccountsubjects
+    } catch (err) {
+        return err
+    }
+}
+
+let getchargesheader = {}
+const getChargesTemplateHeader = async (curriculum, sem, program, course, gradelvl, section) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-charge-header/' + curriculum + '/' + sem+ '/' + program + '/' + course+ '/' + gradelvl+ '/' + section,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getchargesheader = results.data
+        })
+        return getchargesheader
+    } catch (err) {
+        return err
+    }
+}
 
 
 export {
@@ -2876,6 +2973,12 @@ export {
     getCashiersDetails,
     turnOffCollection,
     getCollectionStatus,
-    getAccountsFee
+    getAccountsFee,
+    getTuitionInformation,
+    editAccountingTuition,
+    saveTuitionTemplate,
+    getTuitionTemplate,
+    getSubjectsFromRegistrar,
+    getChargesTemplateHeader
 }
 

@@ -480,6 +480,7 @@ class RegistrarController extends Controller
     public function enrollApplicant(Request $request)
     {
        try{
+            // $finance = new FinanceController();
             date_default_timezone_set('Asia/Manila');
             $date = date('Y-m-d h:i:s', time());
 
@@ -499,6 +500,16 @@ class RegistrarController extends Controller
                 ->where('enr_personid', '=' ,  $request->input('personid'))
                 ->where('enr_status', '=' ,  1)
                 ->first();
+
+                // $data = $finance->getChargesTemplateHeader(
+                //     $enr->enr_curriculum ?: 0,
+                //     $enr->enr_quarter ?: 0,
+                //     $enr->enr_program ?: 0,
+                //     $enr->enr_course ?: 0,
+                //     $enr->enr_gradelvl ?: 0,
+                //     $enr->enr_section ?: 0
+                // );
+                // return $data;
 
                 $primary = DB::table('def_accounts_settlement')->insert([
                     'acs_personid' => $request->input('personid'),
@@ -1035,7 +1046,121 @@ class RegistrarController extends Controller
                 'enr_updatedby' => $request->input('enr_updatedby'),
                 'enr_dateupdated' => $date,
             ]);
-            return 204;
+
+            $finance = new FinanceController();
+            $financedata = $finance->getChargesTemplateHeader(
+                $request->input('enr_curriculum') ?: 0,
+                $request->input('enr_quarter') ?: 0,
+                $request->input('enr_program') ?: 0,
+                $request->input('enr_course') ?: 0,
+                $request->input('enr_gradelvl') ?: 0,
+                $request->input('enr_section') ?: 0
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Flatten template data (same as Object.values + push in Vue)
+            |--------------------------------------------------------------------------
+            */
+            $templatePricesData = [];
+            foreach ($financedata['template'] as $template) {
+                foreach ($template['data'] as $row) {
+                    $templatePricesData[] = $row;
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get milestone data
+            |--------------------------------------------------------------------------
+            */
+            $milestonedata = $this->getMilestone(
+                $request->input('enr_id')
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Merge milestone + template and compute totals
+            |--------------------------------------------------------------------------
+            */
+            $totalCost = 0;
+            $mergedMilestones = [];
+
+            foreach ($milestonedata as $ms) {
+
+                $template = null;
+
+                // Find matching template by subject ID
+                foreach ($templatePricesData as $tp) {
+                    if (
+                        isset($tp->tuitemp_subjid, $ms->mi_subjid) &&
+                        (int) $tp->tuitemp_subjid === (int) $ms->mi_subjid
+                    ) {
+                        $template = $tp;
+                        break;
+                    }
+                }
+
+                $total_price = 0;
+                $mergedItem  = clone $ms; // copy object safely
+
+                if ($template) {
+                    // Merge template fields into milestone
+                    foreach (get_object_vars($template) as $key => $value) {
+                        $mergedItem->$key = $value;
+                    }
+
+                    // Compute from template
+                    $total_price =
+                        ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
+                        ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($template->tuitemp_lab ?? 0));
+
+                    // Ensures template exists in UI
+                    $mergedItem->tuitemp_id = $template->tuitemp_id;
+
+                } else {
+                    // Fallback to milestone rates
+                    $total_price =
+                        ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec ?? 0)) +
+                        ((float) ($ms->subj_lab_rate ?? 0) * (float) ($ms->subj_lab ?? 0));
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | APPLY CONDITION HERE, mi_tag 1 means exclude from total cost, already taken
+                |--------------------------------------------------------------------------
+                */
+                if ((int) ($ms->mi_tag ?? 0) !== 1) {
+                    $totalCost += $total_price;
+                }
+
+                // Always attach total_price for UI
+                $mergedItem->total_price = $total_price;
+                $mergedMilestones[] = $mergedItem;
+            }
+
+            foreach ($templatePricesData as $tp) {
+                if (empty($tp->tuitemp_subjid)) {
+                    $totalCost += (float) ($tp->tuitemp_price ?? 0);
+                }
+            }
+
+            $account = DB::table('def_accounts_settlement')
+            ->where('acs_enrid','=', $request->input('enr_id'))
+            ->update([
+                'acs_amount' => $totalCost,
+                'acs_dateupdated' => $date,
+                'acs_updatedby' => $request->input('user_id'),
+            ]);
+
+
+            return [
+                'templatePricesData' => $templatePricesData,
+                'milestonedata' => $milestonedata,
+                'totalCost' => $totalCost,
+            ];
+
+            // return 204;
         }
         catch (Exception $ex) {
             return 500;

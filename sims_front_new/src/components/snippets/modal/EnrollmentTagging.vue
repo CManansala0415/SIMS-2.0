@@ -256,6 +256,14 @@ const setData = (type, data) => {
 const saving = ref(false)
 const saveData = async () => {
     saving.value = true
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all series details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     addedSubject.value = addedSubject.value.map(itemObj => {
         return {
             ...itemObj,
@@ -279,7 +287,8 @@ const saveData = async () => {
         ...studentData.value,
         enr_updatedby: userID.value,
         enr_section: enr_section.value,
-        enr_curriculum: enr_curriculum.value
+        enr_curriculum: enr_curriculum.value,
+        user_id: userID.value
     }
 
     for await (const e of addedSubject.value) {
@@ -292,6 +301,7 @@ const saveData = async () => {
             // //router.replace({ name: 'Academics', params: { id: 2}});
             // location.reload()
             // saving.value = false
+            Swal.close()
             Swal.fire({
                 title: "Tagging Successful",
                 text: "Changes applied, refreshing the page",
@@ -508,10 +518,10 @@ const filterCurriculum = () => {
                                                                         <span class=" input-group-text">Total Units / Hours</span>
                                                                         <input :value="a.subj_lab + a.subj_lec" type="text" class="form-control form-control-sm" disabled>
                                                                     </div>
-                                                                    <div class="mb-1">
+                                                                    <!-- <div class="mb-1">
                                                                         <label for="cross" class="form-label">Cross Enrolled (School)</label>
                                                                         <input class="form-control form-control-sm" type="text" v-model="addedSubject[index].mi_crossenr">
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div class="mb-1">
                                                                         <label for="cross" class="form-label">Subject Completion</label>
                                                                         <select class="form-select form-select-sm" v-model="addedSubject[index].mi_tag">

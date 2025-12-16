@@ -4,14 +4,15 @@ import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
-import { getFeeDetails, addAccountingItem } from '../Fetchers.js';
-import AccountingItemsModal from '../snippets/modal/AccountingItemsModal.vue';
+import { getFeeDetails, getTuitionInformation, editAccountingTuition, getAcademicDefaults, getQuarter } from '../Fetchers.js';
+import AccountingTuitionEdit from '../snippets/modal/AccountingTuitionEdit.vue';
 
 const router = useRouter();
 const limit = ref(10)
 const offset = ref(0)
 const fee = ref([])
-const feeCount = ref(0)
+const tuitionInfoCount = ref(0)
+const tuitionInfo = ref([])
 const preLoading = ref(true)
 const searchValue = ref('')
 const userID = ref('')
@@ -21,6 +22,12 @@ const booting = ref('')
 const bootingCount = ref(0)
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
+const course = ref([])
+const section = ref([])
+const program = ref([])
+const degree = ref([])
+const gradelvl = ref([])
+const quarter = ref([])
 
 const booter = async () => {
     // getUserID().then((results) => {
@@ -29,30 +36,47 @@ const booter = async () => {
     //     userID.value = results.account.data.id
     //     emit('fetchUser', results)
     // })
-}
+    getFeeDetails(limit.value, offset.value).then((results2) => {
+        fee.value = results2.data
+    })
+    getAcademicDefaults().then((results) => {
+        gradelvl.value = results.gradelvl
+        // quarter.value = results.quarter
+        course.value = results.course
+        section.value = results.section
+        program.value = results.program
+        degree.value = results.degree
+        // subject.value = results.subject
+        booting.value = 'Loading Academic Information'
+        bootingCount.value += 1
+    })
 
+    getQuarter().then((results)=>{
+       quarter.value = results
+    })
+}
 onMounted(async () => {
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
-        console.log(results1)
         emit('fetchUser', results1)
         accessData.value = results1.access
+
         try {
-            preLoading.value = true
-            // await booter().then((results) => {
+
+            await booter().then(() => {
+
                 booting.value = 'Loading Items...'
                 bootingCount.value += 1
-                getFeeDetails(limit.value, offset.value).then((results2) => {
-                    fee.value = results2.data
-                    feeCount.value = results2.count
+
+                getTuitionInformation(limit.value, offset.value).then((results2) => {
+                    tuitionInfo.value = results2.data
+                    tuitionInfoCount.value = results2.count
                     preLoading.value = false
                     emit('doneLoading', false)
                 })
-            // })
+            })
 
         } catch (err) {
-            // preLoading.value = false
-            // alert('error loading the list default components')
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -64,7 +88,6 @@ onMounted(async () => {
             });
         }
     }).catch((err) => {
-        // alert('Unauthorized Session, Please Log In')
         Swal.fire({
             icon: "error",
             title: "Oops...",
@@ -82,29 +105,28 @@ const paginate = (mode) => {
             if (offset.value <= 0) {
                 offset.value = 0
             } else {
-                fee.value = []
+                tuitionInfo.value = []
                 offset.value -= 10
-                feeCount.value = 0
-                preLoading.value = true
-                getFeeDetails(limit.value, offset.value).then((results) => {
-                    fee.value = results.data
-                    feeCount.value = results.count
+                tuitionInfoCount.value = 0
+                getTuitionInformation(limit.value, offset.value).then((results) => {
+                    tuitionInfo.value = results.data
+                    tuitionInfoCount.value = results.count
                     preLoading.value = false
                 })
             }
             break;
         case 'next':
 
-            if (offset.value >= feeCount.value) {
-                offset.value = feeCount.value
+            if (offset.value >= tuitionInfoCount.value) {
+                offset.value = tuitionInfoCount.value
             } else {
-                fee.value = []
+                tuitionInfo.value = []
                 offset.value += 10
-                feeCount.value = 0
+                tuitionInfoCount.value = 0
                 preLoading.value = true
-                getFeeDetails(limit.value, offset.value, null).then((results) => {
-                    fee.value = results.data
-                    feeCount.value = results.count
+                getTuitionInformation(limit.value, offset.value, null).then((results) => {
+                    tuitionInfo.value = results.data
+                    tuitionInfoCount.value = results.count
                     preLoading.value = false
                 })
             }
@@ -112,13 +134,13 @@ const paginate = (mode) => {
         case 'search':
             searchValue.value = searchValue.value.trim()
             if (searchValue.value || searchValue.value == '') {
-                fee.value = []
+                tuitionInfo.value = []
                 offset.value = 0
-                feeCount.value = 0
+                tuitionInfoCount.value = 0
                 preLoading.value = true
-                getFeeDetails(limit.value, offset.value, searchValue.value).then((results) => {
-                    fee.value = results.data
-                    feeCount.value = results.count
+                getTuitionInformation(limit.value, offset.value, searchValue.value).then((results) => {
+                    tuitionInfo.value = results.data
+                    tuitionInfoCount.value = results.count
                     preLoading.value = false
                 }).catch((err) => {
                     // console.log(err)
@@ -142,51 +164,28 @@ const search = () => {
     paginate('search')
 }
 
+const toBeEdited = ref([])
+const manageSetup = ref(false)
 
-const itemValue = ref([])
-const preloading = ref(false)
-
-const itemModal = (type, data) => {
-    if (type == 1) {
-        itemValue.value = []
-        showAddItemModal.value = !showAddItemModal.value
-    } else if (type == 2) {
-        itemValue.value = data
-        showAddItemModal.value = !showAddItemModal.value
-    } else {
-        // if (confirm("Are you sure you want to delete this item") == true) {
-        //     preloading.value = true
-        //     let x = {
-        //         acf_id: data.acf_id,
-        //         acf_user: userID.value,
-        //         acf_delete: true
-        //     }
-        //     addAccountingItem(x).then((results) => {
-        //         if (results.status != 204) {
-        //             // alert('Delete Failed')
-        //             Swal.fire({
-        //                 title: "Action Failed",
-        //                 text: "Delete failed, please try again later or contact the administrator",
-        //                 icon: "error"
-        //             }).then(()=>{
-        //                 preLoading.value = false
-        //             });
-        //             // location.reload()
-        //         } else {
-        //             // alert('Delete Successful')
-        //             Swal.fire({
-        //                 title: "Action Completed",
-        //                 text: "Successfully Deleted",
-        //                 icon: "success"
-        //             }).then(()=>{
-        //                 location.reload()
-        //             });
-        //         }
-        //     })
-        // } else {
-        //     return false;
-        // }
-
+const itemModal = (mode, data) =>{
+    if(mode == 1){
+        //add new
+        toBeEdited.value = []
+        showAddItemModal.value = !showAddItemModal.value  
+        manageSetup.value = false
+    }else if (mode == 2){
+        //edit data
+        toBeEdited.value = data
+        showAddItemModal.value = !showAddItemModal.value    
+        manageSetup.value = false
+    }else if (mode == 3){
+        toBeEdited.value = data
+        showAddItemModal.value = !showAddItemModal.value    
+        manageSetup.value = true
+    }
+    else{
+        //delete data
+        manageSetup.value = false
         Swal.fire({
             title: "Delete Record",
             text: "Are you sure you want to deactivate this record?",
@@ -197,14 +196,16 @@ const itemModal = (type, data) => {
             confirmButtonText: "Yes, Im Delete it!"
         }).then(async (result) => {
             if (result.isConfirmed) {
-                preloading.value = true
+                preLoading.value = true
+
                 let x = {
-                    acf_id: data.acf_id,
-                    acf_user: userID.value,
-                    acf_delete: true
+                    act_id: data.act_id,
+                    act_user: userID.value,
+                    act_mode: 'delete'
                 }
-                addAccountingItem(x).then((results) => {
-                    if (results.status != 204) {
+
+                editAccountingTuition(x).then((results) => {
+                    if (results.status != 200) {
                         // alert('Delete Failed')
                         Swal.fire({
                             title: "Action Failed",
@@ -230,11 +231,65 @@ const itemModal = (type, data) => {
     }
 }
 
+const deactivateCharge = (data) =>{
+
+    Swal.fire({
+            title: 'Update Item',
+            html: `Are you sure to to change its status?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Im Change it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we check all series details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            let x = {
+                ...data,
+                act_mode: 'charge',
+                act_status: data.act_status == 1? data.act_status = 0: data.act_status = 1
+            }
+
+            editAccountingTuition(x).then((results)=>{
+                Swal.close()
+         
+                if (results.status == 200) {
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Update Failed",
+                        text: "Unknown error occured, try again later",
+                        icon: "error"
+                    }).then(()=>{
+                        // location.reload()
+                    });
+                }
+            })
+        }
+    })
+}
+
+
+
 </script>
 <template>
     <div>
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Tuition Setup</h5>
+            <h5 class=" text-uppercase fw-bold">Tuition / Charges Setup</h5>
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
@@ -255,34 +310,52 @@ const itemModal = (type, data) => {
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Fee ID</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Price</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
+                        <th style="background-color: #237a5b;" class="text-white w-25">Description</th>
+                        <th style="background-color: #237a5b;" class="text-white w-10">Semester</th>
+                        <th style="background-color: #237a5b;" class="text-white w-10">Program</th>
+                        <th style="background-color: #237a5b;" class="text-white w-25">Course</th>
+                        <th style="background-color: #237a5b;" class="text-white w-10">Grade/Year Level</th>
+                        <th style="background-color: #237a5b;" class="text-white w-10">Section</th>
+                        <th style="background-color: #237a5b;" class="text-white w-10">Commands</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-if="!preLoading && Object.keys(fee).length" v-for="(f, index) in fee">
+                    <tr v-if="!preLoading && Object.keys(tuitionInfo).length" v-for="(act, index) in tuitionInfo">
                         <td class="align-middle">
-                            {{ f.acf_id }}
+                            {{ act.act_description }}
                         </td>
                         <td class="align-middle">
-                            {{ f.acf_desc }}
+                             {{ act.quar_desc?act.quar_desc:'All Semester' }}
                         </td>
                         <td class="align-middle">
-                            {{ f.acf_price }}
+                            {{ act.prog_desc? act.prog_desc == 'Senior High-School'? 'SHS':act.prog_desc:'All Programs' }}
+                        </td>
+                        <td class="align-middle">
+                            {{ act.prog_code?act.prog_code:'All Courses' }}
+                        </td>
+                        <td class="align-middle">
+                            {{ act.gradelvl_desc?act.gradelvl_desc:'All Grade Levels' }}
+                        </td>
+                        <td class="align-middle">
+                            {{ act.sec_desc?act.sec_desc:'All Sections' }}
                         </td>
                         <td v-if="accessData[16].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#editdatamodal" title="Edit Data"
-                                    @click="itemModal(2, f)" :disabled="preloading? true:false">
+                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" @click="itemModal(2, act)"
+                                    data-bs-target="#editdatamodal" title="Edit Data">
                                     <font-awesome-icon icon="fa-solid fa-pen" />
                                 </button>
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#dispensemodal" title="Delete Item"
-                                    @click="itemModal(3, f)" :disabled="preloading? true:false">
+                                <button class="btn btn-sm btn-secondary"
+                                    title="Delete Item" @click="itemModal(4, act)">
                                     <font-awesome-icon icon="fa-solid fa-trash" />
+                                </button>
+                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" @click="itemModal(3, act)"
+                                    data-bs-target="#editdatamodal" title="Edit Data">
+                                    <font-awesome-icon icon="fa-solid fa-gear" />
+                                </button>
+                                <button class="btn btn-sm" :class="act.act_status == 1?'btn-success':'btn-danger'" @click="deactivateCharge(act)"
+                                    title="Activate Charge">
+                                    <font-awesome-icon icon="fa-solid fa-power-off"/>
                                 </button>
                             </div>
                         </td>
@@ -290,13 +363,13 @@ const itemModal = (type, data) => {
                             N/A
                         </td>
                     </tr>
-                    <tr v-if="!preLoading && !Object.keys(fee).length">
-                        <td class="p-3 text-center" colspan="4">
+                    <tr v-if="!preLoading && !Object.keys(tuitionInfo).length">
+                        <td class="p-3 text-center" colspan="7">
                             No Records Found
                         </td>
                     </tr>
-                    <tr v-if="preLoading && !Object.keys(fee).length">
-                        <td class="p-3 text-center" colspan="4">
+                    <tr v-if="preLoading && !Object.keys(tuitionInfo).length">
+                        <td class="p-3 text-center" colspan="7">
                             <div class="m-3">
                                 <Loader />
                             </div>
@@ -308,10 +381,10 @@ const itemModal = (type, data) => {
                 <div class="d-flex gap-1">
                     <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
                         class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(fee).length < 10 ? true : false" @click="paginate('next')"
+                    <button :disabled="Object.keys(tuitionInfo).length < 10 ? true : false" @click="paginate('next')"
                         class="btn btn-sm btn-secondary">Next</button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ feeCount }})</span> items</p>
+                <p class="">showing total of <span class="font-semibold">({{ tuitionInfoCount }})</span> items</p>
             </div>
         </div>
     </div>
@@ -319,7 +392,10 @@ const itemModal = (type, data) => {
     <!-- Edit Medical Modal -->
     <div class="modal fade" id="editdatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+        <div 
+            class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+            :class="manageSetup ? 'modal-fullscreen' : 'modal-md'"
+            >
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Accounting Items</h5>
@@ -327,7 +403,8 @@ const itemModal = (type, data) => {
                         @click="showAddItemModal = false"></button>
                 </div>
                 <div class="modal-body">
-                    <AccountingItemsModal v-if="showAddItemModal" :itemData="itemValue"/>
+                    <AccountingTuitionEdit v-if="showAddItemModal" :itemData="toBeEdited"
+                    :courseData="course" :sectionData="section" :programData="program" :gradelvlData="gradelvl" :manageSetupData="manageSetup" :quarterData="quarter"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

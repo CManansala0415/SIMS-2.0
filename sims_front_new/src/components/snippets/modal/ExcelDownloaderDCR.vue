@@ -2,7 +2,9 @@
 import { ref, onMounted, computed } from 'vue';
 import {
   getAllPayments,
-  getAccountsFee
+  getAccountsFee,
+  getAcademicDefaults
+
 } from "../../Fetchers.js";
 import Loading1 from '../loaders/Loading1.vue';
 import ExcelJS from "exceljs";
@@ -36,6 +38,12 @@ const dateTo = computed(() => {
 const isLoading = ref(true)
 const dcrItems = ref('')
 
+const course = ref([])
+const section = ref([])
+const program = ref([])
+const degree = ref([])
+const gradelvl = ref([])
+
 
 const dateFromString = ref('')
 const dateToString = ref('')
@@ -54,11 +62,27 @@ const billType = ref(0)
 const itemDesc = ref('')
 const searchedItem = ref('')
 const activateSearch = ref(false)
-const orderBy = ref(1)
+const orderBy = ref(0)
 const fileNameExt = ref('')
+
+const actCourse = ref(0)
+const actProgram = ref(0)
+const actSection = ref(0)
+const actGradelvl = ref(0)
 
 onMounted(async () => {
   try {
+
+    getAcademicDefaults().then((results) => {
+      gradelvl.value = results.gradelvl
+      // quarter.value = results.quarter
+      course.value = results.course
+      section.value = results.section
+      program.value = results.program
+      degree.value = results.degree
+      // subject.value = results.subject
+    })
+
     dateFromString.value = formatDate(dateFrom.value)
     dateToString.value = formatDate(dateTo.value)
 
@@ -97,7 +121,7 @@ onMounted(async () => {
 
 
 
-const getFileNameFormat = ()=>{
+const getFileNameFormat = () => {
   var now = new Date();
 
   var year = now.getFullYear();          // e.g., 2025
@@ -135,57 +159,94 @@ const filterItems = () => {
   }
 
   //items search filter
-  if(billType.value == 2 && searchedItem.value){
-    dcrItems.value = dcrItems.value.filter((e)=>{
+  if (billType.value == 2 && searchedItem.value) {
+    dcrItems.value = dcrItems.value.filter((e) => {
       return e.acr_reqitem == searchedItem.value
     })
   }
 
-  //order by
-  if(orderBy.value == '2'){
-    dcrItems.value.sort((a, b) => b.acy_series_pattern - a.acy_series_pattern);
-  }else if (orderBy.value == '1'){
-    dcrItems.value.sort((a, b) => a.acy_series_pattern - b.acy_series_pattern);
-  }else{
-    dcrItems.value.sort((a, b) => b.acy_id - a.acy_id);
+  //filter by grade level
+  // if((actProgram.value != 0)||(actGradelvl.value != 0)||(actCourse.value != 0)||(actSection.value != 0)){
+  //     dcrItems.value = dcrItems.value.filter((e) => {
+  //       if((e.grad_id == actGradelvl.value) || (e.grad_id == actGradelvl.value) || (e.course_id == actCourse.value) || (e.sec_id == actSection.value)){
+  //         return e
+  //       }
+  //     })
+  // }
+
+  if(actProgram.value != 0){
+    //filter by program ex college or shs
+    dcrItems.value = dcrItems.value.filter((e) => {
+      return e.prog_id == actProgram.value
+    })
+  }
+  if(actGradelvl.value != 0){
+    //filter by grade level
+    dcrItems.value = dcrItems.value.filter((e) => {
+      return e.gradelvl_id == actGradelvl.value
+    })
+  }
+  if(actCourse.value != 0){
+    //filter by course
+    dcrItems.value = dcrItems.value.filter((e) => {
+      return e.course_id == actCourse.value
+    })
+  }
+  if(actSection.value != 0){
+    //filter by section
+    dcrItems.value = dcrItems.value.filter((e) => {
+      return e.sec_id == actSection.value
+    })
   }
 
+  if(Object.keys(dcrItems.value).length){
+      //order by
+      if (orderBy.value == '2') {
+        dcrItems.value.sort((a, b) => b.acy_series_pattern - a.acy_series_pattern);
+      } else if (orderBy.value == '1') {
+        dcrItems.value.sort((a, b) => a.acy_series_pattern - b.acy_series_pattern);
+      } else {
+        dcrItems.value.sort((a, b) => b.acy_id - a.acy_id);
+      }
 
-  // get the first and last series
-  if(billType.value == 2){
+      // get the first and last series
+      if (billType.value == 2) {
 
-    firstOR.value = dcrItems.value[0].acy_series_pattern?dcrItems.value[0].acy_series_pattern:'N/A'
-    lastOR.value = dcrItems.value[dcrItems.value.length - 1].acy_series_pattern?dcrItems.value[dcrItems.value.length - 1].acy_series_pattern:'N/A'
+        firstOR.value = dcrItems.value[0].acy_series_pattern ? dcrItems.value[0].acy_series_pattern : 'N/A'
+        lastOR.value = dcrItems.value[dcrItems.value.length - 1].acy_series_pattern ? dcrItems.value[dcrItems.value.length - 1].acy_series_pattern : 'N/A'
 
-    firstPR.value = '--'
-    lastPR.value = '--'
+        firstPR.value = '--'
+        lastPR.value = '--'
 
-    closingSeries.value = `[ OR ${firstOR.value} -> OR ${lastOR.value} ]`
+        closingSeries.value = `[ OR ${firstOR.value} -> OR ${lastOR.value} ]`
 
-  }else if(billType.value == 1){
-    firstPR.value = dcrItems.value[0].acy_series_pattern?dcrItems.value[0].acy_series_pattern:'N/A'
-    lastPR.value = dcrItems.value[dcrItems.value.length - 1].acy_series_pattern?dcrItems.value[dcrItems.value.length - 1].acy_series_pattern:'N/A'
+      } else if (billType.value == 1) {
+        firstPR.value = dcrItems.value[0].acy_series_pattern ? dcrItems.value[0].acy_series_pattern : 'N/A'
+        lastPR.value = dcrItems.value[dcrItems.value.length - 1].acy_series_pattern ? dcrItems.value[dcrItems.value.length - 1].acy_series_pattern : 'N/A'
 
-    firstOR.value = '--'
-    lastOR.value = '--'
+        firstOR.value = '--'
+        lastOR.value = '--'
 
-    closingSeries.value = `[ PR ${firstPR.value} -> PR ${lastPR.value} ]`
-  }else{
-    let pr = dcrItems.value.filter((e)=>{
-      return e.acy_billtype == 1
-    })
+        closingSeries.value = `[ PR ${firstPR.value} -> PR ${lastPR.value} ]`
+      } else {
+        let pr = dcrItems.value.filter((e) => {
+          return e.acy_billtype == 1
+        })
 
-    let or = dcrItems.value.filter((e)=>{
-      return e.acy_billtype == 2
-    })
+        let or = dcrItems.value.filter((e) => {
+          return e.acy_billtype == 2
+        })
 
-    firstPR.value = allPRlist.value[0].acy_series_pattern? allPRlist.value[0].acy_series_pattern:'N/A'
-    lastPR.value = allPRlist.value[allPRlist.value.length - 1].acy_series_pattern?allPRlist.value[allPRlist.value.length - 1].acy_series_pattern:'N/A'
-    firstOR.value = allORlist.value[0].acy_series_pattern? allORlist.value[0].acy_series_pattern:'N/A'
-    lastOR.value = allORlist.value[allORlist.value.length - 1].acy_series_pattern?allORlist.value[allORlist.value.length - 1].acy_series_pattern:'N/A'
+        firstPR.value = allPRlist.value[0].acy_series_pattern ? allPRlist.value[0].acy_series_pattern : 'N/A'
+        lastPR.value = allPRlist.value[allPRlist.value.length - 1].acy_series_pattern ? allPRlist.value[allPRlist.value.length - 1].acy_series_pattern : 'N/A'
+        firstOR.value = allORlist.value[0].acy_series_pattern ? allORlist.value[0].acy_series_pattern : 'N/A'
+        lastOR.value = allORlist.value[allORlist.value.length - 1].acy_series_pattern ? allORlist.value[allORlist.value.length - 1].acy_series_pattern : 'N/A'
 
-    closingSeries.value = `[ OR ${firstOR.value} -> OR ${lastOR.value} ] | [ PR ${firstPR.value} -> PR ${lastPR.value} ]`
+        closingSeries.value = `[ OR ${firstOR.value} -> OR ${lastOR.value} ] | [ PR ${firstPR.value} -> PR ${lastPR.value} ]`
+      }
   }
+
+  
 
   // refresh total amount
   totalAmount.value = dcrItems.value.reduce((sum, item) => {
@@ -243,16 +304,16 @@ const exportToExcel = async () => {
   };
 
   // ---------- TITLE ----------
-  sheet.mergeCells("A1", "J1");
+  sheet.mergeCells("A1", "M1");
   sheet.getCell("A1").value = "Collection List";
   sheet.getCell("A1").font = { size: 14, bold: true };
   sheet.getCell("A1").alignment = { horizontal: "center" };
 
-  sheet.mergeCells("A2", "J2");
+  sheet.mergeCells("A2", "M2");
   sheet.getCell("A2").value = `From ${dateFromString.value} → To ${dateToString.value}`;
   sheet.getCell("A2").alignment = { horizontal: "center" };
 
-  sheet.mergeCells("A3", "J3");
+  sheet.mergeCells("A3", "M3");
   sheet.getCell("A3").value = closingSeries.value;
   sheet.getCell("A3").font = { italic: true };
   sheet.getCell("A3").alignment = { horizontal: "center" };
@@ -342,7 +403,7 @@ const exportToExcel = async () => {
   });
 
   // ---------- FOOTER TOTAL ----------
-  const footer = sheet.addRow(["", "", "", "", "", "", "", "", "Total:", totalAmount.value.toFixed(2)]);
+  const footer = sheet.addRow(["", "", "", "", "", "", "", "", "", "", "", "Total:", totalAmount.value.toFixed(2)]);
   footer.font = { bold: true };
   footer.eachCell((cell) => {
     cell.border = {
@@ -361,9 +422,9 @@ const exportToExcel = async () => {
   const noteRow = sheet.addRow([
     "Miscellaneous income includes collection from transcript, diploma, classcard, certification, copy of grades"
   ]);
-  sheet.mergeCells(noteRow.number, 1, noteRow.number, 10);
+  sheet.mergeCells(noteRow.number, 1, noteRow.number, 13);
   sheet.getCell(noteRow.number, 1).alignment = { horizontal: "center" };
-  sheet.getCell(noteRow.number, 1).font = { italic: true, size: 10 };
+  sheet.getCell(noteRow.number, 1).font = { italic: true, size: 13 };
   sheet.getCell(noteRow.number, 1).protection = { locked: false };
   sheet.addRow([]);
 
@@ -412,7 +473,7 @@ const exportToExcel = async () => {
 
   // ---------- AUTO COLUMN WIDTH ----------
   sheet.columns.forEach((col) => {
-    let max = 10;
+    let max = 13;
     col.eachCell({ includeEmpty: true }, (cell) => {
       const len = cell.value ? cell.value.toString().length : 0;
       if (len > max) max = len;
@@ -431,10 +492,10 @@ const exportToExcel = async () => {
 <template>
   <!-- style="width: 795px;  height:1215px;" -->
   <div v-if="isLoading" class="h-100 d-flex justify-content-center align-items-center">
-    <Loading1 ></Loading1>
+    <Loading1></Loading1>
   </div>
-  <div v-else>
-    <div class="row border w-100  mb-3 p-4 shadow">
+  <div v-else class="d-flex flex-column justify-content-center align-items-center">
+    <div class="row border w-100 mb-2 p-4 shadow">
       <div class="col-md-4">
         <select @change="filterItems()" class="form-control form-control-sm" v-model="billType">
           <option value="0">All Receipts</option>
@@ -444,7 +505,8 @@ const exportToExcel = async () => {
       </div>
       <div class="col-md-4 position-relative">
         <input type="text" class="form-control form-control-sm" v-model="itemDesc" @keyup="searchItem()"
-          @focus="showSearch" @focusout="showSearch" placeholder="Search Item Here" :disabled="billType == 2? false:true"/>
+          @focus="showSearch" @focusout="showSearch" placeholder="Search Item Here"
+          :disabled="billType == 2 ? false : true" />
 
         <div class="position-absolute mt-1 bg-white w-100 overflow-auto fade-in" style="height: 200px; z-index: 1000;"
           v-if="activateSearch">
@@ -475,7 +537,45 @@ const exportToExcel = async () => {
       </div>
 
     </div>
-    <div class="d-flex flex-column gap-2 justify-content-center align-items-center p-3 border p-2" id="main-table">
+    <div class="row border w-100  mb-3 p-4 shadow">
+      <div class="col-md-3">
+        <select v-model="actProgram" class="form-control form-select-sm" @change="filterItems()">
+          <option value="0">-- Select All Program --</option>
+          <option :value="prog.dtype_id" v-for="(prog, index) in program">
+            {{ prog.dtype_desc }}
+          </option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select v-model="actGradelvl" class="form-control form-select-sm" @change="filterItems()">
+          <option value="0">-- Select All Grade Level --</option>
+          <template v-for="(grad, index) in gradelvl">
+            <option v-if="actProgram == grad.grad_dtypeid" :value="grad.grad_id">
+              {{ grad.grad_name }}
+            </option>
+          </template>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select v-model="actCourse" class="form-control form-select-sm" @change="filterItems()">
+          <option value="0">-- Select All Course</option>
+          <template v-for="(cour, index) in course">
+            <option v-if="actProgram == cour.prog_progtype" :value="cour.prog_id">
+              {{ cour.prog_name }}
+            </option>
+          </template>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select v-model="actSection" class="form-control form-select-sm" @change="filterItems()">
+          <option value="0">-- Select All Section</option>
+          <template v-for="(sec, index) in section">
+            <option :value="sec.sec_id">{{ sec.sec_name }}</option>
+          </template>
+        </select>
+      </div>
+    </div>
+    <div class="d-flex flex-column gap-2 justify-content-center align-items-center p-3 border p-2 w-100" id="main-table">
       <!-- <select class="form-select form-select-sm w-50 mb-4" v-model="orientation">
         <option value="portrait">Portrait</option>
         <option value="landscape">Landscape</option>
@@ -529,16 +629,16 @@ const exportToExcel = async () => {
                 }}</span>
             </td>
             <td>
-              {{ dcr.prog_code}}
+              {{ dcr.prog_code }}
             </td>
             <td>
-              {{ dcr.gradelvl_desc}}
+              {{ dcr.gradelvl_desc }}
             </td>
             <td>
               {{ dcr.sec_desc }}
             </td>
             <td>
-              {{ dcr.prog_desc}}
+              {{ dcr.prog_desc }}
             </td>
             <td>
               <span v-if="dcr.acy_billtype == 2">{{ dcr.acf_desc }}</span>
@@ -555,21 +655,20 @@ const exportToExcel = async () => {
               <span v-if="dcr.acy_billtype == 1" class="text-uppercase">{{ dcr.acy_payment.toFixed(2) }}</span>
             </td>
             <td>{{ dcr.acy_balance.toFixed(2) }}</td>
-            {{ dcr.acy_balance == 0 ? 'Completed' : 'Partial' }}
             <td>
-              <!-- {{ dcr.acf_desc && (dcr.acy_billtype == 2)?dcr.acf_desc:'TUITION' }} -->
+              {{ dcr.acy_balance == 0 ? 'Completed' : 'Partial' }}
             </td>
           </tr>
           <tr v-if="!Object.keys(dcrItems).length">
-            <td colspan="10">No Items Found</td>
+            <td colspan="13">No Items Found</td>
           </tr>
         </tbody>
 
         <tfoot>
           <tr>
-            <td colspan="7" class="text-end fw-bold">Total:</td>
+            <td colspan="12" class="text-end fw-bold">Total:</td>
             <td class="fw-bold">
-              {{ totalAmount.toFixed(2) }}
+              {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalAmount.toFixed(2)) }}
             </td>
           </tr>
         </tfoot>
@@ -629,6 +728,7 @@ const exportToExcel = async () => {
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -644,5 +744,4 @@ const exportToExcel = async () => {
 .list-group-item:hover {
   background: #f1f1f1;
 }
-
 </style>

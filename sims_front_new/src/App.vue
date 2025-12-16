@@ -77,6 +77,7 @@ const getUser = (data) => {
     "/daily-collections-accounting":  ["2", "1", "1"],    // Accounting module
     "/accounting-items":              ["2", "1", "2"],       // Accounting module
     "/accounting-tuition":            ["2", "1", "3"],    // Accounting module
+    "/accounting-subjects":            ["2", "1", "4"],    // Accounting module
 
     "/daily-collections-cashier": ["2", "2", "1"],    // Billing module
     "/accounting-billing":        ["2", "2", "2"],    // Billing module
@@ -256,6 +257,8 @@ const linker = () => {
         "/daily-collections-accounting",
         "/accounting-items", 
         "/accounting-tuition",
+        "/accounting-subjects", 
+
       ], 
       action: () => switchItem(2, 1),
     },
@@ -692,7 +695,12 @@ const active_class = ref("nav-static border p-2 active");
                       </li>
                       <li>
                         <router-link @click="checkPath('/accounting-tuition')" v-if="accessData[16].useracc_grant == 1" to="/accounting-tuition" class="dropdown-item" title="items" tabindex="-1">
-                          <p class="m-2">Tuition Setup</p>
+                          <p class="m-2">Tuition / Charges</p>
+                        </router-link> 
+                      </li>
+                      <li>
+                        <router-link @click="checkPath('/accounting-subjects')" v-if="accessData[17].useracc_grant == 1" to="/accounting-subjects" class="dropdown-item" title="items" tabindex="-1">
+                          <p class="m-2">Subject Rates</p>
                         </router-link> 
                       </li>
                       <!-- <li>
@@ -713,17 +721,17 @@ const active_class = ref("nav-static border p-2 active");
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
                       <li>
-                        <router-link @click="checkPath('/daily-collections-cashier')" v-if="accessData[17].useracc_grant == 1" to="/daily-collections-cashier" class="dropdown-item" title="request" tabindex="-1">
+                        <router-link @click="checkPath('/daily-collections-cashier')" v-if="accessData[18].useracc_grant == 1" to="/daily-collections-cashier" class="dropdown-item" title="request" tabindex="-1">
                           <p class="m-2">Daily Collections</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/accounting-billing')" v-if="accessData[18].useracc_grant == 1" to="/accounting-billing" class="dropdown-item" title="Billing" tabindex="-1">
+                        <router-link @click="checkPath('/accounting-billing')" v-if="accessData[19].useracc_grant == 1" to="/accounting-billing" class="dropdown-item" title="Billing" tabindex="-1">
                           <p class="m-2">Tuition Payment</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/accounting-request')" v-if="accessData[19].useracc_grant == 1" to="/accounting-request" class="dropdown-item" title="request" tabindex="-1">
+                        <router-link @click="checkPath('/accounting-request')" v-if="accessData[20].useracc_grant == 1" to="/accounting-request" class="dropdown-item" title="request" tabindex="-1">
                           <p class="m-2">Request Payment</p>
                         </router-link>
                       </li>
@@ -750,17 +758,17 @@ const active_class = ref("nav-static border p-2 active");
                         </router-link>
                       </li> -->
                       <li>
-                        <router-link @click="checkPath('/faculty-classes')" v-if="accessData[20].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
+                        <router-link @click="checkPath('/faculty-classes')" v-if="accessData[21].useracc_grant == 1" to="/faculty-classes" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Loadings</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/faculty-student')" v-if="accessData[21].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
+                        <router-link @click="checkPath('/faculty-student')" v-if="accessData[22].useracc_grant == 1" to="/faculty-student" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Students</p>
                         </router-link>
                       </li>
                       <li>
-                        <router-link @click="checkPath('/faculty-grading-sheet')" v-if="accessData[22].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
+                        <router-link @click="checkPath('/faculty-grading-sheet')" v-if="accessData[23].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Grading Sheet</p>
                         </router-link>
                       </li>

@@ -10,9 +10,9 @@ import {
     getUsedSeries,
     getCollectionStatus
 } from "../../Fetchers.js";
-
 import {
     pdfGenerator,
+    numberToWords
 } from "../../Generators.js";
 import ProvisionalReceipt from '../forms/accountingforms/ProvisionalReceipt.vue';
 import OfficialReceipt from '../forms/accountingforms/OfficialReceipt.vue';
@@ -69,7 +69,6 @@ const receiptPrSeries = ref([])
 const receiptSeries = ref([])
 
 onMounted(() => {
-
     //prevent e and negative
     document.querySelector(".amount-text").addEventListener("keypress", function (evt) {
         if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57)
@@ -567,8 +566,11 @@ const renderPayment = (paymentdata) =>{
                     </div>
                     <div v-if="paymentMode == 3" class="form-group p-1">
                         <label class="text-xs">Cheque No.</label>
-                        <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
+                        <!-- <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
                             oninput="this.value = Math.abs(this.value)" type="number"
+                            class="form-control form-control-sm" /> -->
+                        <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
+                             type="text"
                             class="form-control form-control-sm" />
                     </div>
 
@@ -704,9 +706,19 @@ const renderPayment = (paymentdata) =>{
                     <span v-if="paymentMode == 1" style="position:absolute;top:265px; left:25px; font-size:8.5px;">
                         &#8369; &nbsp;{{ amountPaid }} 
                     </span>
+                    <span v-if="paymentMode == 1" style="position:absolute;top:225px; left:210px; font-size:8.5px;">
+                        &#8369; &nbsp;{{ numberToWords(amountPaid) }} 
+                    </span>
+                    <span v-if="paymentMode == 1" style="position:absolute;top:250px; left:220px; font-size:8.5px;">
+                        &#8369; &nbsp;{{ amountPaid }} 
+                    </span>
+
+                    <span v-if="paymentMode ==  2" style="position:absolute;top:300px; left:25px; font-size:8.5px;">
+                        ({{ bankTransferName }}) - {{ bankTransferNo }}
+                    </span>
 
                     <span v-if="paymentMode == 3" style="position:absolute;top:300px; left:25px; font-size:8.5px;">
-                       Check Here 
+                        ({{ chequeBankName }}) - {{ chequeNo }}
                     </span>
                 </div>
                 <div v-if="generateDefault == 2 && receiptType == 1" style="height: 100%; width: 100%;">

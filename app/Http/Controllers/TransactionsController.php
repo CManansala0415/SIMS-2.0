@@ -280,6 +280,7 @@ class TransactionsController extends Controller
                     "acs_datesettled" => $date,
                     "acs_cashier" => $request['acy_cashier'],
                     "acs_updatedby" => $request['acy_cashier'],
+                    "acs_dateupdated" => $date,
                 ]);   
            }else{
                 $s1 = DB::table('def_accounts_request')
@@ -432,22 +433,35 @@ class TransactionsController extends Controller
                             'at.*',
                             'emp.*',
                             'prnsettle.*',
-                            'acf .*',
+                            'acf.*',
                             // Course / Arc course
                             DB::raw("(COALESCE(course.prog_code, 
                                     (SELECT arc.arc_course 
                                     FROM server_archive_persons as arc
                                     WHERE arc.arc_personid = prnrequest.per_id
-                                    ORDER BY arc.arc_id ASC
+                                    ORDER BY arc.arc_id DESC
                                     LIMIT 1), 'N/A')) as prog_code"),
+                            DB::raw("(COALESCE(course.prog_id, 
+                                    (SELECT arc.arc_courseid 
+                                    FROM server_archive_persons as arc
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id DESC
+                                    LIMIT 1), 'N/A')) as course_id"),
                             // Grade level: use joined gradelvl or first fallback from subquery
                             DB::raw("(COALESCE(gradelvl.grad_name, 
                                     (SELECT sc.grad_name 
                                     FROM server_archive_persons as arc
                                     LEFT JOIN def_gradelvl sc ON arc.arc_gradelvl = sc.grad_id
                                     WHERE arc.arc_personid = prnrequest.per_id
-                                    ORDER BY arc.arc_id ASC
+                                    ORDER BY arc.arc_id DESC
                                     LIMIT 1), 'N/A')) as gradelvl_desc"),
+                            DB::raw("(COALESCE(gradelvl.grad_id, 
+                                    (SELECT sc.grad_id 
+                                    FROM server_archive_persons as arc
+                                    LEFT JOIN def_gradelvl sc ON arc.arc_gradelvl = sc.grad_id
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id DESC
+                                    LIMIT 1), 'N/A')) as gradelvl_id"),
                             // Section: use joined section or first fallback from subquery
                             DB::raw("(COALESCE(section.sec_name, 
                                     (SELECT sc.sec_name 
@@ -456,6 +470,13 @@ class TransactionsController extends Controller
                                     WHERE arc.arc_personid = prnrequest.per_id
                                     ORDER BY arc.arc_id ASC
                                     LIMIT 1), 'N/A')) as sec_desc"),
+                            DB::raw("(COALESCE(section.sec_id, 
+                                    (SELECT sc.sec_id 
+                                    FROM server_archive_persons as arc
+                                    LEFT JOIN def_section sc ON arc.arc_section = sc.sec_id
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id ASC
+                                    LIMIT 1), 'N/A')) as sec_id"),
                             // program type
                             DB::raw("(COALESCE(program.dtype_desc, 
                                     (SELECT dt.dtype_desc 
@@ -463,7 +484,14 @@ class TransactionsController extends Controller
                                     LEFT JOIN sett_degree_types dt ON arc.arc_program = dt.dtype_id
                                     WHERE arc.arc_personid = prnrequest.per_id
                                     ORDER BY arc.arc_id ASC
-                                    LIMIT 1), 'N/A')) as prog_desc")
+                                    LIMIT 1), 'N/A')) as prog_desc"),
+                            DB::raw("(COALESCE(program.dtype_id, 
+                                    (SELECT dt.dtype_id 
+                                    FROM server_archive_persons as arc
+                                    LEFT JOIN sett_degree_types dt ON arc.arc_program = dt.dtype_id
+                                    WHERE arc.arc_personid = prnrequest.per_id
+                                    ORDER BY arc.arc_id ASC
+                                    LIMIT 1), 'N/A')) as prog_id")
                         )
                         ->distinct()
                         ->where('ac.acy_status', 1)

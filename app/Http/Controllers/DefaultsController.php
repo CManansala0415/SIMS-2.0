@@ -518,22 +518,34 @@ class DefaultsController extends Controller
                 }
             }else{
                 try{
-    
-                    $s1 = DB::table('def_subject')
-                    ->where('subj_id','=', $request['subj_id'])
-                    ->update([
-                        'subj_name' => $request->input('subj_name'),
-                        'subj_code' => $request->input('subj_code'),
-                        'subj_lec' => $request->input('subj_lec'),
-                        'subj_lab' => $request->input('subj_lab'),
-                        'subj_hrs_week' => $request->input('subj_hrs_week'),
-                        'subj_preq' => $request->input('subj_preq'),
-                        'subj_dtypeid' => $request->input('subj_dtypeid'),
-                        'subj_specid' => $request->input('subj_specid'),
-                        'subj_schedpass' => $request->input('subj_schedpass'),
-                        'subj_updatedby' => $request->input('subj_addedby'),
-                        'subj_dateupdated' => $date,
-                    ]);
+                    
+                    if($request->input('mode')  == 1){ //means edit rates
+                        $s1 = DB::table('def_subject')
+                        ->where('subj_id','=', $request['subj_id'])
+                        ->update([
+                            'subj_lec_rate' => $request->input('subj_lec_rate'),
+                            'subj_lab_rate' => $request->input('subj_lab_rate'),
+                            'subj_updatedby' => $request->input('subj_updatedby'),
+                            'subj_dateupdated' => $date,
+                        ]);
+                    }else{
+                         $s1 = DB::table('def_subject')
+                        ->where('subj_id','=', $request['subj_id'])
+                        ->update([
+                            'subj_name' => $request->input('subj_name'),
+                            'subj_code' => $request->input('subj_code'),
+                            'subj_lec' => $request->input('subj_lec'),
+                            'subj_lab' => $request->input('subj_lab'),
+                            'subj_hrs_week' => $request->input('subj_hrs_week'),
+                            'subj_preq' => $request->input('subj_preq'),
+                            'subj_dtypeid' => $request->input('subj_dtypeid'),
+                            'subj_specid' => $request->input('subj_specid'),
+                            'subj_schedpass' => $request->input('subj_schedpass'),
+                            'subj_updatedby' => $request->input('subj_updatedby'),
+                            'subj_dateupdated' => $date,
+                        ]);
+                    }
+                   
     
                     return $data = [
                         'status' => 200,

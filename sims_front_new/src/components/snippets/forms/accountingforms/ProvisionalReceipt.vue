@@ -147,7 +147,7 @@ const numberToWords = (num) => {
           <div class="big">{{ account.acr_id }}</div>
           <div class="muted">Date Issued</div>
           <div>{{ account.acr_dateupdated }}</div>
-        </div>
+        </div> 
       </div>
 
       <!-- DETAILS -->

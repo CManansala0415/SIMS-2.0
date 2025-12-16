@@ -233,7 +233,7 @@ const itemModal = (type, data) => {
 <template>
     <div>
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Accounting Items</h5>
+            <h5 class=" text-uppercase fw-bold">Miscellaneous Items</h5>
         </div>
 
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
