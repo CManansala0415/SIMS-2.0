@@ -466,15 +466,15 @@ function getScheduleGroupsForSubject(subjId) {
                                         <td class="align-middle">
                                             <div class="input-group input-group-sm mb-1">
                                                 <span class=" input-group-text">Lecture Units</span>
-                                                <input v-model="app.subj_lec" type="text" class="form-control" disabled>
+                                                <input v-model="app.subj_lec_units" type="text" class="form-control" disabled>
                                             </div>
                                             <div class="input-group input-group-sm mb-1">
                                                 <span class=" input-group-text">Laboratory Units</span>
-                                                <input v-model="app.subj_lab" type="text" class="form-control" disabled>
+                                                <input v-model="app.subj_lab_units" type="text" class="form-control" disabled>
                                             </div>
                                         </td>
                                         <td class="align-middle">
-                                            {{ app.subj_lec + app.subj_lab }}
+                                            {{ app.subj_lec_units + app.subj_lab_units }}
                                         </td>
                                         <!-- Days -->
                                         <td class="align-middle p-2">

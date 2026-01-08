@@ -152,10 +152,15 @@ const numberToWords = (num) => {
   return words.trim();
 }
 
+const pesoConverter = (amount) => { 
+  let data = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(amount)
+  return data;
+}
 
 export {
     qrImageGenerator,
     pdfGenerator,
     imageFetcher,
-    numberToWords
+    numberToWords,
+    pesoConverter
 }

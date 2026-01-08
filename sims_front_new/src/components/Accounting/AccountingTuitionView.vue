@@ -4,7 +4,7 @@ import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
-import { getFeeDetails, getTuitionInformation, editAccountingTuition, getAcademicDefaults, getQuarter } from '../Fetchers.js';
+import { getFeeDetails, getTuitionInformation, editAccountingTuition, getAcademicDefaults, getQuarter, getAcademicStatus } from '../Fetchers.js';
 import AccountingTuitionEdit from '../snippets/modal/AccountingTuitionEdit.vue';
 
 const router = useRouter();
@@ -28,7 +28,7 @@ const program = ref([])
 const degree = ref([])
 const gradelvl = ref([])
 const quarter = ref([])
-
+const activeEnrollment = ref(false)
 const booter = async () => {
     // getUserID().then((results) => {
     //     booting.value = 'Loading Items...'
@@ -54,21 +54,27 @@ const booter = async () => {
     getQuarter().then((results)=>{
        quarter.value = results
     })
+
+    getAcademicStatus(1,'cs_05').then((results) => {
+        activeEnrollment.value = results[0].sett_status == 1? true:false
+    })
 }
 onMounted(async () => {
+    
     getUserID().then(async(results1) => {
         userID.value = results1.account.data.id
         emit('fetchUser', results1)
         accessData.value = results1.access
 
+        
         try {
 
             await booter().then(() => {
-
                 booting.value = 'Loading Items...'
                 bootingCount.value += 1
 
                 getTuitionInformation(limit.value, offset.value).then((results2) => {
+                    console.log(activeEnrollment.value)
                     tuitionInfo.value = results2.data
                     tuitionInfoCount.value = results2.count
                     preLoading.value = false
@@ -243,40 +249,53 @@ const deactivateCharge = (data) =>{
             confirmButtonText: "Yes, Im Change it!"
     }).then(async (result) => {
         if (result.isConfirmed) {
-            Swal.fire({
-                title: "Saving Updates",
-                text: "Please wait while we check all series details.",
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
+            getAcademicStatus(1,'cs_05').then((results) => {
+                activeEnrollment.value = results[0].sett_status == 1? true:false
 
-            let x = {
-                ...data,
-                act_mode: 'charge',
-                act_status: data.act_status == 1? data.act_status = 0: data.act_status = 1
-            }
-
-            editAccountingTuition(x).then((results)=>{
-                Swal.close()
-         
-                if (results.status == 200) {
+                if(activeEnrollment.value){
                     Swal.fire({
-                        title: "Update Successful",
-                        text: "Changes applied, refreshing the page",
-                        icon: "success"
-                    }).then(()=>{
-                        location.reload()
-                    });
-                } else {
-                    Swal.fire({
-                        title: "Update Failed",
-                        text: "Unknown error occured, try again later",
+                        title: "Action Denied",
+                        text: "Cannot change charge status while enrollment is active.",
                         icon: "error"
-                    }).then(()=>{
-                        // location.reload()
                     });
+                    return
+                }else{
+                    Swal.fire({
+                        title: "Saving Updates",
+                        text: "Please wait while we check all series details.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    let x = {
+                        ...data,
+                        act_mode: 'charge',
+                        act_status: data.act_status == 1? data.act_status = 0: data.act_status = 1
+                    }
+
+                    editAccountingTuition(x).then((results)=>{
+                        Swal.close()
+                
+                        if (results.status == 200) {
+                            Swal.fire({
+                                title: "Update Successful",
+                                text: "Changes applied, refreshing the page",
+                                icon: "success"
+                            }).then(()=>{
+                                location.reload()
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "Update Failed",
+                                text: "Unknown error occured, try again later",
+                                icon: "error"
+                            }).then(()=>{
+                                // location.reload()
+                            });
+                        }
+                    })
                 }
             })
         }
@@ -341,11 +360,11 @@ const deactivateCharge = (data) =>{
                         </td>
                         <td v-if="accessData[16].useracc_modifying == 1" class="align-middle">
                             <div class="d-flex gap-2 justify-content-center">
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" @click="itemModal(2, act)"
+                                <button  v-if="!activeEnrollment" class="btn btn-sm btn-secondary" data-bs-toggle="modal" @click="itemModal(2, act)"
                                     data-bs-target="#editdatamodal" title="Edit Data">
                                     <font-awesome-icon icon="fa-solid fa-pen" />
                                 </button>
-                                <button class="btn btn-sm btn-secondary"
+                                <button  v-if="!activeEnrollment" class="btn btn-sm btn-secondary"
                                     title="Delete Item" @click="itemModal(4, act)">
                                     <font-awesome-icon icon="fa-solid fa-trash" />
                                 </button>
@@ -353,8 +372,8 @@ const deactivateCharge = (data) =>{
                                     data-bs-target="#editdatamodal" title="Edit Data">
                                     <font-awesome-icon icon="fa-solid fa-gear" />
                                 </button>
-                                <button class="btn btn-sm" :class="act.act_status == 1?'btn-success':'btn-danger'" @click="deactivateCharge(act)"
-                                    title="Activate Charge">
+                                <button v-if="!activeEnrollment" class="btn btn-sm" :class="act.act_status == 1?'btn-success':'btn-danger'" @click="deactivateCharge(act)"
+                                    :title="act.act_status == 1?'Active':'Inactive'">
                                     <font-awesome-icon icon="fa-solid fa-power-off"/>
                                 </button>
                             </div>
@@ -404,7 +423,7 @@ const deactivateCharge = (data) =>{
                 </div>
                 <div class="modal-body">
                     <AccountingTuitionEdit v-if="showAddItemModal" :itemData="toBeEdited"
-                    :courseData="course" :sectionData="section" :programData="program" :gradelvlData="gradelvl" :manageSetupData="manageSetup" :quarterData="quarter"/>
+                    :courseData="course" :sectionData="section" :programData="program" :gradelvlData="gradelvl" :manageSetupData="manageSetup" :quarterData="quarter" :activeEnrollmentData="activeEnrollment"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

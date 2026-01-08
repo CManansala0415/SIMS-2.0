@@ -10,11 +10,14 @@ import {
     updateMilestone,
     getCommandUpdateCurriculum,
     getEnrollmentSchedule,
-    getLaunchChecker
+    getLaunchChecker,
+    getPaymentDetails,
+    getTotalCharges
 } from "../../Fetchers.js";
 import Loader from '../loaders/Loader1.vue';
 import {
-    pdfGenerator
+    pdfGenerator,
+    pesoConverter
 } from "../../Generators.js";
 import { useRouter, useRoute } from 'vue-router'
 
@@ -69,6 +72,10 @@ const studentSem = ref('')
 const studentSemId = ref('')
 const studentDateEnr = ref('')
 const scheduleData = ref([])
+const grandTotal = ref(0)
+const paymentDetails = ref([])
+const chargeBreakdown = ref([])
+
 onMounted(async () => {
     window.stop()
     enr_section.value = studentData.value.enr_section
@@ -160,7 +167,23 @@ onMounted(async () => {
                                 preloading.value = false
                                 milestoneLoading.value = false
 
-                                // console.log(results2)
+                                getPaymentDetails(enrolleeData.value[0].acs_id, 1).then((results) => {
+                                    let x = results.data.slice(-1).pop()
+                                    paymentDetails.value = results.data
+                                    grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : enrolleeData.value[0].acs_amount
+                                })
+
+                                getTotalCharges(
+                                    enrolleeData.value[0].enr_curriculum, 
+                                    enrolleeData.value[0].enr_quarter, 
+                                    enrolleeData.value[0].enr_program, 
+                                    enrolleeData.value[0].enr_course, 
+                                    enrolleeData.value[0].enr_gradelvl, 
+                                    enrolleeData.value[0].enr_section, 
+                                    enrolleeData.value[0].enr_id, 
+                                ).then((results) => {
+                                    chargeBreakdown.value = results
+                                })
                             })
                         })
 
@@ -523,7 +546,7 @@ function getScheduleGroupsForSubject(subjId) {
                                         <td class="p-2 border" colspan="2">
                                             <span style="text-transform:none">Name: </span>
                                             <span class="fw-semibold">
-                                                {{ studentData.per_firstname }}
+                                                {{ studentData.per_firstname }} 
                                                 {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
                                                 {{ studentData.per_lastname }}
                                                 {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
@@ -603,7 +626,7 @@ function getScheduleGroupsForSubject(subjId) {
 
                         <!-- Units -->
                         <td class="align-middle p-2">
-                            Lec: {{ c.subj_lec }} | Lab: {{ c.subj_lab }} | Total: {{ c.subj_lec + c.subj_lab }}
+                            Lec: {{ c.subj_lec_units }} | Lab: {{ c.subj_lab_units }} | Total: {{ c.subj_lec_units + c.subj_lab_units }}
                         </td>
 
                         <!-- Days -->
@@ -770,9 +793,9 @@ function getScheduleGroupsForSubject(subjId) {
 
                 </div>
             </div>
-            <div class="w-100 p-2 d-flex gap-2 justify-content-around" v-if="formType == 2">
+            <div class="w-100 p-2 d-flex gap-2 justify-content-around" v-if="formType == 2" style="height: 180px;">
                 <div class="w-100 border bg-body-secondary">
-                    <span class="fw-bold">Payments</span>
+                    <span class="fw-bold">Payments (5 latest Transaction)</span>
                     <table class="table table-bordered">
                         <thead>
                             <tr>
@@ -782,49 +805,47 @@ function getScheduleGroupsForSubject(subjId) {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="p-1">Date</td>
-                                <td class="p-1">Date</td>
-                                <td class="p-1">Date</td>
+                            <tr v-for="(pay, index) in paymentDetails.slice(-5)" :key="index">
+                                <td class="p-1">{{ pay.acy_datepaid }}</td>
+                                <td class="p-1">
+                                    {{ pay.acy_series_prefix }}-{{ pay.acy_series_year }}-{{ pay.acy_series_pattern }}
+                                </td>
+                                <td class="p-1">{{ pesoConverter(pay.acy_payment) }}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div class="w-100 p-2">
+                    
+                    <!-- <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Subject Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.subjects_amount?  pesoConverter(chargeBreakdown.subjects_amount) : 0.00 }}</span>
+                    </div> -->
                     <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Tuition Fee</span>
-                        <span class="fw-bold">0.00</span>
-
-                    </div>
-                    <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Miscellaneous Fees</span>
-                        <span class="fw-bold">0.00</span>
-
+                        <span>Total lecture Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.lec_amount) : 0.00 }}</span>
                     </div>
                     <div class="d-flex gap-1 justify-content-between">
                         <span>Total Laboratory Fees</span>
-                        <span class="fw-bold">0.00</span>
-
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.lab_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Miscellaneous Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.misc_amount) : 0.00 }}</span>
                     </div>
                     <div class="d-flex gap-1 justify-content-between">
                         <span>Total Other Fees</span>
-                        <span class="fw-bold">0.00</span>
-
-                    </div>
-                    <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Additional Fees</span>
-                        <span class="fw-bold">0.00</span>
-
+                        <span class="fw-bold">{{ chargeBreakdown.item_amount?  pesoConverter(chargeBreakdown.item_amount) : 0.00 }}</span>
                     </div>
                     <div class="d-flex gap-1 justify-content-between">
                         <span>Total Tuition and Fees</span>
-                        <span class="fw-bold">0.00</span>
+                        <span class="fw-bold">{{ enrolleeData[0].acs_amount?  pesoConverter(enrolleeData[0].acs_amount) : 0.00 }}</span>
                     </div>
-                    <div class="d-flex gap-1 justify-content-between">
+                    <!-- <div class="d-flex gap-1 justify-content-between">
                         <span>Mode of Payment</span>
                         <span class="fw-bold">INSTALLMENT</span>
-                    </div>
-                    <div class="d-flex gap-1 justify-content-between">
+                    </div> -->
+                    <!-- <div class="d-flex gap-1 justify-content-between">
                         <span>Prelim</span>
                         <span class="fw-bold">0.00</span>
 
@@ -842,7 +863,7 @@ function getScheduleGroupsForSubject(subjId) {
                     <div class="d-flex gap-1 justify-content-between">
                         <span>Final</span>
                         <span class="fw-bold">0.00</span>
-                    </div>
+                    </div> -->
                     <div class="text-center mt-1 fst-italic">
                         <span class="fw-bold">Note: </span>
                         <span>Above fees exclude other applicable charges to be paid at cashiers office.</span>

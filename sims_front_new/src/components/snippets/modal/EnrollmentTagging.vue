@@ -258,7 +258,7 @@ const saveData = async () => {
     saving.value = true
     Swal.fire({
         title: "Saving Updates",
-        text: "Please wait while we check all series details.",
+        text: "Please wait while we check all details.",
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -508,15 +508,15 @@ const filterCurriculum = () => {
                                                                     </div>
                                                                     <div class="input-group input-group-sm mb-1">
                                                                         <span class=" input-group-text">Lecture Units</span>
-                                                                        <input v-model="a.subj_lec" type="text" class="form-control form-control-sm" disabled>
+                                                                        <input v-model="a.subj_lec_units" type="text" class="form-control form-control-sm" disabled>
                                                                     </div>
                                                                     <div class="input-group input-group-sm mb-1">
                                                                         <span class=" input-group-text">Laboratory Units</span>
-                                                                        <input v-model="a.subj_lab" type="text" class="form-control form-control-sm" disabled>
+                                                                        <input v-model="a.subj_lab_units" type="text" class="form-control form-control-sm" disabled>
                                                                     </div>
                                                                     <div class="input-group input-group-sm mb-3">
                                                                         <span class=" input-group-text">Total Units / Hours</span>
-                                                                        <input :value="a.subj_lab + a.subj_lec" type="text" class="form-control form-control-sm" disabled>
+                                                                        <input :value="a.subj_lab_units + a.subj_lec_units" type="text" class="form-control form-control-sm" disabled>
                                                                     </div>
                                                                     <!-- <div class="mb-1">
                                                                         <label for="cross" class="form-label">Cross Enrolled (School)</label>
@@ -674,13 +674,13 @@ const filterCurriculum = () => {
                                                                 class=" text-red-500"> {{ c.mi_crossenr }}</span></span>
                                                     </td>
                                                     <td class="align-middle">
-                                                        <span>{{ c.subj_lec }}</span>
+                                                        <span>{{ c.subj_lec_units }}</span>
                                                     </td>
                                                     <td class="align-middle">
-                                                        <span>{{ c.subj_lab }}</span>
+                                                        <span>{{ c.subj_lab_units }}</span>
                                                     </td>
                                                     <td class="align-middle">
-                                                        <span class="fw-bold">{{ c.subj_lec + c.subj_lab  }}</span>
+                                                        <span class="fw-bold">{{ c.subj_lec_units + c.subj_lab_units  }}</span>
                                                     </td>
                                                     <td class="align-middle">
                                                         <span class="text-primary">{{ c.grs_prelims?c.grs_prelims:0 }}</span>

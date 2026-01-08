@@ -18,7 +18,8 @@ import {
     getSubject,
     getAccountsDetails,
     getStudentFiltering,
-    getAcademicDefaults
+    getAcademicDefaults,
+    getPaymentDetails
 } from "../Fetchers.js";
 import Loader from '../snippets/loaders/Loading1.vue';
 // import PrintForm from '../snippets/modal/PrintForms.vue';
@@ -66,7 +67,7 @@ const showPrintModal = ref('')
 const printType = ref('')
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
-
+const paymentDetails = ref([])
 const booter = async () => {
     getAcademicDefaults().then((results) => {
         // console.log(results)
@@ -121,6 +122,9 @@ const booter = async () => {
         booting.value = 'Loading Accounts...'
         bootingCount.value += 1
     })
+    getPaymentDetails(0,1).then((results) => {
+        paymentDetails.value = results.data
+    })
     // getUserID().then((results) => {
     //     userID.value = results.account.data.id
     //     emit('fetchUser', results)
@@ -144,10 +148,23 @@ onMounted(async () => {
                     student.value = results.data
                     studentCount.value = results.count
 
+                    console.log(paymentDetails.value)
                     let x = student.value.map((e) => {
                         let y = accounts.value.findIndex((f) => {
                             return f.acs_enrid === e.enr_id
                         })
+
+                        let acsid = accounts.value
+                        .filter(f => f.acs_enrid === e.enr_id)
+                        .map(f => ({
+                            acs_id: f.acs_id
+                        }))
+
+                        // console.log(accounts.value)
+                        let pay = paymentDetails.value.findIndex((f) => {
+                            return f.acy_accid === acsid[0].acs_id
+                        })
+
 
                         // stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
@@ -162,16 +179,20 @@ onMounted(async () => {
                             }
                         }
 
+                        console.log(paymentDetails.value)
 
                         return {
                             ...e,
                             profile_picture: z,
+                            is_paid: pay != -1 ? true : false,
                             ...accounts.value[y],
                         }
+
                     })
 
                     student.value = x
-                    //    console.log(student.value)
+
+                    
 
                     preLoading.value = false
                     emit('doneLoading', false)
@@ -730,7 +751,7 @@ const getData = (result) => {
                                 <h6 class="text-uppercase fw-bold"  style="font-size: 13px;"> {{ stud.per_firstname }} {{ stud.per_middlename }} {{
                                     stud.per_lastname }} {{
                                         stud.per_suffixname }}</h6>
-                                <p v-if="stud.acs_amount > 0" class="text-success fw-bold" style="font-size: 10px;">Officially Enrolled</p>
+                                <p v-if="stud.is_paid" class="text-success fw-bold" style="font-size: 10px;">Officially Enrolled</p>
                                 <p v-else class="text-danger fw-bold" style="font-size: 10px;">Not Officially Enrolled</p>
                                 <div class="d-flex flex-column gap-1 mt-3">
                                     <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_program"

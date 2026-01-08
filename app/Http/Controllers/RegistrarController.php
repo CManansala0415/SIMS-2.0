@@ -459,9 +459,11 @@ class RegistrarController extends Controller
             ->leftJoin('def_curriculum', 'def_enrollment.enr_curriculum', '=', 'def_curriculum.curr_id') 
             ->leftJoin('def_section', 'def_enrollment.enr_section', '=', 'def_section.sec_id') 
             ->leftJoin('def_student_identification', 'def_enrollment.enr_personid', '=', 'def_student_identification.ident_personid') 
+            ->leftJoin('def_accounts_settlement', 'def_enrollment.enr_id', '=', 'def_accounts_settlement.acs_enrid') 
 
             ->select(  
                 'def_enrollment.*',
+                'def_accounts_settlement.*',
                 'def_student_identification.*',
                 'def_gradelvl.*',
                 'def_program.*',
@@ -1085,6 +1087,7 @@ class RegistrarController extends Controller
             */
             $totalCost = 0;
             $mergedMilestones = [];
+            $deductions = 0;
 
             foreach ($milestonedata as $ms) {
 
@@ -1121,8 +1124,8 @@ class RegistrarController extends Controller
                 } else {
                     // Fallback to milestone rates
                     $total_price =
-                        ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec ?? 0)) +
-                        ((float) ($ms->subj_lab_rate ?? 0) * (float) ($ms->subj_lab ?? 0));
+                        ((float) ($ms->subj_lec_rate ?? 0) * (float) (($ms->subj_lec_units) ?? 0)) +
+                        ((float) ($ms->subj_lab_rate ?? 0) * (float) (($ms->subj_lab_units) ?? 0));
                 }
 
                 /*
@@ -1139,16 +1142,23 @@ class RegistrarController extends Controller
                 $mergedMilestones[] = $mergedItem;
             }
 
+            
             foreach ($templatePricesData as $tp) {
-                if (empty($tp->tuitemp_subjid)) {
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 3) {
                     $totalCost += (float) ($tp->tuitemp_price ?? 0);
+                }
+            }
+
+            foreach ($templatePricesData as $tp) {
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 4) {
+                    $deductions += (float) ($tp->tuitemp_price ?? 0);
                 }
             }
 
             $account = DB::table('def_accounts_settlement')
             ->where('acs_enrid','=', $request->input('enr_id'))
             ->update([
-                'acs_amount' => $totalCost,
+                'acs_amount' => $totalCost-$deductions,
                 'acs_dateupdated' => $date,
                 'acs_updatedby' => $request->input('user_id'),
             ]);
@@ -1219,6 +1229,7 @@ class RegistrarController extends Controller
         $curriculum = DB::table('def_curriculum')->orderBy('curr_id')
         ->where('curr_progid', '=' , $prog)
         ->where('curr_progtype', '=' , $type)
+        ->where('curr_status', '=' , 1)
         ->get();
         return $curriculum; 
        

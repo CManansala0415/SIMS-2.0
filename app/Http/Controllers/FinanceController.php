@@ -416,6 +416,7 @@ class FinanceController extends Controller
                             'tuitemp_custid'     => (
                                 !empty($item['tuitemp_itemid']) || !empty($item['tuitemp_subjid'])
                             ) ? null : $custid,
+                            'tuitemp_custype'     => $item['tuitemp_custype'] ?? null,
                             'tuitemp_desc'       => $item['tuitemp_desc'] ?? null,
                             'tuitemp_price'      => $item['tuitemp_price'] ?? null,
                             'tuitemp_lec_price'      => $item['tuitemp_lec_price'] ?? null,
@@ -437,6 +438,7 @@ class FinanceController extends Controller
                             'tuitemp_custid'     => (
                                 !empty($item['tuitemp_itemid']) || !empty($item['tuitemp_subjid'])
                             ) ? null : $custid,
+                            'tuitemp_custype'     => $item['tuitemp_custype'] ?? null,
                             'tuitemp_desc'       => $item['tuitemp_desc'] ?? null,
                             'tuitemp_price'      => $item['tuitemp_price'] ?? null,
                             'tuitemp_lec_price'      => $item['tuitemp_lec_price'] ?? null,
@@ -614,6 +616,137 @@ class FinanceController extends Controller
                 'status' => 500
             ];
         }
+    }
+
+    public function getTotalCharges($curr, $sem, $program, $course, $gradelvl, $section, $enrid){
+            $financedata = $this->getChargesTemplateHeader(
+                $curr ?: 0,
+                $sem ?: 0,
+                $program ?: 0,
+                $course ?: 0,
+                $gradelvl ?: 0,
+                $section ?: 0,
+                $enrid ?: 0
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Flatten template data (same as Object.values + push in Vue)
+            |--------------------------------------------------------------------------
+            */
+            $templatePricesData = [];
+            foreach ($financedata['template'] as $template) {
+                foreach ($template['data'] as $row) {
+                    $templatePricesData[] = $row;
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get milestone data
+            |--------------------------------------------------------------------------
+            */
+            $milestone = new RegistrarController();
+            $milestonedata = $milestone->getMilestone(
+               $enrid
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Merge milestone + template and compute totals
+            |--------------------------------------------------------------------------
+            */
+            $overall_amount = 0;
+            $subjects_amount = 0;
+            $misc_amount = 0;
+            $item_amount = 0;
+            $lab_amount = 0;
+            $lec_amount = 0;
+
+            $mergedMilestones = [];
+
+            foreach ($milestonedata as $ms) {
+
+                $template = null;
+
+                // Find matching template by subject ID
+                foreach ($templatePricesData as $tp) {
+                    if (
+                        isset($tp->tuitemp_subjid, $ms->mi_subjid) &&
+                        (int) $tp->tuitemp_subjid === (int) $ms->mi_subjid
+                    ) {
+                        $template = $tp;
+                        break;
+                    }
+                }
+
+                $total_price = 0;
+                $mergedItem  = clone $ms; // copy object safely
+
+                if ($template) {
+                    // Merge template fields into milestone
+                    foreach (get_object_vars($template) as $key => $value) {
+                        $mergedItem->$key = $value;
+                    }
+
+                    // Compute from template
+                    $total_price =
+                        ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
+                        ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($template->tuitemp_lab ?? 0));
+
+                    // compute lab and lec total
+                    $lab_amount += ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($template->tuitemp_lab ?? 0));
+                    $lec_amount += ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0));
+
+                    // Ensures template exists in UI
+                    $mergedItem->tuitemp_id = $template->tuitemp_id;
+
+                } else {
+                    // Fallback to milestone rates
+                    $total_price =
+                        ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0)) +
+                        ((float) ($ms->subj_lab_rate ?? 0) * (float) ($ms->subj_lab_units ?? 0));
+
+                    $lab_amount += ((float) ($ms->subj_lab_rate ?? 0) * (float) ($ms->subj_lab_units ?? 0));
+                    $lec_amount += ((float) ($template->subj_lec_rate ?? 0) * (float) ($template->subj_lec_units ?? 0));
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | APPLY CONDITION HERE, mi_tag 1 means exclude from total cost, already taken
+                |--------------------------------------------------------------------------
+                */
+                if ((int) ($ms->mi_tag ?? 0) !== 1) {
+                    $overall_amount += $total_price;
+                    $subjects_amount += $total_price;
+                }
+
+                // Always attach total_price for UI
+                // $mergedItem->total_price = $total_price;
+                // $mergedMilestones[] = $mergedItem;
+            }
+
+            foreach ($templatePricesData as $tp) {
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_itemid) {
+                    $overall_amount += (float) ($tp->tuitemp_price ?? 0);
+                    $misc_amount += (float) ($tp->tuitemp_price ?? 0);
+                }elseif (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid) {
+                    $overall_amount += (float) ($tp->tuitemp_price ?? 0);
+                    $item_amount += (float) ($tp->tuitemp_price ?? 0);
+                }else{
+                    // Subject already counted in milestone loop
+                }
+            }
+
+            return [
+                'subjects_amount' => $subjects_amount,
+                'misc_amount' => $misc_amount,
+                'item_amount' => $item_amount,
+                'lab_amount' => $lab_amount,
+                'lec_amount' => $lec_amount,
+                'overall_amount' => $overall_amount,
+                'status' => 200
+            ];
     }
 
 

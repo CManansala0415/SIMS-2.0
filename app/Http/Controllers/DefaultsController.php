@@ -495,9 +495,11 @@ class DefaultsController extends Controller
                     $s1 = DB::table('def_subject')->insert([
                         'subj_name' => $request->input('subj_name'),
                         'subj_code' => $request->input('subj_code'),
-                        'subj_lec' => $request->input('subj_lec'),
-                        'subj_lab' => $request->input('subj_lab'),
-                        'subj_hrs_week' => $request->input('subj_hrs_week'),
+                        'subj_lec_units' => $request->input('subj_lec_units'),
+                        'subj_lab_units' => $request->input('subj_lab_units'),
+                        'subj_lec_hrs' => $request->input('subj_lec_units') * 1,
+                        'subj_lab_hrs' => $request->input('subj_lab_units') * 3,
+                        'subj_hrs_week' => $request->input('subj_lec_units') + ($request->input('subj_lab_units') * 3),
                         'subj_preq' => $request->input('subj_preq'),
                         'subj_dtypeid' => $request->input('subj_dtypeid'),
                         'subj_specid' => $request->input('subj_specid'),
@@ -523,8 +525,8 @@ class DefaultsController extends Controller
                         $s1 = DB::table('def_subject')
                         ->where('subj_id','=', $request['subj_id'])
                         ->update([
-                            'subj_lec_rate' => $request->input('subj_lec_rate'),
-                            'subj_lab_rate' => $request->input('subj_lab_rate'),
+                            'subj_lec_rate' => $request->input('subj_lec_units_rate'),
+                            'subj_lab_rate' => $request->input('subj_lab_units_rate'),
                             'subj_updatedby' => $request->input('subj_updatedby'),
                             'subj_dateupdated' => $date,
                         ]);
@@ -534,9 +536,11 @@ class DefaultsController extends Controller
                         ->update([
                             'subj_name' => $request->input('subj_name'),
                             'subj_code' => $request->input('subj_code'),
-                            'subj_lec' => $request->input('subj_lec'),
-                            'subj_lab' => $request->input('subj_lab'),
-                            'subj_hrs_week' => $request->input('subj_hrs_week'),
+                            'subj_lec_units' => $request->input('subj_lec_units'),
+                            'subj_lab_units' => $request->input('subj_lab_units'),
+                            'subj_lec_hrs' => $request->input('subj_lec_units') * 1,
+                            'subj_lab_hrs' => $request->input('subj_lab_units') * 3,
+                            'subj_hrs_week' => $request->input('subj_lec_units') + ($request->input('subj_lab_units') * 3),
                             'subj_preq' => $request->input('subj_preq'),
                             'subj_dtypeid' => $request->input('subj_dtypeid'),
                             'subj_specid' => $request->input('subj_specid'),
@@ -642,23 +646,20 @@ class DefaultsController extends Controller
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d h:i:s', time());
 
-        if($request->input('deactivate') == true){
+        
+        if($request->input('currtag_id') && $request->input('deactivate') == false){
             try{
-
                 $s1 = DB::table('def_curriculum_tags')
-                ->where('currtag_id','=', $request['currtag_id'])
+                ->where('currtag_id','=', $request->input('currtag_id'))
                 ->update([
-                    'currtag_updatedby' => $request->input('currtag_updatedby'),
+                    'currtag_currid' => $request->input('currtag_currid'),
+                    'currtag_subjid' => $request->input('subj_id'),
+                    'currtag_lec' => $request->input('subj_lec_units'),
+                    'currtag_lab' => $request->input('subj_lab_units'),
+                    'currtag_gradelvl' => $request->input('currtag_gradelvl'),
+                    'currtag_sem' => $request->input('currtag_sem'),
+                    'currtag_updatedby' => $request->input('currtag_addedby'),
                     'currtag_dateupdated' => $date,
-                    'currtag_status' => 0,
-                ]);
-
-                $s2 = DB::table('def_curriculum')
-                ->where('curr_id','=', $request['currtag_id'])
-                ->update([
-                    'curr_updatedby' => $request->input('curr_updatedby'),
-                    'curr_dateupdated' => $date,
-                    'curr_status' => 0,
                 ]);
 
                 return $data = [
@@ -669,21 +670,23 @@ class DefaultsController extends Controller
                     'status' => 500,
                 ];
             }
-        }
-        
-        if($request->input('currtag_id')){
-            try{
+        }else if($request->input('currtag_id') && $request->input('deactivate') == true){
+             try{
+
                 $s1 = DB::table('def_curriculum_tags')
-                ->where('currtag_id','=', $request['currtag_id'])
+                ->where('currtag_id','=', $request->input('currtag_id'))
                 ->update([
-                    'currtag_currid' => $request->input('currtag_currid'),
-                    'currtag_subjid' => $request->input('subj_id'),
-                    'currtag_lec' => $request->input('subj_lec'),
-                    'currtag_lab' => $request->input('subj_lab'),
-                    'currtag_gradelvl' => $request->input('currtag_gradelvl'),
-                    'currtag_sem' => $request->input('currtag_sem'),
-                    'currtag_updatedby' => $request->input('currtag_addedby'),
+                    'currtag_updatedby' => $request->input('currtag_updatedby'),
                     'currtag_dateupdated' => $date,
+                    'currtag_status' => 0,
+                ]);
+
+                $s2 = DB::table('def_curriculum')
+                ->where('curr_id','=', $request->input('currtag_id'))
+                ->update([
+                    'curr_updatedby' => $request->input('curr_updatedby'),
+                    'curr_dateupdated' => $date,
+                    'curr_status' => 0,
                 ]);
 
                 return $data = [
@@ -700,8 +703,8 @@ class DefaultsController extends Controller
                 $s1 = DB::table('def_curriculum_tags')->insert([
                     'currtag_currid' => $request->input('currtag_currid'),
                     'currtag_subjid' => $request->input('subj_id'),
-                    'currtag_lec' => $request->input('subj_lec'),
-                    'currtag_lab' => $request->input('subj_lab'),
+                    'currtag_lec' => $request->input('subj_lec_units'),
+                    'currtag_lab' => $request->input('subj_lab_units'),
                     'currtag_gradelvl' => $request->input('currtag_gradelvl'),
                     'currtag_sem' => $request->input('currtag_sem'),
                     'currtag_addedby' => $request->input('currtag_addedby'),

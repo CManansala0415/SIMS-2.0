@@ -136,6 +136,7 @@ Route::middleware(['auth:sanctum'])->post('/set-account-tuition-template/{mode}'
 Route::middleware(['auth:sanctum'])->get('/get-accounts-tuition-template/{id}', [FinanceController::class,'getTuitionTemplate']);
 Route::middleware(['auth:sanctum'])->get('/get-accounts-subjects/{course}/{gradelvl}/{sem}/{curr}', [FinanceController::class,'getSubjectsFromRegistrar']);
 Route::middleware(['auth:sanctum'])->get('/get-charge-header/{curriculum}/{sem}/{program}/{course}/{gradelvl}/{section}', [FinanceController::class,'getChargesTemplateHeader']);
+Route::middleware(['auth:sanctum'])->get('/get-charge-total/{curriculum}/{sem}/{program}/{course}/{gradelvl}/{section}/{enrid}', [FinanceController::class,'getTotalCharges']);
 
 Route::middleware(['auth:sanctum'])->post('/add-clinical-students', [ClinicController::class,'addStudentClinicalRecord']);
 Route::middleware(['auth:sanctum'])->post('/add-clinical-employee', [ClinicController::class,'addEmployeeClinicalRecord']);

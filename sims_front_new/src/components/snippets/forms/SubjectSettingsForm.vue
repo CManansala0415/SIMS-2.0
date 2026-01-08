@@ -41,14 +41,14 @@ const editData = ref({
     subj_name: '',
     subj_code: '',
     subj_addedby: '',
-    subj_lec: '',
-    subj_lab: '',
+    subj_lec_units: '',
+    subj_lab_units: '',
     subj_hrs_week: '',
     subj_preq: '',
     subj_dtypeid: '',
     subj_specid: '',
     subj_schedpass: '',
-
+    subj_extra: '',
 })
 const edit = (data) => {
 
@@ -58,26 +58,29 @@ const edit = (data) => {
         editData.value.subj_id = data.subj_id
         editData.value.subj_name = data.subj_name
         editData.value.subj_code = data.subj_code
-        editData.value.subj_lec = data.subj_lec
-        editData.value.subj_lab = data.subj_lab
+        editData.value.subj_lec_units = data.subj_lec_units
+        editData.value.subj_lab_units = data.subj_lab_units
         editData.value.subj_hrs_week = data.subj_hrs_week
         editData.value.subj_preq = data.subj_preq
         editData.value.subj_dtypeid = data.subj_dtypeid
         editData.value.subj_specid = data.subj_specid
         editData.value.subj_schedpass = data.subj_schedpass
-        editData.value.subj_addedby = userID.value
+        editData.value.subj_extra = data.subj_extra
+        editData.value.subj_updatedby = userID.value
+
         searchValueModal.value = data.subj_preq
     } else {
         editData.value.subj_id = ''
         editData.value.subj_name = ''
         editData.value.subj_code = ''
-        editData.value.subj_lec = ''
-        editData.value.subj_lab = ''
+        editData.value.subj_lec_units = ''
+        editData.value.subj_lab_units = ''
         editData.value.subj_hrs_week = ''
         editData.value.subj_preq = ''
         editData.value.subj_dtypeid = ''
         editData.value.subj_specid = ''
         editData.value.subj_schedpass = ''
+        editData.value.subj_extra = ''
         editData.value.subj_addedby = userID.value
         searchValueModal.value = ''
 
@@ -204,11 +207,11 @@ onMounted(async () => {
                             <div class="d-flex flex-column">
                                 <div class="input-group input-group-sm mb-1">
                                     <span class=" input-group-text">Lecture Units</span>
-                                    <input v-model="sj.subj_lec" type="text" class="form-control" disabled>
+                                    <input :value="sj.subj_lec_units" type="text" class="form-control" disabled>
                                 </div>
                                 <div class="input-group input-group-sm mb-1">
                                     <span class=" input-group-text">Laboratory Units</span>
-                                    <input v-model="sj.subj_lab" type="text" class="form-control" disabled>
+                                    <input :value="sj.subj_lab_units" type="text" class="form-control" disabled>
                                 </div>
                                 <div class="input-group input-group-sm mb-3">
                                     <span class=" input-group-text">Hours /week</span>
@@ -253,8 +256,8 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="editForm = false"></button>
                 </div>
-                <div class="modal-body">
-                    <form @submit.prevent="registerSubject()" class="d-flex flex-column p-2 gap-2">
+                <div class="modal-body small-font">
+                    <form @submit.prevent="registerSubject()" class="d-flex flex-column p-1 gap-2">
                         <div class="d-flex flex-wrap flex-column">
                             <p class="text-success fw-bold">Subject Settings</p>
                             <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span
@@ -275,23 +278,23 @@ onMounted(async () => {
                                 class="form-control form-control-sm" />
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">Lecture Units</label>
-                            <input v-model="editData.subj_lec" required type="text"
+                            <label for="type">Lecture Units (1 Unit = 1 Hour)</label>
+                            <input v-model="editData.subj_lec_units" required type="text"
                                 class="form-control form-control-sm" />
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">Laboratory Unit</label>
-                            <input v-model="editData.subj_lab" required type="text"
+                            <label for="type">Laboratory Units (1 Unit = 3 Hour)</label>
+                            <input v-model="editData.subj_lab_units" required type="text"
                                 class="form-control form-control-sm" />
                         </div>
-                        <div class="d-flex flex-wrap form-group">
+                        <!-- <div class="d-flex flex-wrap form-group">
                             <label for="type">Hours</label>
                             <input v-model="editData.subj_hrs_week" required type="text"
                                 class="form-control form-control-sm" />
-                        </div>
+                        </div> -->
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Program</label>
-                            <select class="form-control" v-model="editData.subj_dtypeid" required
+                            <select class="form-select form-select-sm" v-model="editData.subj_dtypeid" required
                                 @change="editData.subj_specid = ''">
                                 <option value="" disabled>-- Select Type --</option>
                                 <option v-for="(pg, index) in program" :value="pg.dtype_id">
@@ -301,7 +304,7 @@ onMounted(async () => {
                         </div>
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Subject Type</label>
-                            <select class="form-control" v-model="editData.subj_specid"
+                            <select class="form-select form-select-sm" v-model="editData.subj_specid"
                                 :disabled="editData.subj_dtypeid ? false : true" required>
                                 <option value="" disabled>-- Select Type --</option>
                                 <option v-for="(spc, index) in specialization" :value="spc.spec_id"
@@ -311,11 +314,20 @@ onMounted(async () => {
                             </select>
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">By Pass Schedule</label>
-                            <select class="form-control" v-model="editData.subj_schedpass"
+                            <label for="type">By Pass Schedule (For OJT)</label>
+                            <select class="form-select form-select-sm" v-model="editData.subj_schedpass"
                                 :disabled="editData.subj_dtypeid ? false : true" required>
                                 <option value="0" >No</option>
                                 <option value="1" >Yes</option>
+                            </select>
+                        </div>
+                        <div class="d-flex flex-wrap form-group">
+                            <label for="type">Extra</label>
+                            <select class="form-select form-select-sm" v-model="editData.subj_extra"
+                                :disabled="editData.subj_dtypeid ? false : true">
+                                <option value="" >N/A</option>
+                                <option value="1" >PE</option>
+                                <option value="2" >NSTP</option>
                             </select>
                         </div>
                         

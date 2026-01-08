@@ -516,7 +516,6 @@ const viewApplicationFormModal = (data) => {
                                 <button @click="deletePerson(app.per_id)" type="button" title="Delete Record"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-trash"
                                     /></button>
-
                                 <button data-bs-toggle="modal" data-bs-target="#enrollmentmodal" v-if="activeEnrollment"
                                     @click="enrollApplicant(app)" type="button" title="Enroll Applicant"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-gear"

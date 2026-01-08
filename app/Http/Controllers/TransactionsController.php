@@ -329,14 +329,24 @@ class TransactionsController extends Controller
 
     public function getPaymentDetails($id, $billtype)
     {   
-        $payment = DB::table('def_accounts_payment')->orderBy('acy_accid','DESC')
-        ->where('acy_accid', '=',  $id)
-        ->where('acy_billtype', '=',  $billtype)
-        ->get();
+        if($id == 0){
+            $payment = DB::table('def_accounts_payment')->orderBy('acy_accid','DESC')
+            ->where('acy_billtype', '=',  $billtype)
+            ->get();
 
-        return $data = [
-            'data' => $payment,
-        ];
+            return $data = [
+                'data' => $payment,
+            ];
+        }else{
+            $payment = DB::table('def_accounts_payment')->orderBy('acy_accid','DESC')
+            ->where('acy_accid', '=',  $id)
+            ->where('acy_billtype', '=',  $billtype)
+            ->get();
+
+            return $data = [
+                'data' => $payment,
+            ];
+        }
     }
 
     public function getAllPayments($billtype, $dfrom, $dto, $cashier, $access)

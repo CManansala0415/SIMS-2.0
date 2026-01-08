@@ -109,7 +109,7 @@ onMounted(async () => {
                         ) {
                             return e
                         }
-                    })
+                    }) 
                     // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
                     milestoneSubject.value.forEach((e) => {
                         addedSubject.value.push(e)
@@ -126,7 +126,7 @@ onMounted(async () => {
                         preloading.value = false
                         milestoneLoading.value = false
 
-
+                        
                     })
 
                 })
@@ -457,13 +457,13 @@ const downloadPdf = () => {
                             {{ c.subj_name }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.subj_lec }}
+                            {{ c.subj_lec_units }}
                         </td>
                         <td class="align-middle p-2">
-                            {{ c.subj_lab }}
+                            {{ c.subj_lab_units }}
                         </td>
                         <!-- <td class="align-middle p-2">
-                            {{ c.subj_lec + c.subj_lab }}
+                            {{ c.subj_lec_units + c.subj_lab_units }}
                         </td> -->
                         <!-- <td class="align-middle p-2">
                             {{ c.grs_prelims? c.grs_prelims:'N/A' }}

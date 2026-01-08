@@ -8,7 +8,7 @@ import {
     getPaymentDetails,
     getSetSeries,
     getUsedSeries,
-    getCollectionStatus
+    getCollectionStatus,
 } from "../../Fetchers.js";
 import {
     pdfGenerator,
@@ -132,44 +132,62 @@ onMounted(() => {
                         receiptSeries.value.push(...series.or_series, ...series.pr_series)  
 
                         if(billType.value == 1){
-                            seriesNoStart.value = receiptPrSeries.value[0].sr_prefix+ '-' + receiptPrSeries.value[0].sr_year+ '-' + receiptPrSeries.value[0].sr_start
-                            seriesNoLimit.value = receiptPrSeries.value[0].sr_prefix+ '-' + receiptPrSeries.value[0].sr_year+ '-' + receiptPrSeries.value[0].sr_end
-
-                            let exist = await getUsedSeries(receiptPrSeries.value[0].sr_start, receiptPrSeries.value[0].sr_end, receiptPrSeries.value[0].sr_year);
-                            let latestpattern = receiptPrSeries.value[0].sr_start; // default if no data found
-
-                            if (exist.data && exist.data.length > 0) {
-                                latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
-                            }
-                            
-                            seriesNoActual.value =receiptPrSeries.value[0].sr_prefix + '-' +receiptPrSeries.value[0].sr_year + '-' + (Number(latestpattern) + 1);
-                            checking.value = false
-
-                        }else{
-
-                            if(transact.data[0].acr_docstamp === 'underfined'){
+                            if(receiptPrSeries.value.length <= 0){
                                 Swal.fire({
                                     title: "Error",
-                                    text: "Unknown error occured, try again later",
+                                    text: "Series not found, please setup the series first to proceed payment",
                                     icon: "error"
                                 }).then(() => {
                                     location.reload()
                                 });
                             }else{
-                                !transact.data[0].acr_docstamp?receiptType.value=1:receiptType.value=2
-                                seriesNoStart.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + receiptOrSeries.value[0].sr_start
-                                seriesNoLimit.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + receiptOrSeries.value[0].sr_end
-                                
-                                let exist = await getUsedSeries(receiptOrSeries.value[0].sr_start, receiptOrSeries.value[0].sr_end, receiptOrSeries.value[0].sr_year);
-                                let latestpattern = receiptOrSeries.value[0].sr_start; // default if no data found
+                                seriesNoStart.value = receiptPrSeries.value[0].sr_prefix+ '-' + receiptPrSeries.value[0].sr_year+ '-' + receiptPrSeries.value[0].sr_start
+                                seriesNoLimit.value = receiptPrSeries.value[0].sr_prefix+ '-' + receiptPrSeries.value[0].sr_year+ '-' + receiptPrSeries.value[0].sr_end
+
+                                let exist = await getUsedSeries(receiptPrSeries.value[0].sr_start, receiptPrSeries.value[0].sr_end, receiptPrSeries.value[0].sr_year);
+                                let latestpattern = receiptPrSeries.value[0].sr_start; // default if no data found
 
                                 if (exist.data && exist.data.length > 0) {
                                     latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
                                 }
                                 
-                                seriesNoActual.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + (Number(latestpattern) + 1)
+                                seriesNoActual.value =receiptPrSeries.value[0].sr_prefix + '-' +receiptPrSeries.value[0].sr_year + '-' + (Number(latestpattern) + 1);
                                 checking.value = false
+                            }
+                        }else{
+                             if(receiptPrSeries.value.length <= 0){
+                                Swal.fire({
+                                    title: "Error",
+                                    text: "Series not found, please setup the series first to proceed payment",
+                                    icon: "error"
+                                }).then(() => {
+                                    location.reload()
+                                });
+                            }else{
+                                if(transact.data[0].acr_docstamp === 'underfined'){
+                                    Swal.fire({
+                                        title: "Error",
+                                        text: "Unknown error occured, try again later",
+                                        icon: "error"
+                                    }).then(() => {
+                                        location.reload()
+                                    });
+                                }else{
+                                    !transact.data[0].acr_docstamp?receiptType.value=1:receiptType.value=2
+                                    seriesNoStart.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + receiptOrSeries.value[0].sr_start
+                                    seriesNoLimit.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + receiptOrSeries.value[0].sr_end
+                                    
+                                    let exist = await getUsedSeries(receiptOrSeries.value[0].sr_start, receiptOrSeries.value[0].sr_end, receiptOrSeries.value[0].sr_year);
+                                    let latestpattern = receiptOrSeries.value[0].sr_start; // default if no data found
 
+                                    if (exist.data && exist.data.length > 0) {
+                                        latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
+                                    }
+                                    
+                                    seriesNoActual.value = receiptOrSeries.value[0].sr_prefix+ '-' + receiptOrSeries.value[0].sr_year+ '-' + (Number(latestpattern) + 1)
+                                    checking.value = false
+
+                                }
                             }
                         }
                     })

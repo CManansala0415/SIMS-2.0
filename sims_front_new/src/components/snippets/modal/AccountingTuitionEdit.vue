@@ -34,6 +34,8 @@ const props = defineProps({
     },
     quarterData: {
     },
+    activeEnrollmentData: {
+    },
 })
 const item = computed(() => {
     return props.itemData
@@ -56,6 +58,9 @@ const manageSetup = computed(() => {
 });
 const quarter = computed(() => {
     return props.quarterData
+});
+const activeEnrollment = computed(() => {
+    return props.activeEnrollmentData
 });
 
 const userID = ref('')
@@ -349,11 +354,11 @@ const addMiscFee = (data, type) =>{
             tuitemp_subjid:data.subj_id,
             tuitemp_custid:'',
             tuitemp_desc:data.subj_name,
-            tuitemp_lec:data.subj_lec,
-            tuitemp_lab:data.subj_lab,
-            tuitemp_lec_price:data.subj_lec_rate,
-            tuitemp_lab_price:data.subj_lab_rate,
-            tuitemp_price:parseFloat(data.subj_lec_rate) + parseFloat(data.subj_lab_rate),
+            tuitemp_lec:data.subj_lec_units,
+            tuitemp_lab:data.subj_lab_units,
+            tuitemp_lec_price:data.subj_lec_units_rate,
+            tuitemp_lab_price:data.subj_lab_units_rate,
+            tuitemp_price:parseFloat(data.subj_lec_units_rate) + parseFloat(data.subj_lab_units_rate),
             tuitemp_type:type, // means misc item, 2 for subject and 3 for custom
             tuitemp_user:userID.value
         }
@@ -381,6 +386,7 @@ const addMiscFee = (data, type) =>{
             tuitemp_itemid:'',
             tuitemp_subjid:'',
             tuitemp_custid:'',
+            tuitemp_custype:type,
             tuitemp_desc:customDescription.value,
             tuitemp_price:customPrice.value,
             tuitemp_user:userID.value
@@ -392,6 +398,8 @@ const addMiscFee = (data, type) =>{
 const subjFeesTotal = ref(0)
 const miscFeesTotal = ref(0)
 const customFeesTotal = ref(0)
+const customDeductionsTotal = ref(0)
+
 const totalFees = ref(0)
 
 const checkCurr = () =>{
@@ -423,10 +431,14 @@ const manageDetails = ()=> {
         })
 
         customFees.value.forEach((price) => {
-            customFeesTotal.value += parseFloat(price.tuitemp_price)
+            if(price.tuitemp_custype == 3){
+                customFeesTotal.value += parseFloat(price.tuitemp_price)
+            }else{
+                customDeductionsTotal.value += parseFloat(price.tuitemp_price)
+            }
         })
 
-        totalFees.value = parseFloat(miscFeesTotal.value) + parseFloat(subjFeesTotal.value) + parseFloat(customFeesTotal.value)
+        totalFees.value = parseFloat(miscFeesTotal.value) + parseFloat(subjFeesTotal.value) + parseFloat(customFeesTotal.value) - parseFloat(customDeductionsTotal.value)
 
     }else{
         Swal.fire({
@@ -761,11 +773,11 @@ const resolveGroupLabel = (groupKey) => {
                                                             {{ subj.subj_name }}
                                                         </span>
                                                         <span>
-                                                            Lec: <span class="fw-bold">{{ subj.subj_lec }}</span> <br/>
-                                                            Lec Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lec_rate) }}</span><br/>
+                                                            Lec: <span class="fw-bold">{{ subj.subj_lec_units }}</span> <br/>
+                                                            Lec Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lec_units_rate) }}</span><br/>
                                                             
-                                                            Lab: <span class="fw-bold">{{ subj.subj_lab }}</span> <br/>
-                                                            Lab Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lab_rate) }}</span>
+                                                            Lab: <span class="fw-bold">{{ subj.subj_lab_units }}</span> <br/>
+                                                            Lab Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lab_units_rate) }}</span>
                                                         </span>
                                                     </div>
                                                 </li>
@@ -787,11 +799,11 @@ const resolveGroupLabel = (groupKey) => {
                                                             {{ subj.subj_name }}
                                                         </span>
                                                         <span>
-                                                            Lec: <span class="fw-bold">{{ subj.subj_lec }}</span> <br/>
-                                                            Lec Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lec_rate) }}</span><br/>
+                                                            Lec: <span class="fw-bold">{{ subj.subj_lec_units }}</span> <br/>
+                                                            Lec Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lec_units_rate) }}</span><br/>
                                                             
-                                                            Lab: <span class="fw-bold">{{ subj.subj_lab }}</span> <br/>
-                                                            Lab Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lab_rate) }}</span>
+                                                            Lab: <span class="fw-bold">{{ subj.subj_lab_units }}</span> <br/>
+                                                            Lab Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lab_units_rate) }}</span>
                                                         </span>
                                                     </div>
                                                 </li>
@@ -815,11 +827,11 @@ const resolveGroupLabel = (groupKey) => {
                                                 {{ subj.subj_name }}
                                             </span>
                                             <span>
-                                                Lec: <span class="fw-bold">{{ subj.subj_lec }}</span> <br/>
-                                                Lec Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lec_rate) }}</span><br/>
+                                                Lec: <span class="fw-bold">{{ subj.subj_lec_units }}</span> <br/>
+                                                Lec Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lec_units_rate) }}</span><br/>
                                                 
-                                                Lab: <span class="fw-bold">{{ subj.subj_lab }}</span> <br/>
-                                                Lab Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lab_rate) }}</span>
+                                                Lab: <span class="fw-bold">{{ subj.subj_lab_units }}</span> <br/>
+                                                Lab Rate: <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subj.subj_lab_units_rate) }}</span>
                                             </span>
                                         </div>
                                     </li>
@@ -831,10 +843,10 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="col-md-12">
                             <p class="mb-2 fw-bold">Custom Items</p>
                             <div class="row g-1 mb-2">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <input v-model="customDescription" :disabled="preLoading? true:false" type="text" class="form-control form-control-sm" placeholder="Description"/>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-6">
                                     <input 
                                         v-model.number="customPrice"
                                         required
@@ -851,8 +863,9 @@ const resolveGroupLabel = (groupKey) => {
                                 <!-- <div class="col-md-2">
                                     <input :disabled="preLoading? true:false" type="text" class="form-control form-control-sm" placeholder=""/>
                                 </div> -->
-                                 <div class="col-md-2">
-                                    <button @click="addMiscFee(), clickSubmit('assess')" class="btn btn-sm btn-primary w-100">Add Item</button>
+                                 <div class="col-md-6 d-flex gap-1">
+                                    <button @click="addMiscFee([],3), clickSubmit('assess')" class="btn btn-sm btn-primary w-100">Add as Item</button>
+                                    <button @click="addMiscFee([],4), clickSubmit('assess')" class="btn btn-sm btn-info w-100">Add as Discount</button>
                                 </div>
                             </div>
                             <div class="col-md-12 border overflow-auto py-2 bg-secondary-subtle" style="height: 320px;">
@@ -860,7 +873,10 @@ const resolveGroupLabel = (groupKey) => {
                                     <li class="list-group-item" v-for="(cust, index) in customFees">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span>{{ cust.tuitemp_desc?cust.tuitemp_desc:'N/A' }}</span>
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cust.tuitemp_price) }}</span>
+                                            <span>
+                                                <span v-if="cust.tuitemp_custype == 3">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cust.tuitemp_price) }}</span>
+                                                <span v-if="cust.tuitemp_custype == 4" class="text-danger">- {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cust.tuitemp_price) }}</span>
+                                            </span>
 
                                             <!-- <button class="btn btn-sm btn-danger" 
                                                 @click="customFees.splice(index, 1), clickSubmit('assess')">
@@ -895,7 +911,7 @@ const resolveGroupLabel = (groupKey) => {
                                             <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(mf.tuitemp_price) }}</span>
                                         </div>
                                         <div class="d-flex justify-content-start align-items-center">
-                                            <button class="btn btn-sm btn-danger" type="button" 
+                                            <button class="btn btn-sm btn-danger" type="button" v-if="!activeEnrollment"
                                                 @click="deleteMiscData(1, mf, index)">
                                                 <font-awesome-icon icon="fa-solid fa-trash" />
                                             </button>
@@ -998,7 +1014,7 @@ const resolveGroupLabel = (groupKey) => {
                                                 </div>
                                             </div>    
                                         </div>
-                                        <div class="d-flex justify-content-center align-items-center">
+                                        <div class="w-25 d-flex justify-content-center align-items-center">
                                             <div class="d-flex flex-column gap-2 text-start">
                                                 <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
                                                 <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((sj.tuitemp_lab_price || 0) * sj.tuitemp_lab) }}</span>
@@ -1040,10 +1056,11 @@ const resolveGroupLabel = (groupKey) => {
                                         <div class="w-25 d-flex justify-content-start align-items-center">
                                         </div>
                                         <div class="d-flex justify-content-start align-items-center">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cq.tuitemp_price) }}</span>
+                                            <span v-if="cq.tuitemp_custype==3">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cq.tuitemp_price) }}</span>
+                                            <span v-else class="text-danger">- {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cq.tuitemp_price) }}</span>
                                         </div>
                                         <div>
-                                            <button class="btn btn-sm btn-danger" 
+                                            <button class="btn btn-sm btn-danger" v-if="!activeEnrollment"
                                                 @click="deleteMiscData(3, cq, index)" type="button">
                                                 <font-awesome-icon icon="fa-solid fa-trash" />
                                             </button>
@@ -1059,17 +1076,19 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="d-flex flex-column gap-2 text-start w-100">
                             <span>Total Miscellaneous Items</span>
                             <span v-if="chargeType == 1">Total Subject Units</span>
-                            <span class="border-0 border-bottom mb-2">Total Other Charges</span>
+                            <span>Total Other Charges</span>
+                            <span class="border-0 border-bottom mb-2">Total Deductions</span>
                             <span>Grand total</span>
                         </div>
                         <div class="d-flex flex-column gap-2 text-end w-100">
                             <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(miscFeesTotal) }}</span>
                             <span v-if="chargeType == 1">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subjFeesTotal) }}</span>
-                            <span class="border-0 border-bottom mb-2">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(customFeesTotal) }}</span>
+                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(customFeesTotal) }}</span>
+                            <span class="border-0 border-bottom mb-2 text-danger">- {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(customDeductionsTotal) }}</span>
                             <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalFees) }}</span>
                         </div>
                     </div>
-                    <div class="w-100 p-4 border mb-2 d-flex justify-content-end gap-2">
+                    <div class="w-100 p-4 border mb-2 d-flex justify-content-end gap-2" v-if="!activeEnrollment">
                         <!-- <button type="button" class="btn btn-sm btn-warning" @click="clickSubmit('clear')">Reset Details</button> -->
                         <button type="button" class="btn btn-sm btn-success" @click="clickSubmit('save')">Save Details</button>
                     </div>

@@ -313,7 +313,6 @@ const settlement = (stud) => {
                     ...results.template[key].data
                 })
             }
-            console.log(results)
         })
 
     }catch(err){
@@ -391,6 +390,7 @@ const settlement = (stud) => {
 
 
         let mergedData = []
+        let discount = 0
         // let totalCost = 0
 
         // Convert template object to array
@@ -419,8 +419,8 @@ const settlement = (stud) => {
             } else {
                 // Fallback to milestone rates
                 total_price =
-                    ((ms.subj_lec_rate || 0) * (ms.subj_lec || 0)) +
-                    ((ms.subj_lab_rate || 0) * (ms.subj_lab || 0))
+                    ((ms.subj_lec_units_rate || 0) * ((ms.subj_lec_units) || 0)) +
+                    ((ms.subj_lab_units_rate || 0) * ((ms.subj_lab_units) || 0))
             }
 
             // ✅ APPLY CONDITION HERE
@@ -439,17 +439,20 @@ const settlement = (stud) => {
         |--------------------------------------------------------------------------
         */
         templateArray.forEach((tp) => {
-            if (tp.tuitemp_subjid == null) {
+            if (tp.tuitemp_subjid == null && Number(tp.tuitemp_custype) == 3) {
                 totalCost.value += Number(tp.tuitemp_price || 0)
+            }else{
+                discount += Number(tp.tuitemp_price || 0) // if custype == 4 means deduction
             }
         })
 
 
-
+        totalCost.value = totalCost.value - discount
         templatePricesData.value = mergedData
-        console.log(templatePricesData.value)
-        console.log(milestone.value)
-        console.log(mergedData)
+        // console.log(templatePricesData.value)
+        // console.log(milestone.value)
+        // console.log(mergedData)
+        // console.log(discount)
 
     })
 
@@ -724,20 +727,20 @@ const getData = (result) =>{
                                         <span class="input-group-text " id="inputGroup-sizing-default">Lecture</span>
                                         <input type="text" class="form-control form-control-sm"
                                             aria-label="Sizing example input"
-                                            aria-describedby="inputGroup-sizing-default" :value="c.subj_lec" disabled>
+                                            aria-describedby="inputGroup-sizing-default" :value="c.subj_lec_units" disabled>
                                     </div>
                                     <div class="input-group mb-1">
                                         <span class="input-group-text" id="inputGroup-sizing-default">Laboratory</span>
                                         <input type="text" class="form-control form-control-sm"
                                             aria-label="Sizing example input"
-                                            aria-describedby="inputGroup-sizing-default" :value="c.subj_lab" disabled>
+                                            aria-describedby="inputGroup-sizing-default" :value="c.subj_lab_units" disabled>
                                     </div>
                                     <div class="input-group mb-1">
                                         <span class="input-group-text" id="inputGroup-sizing-default">Total</span>
                                         <input type="text" class="form-control form-control-sm"
                                             aria-label="Sizing example input"
                                             aria-describedby="inputGroup-sizing-default"
-                                            :value="c.subj_lec + c.subj_lab" disabled>
+                                            :value="(c.subj_lec_units) + (c.subj_lab_units)" disabled>
                                     </div>
                                 </div>
                                 
@@ -745,12 +748,12 @@ const getData = (result) =>{
                                 <div v-if="c.tuitemp_id"  class="col p-3 border bg-white shadow d-flex flex-column text-start">
                                     <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.tuitemp_lec_price) }}/Unit</p>
                                     <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.tuitemp_lab_price) }}/Unit</p>
-                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.tuitemp_lec_price || 0) * (c.tuitemp_lec || 0)) + ((c.tuitemp_lab_price || 0) * (c.tuitemp_lab || 0))) }}</p>
+                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.tuitemp_lec_price || 0) * ((c.tuitemp_lec) || 0)) + ((c.tuitemp_lab_price || 0) * ((c.tuitemp_lab) || 0))) }}</p>
                                 </div>
                                 <div v-else class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lec_rate) }}/Unit</p>
-                                    <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lab_rate) }}/Unit</p>
-                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.subj_lec_rate || 0) * (c.subj_lec || 0)) + ((c.subj_lab_rate || 0) * (c.subj_lab || 0))) }}</p>
+                                    <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lec_units_rate) }}/Unit</p>
+                                    <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lab_units_rate) }}/Unit</p>
+                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.subj_lec_units_rate || 0) * ((c.subj_lec_units) || 0)) + ((c.subj_lab_units_rate || 0) * (c.subj_lab_units || 0))) }}</p>
                                 </div>
                                 
                             </div>

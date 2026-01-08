@@ -120,7 +120,6 @@ onMounted(async () => {
     getCollectionStatus().then((results)=>{
         counterStatus.value = results.data.sett_status == 0? false : true
         checkHighlights()
-        
     })
 
     getUserID().then(async (results1) => {
@@ -772,7 +771,7 @@ const turnOffCounters = () => {
                                             </tr>
                                             <tr v-if="!Object.keys(receiptSeries).length">
                                                 <td colspan="4">
-                                                    No Active Counters with Updated Series
+                                                    Active Counters does not have updated series
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -803,9 +802,9 @@ const turnOffCounters = () => {
                                                     <span v-else class="fw-bold text-success" title="to edit series, deactivate all counters first">Active</span>
                                                 </td>
                                             </tr>
-                                            <tr v-if="!Object.keys(receiptSeries).length">
+                                            <tr v-if="!Object.keys(employeeCashier).length">
                                                 <td colspan="4">
-                                                    No Active Counters with Updated Series
+                                                    No Active Counters
                                                 </td>
                                             </tr>
                                         </tbody>

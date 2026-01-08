@@ -294,7 +294,7 @@ const filterCard = () => {
                                                 {{ c.arc_laboratory? c.arc_laboratory:'N/A' }}
                                             </td>
                                             <!-- <td class="align-middle p-2">
-                                                    {{ c.subj_lec + c.subj_lab }}
+                                                    {{ c.subj_lec_units + c.subj_lab_units }}
                                                 </td> -->
                                             <!-- <td class="align-middle p-2">
                                                     {{ c.grs_prelims? c.grs_prelims:'N/A' }}

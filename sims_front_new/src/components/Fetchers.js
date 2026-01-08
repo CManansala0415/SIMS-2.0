@@ -2808,6 +2808,22 @@ const getChargesTemplateHeader = async (curriculum, sem, program, course, gradel
     }
 }
 
+let gettotalcharges = {}
+const getTotalCharges = async (curriculum, sem, program, course, gradelvl, section, enrid) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-charge-total/' + curriculum + '/' + sem+ '/' + program + '/' + course+ '/' + gradelvl+ '/' + section + '/' + enrid,
+        }).then(async (results) => {
+            // console.log(results.data)
+            gettotalcharges = results.data
+        })
+        return gettotalcharges
+    } catch (err) {
+        return err
+    }
+}
+
 
 export {
 
@@ -2979,6 +2995,7 @@ export {
     saveTuitionTemplate,
     getTuitionTemplate,
     getSubjectsFromRegistrar,
-    getChargesTemplateHeader
+    getChargesTemplateHeader,
+    getTotalCharges
 }
 

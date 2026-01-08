@@ -137,8 +137,6 @@ onMounted(async () => {
     filteredCourseModal.value = course.value
     filteredCurriculum.value = curriculum.value
     filteredSubject.value = subject.value
-
-    console.log(curriculum.value)
 })
 
 const reset = () => {
@@ -230,19 +228,9 @@ const searchSubject = () => {
 const deactivate = (id, type) => {
     //means delete yung mismong whole curriculum
     let data = {}
-    if (type == 'deac') {
-        data = {
-            currtag_id: id
-        }
-    } else { // means tagging ang inaalis
-        data = id
+    data = {
+        currtag_id: id
     }
-
-    // if (confirm("Are you sure you want to deactivate this record?") == true) {
-    //     removeTag(data)
-    // } else {
-    //     return false;
-    // }
 
     Swal.fire({
         title: "Delete Record",
@@ -268,7 +256,16 @@ const removeTag = (data, index) => {
         deactivate: true
     }
 
-    console.log(data)
+    console.log(data) 
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all series details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     addCurriculumTagging(x).then((results) => {
         // alert('Successfull Deactivated')
         Swal.fire({
@@ -279,6 +276,7 @@ const removeTag = (data, index) => {
             addedSubject.value.splice(index, 1)
             addedSubjectId.value.splice(index, 1)
             // location.reload()
+            Swal.close()
             saving.value = false
         })
     })
@@ -295,6 +293,16 @@ const saveData = () => {
             icon: "question"
         })
     } else {
+
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all series details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         let x = JSON.parse(JSON.stringify(addedSubject.value))
         savingTag.value = true
         x.forEach(async (items) => {
@@ -303,10 +311,10 @@ const saveData = () => {
                 currtag_addedby: userID.value,
                 currtag_gradelvl: activeGradelvl.value,
                 currtag_sem: activeQuarter.value,
-                currtag_currid: currData.value.curr_id
+                currtag_currid: currData.value.curr_id,
+                deactivate: false
             }
             addCurriculumTagging(data).then((results) => {
-                console.log(results)
                 savingCount.value += 1
                 if (savingCount.value == Object.keys(addedSubject.value).length) {
                     // alert('Taggings Saved, refresh the page')
@@ -316,6 +324,7 @@ const saveData = () => {
                         text: "Taggings saved, refreshing the page",
                         icon: "success"
                     }).then(()=>{
+                        Swal.close()
                         location.reload()
                     })
                 }
@@ -358,7 +367,7 @@ const saveData = () => {
                 </thead>
                 <tbody>
                     <tr v-for="(cr, index) in filteredCurriculum">
-                        <td class="align-middle">
+                        <td class="align-middle ">
                             {{ cr.curr_code }}
                         </td>
                         <td class="align-middle">
@@ -389,7 +398,7 @@ const saveData = () => {
                                 <button data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit(cr)" type="button"
                                     title="Edit Record" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen" /></button>
-                                <button @click="deactivate(cr.sec_id)" type="button" title="Delete Record"
+                                <button @click="deactivate(cr.curr_id)" type="button" title="Delete Record"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon
                                         icon="fa-solid fa-trash" /></button>
                                 <button data-bs-toggle="modal" data-bs-target="#setdatamodal" @click="setData(cr)"

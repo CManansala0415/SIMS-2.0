@@ -87,7 +87,7 @@ const booter = async () => {
 
         // for total units
         addedSubject.value.forEach(e => {
-            let x = e.subj_lec + e.subj_lab
+            let x = e.subj_lec_units + e.subj_lab_units
             totalUnits.value += x
         })
 
@@ -339,15 +339,15 @@ const refresh = () => {
                                                         </div>
                                                         <div class="input-group input-group-sm mb-1">
                                                             <span class=" input-group-text">Lecture Units</span>
-                                                            <input v-model="s.subj_lec" type="text" class="form-control" disabled>
+                                                            <input v-model="s.subj_lec_units" type="text" class="form-control" disabled>
                                                         </div>
                                                         <div class="input-group input-group-sm mb-1">
                                                             <span class=" input-group-text">Laboratory Units</span>
-                                                            <input v-model="s.subj_lab" type="text" class="form-control" disabled>
+                                                            <input v-model="s.subj_lab_units" type="text" class="form-control" disabled>
                                                         </div>
                                                         <div class="input-group input-group-sm mb-3">
                                                             <span class=" input-group-text">Total Units / Hours</span>
-                                                            <input :value="s.subj_lab + s.subj_lec" type="text" class="form-control" disabled>
+                                                            <input :value="s.subj_lab_units + s.subj_lec_units" type="text" class="form-control" disabled>
                                                         </div>  
                                                         <button :disabled="savingLoads? true:false" @click="removeSubject(index, s.ld_id)" type="button" class="btn btn-sm btn-danger">&times; Remove</button> 
                                                     </div>

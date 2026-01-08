@@ -9,7 +9,7 @@ import {
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
 import Loader from '../snippets/loaders/Loading1.vue';
-
+const router = useRouter();
 const subject = ref([])
 const program = ref([])
 const specialization = ref([])
@@ -26,15 +26,17 @@ const editData = ref({
     subj_name: '',
     subj_code: '',
     subj_addedby: '',
-    subj_lec: '',
-    subj_lab: '',
+    subj_lec_units: '',
+    subj_lab_units: '',
+    subj_lec_hrs: '',
+    subj_lab_hrs: '',
     subj_hrs_week: '',
     subj_preq: '',
     subj_dtypeid: '',
     subj_specid: '',
     subj_schedpass: '',
-    subj_lec_rate:0,
-    subj_lab_rate:0,
+    subj_lec_units_rate:0,
+    subj_lab_units_rate:0,
     mode:1
 
 })
@@ -46,24 +48,28 @@ const edit = (data) => {
         editData.value.subj_id = data.subj_id
         editData.value.subj_name = data.subj_name
         editData.value.subj_code = data.subj_code
-        editData.value.subj_lec = data.subj_lec
-        editData.value.subj_lab = data.subj_lab
+        editData.value.subj_lec_units = data.subj_lec_units
+        editData.value.subj_lab_units = data.subj_lab_units
+        editData.value.subj_lec_hrs = data.subj_lec_hrs
+        editData.value.subj_lab_hrs = data.subj_lab_hrs
         editData.value.subj_hrs_week = data.subj_hrs_week
         editData.value.subj_preq = data.subj_preq
         editData.value.subj_dtypeid = data.subj_dtypeid
         editData.value.subj_specid = data.subj_specid
         editData.value.subj_schedpass = data.subj_schedpass
-        editData.value.subj_lec_rate = data.subj_lec_rate
-        editData.value.subj_lab_rate = data.subj_lab_rate
-        editData.value.subj_addedby = userID.value
+        editData.value.subj_lec_units_rate = data.subj_lec_units_rate
+        editData.value.subj_lab_units_rate = data.subj_lab_units_rate
+        editData.value.subj_updatedby = userID.value
         searchValueModal.value = data.subj_preq
 
     } else {
         editData.value.subj_id = ''
         editData.value.subj_name = ''
         editData.value.subj_code = ''
-        editData.value.subj_lec = ''
-        editData.value.subj_lab = ''
+        editData.value.subj_lec_units = ''
+        editData.value.subj_lab_units = ''
+        editData.value.subj_lec_hrs = ''
+        editData.value.subj_lab_hrs = ''
         editData.value.subj_hrs_week = ''
         editData.value.subj_preq = ''
         editData.value.subj_dtypeid = ''
@@ -238,7 +244,7 @@ const lecRate = ref(0)
                         <th style="background-color: #237a5b;" class="text-white">Code</th>
                         <th style="background-color: #237a5b;" class="text-white">Name</th>
                         <th style="background-color: #237a5b;" class="text-white">Details</th>
-                        <th style="background-color: #237a5b;" class="text-white w-25">Pre-requisite</th>
+                        <th style="background-color: #237a5b;" class="text-white w-25">Default Rate</th>
                         <th style="background-color: #237a5b;" class="text-white">Status</th>
                         <th style="background-color: #237a5b;" class="text-white">Commands</th>
                     </tr>
@@ -255,11 +261,11 @@ const lecRate = ref(0)
                             <div class="d-flex flex-column">
                                 <div class="input-group input-group-sm mb-1">
                                     <span class=" input-group-text">Lecture Units</span>
-                                    <input v-model="sj.subj_lec" type="text" class="form-control" disabled>
+                                    <input v-model="sj.subj_lec_units" type="text" class="form-control" disabled>
                                 </div>
                                 <div class="input-group input-group-sm mb-1">
                                     <span class=" input-group-text">Laboratory Units</span>
-                                    <input v-model="sj.subj_lab" type="text" class="form-control" disabled>
+                                    <input v-model="sj.subj_lab_units" type="text" class="form-control" disabled>
                                 </div>
                                 <div class="input-group input-group-sm mb-3">
                                     <span class=" input-group-text">Hours /week</span>
@@ -268,7 +274,8 @@ const lecRate = ref(0)
                             </div>
                         </td>
                         <td class="align-middle">
-                            {{ sj.subj_preq_code ? sj.subj_preq_code : 'N/A' }}
+                            <!-- {{ sj.subj_preq_code ? sj.subj_preq_code : 'N/A' }} -->
+                            {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format( sj.subj_lec_rate + sj.subj_lab_rate ) }}
                         </td>
                         <td class="align-middle">
                             {{ sj.subj_status == 1 ? 'Active' : 'Inactive' }}
@@ -325,44 +332,58 @@ const lecRate = ref(0)
                                     </th>
                                 </tr>
                                  <tr>
-                                    <th class="w-25">Unit</th>
+                                    <th class="w-25">Type</th>
+                                    <th class="w-10">Units</th>
+                                    <th class="w-10">Hours</th>
                                     <th class="w-25">Rate</th>
                                     <th class="w-25">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="align-middle">{{ editData.subj_lec }}</td>
+                                    <td class="align-middle"><span class="fw-bold">Lecture</span></td>
+                                    <td class="align-middle">{{ editData.subj_lec_units }}</td>
+                                    <td class="align-middle">{{ editData.subj_lec_hrs }}</td>
                                     <td class="align-middle">
-                                        <input  v-model.number="editData.subj_lec_rate"
+                                        <input  v-model.number="editData.subj_lec_units_rate"
                                                 required
                                                 step="0.01" 
                                                 min="0.00"
-                                                @input="if (editData.subj_lec_rate <= 0) editData.subj_lec_rate = 0;"
+                                                @input="if (editData.subj_lec_units_rate <= 0) editData.subj_lec_units_rate = 0;"
                                                 type="number"
                                                 class="form-control" placeholder="Price Per Unit"/>
                                     </td>
                                     <td class="align-middle">
                                         <div class="d-flex flex-column gap-2">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lec_rate || 0) * editData.subj_lec) }}</span>
+                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lec_units_rate || 0) * (editData.subj_lec_units)) }}</span>
                                         </div>    
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td class="align-middle">{{ editData.subj_lab }}</td>
+                                    <td class="align-middle"><span class="fw-bold">Laboratory</span></td>
+                                    <td class="align-middle">{{ editData.subj_lab_units }}</td>
+                                    <td class="align-middle">{{ editData.subj_lab_hrs }}</td>
                                     <td class="align-middle">
-                                        <input  v-model.number="editData.subj_lab_rate"
+                                        <input  v-model.number="editData.subj_lab_units_rate"
                                                 required
                                                 step="0.01" 
                                                 min="0.00"
-                                                @input="if (editData.subj_lab_rate <= 0) editData.subj_lab_rate = 0;"
+                                                @input="if (editData.subj_lab_units_rate <= 0) editData.subj_lab_units_rate = 0;"
                                                 type="number"
-                                                :disabled="editData.subj_lab==0?true:false"
+                                                :disabled="editData.subj_lab_units==0?true:false"
                                                 class="form-control" placeholder="Price Per Unit"/>
                                     </td>
                                     <td class="align-middle">
                                         <div class="d-flex flex-column gap-2">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lab_rate || 0) * editData.subj_lab) }}</span>
+                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lab_units_rate || 0) * (editData.subj_lab_units)) }}</span>
+                                        </div>    
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="align-middle text-end fw-bold" colspan="4">Total</td>
+                                    <td class="align-middle">
+                                        <div class="d-flex flex-column gap-2 fw-bold">
+                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lab_units_rate || 0) * (editData.subj_lab_units) + (editData.subj_lec_units_rate || 0) * (editData.subj_lec_units)) }}</span>
                                         </div>    
                                     </td>
                                 </tr>
