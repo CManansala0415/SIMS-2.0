@@ -302,13 +302,25 @@ const saveData = async () => {
             // location.reload()
             // saving.value = false
             Swal.close()
-            Swal.fire({
-                title: "Tagging Successful",
-                text: "Changes applied, refreshing the page",
-                icon: "success"
-            }).then(()=>{
-                location.reload()
-            });
+
+            if(results.status == 200){
+                Swal.fire({
+                    title: "Tagging Successful",
+                    text: "Changes applied, refreshing the page",
+                    icon: "success"
+                }).then(()=>{
+                    location.reload()
+                });
+            }else{
+                Swal.fire({
+                    title: "Cannot Alter Records",
+                    text: "Unable to save changes, due to the account is already forwarded to accounting. Please contact the system administrator for assistance.",
+                    icon: "error"
+                }).then(()=>{
+                    saving.value = false
+                });
+            }
+            
         })
     }
 

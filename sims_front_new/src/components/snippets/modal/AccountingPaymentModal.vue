@@ -535,6 +535,7 @@ const renderPayment = (paymentdata) =>{
                             <option value="1">Cash</option>
                             <option value="2">Bank</option>
                             <option value="3">Cheque</option>
+                            <option value="4">Credit</option>
                         </select>
                     </div>
 

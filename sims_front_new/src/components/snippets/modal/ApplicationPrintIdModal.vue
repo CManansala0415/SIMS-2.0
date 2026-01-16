@@ -147,14 +147,15 @@ const printForm = (studentid) => {
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
                             </span>
                         </div>
-                        <div style="width:100%; margin-top: 5px; display: flex; justify-content: center; align-items: center; align-content: center;">
+                         <!-- display: flex; justify-content: center; align-items: center; align-content: center; -->
+                        <div style="width:100%; margin-top: 5px;">
                             <span class="px-5 py-1" 
                                     :style="`color:#FFFFFF;
                                     background-color: `+indicator+`; 
                                     border-radius: 10px; 
                                     font-size:10px; 
                                     font-weight: bolder;`">
-                                    {{ studentData.studentid }}
+                                    {{ studentData.studentid? studentData.studentid: '000000' }}
                             </span>
                         </div>
                         <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px;">

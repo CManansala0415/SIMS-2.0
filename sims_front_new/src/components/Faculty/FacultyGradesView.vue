@@ -112,6 +112,7 @@ const booter = async () => {
         commands.value = results
         booting.value = 'Loading Settings'
         bootingCount.value += 1
+        console.log(commands.value)
     })
     
     getAcademicDefaults().then((results) => {
@@ -401,6 +402,16 @@ const saveGrades = () => {
 }
 
 const generateSheet = (type) => {
+    let msg = ''
+    let title = ''
+
+    if(type == 2){
+        title = 'Delete Record'
+        msg = 'Are you sure you want to delete the grading sheet?'
+    }else{
+        title = 'Generate Record'
+        msg = 'Are you sure you want to generate a grading sheet?'
+    }
     // if (confirm("Are you sure you want to generate a grading sheet?") == true) {
     //     savingData.value = true
     //     //find lf_lnid para dun sa fetcher ng header ni grading sheet
@@ -442,13 +453,13 @@ const generateSheet = (type) => {
     // }
 
     Swal.fire({
-        title: "Generate Record",
-        text: "Are you sure you want to generate a grading sheet?",
+        title: title,
+        text: msg,
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Im create it!"
+        confirmButtonText: "Yes, proceed!",
     }).then(async (result) => {
         if (result.isConfirmed) {
             savingData.value = true
@@ -600,15 +611,8 @@ const openTip = () => {
                             {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
                         </td>
                         <td class="align-middle p-3">
-                            <!-- {{ app.grad_id }}
-                            {{ app.grad_dtypeid }}
-                            {{ app.prog_id }}
-
-                            {{ commands[8].sett_gradelvl}}
-                            {{ commands[8].sett_program}} 
-                            {{ commands[8].sett_course }} -->
                             <input v-if="
-                            (commands[7].sett_status == 1) &&
+                                (commands[7].sett_status == 1) &&
                                 (
                                     (
                                             app.grad_id == commands[7].sett_gradelvl &&
@@ -653,14 +657,10 @@ const openTip = () => {
                                             commands[7].sett_program == 0 &&
                                             commands[7].sett_course == 0
                                     )
-                                )      
-                            " 
+                                )                                
+                                " 
+
                                 type="number" :id="'prelims' + app.enr_id" min="60" max="100" required
-                                :value="app.grs_prelims ? app.grs_prelims : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
-                            
-                            <input v-else type="number" :id="'prelims' + app.enr_id" min="60" max="100" disabled
                                 :value="app.grs_prelims ? app.grs_prelims : 60"
                                 oninput="this.value = Math.abs(this.value)"
                                 @focusout="
@@ -673,6 +673,10 @@ const openTip = () => {
                                     }
                                 "
                                 class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                            <input v-else type="number" :id="'prelims' + app.enr_id" min="60" max="100" disabled
+                                :value="app.grs_prelims ? app.grs_prelims : 60"
+                                oninput="this.value = Math.abs(this.value)"
+                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
                         </td>
                         <td class="align-middle p-3">
                             <input v-if="
@@ -910,16 +914,16 @@ const openTip = () => {
                     </span>
                 </div>
                 <div class="w-50 d-flex border justify-content-center align-content-center p-3 gap-2">
-                    <button v-if="!Object.keys(gradingHeader).length"
+                    <button v-if="!Object.keys(gradingHeader).length && commands[10].sett_status == 1"
                         :disabled="savingData || filteringData ? true : false" @click="generateSheet(1)" type="button"
                         class="btn btn-sm btn-dark w-100">
                         <i class="mr-2 fa-solid fa-bolt"></i>Generate
                     </button>
-                    <button v-else :disabled="savingData || filteringData ? true : false" @click="generateSheet(2)"
+                    <button v-else :disabled="savingData || filteringData ? true : false" @click="generateSheet(2)" v-show="commands[10].sett_status == 1"
                         type="button" class="btn btn-sm btn-dark w-100">
                         <i class="mr-2 fa-solid fa-trash"></i>Delete
                     </button>
-                    <button v-if="Object.keys(gradingHeader).length"
+                    <button v-if="Object.keys(gradingHeader).length && commands[10].sett_status == 1"
                         :disabled="savingData || filteringData ? true : false" @click="saveGrades()" type="button"
                         class="btn btn-sm btn-dark w-100">
                         <i class="mr-2 fa-solid fa-floppy-disk"></i>Save

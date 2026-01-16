@@ -416,6 +416,8 @@ class FinanceController extends Controller
                             'tuitemp_custid'     => (
                                 !empty($item['tuitemp_itemid']) || !empty($item['tuitemp_subjid'])
                             ) ? null : $custid,
+                            'tuitemp_quantity'     => $item['tuitemp_quantity'] ?? null,
+                            'tuitemp_disc_type'     => $item['tuitemp_disc_type'] ?? null,
                             'tuitemp_custype'     => $item['tuitemp_custype'] ?? null,
                             'tuitemp_desc'       => $item['tuitemp_desc'] ?? null,
                             'tuitemp_price'      => $item['tuitemp_price'] ?? null,
@@ -438,6 +440,7 @@ class FinanceController extends Controller
                             'tuitemp_custid'     => (
                                 !empty($item['tuitemp_itemid']) || !empty($item['tuitemp_subjid'])
                             ) ? null : $custid,
+                            'tuitemp_quantity'     => $item['tuitemp_quantity'] ?? null,
                             'tuitemp_custype'     => $item['tuitemp_custype'] ?? null,
                             'tuitemp_desc'       => $item['tuitemp_desc'] ?? null,
                             'tuitemp_price'      => $item['tuitemp_price'] ?? null,
@@ -485,12 +488,14 @@ class FinanceController extends Controller
             ->leftJoin('sett_degree_types as program', 'th.act_program', '=', 'program.dtype_id')
             ->leftJoin('def_gradelvl as gradelvl', 'tt.tuitemp_gradelvl', '=', 'gradelvl.grad_id')
             ->leftJoin('def_section as section', 'th.act_section', '=', 'section.sec_id')           
+            ->leftJoin('def_subject as subject', 'tt.tuitemp_subjid', '=', 'subject.subj_id')           
             ->select(
                 'tt.*',
                 'th.*',
                 'course.prog_name as prog_code',
                 'gradelvl.grad_name as gradelvl_desc',
-                'section.sec_name as sec_desc',
+                'subject.subj_name',
+                'subject.subj_code',
                 'program.dtype_desc as prog_desc'
             )
             // ->where('th.act_status', '=' , 1)
@@ -662,6 +667,9 @@ class FinanceController extends Controller
             $item_amount = 0;
             $lab_amount = 0;
             $lec_amount = 0;
+            $deductions_fixed = 0;
+            $deductions_percent = 0;
+            $computed_percent = 0;
 
             $mergedMilestones = [];
 
@@ -727,14 +735,25 @@ class FinanceController extends Controller
             }
 
             foreach ($templatePricesData as $tp) {
-                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_itemid) {
-                    $overall_amount += (float) ($tp->tuitemp_price ?? 0);
-                    $misc_amount += (float) ($tp->tuitemp_price ?? 0);
-                }elseif (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid) {
-                    $overall_amount += (float) ($tp->tuitemp_price ?? 0);
-                    $item_amount += (float) ($tp->tuitemp_price ?? 0);
-                }else{
-                    // Subject already counted in milestone loop
+                // for items and other charges without subject ID
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 3) {
+                    $overall_amount += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    $misc_amount += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                }
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid == null) {
+                    $overall_amount += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    $item_amount += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                }
+            }
+
+            foreach ($templatePricesData as $tp) {
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 4) {
+                    
+                    if ($tp->tuitemp_disc_type == 1) {
+                        $deductions_percent += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    }else{
+                        $deductions_fixed += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    }
                 }
             }
 
@@ -744,11 +763,131 @@ class FinanceController extends Controller
                 'item_amount' => $item_amount,
                 'lab_amount' => $lab_amount,
                 'lec_amount' => $lec_amount,
-                'overall_amount' => $overall_amount,
+                'deductions' => $deductions_fixed + ($overall_amount * ($deductions_percent / 100)),
+                'percent' => $deductions_percent,
+                'overall_amount' => $overall_amount - ($deductions_fixed + ($overall_amount * (float) ($deductions_percent / 100))),
                 'status' => 200
             ];
     }
 
+    public function getStudentAccount($id){
+        try {
+            $query1 = DB::table('def_accounts_settlement')
+            ->where('acs_personid', '=' , $id)
+            ->get();
 
-    
+            $query2 = DB::table('def_accounts_student as das')
+            ->leftJoin('def_subject as subj', 'das.soa_subjid', '=', 'subj.subj_id')
+            ->leftJoin('def_person as person', 'das.soa_personid', '=', 'person.per_id')
+            ->leftJoin('def_program as course', 'das.soa_course', '=', 'course.prog_id')
+            ->leftJoin('sett_degree_types as program', 'das.soa_program', '=', 'program.dtype_id')
+            ->leftJoin('def_gradelvl as gradelvl', 'das.soa_gradelvl', '=', 'gradelvl.grad_id')
+            ->leftJoin('sett_quarter as quarter', 'das.soa_quarter', '=', 'quarter.quar_id')
+            ->leftJoin('def_section as section', 'das.soa_section', '=', 'section.sec_id')
+            ->select(
+                'das.*',
+                'subj.subj_code',
+                'subj.subj_name',
+                'person.per_id',
+                'person.per_firstname',
+                'person.per_middlename',
+                'person.per_lastname',
+                'person.per_suffixname',
+                'person.per_email',
+                'course.prog_code',
+                'course.prog_name',
+                'program.dtype_desc as program_desc',
+                'gradelvl.grad_name as gradelvl_desc',
+                'quarter.quar_desc as quarter_desc',
+                'section.sec_name as section_name', 
+                \DB::raw("CONCAT_WS(' ', person.per_firstname, person.per_middlename, person.per_lastname, person.per_suffixname) AS fullname")
+            )
+            ->where('das.soa_personid', '=' , $id)
+            ->get();
+
+            $query1 && $query2? $status = 200 : $status = 500;
+
+            return [
+                'student_settlement' => $query1,
+                'student_account' => $query2,
+                'status' => $status
+            ];
+
+        } catch (Exception $ex) {
+            return [
+                'data' => 'No Data',
+                'status' => 500
+            ];
+        }
+    }
+
+    public function generateStudentAccount($milestonedata, $templatePricesData, $settlement){
+        try {
+            date_default_timezone_set('Asia/Manila');
+            $date = date('Y-m-d H:i:s');
+
+            $firstMilestone = $milestonedata[0];
+            $settlementData = $settlement[0];
+
+            foreach ($templatePricesData as $price) {
+
+                $query = DB::table('def_accounts_student')
+                ->insert([
+                    'soa_enrid' => $firstMilestone->enr_id,
+                    'soa_personid' => $firstMilestone->enr_personid,
+
+                    'soa_headerid' => $price->act_headerid,
+                    'soa_curriculum' => $firstMilestone->enr_curriculum,
+                    'soa_quarter' => $firstMilestone->enr_quarter,
+                    'soa_program' => $firstMilestone->enr_program,
+                    'soa_course' => $firstMilestone->enr_course,
+                    'soa_gradelvl' => $firstMilestone->enr_gradelvl,
+                    'soa_dateenrolled' => $firstMilestone->enr_dateenrolled,
+                    'soa_enrolledby' => $firstMilestone->enr_enrby,
+                    'soa_section' => $firstMilestone->enr_section,
+
+                    'soa_actid' => $price->tuitemp_id,
+                    'soa_acsid' => $settlementData->acs_id,
+                    'soa_itemid' => $price->tuitemp_itemid,
+                    'soa_subjid' => $price->tuitemp_subjid,
+                    'soa_custid' => $price->tuitemp_custid,
+                    'soa_custype' => $price->tuitemp_custype,
+                    'soa_desc' => $price->tuitemp_desc,
+                    'soa_price' => $price->tuitemp_price,
+                    'soa_quantity' => $price->tuitemp_quantity,
+                    'soa_disc_type' => $price->tuitemp_disc_type,
+                    'soa_lec_price' => $price->tuitemp_lec_price,
+                    'soa_lab_price' => $price->tuitemp_lab_price,
+                    'soa_lec' => $price->tuitemp_lec,
+                    'soa_lab' => $price->tuitemp_lab,
+
+                    'soa_addedby' => $price->tuitemp_updatedby,
+                    'soa_dateadded' => $date,
+                ]);
+            }
+
+            // $query = DB::table('def_accounts_settlement')
+            // ->insert([
+            //     'acs_personid' => $request->input('acs_personid'),
+            //     'acs_description' => $request->input('acs_description'),
+            //     'acs_amount' => $request->input('acs_amount'),
+            //     'acs_addedby' => $request->input('acs_user'),
+            //     'acs_dateadded' => $date,
+            // ]);
+
+            // $query? $status = 200 : $status = 500;
+
+             return [
+                'templatePricesData' => $templatePricesData,
+                'milestonedata' => $milestonedata,
+                'status' => 200
+
+            ];
+        } catch (Exception $ex) {
+            return [
+                'data' => 'No Data',
+                'status' => 500
+            ];
+        }
+    }
 }

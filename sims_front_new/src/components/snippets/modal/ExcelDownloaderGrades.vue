@@ -69,16 +69,16 @@ const downloadExcel = () => {
               {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
           </td>
           <td class="align-middle p-3">
-            {{ app.grade_prelims ? app.grade_prelims : 'N/A' }}
+            {{ app.grs_prelims ? app.grs_prelims : 'N/A' }}
           </td>
           <td class="align-middle p-3">
-            {{ app.grade_midterms ? app.grade_midterms : 'N/A' }}
+            {{ app.grs_midterms ? app.grs_midterms : 'N/A' }}
           </td>
           <td class="align-middle p-3">
-            {{ app.grade_prefinals ? app.grade_prefinals : 'N/A' }}
+            {{ app.grs_prefinals ? app.grs_prefinals : 'N/A' }}
           </td>
           <td class="align-middle p-3">
-            {{ app.grade_finals ? app.grade_finals : 'N/A' }}
+            {{ app.grs_finals ? app.grs_finals : 'N/A' }}
           </td>
         </tr>
         <tr v-if="!Object.keys(gradingSheet).length">

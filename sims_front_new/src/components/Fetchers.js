@@ -2824,6 +2824,22 @@ const getTotalCharges = async (curriculum, sem, program, course, gradelvl, secti
     }
 }
 
+let getstudentaccount = {}
+const getStudentAccount = async (perid) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-student-account/' + perid,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getstudentaccount = results.data
+        })
+        return getstudentaccount
+    } catch (err) {
+        return err
+    }
+}
+
 
 export {
 
@@ -2996,6 +3012,7 @@ export {
     getTuitionTemplate,
     getSubjectsFromRegistrar,
     getChargesTemplateHeader,
-    getTotalCharges
+    getTotalCharges,
+    getStudentAccount
 }
 

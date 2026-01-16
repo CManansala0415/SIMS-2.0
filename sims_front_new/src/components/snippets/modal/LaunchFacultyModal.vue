@@ -431,7 +431,7 @@ onMounted(async () => {
                 <div class="col-faculty flex-fill">
                     <span class="d-md-none fw-bold text-success">Faculty: </span>
                     <select @change="detectLoad(index, sj.subj_id, sj.lock)" :id="'assignedFaculty' + index"
-                        :value="sj.faculty_id" :disabled="sj.lock" class="form-select form-select-sm w-100 text-center"
+                        :value="sj.faculty_id" :disabled="sj.lock" class="form-select form-select-sm w-100 text-center text-uppercase"
                         title="Click Edit to modify details">
                         <option value="" disabled>-- Select Faculty --</option>
                         <option v-for="(emp, i) in employee" :key="i" :value="emp.emp_id">

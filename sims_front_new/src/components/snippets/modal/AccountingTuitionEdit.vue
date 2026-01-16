@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, nextTick  } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import { getUserID } from "../../../routes/user";
 import Loader from '../loaders/Loading1.vue';
 import LoaderSmall from '../loaders/Loader1.vue';
@@ -16,6 +16,11 @@ import {
     getCurriculumSett
 
 } from "../../Fetchers.js";
+
+import {
+    pesoConverter
+} from "../../Generators.js";
+
 import { useRouter, useRoute } from 'vue-router';
 const router = useRouter();
 
@@ -101,47 +106,47 @@ const curriculumData = ref([])
 const curriculumHolder = ref([])
 
 const booter = async () => {
-    getFeeDetails(0,0).then((result)=>{
+    getFeeDetails(0, 0).then((result) => {
         miscFeesMain.value = result.data
         miscFeesMainFiltered.value = miscFeesMain.value
     })
-    getSubject().then((result)=>{
+    getSubject().then((result) => {
         subjectsData.value = result
         subjectsDataFiltered.value = subjectsData.value
     })
-    getTuitionTemplate(item.value.act_id).then((results)=>{
+    getTuitionTemplate(item.value.act_id).then((results) => {
         tuitionTemplateItems.value = results.data
         tuitionTemplateHolder.value = results.data // for comparison if may nadelete or nadagdag
     })
-    getSubjectsFromRegistrar(item.value.act_course, item.value.act_gradelvl , item.value.act_sem, item.value.act_curriculum).then((results)=>{
-       registrarSubjects.value = results.data
-       registrarSubjectsFiltered.value = results.data
+    getSubjectsFromRegistrar(item.value.act_course, item.value.act_gradelvl, item.value.act_sem, item.value.act_curriculum).then((results) => {
+        registrarSubjects.value = results.data
+        registrarSubjectsFiltered.value = results.data
     })
-    getQuarter().then((results)=>{
+    getQuarter().then((results) => {
         let map = {}
         results.forEach(p => {
             map[p.quar_id] = p.quar_desc
         })
         periodMap.value = map
     })
-    getGradelvl().then((results)=>{
+    getGradelvl().then((results) => {
         let map = {}
         results.forEach(g => {
             map[g.grad_code] = g.grad_name
         })
         gradeMap.value = map
     })
-    getCurriculumSett().then((results)=>{
-       curriculumHolder.value = results
-       curriculumData.value = results
+    getCurriculumSett().then((results) => {
+        curriculumHolder.value = results
+        curriculumData.value = results
     })
 
 }
 
 // run this kapag tuition ang usapan and settings ng fees na
-const setupLimiter = ()=>{
-    if(chargeType.value == 1 && Object.keys(tuitionTemplateItems.value).length <= 0){
-        registrarSubjects.value.forEach((e)=>{
+const setupLimiter = () => {
+    if (chargeType.value == 1 && Object.keys(tuitionTemplateItems.value).length <= 0) {
+        registrarSubjects.value.forEach((e) => {
             addMiscFee(e, 2)
         })
     }
@@ -167,22 +172,22 @@ const setupLimiter = ()=>{
         return acc;
     }, {});
 
-    
+
 }
 
-onMounted(async() => {
-     await booter().then(() => {
+onMounted(async () => {
+    await booter().then(() => {
         getUserID().then((results) => {
             userID.value = results.account.data.id
 
             chargeType.value = item.value.act_type // 1 tuition 2 charge
-            
+
             if (manageSetup.value === true) {
                 setupLimiter()
                 saveMode.value = 'assess'
                 manageDetails()
             }
-            
+
 
 
             preLoading.value = false
@@ -192,7 +197,7 @@ onMounted(async() => {
                 icon: "error",
                 title: "Oops...",
                 text: "Session expired, log in again",
-            }).then(()=>{
+            }).then(() => {
                 router.push("/");
                 location.reload()
                 window.stop()
@@ -222,14 +227,14 @@ onMounted(async() => {
             actCurriculum.value = '0'
             mode.value = 'new'
         }
-     })
+    })
 })
 
 
-const searchItem = (type) =>{
+const searchItem = (type) => {
 
-    if(type == 1){
-        miscFeesMainFiltered.value = miscFeesMain.value.filter((e)=>{
+    if (type == 1) {
+        miscFeesMainFiltered.value = miscFeesMain.value.filter((e) => {
             if (
                 (e.acf_desc.toUpperCase().includes(miscFeesMainSearch.value.toUpperCase()))
             ) {
@@ -237,8 +242,8 @@ const searchItem = (type) =>{
             }
         })
 
-    }else if(type == 2){
-        subjectsDataFiltered.value = subjectsData.value.filter((e)=>{
+    } else if (type == 2) {
+        subjectsDataFiltered.value = subjectsData.value.filter((e) => {
             if (
                 (e.subj_code.toUpperCase().includes(subjectsDataSearch.value.toUpperCase())) ||
                 (e.subj_name.toUpperCase().includes(subjectsDataSearch.value.toUpperCase()))
@@ -246,8 +251,8 @@ const searchItem = (type) =>{
                 return e
             }
         })
-    }else{
-        registrarSubjectsFiltered.value = registrarSubjects.value.filter((e)=>{
+    } else {
+        registrarSubjectsFiltered.value = registrarSubjects.value.filter((e) => {
             if (
                 (e.subj_code.toUpperCase().includes(registrarSubjectsSearch.value.toUpperCase())) ||
                 (e.subj_name.toUpperCase().includes(registrarSubjectsSearch.value.toUpperCase()))
@@ -256,7 +261,7 @@ const searchItem = (type) =>{
             }
         })
     }
-    console.log(type)
+    // console.log(type)
 }
 
 const saveCharges = () => {
@@ -272,12 +277,12 @@ const saveCharges = () => {
     });
 
     let x = {
-        act_description:actDescription.value,
-        act_course:actCourse.value,
-        act_program:actProgram.value,
-        act_section:actSection.value,
-        act_type:actType.value,
-        act_gradelvl:actGradelvl.value,
+        act_description: actDescription.value,
+        act_course: actCourse.value,
+        act_program: actProgram.value,
+        act_section: actSection.value,
+        act_type: actType.value,
+        act_gradelvl: actGradelvl.value,
         act_user: userID.value,
         act_mode: mode.value,
         act_id: actId.value,
@@ -285,7 +290,7 @@ const saveCharges = () => {
         act_curriculum: actCurriculum.value
 
     }
-    
+
     editAccountingTuition(x).then((results) => {
         Swal.close()
 
@@ -294,35 +299,36 @@ const saveCharges = () => {
                 title: "Update Successful",
                 text: "Changes applied, refreshing the page",
                 icon: "success"
-            }).then(()=>{
-                location.reload()
+            }).then(() => {
+                // location.reload()
             });
         } else {
             Swal.fire({
                 title: "Update Failed",
                 text: "Unknown error occured, try again later",
                 icon: "error"
-            }).then(()=>{
-                location.reload()
+            }).then(() => {
+                // location.reload()
             });
         }
     })
 }
 
-const addMiscFee = (data, type) =>{
-    
-    if(type == 1){  
+const addMiscFee = (data, type) => {
+
+    if (type == 1) {
 
         let x = {
-            tuitemp_headerid:item.value.act_id,
-            tuitemp_id:'',
-            tuitemp_itemid:data.acf_id,
-            tuitemp_subjid:'',
-            tuitemp_custid:'',
-            tuitemp_desc:data.acf_desc,
-            tuitemp_price:data.acf_price,
-            tuitemp_type:type, // means misc item, 2 for subject and 3 for custom
-            tuitemp_user:userID.value
+            tuitemp_headerid: item.value.act_id,
+            tuitemp_id: '',
+            tuitemp_itemid: data.acf_id,
+            tuitemp_subjid: '',
+            tuitemp_custid: '',
+            tuitemp_desc: data.acf_desc,
+            tuitemp_price: data.acf_price,
+            tuitemp_quantity: 1, // auto na 1 kapag nag add then pwede customize ilan later
+            tuitemp_type: type, // means misc item, 2 for subject and 3 for custom
+            tuitemp_user: userID.value
         }
 
         let check = miscFees.value.filter((e) => {
@@ -331,9 +337,9 @@ const addMiscFee = (data, type) =>{
             }
         })
 
-        if(!Object.keys(check).length){
+        if (!Object.keys(check).length) {
             miscFees.value.push(x)
-        }else{
+        } else {
 
             Swal.fire({
                 title: "Duplicate Entry",
@@ -341,55 +347,56 @@ const addMiscFee = (data, type) =>{
                 icon: "warning",
                 confirmButtonText: "Ok, Got it!"
             });
-        }  
-
-
-    }else if(type == 2){
-        let x = {
-            tuitemp_sem: data.tuitemp_sem? data.tuitemp_sem: data.currtag_sem,
-            tuitemp_gradelvl: data.tuitemp_gradelvl? data.tuitemp_sem: data.currtag_gradelvl,
-            tuitemp_headerid:item.value.act_id,
-            tuitemp_id:'',
-            tuitemp_itemid:'',
-            tuitemp_subjid:data.subj_id,
-            tuitemp_custid:'',
-            tuitemp_desc:data.subj_name,
-            tuitemp_lec:data.subj_lec_units,
-            tuitemp_lab:data.subj_lab_units,
-            tuitemp_lec_price:data.subj_lec_units_rate,
-            tuitemp_lab_price:data.subj_lab_units_rate,
-            tuitemp_price:parseFloat(data.subj_lec_units_rate) + parseFloat(data.subj_lab_units_rate),
-            tuitemp_type:type, // means misc item, 2 for subject and 3 for custom
-            tuitemp_user:userID.value
         }
-        
+
+    } else if (type == 2) {
+        let x = {
+            tuitemp_sem: data.tuitemp_sem ? data.tuitemp_sem : data.currtag_sem,
+            tuitemp_gradelvl: data.tuitemp_gradelvl ? data.tuitemp_sem : data.currtag_gradelvl,
+            tuitemp_headerid: item.value.act_id,
+            tuitemp_id: '',
+            tuitemp_itemid: '',
+            tuitemp_subjid: data.subj_id,
+            tuitemp_custid: '',
+            tuitemp_desc: data.subj_name,
+            tuitemp_lec: data.subj_lec_units,
+            tuitemp_lab: data.subj_lab_units,
+            tuitemp_lec_price: data.subj_lec_units_rate,
+            tuitemp_lab_price: data.subj_lab_units_rate,
+            tuitemp_price: parseFloat(data.subj_lec_units_rate) + parseFloat(data.subj_lab_units_rate),
+            tuitemp_type: type, // means misc item, 2 for subject and 3 for custom
+            tuitemp_user: userID.value
+        }
+
         let check = subjFees.value.filter((e) => {
             if (e.tuitemp_subjid == data.subj_id) {
                 return e
             }
         })
 
-        if(!Object.keys(check).length){
+        if (!Object.keys(check).length) {
             subjFees.value.push(x)
-        }else{
+        } else {
             Swal.fire({
                 title: "Duplicate Entry",
                 html: `This item is already added to the template. Try selecting another.`,
                 icon: "warning",
                 confirmButtonText: "Ok, Got it!"
             });
-        }  
-    }else{
+        }
+    } else {
         let x = {
-            tuitemp_headerid:item.value.act_id,
-            tuitemp_id:'',
-            tuitemp_itemid:'',
-            tuitemp_subjid:'',
-            tuitemp_custid:'',
-            tuitemp_custype:type,
-            tuitemp_desc:customDescription.value,
-            tuitemp_price:customPrice.value,
-            tuitemp_user:userID.value
+            tuitemp_headerid: item.value.act_id,
+            tuitemp_id: '',
+            tuitemp_itemid: '',
+            tuitemp_subjid: '',
+            tuitemp_custid: '',
+            tuitemp_custype: type == 5 ? 4 : type, // 3 for custom fee, 4 for deduction, 5 for percent discount, gagamitin padin natin si 4 para mag fall si percent as deduction
+            tuitemp_quantity: 1, // auto na 1 kapag nag add then pwede customize ilan later
+            tuitemp_disc_type: type == 5 ? 1 : 0, // type 5 means percent discount
+            tuitemp_desc: customDescription.value,
+            tuitemp_price: customPrice.value,
+            tuitemp_user: userID.value
         }
         customFees.value.push(x)
     }
@@ -398,31 +405,34 @@ const addMiscFee = (data, type) =>{
 const subjFeesTotal = ref(0)
 const miscFeesTotal = ref(0)
 const customFeesTotal = ref(0)
+const customDeductionsExact = ref(0)
+const customDeductionsPercent = ref(0)
 const customDeductionsTotal = ref(0)
 
 const totalFees = ref(0)
 
-const checkCurr = () =>{
-    curriculumData.value = curriculumHolder.value.filter((e)=>{
-        if(e.curr_progid == actCourse.value){
+const checkCurr = () => {
+    curriculumData.value = curriculumHolder.value.filter((e) => {
+        if (e.curr_progid == actCourse.value) {
             return e
         }
     })
 }
 
-const manageDetails = ()=> {
-    if(saveMode.value == 'clear'){
-        miscFees.value=[]
-        subjFees.value=[]
-        customFees.value=[]
-    }else if(saveMode.value == 'assess'){
+const manageDetails = () => {
+    if (saveMode.value == 'clear') {
+        miscFees.value = []
+        subjFees.value = []
+        customFees.value = []
+    } else if (saveMode.value == 'assess') {
         miscFeesTotal.value = 0
         subjFeesTotal.value = 0
         customFeesTotal.value = 0
+        customDeductionsExact.value = 0
         totalFees.value = 0
 
         miscFees.value.forEach((price) => {
-            miscFeesTotal.value += parseFloat(price.tuitemp_price)
+            miscFeesTotal.value += parseFloat(price.tuitemp_price * price.tuitemp_quantity)
         })
 
         subjFees.value.forEach((price) => {
@@ -431,16 +441,23 @@ const manageDetails = ()=> {
         })
 
         customFees.value.forEach((price) => {
-            if(price.tuitemp_custype == 3){
-                customFeesTotal.value += parseFloat(price.tuitemp_price)
-            }else{
-                customDeductionsTotal.value += parseFloat(price.tuitemp_price)
+            if (price.tuitemp_custype == 3) {
+                customFeesTotal.value += parseFloat(price.tuitemp_price * price.tuitemp_quantity)
+            }
+            else {
+                if (price.tuitemp_disc_type == 1) {
+                    customDeductionsPercent.value += parseFloat(price.tuitemp_price * price.tuitemp_quantity)
+                } else {
+                    customDeductionsExact.value += parseFloat(price.tuitemp_price * price.tuitemp_quantity)
+                }
             }
         })
 
-        totalFees.value = parseFloat(miscFeesTotal.value) + parseFloat(subjFeesTotal.value) + parseFloat(customFeesTotal.value) - parseFloat(customDeductionsTotal.value)
+        totalFees.value = parseFloat(miscFeesTotal.value) + parseFloat(subjFeesTotal.value) + parseFloat(customFeesTotal.value)
+            - (parseFloat(customDeductionsExact.value) + ((parseFloat(miscFeesTotal.value) + parseFloat(subjFeesTotal.value) + parseFloat(customFeesTotal.value)) * parseFloat(customDeductionsPercent.value) / 100))
+        // console.log(customDeductionsPercent.value)
 
-    }else{
+    } else {
         Swal.fire({
             title: "Saving Updates",
             text: "Please wait while we check all series details.",
@@ -458,9 +475,9 @@ const manageDetails = ()=> {
 
         let y = []
 
-        x.forEach((e)=>{
+        x.forEach((e) => {
             // console.log(e)
-            if(e.tuitemp_subjid){
+            if (e.tuitemp_subjid) {
                 let data = tuitionTemplateHolder.value.findIndex((f) => {
                     return f.tuitemp_subjid === e.tuitemp_subjid
                 })
@@ -468,15 +485,15 @@ const manageDetails = ()=> {
                 let response = detectMode(data, e.tuitemp_id, e)
                 y.push(response)
             }
-            else if(e.tuitemp_itemid){
+            else if (e.tuitemp_itemid) {
                 let data = tuitionTemplateHolder.value.findIndex((f) => {
                     return f.tuitemp_itemid === e.tuitemp_itemid
                 })
                 // console.log(data)
                 let response = detectMode(data, e.tuitemp_id, e)
-                y.push(response) 
-            }      
-            else{
+                y.push(response)
+            }
+            else {
                 let data = tuitionTemplateHolder.value.findIndex((f) => {
                     return f.tuitemp_custid === e.tuitemp_custid
                 })
@@ -486,16 +503,14 @@ const manageDetails = ()=> {
             }
         })
 
-        // console.log(y)
-
-        saveTuitionTemplate(y, 1).then((results)=>{
+        saveTuitionTemplate(y, 1).then((results) => {
             Swal.close()
             if (results.status == 200) {
                 Swal.fire({
                     title: "Update Successful",
                     text: "Changes applied, refreshing the page",
                     icon: "success"
-                }).then(()=>{
+                }).then(() => {
                     location.reload()
                 });
             } else {
@@ -503,18 +518,18 @@ const manageDetails = ()=> {
                     title: "Update Failed",
                     text: "Unknown error occured, try again later",
                     icon: "error"
-                }).then(()=>{
+                }).then(() => {
                     // location.reload()
                 });
             }
         })
-        
+
     }
-   
+
 }
 
-const deleteMiscData = (mode, data, index) =>{
-    if(data.tuitemp_id){
+const deleteMiscData = (mode, data, index) => {
+    if (data.tuitemp_id) {
         Swal.fire({
             title: 'Remove Item',
             html: `Are you sure to delete this item from the list? This will permanently remove the item from the list`,
@@ -534,19 +549,19 @@ const deleteMiscData = (mode, data, index) =>{
                     }
                 });
 
-                saveTuitionTemplate(data, 2).then((results)=>{
+                saveTuitionTemplate(data, 2).then((results) => {
                     Swal.close()
                     if (results.status == 200) {
                         Swal.fire({
                             title: "Update Successful",
                             text: "Changes applied, refreshing the page",
                             icon: "success"
-                        }).then(()=>{
-                            if(mode == 1){
+                        }).then(() => {
+                            if (mode == 1) {
                                 miscFees.value.splice(index, 1), clickSubmit('assess')
-                            }else if(mode == 2){
+                            } else if (mode == 2) {
                                 subjFees.value.splice(index, 1), clickSubmit('assess')
-                            }else{
+                            } else {
                                 customFees.value.splice(index, 1), clickSubmit('assess')
                             }
                         });
@@ -555,42 +570,42 @@ const deleteMiscData = (mode, data, index) =>{
                             title: "Update Failed",
                             text: "Unknown error occured, try again later",
                             icon: "error"
-                        }).then(()=>{
+                        }).then(() => {
                             // location.reload()
                         });
                     }
                 })
             }
         })
-    }else{
-        if(mode == 1){
+    } else {
+        if (mode == 1) {
             miscFees.value.splice(index, 1), clickSubmit('assess')
-        }else if(mode == 2){
+        } else if (mode == 2) {
             subjFees.value.splice(index, 1), clickSubmit('assess')
-        }else{
+        } else {
             customFees.value.splice(index, 1), clickSubmit('assess')
         }
     }
-    
+
 
 }
 
-const detectMode = (index, id, obj) =>{
+const detectMode = (index, id, obj) => {
     var item = {}
-    if((index < 0)&&( !id)){ // means wala sa fetched list and wala pang id, means bago and to be inserted as new
+    if ((index < 0) && (!id)) { // means wala sa fetched list and wala pang id, means bago and to be inserted as new
         var item = {
             ...obj,
-            item_mode:'insert'
+            item_mode: 'insert'
         }
-    }else if((index < 0)&&(id)){ // means nasa fetched list and meron ng id, means existing pero tinaggal sa list to be saved
+    } else if ((index < 0) && (id)) { // means nasa fetched list and meron ng id, means existing pero tinaggal sa list to be saved
         var item = {
             ...obj,
-            item_mode:'delete'
+            item_mode: 'delete'
         }
-    }else{ // update remaining items to catch also if binago yung price ng subjects or items
+    } else { // update remaining items to catch also if binago yung price ng subjects or items
         var item = {
             ...obj,
-            item_mode:'update'
+            item_mode: 'update'
         }
     }
 
@@ -621,12 +636,12 @@ const clickSubmit = (mode) => {
 
 
 const resolveGroupLabel = (groupKey) => {
-  const [gradeCode, periodCode] = groupKey.split('-')
+    const [gradeCode, periodCode] = groupKey.split('-')
 
-  const grade = gradeMap.value?.[gradeCode] ?? gradeCode
-  const period = periodMap.value?.[periodCode] ?? periodCode
+    const grade = gradeMap.value?.[gradeCode] ?? gradeCode
+    const period = periodMap.value?.[periodCode] ?? periodCode
 
-  return `${grade} – ${period}`
+    return `${grade} – ${period}`
 }
 
 
@@ -641,7 +656,7 @@ const resolveGroupLabel = (groupKey) => {
                 </span></p>
         </div>
         <div class="d-flex flex-column gap-2 small-font">
-            <LoaderSmall v-if="preLoading"/>
+            <LoaderSmall v-if="preLoading" />
             <div v-else class="w-100">
                 <form @submit.prevent="saveCharges" class="card text-start h-100">
                     <div class="d-flex flex-column gap-2 w-100 p-3">
@@ -655,54 +670,65 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
                         <div class="form-group">
                             <label>Tuition Fee Setup Description</label>
-                            <input v-model="actDescription" required type="text" class="form-control form-control-sm" :disabled="actType?false:true"/>
+                            <input v-model="actDescription" required type="text" class="form-control form-control-sm"
+                                :disabled="actType ? false : true" />
                         </div>
                         <div class="form-group">
                             <label>Semester</label>
-                            <select v-model="actSem" class="form-control form-select-sm" required :disabled="actType?false:true">
+                            <select v-model="actSem" class="form-control form-select-sm" required
+                                :disabled="actType ? false : true">
                                 <option value="0" v-if="actType == 2">All Semesters</option>
                                 <option value="" v-else disabled>-- Select Semester -- </option>
-                                <option :value="quar.quar_id" v-for="(quar, index) in quarter">{{ quar.quar_desc }}</option>
+                                <option :value="quar.quar_id" v-for="(quar, index) in quarter">{{ quar.quar_desc }}
+                                </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Program</label>
-                            <select v-model="actProgram" class="form-control form-select-sm" required :disabled="actType?false:true">
+                            <select v-model="actProgram" class="form-control form-select-sm" required
+                                :disabled="actType ? false : true">
                                 <option value="0" v-if="actType == 2">All Programs</option>
                                 <option value="" v-else disabled>-- Select Program -- </option>
-                                <option :value="prog.dtype_id" v-for="(prog, index) in program">{{ prog.dtype_desc }}</option>
+                                <option :value="prog.dtype_id" v-for="(prog, index) in program">{{ prog.dtype_desc }}
+                                </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Grade / Year Level</label>
-                            <select v-model="actGradelvl" class="form-control form-select-sm" :disabled="actType?false:true">
+                            <select v-model="actGradelvl" class="form-control form-select-sm"
+                                :disabled="actType ? false : true">
                                 <option value="0" v-if="actType == 2">All Grade Levels</option>
                                 <option value="" v-else disabled>-- Select Grade Level -- </option>
                                 <template v-for="(grad, index) in gradelvl">
-                                    <option v-if="actProgram == grad.grad_dtypeid" :value="grad.grad_id" >{{ grad.grad_name }}</option>
+                                    <option v-if="actProgram == grad.grad_dtypeid" :value="grad.grad_id">{{
+                                        grad.grad_name }}</option>
                                 </template>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Course</label>
-                            <select v-model="actCourse" class="form-control form-select-sm" :disabled="actType?false:true" @change="checkCurr()">
+                            <select v-model="actCourse" class="form-control form-select-sm"
+                                :disabled="actType ? false : true" @change="checkCurr()">
                                 <option value="0" v-if="actType == 2">All Courses</option>
                                 <option value="" v-else disabled>-- Select Course -- </option>
                                 <template v-for="(cour, index) in course">
-                                    <option v-if="actProgram == cour.prog_progtype" :value="cour.prog_id">{{ cour.prog_name }}</option>
+                                    <option v-if="actProgram == cour.prog_progtype" :value="cour.prog_id">{{
+                                        cour.prog_name }}</option>
                                 </template>
                             </select>
                         </div>
-                         <div v-if="actType == 1 && actProgram !=0" class="form-group">
+                        <div v-if="actType == 1 && actProgram != 0" class="form-group">
                             <label>Curriculum</label>
-                             <select class="form-select form-select-sm mt-2" v-model="actCurriculum" required>
+                            <select class="form-select form-select-sm mt-2" v-model="actCurriculum" required>
                                 <option value="" disabled>-- Select Curriculum -- </option>
-                                <option v-for="(cd, index) in curriculumData" :value=" cd.curr_id"> {{ cd.curr_code }}</option>
+                                <option v-for="(cd, index) in curriculumData" :value="cd.curr_id"> {{ cd.curr_code }}
+                                </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Section</label>
-                            <select v-model="actSection" class="form-control form-select-sm" :disabled="actType?false:true">
+                            <select v-model="actSection" class="form-control form-select-sm"
+                                :disabled="actType ? false : true">
                                 <option value="0">All Sections</option>
                                 <template v-for="(sec, index) in section">
                                     <option :value="sec.sec_id">{{ sec.sec_name }}</option>
@@ -710,7 +736,7 @@ const resolveGroupLabel = (groupKey) => {
                             </select>
                         </div>
                         <div class="d-flex mt-3">
-                            <button :disabled="saving || !actType ? true : false" type="submit" 
+                            <button :disabled="saving || !actType ? true : false" type="submit"
                                 class="btn btn-sm btn-primary w-100">Save
                             </button>
                         </div>
@@ -728,25 +754,34 @@ const resolveGroupLabel = (groupKey) => {
                 </span></p>
         </div> -->
         <div v-if="preLoading" class="w-100 h-100 d-flex justify-content-center align-items-center">
-            <Loader/>
+            <Loader />
         </div>
         <div v-else class="d-flex gap-2 small-font">
             <div class="row g-2 w-100 p-2">
                 <div class="col-md-5 border">
                     <div class="row g-2 w-100 p-2">
                         <div class="col-md-12">
-                            <p class="mb-2 fw-bold">Miscellaneous  Items</p>
-                            <input :disabled="preLoading? true:false" v-model="miscFeesMainSearch" @keyup="searchItem(1)" type="text" class="form-control form-control-sm mb-2" placeholder="Search Item Here..."/>
+                            <p class="mb-2 fw-bold">Additional Items</p>
+                            <input :disabled="preLoading ? true : false" v-model="miscFeesMainSearch"
+                                @keyup="searchItem(1)" type="text" class="form-control form-control-sm mb-2"
+                                placeholder="Search Item Here..." />
                             <div class="border overflow-auto py-2 bg-secondary-subtle" style="height: 320px;">
                                 <ul class="list-group">
-                                    <li class="list-group-item" v-for="(misc, index) in miscFeesMainFiltered" @click="addMiscFee(misc, 1), clickSubmit('assess')">
+                                    <li class="list-group-item" v-for="(misc, index) in miscFeesMainFiltered"
+                                        @click="addMiscFee(misc, 1), clickSubmit('assess')">
                                         <div class="d-flex justify-content-between">
                                             <span>{{ misc.acf_desc }}</span>
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(misc.acf_price) }}</span>
+                                            <span>{{ new Intl.NumberFormat('en-PH', {
+                                                style: 'currency', currency: 'PHP'
+                                                }).format(misc.acf_price) }}</span>
                                         </div>
                                     </li>
-                                    <li class="list-group-item" v-if="!Object.keys(miscFeesMainFiltered).length && !preLoading">No Record Found</li>
-                                    <li class="list-group-item" v-if="!Object.keys(miscFeesMainFiltered).length && preLoading">Loading Items...</li>
+                                    <li class="list-group-item"
+                                        v-if="!Object.keys(miscFeesMainFiltered).length && !preLoading">No Record Found
+                                    </li>
+                                    <li class="list-group-item"
+                                        v-if="!Object.keys(miscFeesMainFiltered).length && preLoading">Loading Items...
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -844,38 +879,44 @@ const resolveGroupLabel = (groupKey) => {
                             <p class="mb-2 fw-bold">Custom Items</p>
                             <div class="row g-1 mb-2">
                                 <div class="col-md-12">
-                                    <input v-model="customDescription" :disabled="preLoading? true:false" type="text" class="form-control form-control-sm" placeholder="Description"/>
+                                    <input v-model="customDescription" :disabled="preLoading ? true : false" type="text"
+                                        class="form-control form-control-sm" placeholder="Description" />
                                 </div>
                                 <div class="col-md-6">
-                                    <input 
-                                        v-model.number="customPrice"
-                                        required
-                                        step="0.01" 
-                                        min="0.00"
-                                        :disabled="preLoading? true:false"
-                                        @input="
-                                        if (customPrice <= 0) customPrice = 0;"
-                                        type="number"
-                                        class="form-control form-control-sm amount-text"
-                                        placeholder="Price"
-                                    />
+                                    <input v-model.number="customPrice" required step="0.01" min="0.00"
+                                        :disabled="preLoading ? true : false" @input="
+                                        if (customPrice <= 0) customPrice = 0;" type="number"
+                                        class="form-control form-control-sm amount-text" placeholder="Price" />
                                 </div>
                                 <!-- <div class="col-md-2">
                                     <input :disabled="preLoading? true:false" type="text" class="form-control form-control-sm" placeholder=""/>
                                 </div> -->
-                                 <div class="col-md-6 d-flex gap-1">
-                                    <button @click="addMiscFee([],3), clickSubmit('assess')" class="btn btn-sm btn-primary w-100">Add as Item</button>
-                                    <button @click="addMiscFee([],4), clickSubmit('assess')" class="btn btn-sm btn-info w-100">Add as Discount</button>
+                                <div class="col-md-6 d-flex gap-1">
+                                    <button @click="addMiscFee([], 3), clickSubmit('assess')"
+                                        class="btn btn-sm btn-primary w-100">Add as Item</button>
+                                    <button @click="addMiscFee([], 4), clickSubmit('assess')"
+                                        class="btn btn-sm btn-info w-100">Discount =</button>
+                                    <button @click="addMiscFee([], 5), clickSubmit('assess')"
+                                        class="btn btn-sm btn-info w-100">Discount %</button>
                                 </div>
                             </div>
                             <div class="col-md-12 border overflow-auto py-2 bg-secondary-subtle" style="height: 320px;">
                                 <ul class="list-group">
                                     <li class="list-group-item" v-for="(cust, index) in customFees">
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span>{{ cust.tuitemp_desc?cust.tuitemp_desc:'N/A' }}</span>
+                                            <span>{{ cust.tuitemp_desc ? cust.tuitemp_desc : 'N/A' }}</span>
                                             <span>
-                                                <span v-if="cust.tuitemp_custype == 3">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cust.tuitemp_price) }}</span>
-                                                <span v-if="cust.tuitemp_custype == 4" class="text-danger">- {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cust.tuitemp_price) }}</span>
+                                                <span v-if="cust.tuitemp_custype == 3">{{ new Intl.NumberFormat('en-PH',
+                                                    {
+                                                    style: 'currency', currency: 'PHP' }).format(cust.tuitemp_price)
+                                                    }}</span>
+                                                <span v-if="cust.tuitemp_custype == 4" class="text-danger">
+                                                    <span v-if="cust.tuitemp_disc_type == 0">- {{ new
+                                                        Intl.NumberFormat('en-PH', {
+                                                            style: 'currency', currency: 'PHP'
+                                                        }).format(cust.tuitemp_price) }}</span>
+                                                    <span v-else>- {{ cust.tuitemp_price.toFixed(2) }}%</span>
+                                                </span>
                                             </span>
 
                                             <!-- <button class="btn btn-sm btn-danger" 
@@ -884,8 +925,11 @@ const resolveGroupLabel = (groupKey) => {
                                             </button> -->
                                         </div>
                                     </li>
-                                    <li class="list-group-item" v-if="!Object.keys(customFees).length && !preLoading">No Record Found</li>
-                                    <li class="list-group-item" v-if="!Object.keys(customFees).length && preLoading">Loading Items...</li>
+                                    <li class="list-group-item" v-if="!Object.keys(customFees).length && !preLoading">No
+                                        Record Found</li>
+                                    <li class="list-group-item" v-if="!Object.keys(customFees).length && preLoading">
+                                        Loading
+                                        Items...</li>
                                 </ul>
                             </div>
                         </div>
@@ -895,20 +939,37 @@ const resolveGroupLabel = (groupKey) => {
                     <div class="w-100 p-4 shadow mb-2">
                         <span class="mb-2 fw-bold">Payment Breakdown</span>
                     </div>
-                    <form @submit.prevent="manageDetails" class="row g-1 p-2 d-flex flex-column justify-content-start h-100">
-                        <button type="submit" id="submitDetails" hidden ></button>
+                    <form @submit.prevent="manageDetails"
+                        class="row g-1 p-2 d-flex flex-column justify-content-start h-100">
+                        <button type="submit" id="submitDetails" hidden></button>
                         <div class="col-md-12 text-start mb-2">
-                            <span class="fst-italic fw-bold text-success">Miscellaneous Items</span>
+                            <span class="fst-italic fw-bold text-success">Additional Items</span>
                             <ul class="list-group mt-2">
                                 <li class="list-group-item" v-for="(mf, index) in miscFees">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="w-50 d-flex justify-content-start align-items-center">
-                                           <span>{{ mf.tuitemp_desc }}</span>
-                                        </div>
-                                        <div class="w-25 d-flex justify-content-start align-items-center">
+                                            <span>{{ mf.tuitemp_desc }}</span>
                                         </div>
                                         <div class="d-flex justify-content-start align-items-center">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(mf.tuitemp_price) }}</span>
+                                            <span>{{ new Intl.NumberFormat('en-PH', {
+                                                style: 'currency', currency: 'PHP'
+                                                }).format(mf.tuitemp_price) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-start align-items-center">
+                                            <span>Qty</span> &nbsp;
+                                            <!-- <input min="1" minlength="1" type="number" required
+                                                :value="mf.tuitemp_quantity"
+                                                @focusout="c = $event.target.value, clickSubmit('assess')"
+                                                class="form-control form-control-sm" /> -->
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    required
+                                                    class="form-control form-control-sm"
+                                                    :value="mf.tuitemp_quantity"
+                                                    @focus="oldQty = mf.tuitemp_quantity"
+                                                    @focusout="($event.target.value != oldQty) && (mf.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
+                                                />
                                         </div>
                                         <div class="d-flex justify-content-start align-items-center">
                                             <button class="btn btn-sm btn-danger" type="button" v-if="!activeEnrollment"
@@ -918,8 +979,11 @@ const resolveGroupLabel = (groupKey) => {
                                         </div>
                                     </div>
                                 </li>
-                                <li class="list-group-item" v-if="!Object.keys(miscFees).length && !preLoading">No Record Found</li>
-                                <li class="list-group-item" v-if="!Object.keys(miscFees).length && preLoading">Loading Items...</li>
+                                <li class="list-group-item" v-if="!Object.keys(miscFees).length && !preLoading">No
+                                    Record
+                                    Found</li>
+                                <li class="list-group-item" v-if="!Object.keys(miscFees).length && preLoading">Loading
+                                    Items...</li>
                             </ul>
                         </div>
                         <!-- <div class="col-md-12 text-start mb-2" v-if="chargeType == 1">
@@ -980,10 +1044,12 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="col-md-12 text-start mb-2" v-if="chargeType == 1">
                             <span class="fst-italic fw-bold text-primary">Subjects Prices</span>
                             <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey">
-                                <p class="fw-bold p-2 bg-dark rounded-3 text-white mt-2">{{ resolveGroupLabel(groupKey) }}</p>
+                                <p class="fw-bold p-2 bg-dark rounded-3 text-white mt-2">{{ resolveGroupLabel(groupKey)
+                                    }}
+                                </p>
                                 <li class="list-group-item" v-for="(sj, index) in items" :key="index">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        
+
                                         <div class="w-50 d-flex justify-content-start align-items-center">
                                             <span class="w-50">{{ sj.tuitemp_desc }}</span>
                                         </div>
@@ -991,34 +1057,51 @@ const resolveGroupLabel = (groupKey) => {
                                             <div class="d-flex flex-column gap-1">
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text">Lec ({{ sj.tuitemp_lec }})</span>
-                                                    <input  v-model.number="sj.tuitemp_lec_price"
-                                                            required
-                                                            step="0.01" 
-                                                            min="0.00"
-                                                            @input="if (sj.tuitemp_lec_price <= 0) sj.tuitemp_lec_price = 0;"
-                                                            type="number"
-                                                            @focusout="clickSubmit('assess')"
-                                                            class="form-control" placeholder="Price Per Unit"/>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        required
+                                                        class="form-control"
+                                                        placeholder="Price Per Unit"
+                                                        :value="sj.tuitemp_lec_price"
+                                                        @focus="oldLecPrice = sj.tuitemp_lec_price"
+                                                        @input="$event.target.value <= 0 && ($event.target.value = 0)"
+                                                        @focusout="
+                                                            $event.target.value != oldLecPrice
+                                                                ? (sj.tuitemp_lec_price = $event.target.value, clickSubmit('assess'))
+                                                                : null
+                                                        "
+                                                    />
                                                 </div>
                                                 <div class="input-group input-group-sm">
                                                     <span class="input-group-text">Lab ({{ sj.tuitemp_lab }})</span>
-                                                    <input  v-model.number="sj.tuitemp_lab_price"
-                                                            required
-                                                            step="0.01" 
-                                                            min="0.00"
-                                                            @input="if (sj.tuitemp_lab_price <= 0) sj.tuitemp_lab_price = 0;"
-                                                            type="number"
-                                                            @focusout="clickSubmit('assess')"
-                                                            :disabled="sj.tuitemp_lab==0?true:false"
-                                                            class="form-control" placeholder="Price Per Unit"/>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        min="0"
+                                                        required
+                                                        class="form-control"
+                                                        placeholder="Price Per Unit"
+                                                        :disabled="sj.tuitemp_lab == 0"
+                                                        :value="sj.tuitemp_lab_price"
+                                                        @focus="oldLabPrice = sj.tuitemp_lab_price"
+                                                        @input="$event.target.value <= 0 && ($event.target.value = 0)"
+                                                        @focusout="
+                                                            $event.target.value != oldLabPrice
+                                                                ? (sj.tuitemp_lab_price = $event.target.value, clickSubmit('assess'))
+                                                                : null
+                                                        "
+                                                    />
                                                 </div>
-                                            </div>    
+
+                                            </div>
                                         </div>
                                         <div class="w-25 d-flex justify-content-center align-items-center">
                                             <div class="d-flex flex-column gap-2 text-start">
-                                                <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
-                                                <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((sj.tuitemp_lab_price || 0) * sj.tuitemp_lab) }}</span>
-                                            </div>    
+                                                <span>{{ pesoConverter((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
+                                                <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * sj.tuitemp_lab) }}</span>
+                                            </div>
                                         </div>
                                         <!-- <div class="d-flex justify-content-center align-items-center">
                                            <div class="d-flex gap-1 justify-content-center align-items-center w-50">
@@ -1030,8 +1113,11 @@ const resolveGroupLabel = (groupKey) => {
                                         </div> -->
                                     </div>
                                 </li>
-                                <li class="list-group-item" v-if="!Object.keys(subjFees).length && !preLoading">No Record Found</li>
-                                <li class="list-group-item" v-if="!Object.keys(subjFees).length && preLoading">Loading Items...</li>
+                                <li class="list-group-item" v-if="!Object.keys(subjFees).length && !preLoading">No
+                                    Record
+                                    Found</li>
+                                <li class="list-group-item" v-if="!Object.keys(subjFees).length && preLoading">Loading
+                                    Items...</li>
                             </ul>
                         </div>
                         <!-- <div class="col-md-12">
@@ -1051,13 +1137,31 @@ const resolveGroupLabel = (groupKey) => {
                                 <li class="list-group-item" v-for="(cq, index) in customFees">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="w-50 d-flex justify-content-start align-items-center">
-                                           <span>{{ cq.tuitemp_desc }}</span>
+                                            <span>{{ cq.tuitemp_desc }}</span>
                                         </div>
                                         <div class="w-25 d-flex justify-content-start align-items-center">
+                                            <span v-if="cq.tuitemp_custype == 3">{{ pesoConverter(cq.tuitemp_price) }}</span>
+                                            <span v-else class="text-danger">
+                                                <span v-if="cq.tuitemp_disc_type == 1">
+                                                    - {{ cq.tuitemp_price }}%
+                                                </span>
+                                                <span v-else>
+                                                    - {{ pesoConverter(cq.tuitemp_price) }} 
+                                                </span>
+                                            </span>
                                         </div>
-                                        <div class="d-flex justify-content-start align-items-center">
-                                            <span v-if="cq.tuitemp_custype==3">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cq.tuitemp_price) }}</span>
-                                            <span v-else class="text-danger">- {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cq.tuitemp_price) }}</span>
+                                        <div class="w-25 d-flex justify-content-start align-items-center">
+                                            <span>Qty</span> &nbsp;
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                required
+                                                class="form-control form-control-sm"
+                                                :value="cq.tuitemp_quantity"
+                                                @focus="oldQty = cq.tuitemp_quantity"
+                                                @focusout="($event.target.value != oldQty) && (cq.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
+                                            />
+
                                         </div>
                                         <div>
                                             <button class="btn btn-sm btn-danger" v-if="!activeEnrollment"
@@ -1067,30 +1171,94 @@ const resolveGroupLabel = (groupKey) => {
                                         </div>
                                     </div>
                                 </li>
-                                <li class="list-group-item" v-if="!Object.keys(customFees).length && !preLoading">No Record Found</li>
-                                <li class="list-group-item" v-if="!Object.keys(customFees).length && preLoading">Loading Items...</li>
+                                <li class="list-group-item" v-if="!Object.keys(customFees).length && !preLoading">No
+                                    Record
+                                    Found</li>
+                                <li class="list-group-item" v-if="!Object.keys(customFees).length && preLoading">Loading
+                                    Items...</li>
                             </ul>
                         </div>
                     </form>
-                    <div class="w-100 p-2 border mb-1 d-flex justify-content-between gap-2">
-                        <div class="d-flex flex-column gap-2 text-start w-100">
-                            <span>Total Miscellaneous Items</span>
-                            <span v-if="chargeType == 1">Total Subject Units</span>
-                            <span>Total Other Charges</span>
-                            <span class="border-0 border-bottom mb-2">Total Deductions</span>
-                            <span>Grand total</span>
+                    <div class="w-100 p-3 border rounded mb-2">
+
+                        <!-- CHARGES -->
+                        <div class="mb-3">
+                            <div class="fw-bold text-uppercase small border-bottom pb-1 mb-2">
+                                Charges
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Additional Items</span>
+                                <span>{{ pesoConverter(miscFeesTotal) }}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-1" v-if="chargeType == 1">
+                                <span>Subject Units</span>
+                                <span>{{ pesoConverter(subjFeesTotal) }}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Other Charges</span>
+                                <span>{{ pesoConverter(customFeesTotal) }}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between fw-bold border-top pt-2 mt-2">
+                                <span>Total Charges</span>
+                                <span>
+                                    {{ pesoConverter(customFeesTotal + miscFeesTotal + subjFeesTotal) }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="d-flex flex-column gap-2 text-end w-100">
-                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(miscFeesTotal) }}</span>
-                            <span v-if="chargeType == 1">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(subjFeesTotal) }}</span>
-                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(customFeesTotal) }}</span>
-                            <span class="border-0 border-bottom mb-2 text-danger">- {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(customDeductionsTotal) }}</span>
-                            <span class="fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalFees) }}</span>
+
+                        <!-- DEDUCTIONS -->
+                        <div class="mb-3">
+                            <div class="fw-bold text-uppercase small border-bottom pb-1 mb-2 text-danger">
+                                Deductions
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-1 text-danger">
+                                <span>Other Deductions</span>
+                                <span>- {{ pesoConverter(customDeductionsExact) }}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-1 text-danger">
+                                <span>
+                                    Discount ({{ customDeductionsPercent }}%)
+                                </span>
+                                <span>
+                                    - {{ pesoConverter(
+                                        (customFeesTotal + miscFeesTotal + subjFeesTotal)
+                                        * customDeductionsPercent / 100
+                                    ) }}
+                                </span>
+                            </div>
+
+                            <div class="d-flex justify-content-between fw-bold border-top pt-2 mt-2 text-danger">
+                                <span>Total Deductions</span>
+                                <span>
+                                    - {{ pesoConverter(
+                                        customDeductionsExact +
+                                        ((customFeesTotal + miscFeesTotal + subjFeesTotal)
+                                            * customDeductionsPercent / 100)
+                                    ) }}
+                                </span>
+                            </div>
                         </div>
+
+                        <!-- GRAND TOTAL -->
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+                            <span class="fw-bold fs-5">Grand Total</span>
+                            <span class="fw-bold fs-4 text-dark">
+                                {{ pesoConverter(totalFees) }}
+                            </span>
+                        </div>
+
                     </div>
+
                     <div class="w-100 p-4 border mb-2 d-flex justify-content-end gap-2" v-if="!activeEnrollment">
                         <!-- <button type="button" class="btn btn-sm btn-warning" @click="clickSubmit('clear')">Reset Details</button> -->
-                        <button type="button" class="btn btn-sm btn-success" @click="clickSubmit('save')">Save Details</button>
+                        <button type="button" class="btn btn-sm btn-success" @click="clickSubmit('save')">Save
+                            Details</button>
                     </div>
                 </div>
             </div>

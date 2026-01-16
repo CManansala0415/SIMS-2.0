@@ -11,6 +11,7 @@ import BillingTuitionView from '../components/Accounting/BillingTuitionView.vue'
 import StudentRequestView from '../components/Registrar/StudentRequestView.vue';
 import AccountingItemsView from '../components/Accounting/AccountingItemsView.vue';
 import AccountingSubjectsView from '../components/Accounting/AccountingSubjectsView.vue';
+import AccountingStudentAccountsView from '../components/Accounting/AccountingStudentAccountsView.vue';
 import AccountingTuitionView from '../components/Accounting/AccountingTuitionView.vue';
 import CashierDailyCollections from '../components/Accounting/CashierDailyCollections.vue';
 import AccountingDailyCollections from '../components/Accounting/AccountingDailyCollections.vue';
@@ -91,6 +92,9 @@ const routes = [
     },
     {
         path: '/accounting-subjects', name:'/accounting-subjects', component: AccountingSubjectsView
+    },
+    {
+        path: '/accounting-student-accounts', name:'/accounting-student-accounts', component: AccountingStudentAccountsView
     },
     {
         path: '/accounting-tuition', name:'/accounting-tuition', component: AccountingTuitionView

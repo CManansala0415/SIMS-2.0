@@ -164,6 +164,7 @@ onMounted(async () => {
                             // console.log(results1)
                             getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results1.ln_id).then((results2) => {
                                 scheduleData.value = results2.data
+                                console.log(scheduleData.value)
                                 preloading.value = false
                                 milestoneLoading.value = false
 
@@ -402,6 +403,20 @@ const downloadPdf = () => {
 const formType = ref(1)
 
 // Chat GPT Helper
+
+function timeToMinutes(raw) {
+    // raw example: "0600A", "0130P"
+    let hh = parseInt(raw.slice(0, 2), 10)
+    const mm = parseInt(raw.slice(2, 4), 10)
+    const mer = raw.slice(4) // A or P
+
+    if (mer === "P" && hh !== 12) hh += 12
+    if (mer === "A" && hh === 12) hh = 0
+
+    return hh * 60 + mm
+}
+
+
 // Day mapping
 const dayMap = [
     { field: "sched_mon", label: "Monday", key: "mon", order: 1 },
@@ -463,7 +478,11 @@ function getScheduleGroupsForSubject(subjId) {
 
     if (!entries.length) return []
 
-    entries.sort((a, b) => a.dayOrder - b.dayOrder || a.rawStart.localeCompare(b.rawStart))
+    // entries.sort((a, b) => a.dayOrder - b.dayOrder || a.rawStart.localeCompare(b.rawStart))
+    entries.sort((a, b) =>
+        a.dayOrder - b.dayOrder ||
+        timeToMinutes(a.rawStart) - timeToMinutes(b.rawStart)
+    )
 
     const groups = []
     let cur = null
@@ -479,7 +498,8 @@ function getScheduleGroupsForSubject(subjId) {
             e.room === cur.room &&
             e.building === cur.building &&
             e.faculty === cur.faculty &&
-            e.rawStart === prev.rawEnd
+            // e.rawStart === prev.rawEnd
+            timeToMinutes(e.rawStart) === timeToMinutes(prev.rawEnd)
 
         if (canMerge) {
             cur.end = e.end
@@ -830,16 +850,24 @@ function getScheduleGroupsForSubject(subjId) {
                         <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.lab_amount) : 0.00 }}</span>
                     </div>
                     <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Miscellaneous Fees</span>
-                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.misc_amount) : 0.00 }}</span>
-                    </div>
-                    <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Other Fees</span>
+                        <span>Total  Item/Miscellaneous Fees</span>
                         <span class="fw-bold">{{ chargeBreakdown.item_amount?  pesoConverter(chargeBreakdown.item_amount) : 0.00 }}</span>
                     </div>
                     <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Tuition and Fees</span>
+                        <span>Total Other Charges</span>
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.misc_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Deductions</span>
+                        <span class="fw-bold"> - {{ chargeBreakdown.deductions?  pesoConverter(chargeBreakdown.deductions) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
+                        <span>Total Tuition</span>
                         <span class="fw-bold">{{ enrolleeData[0].acs_amount?  pesoConverter(enrolleeData[0].acs_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
+                        <span>Remaining Balance</span>
+                        <span class="fw-bold">{{  chargeBreakdown.overall_amount?  pesoConverter( chargeBreakdown.overall_amount) : 0.00 }}</span>
                     </div>
                     <!-- <div class="d-flex gap-1 justify-content-between">
                         <span>Mode of Payment</span>

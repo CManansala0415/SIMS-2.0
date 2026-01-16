@@ -516,7 +516,50 @@ const turnOffCounters = () => {
 }
 
 
-
+const validateData = (type, value) =>{
+    switch(type){
+        case 'or-start':
+            if(seriesOrStart.value && parseInt(value) > parseInt(seriesOrEnd.value)){
+                Swal.fire({
+                    icon: "warning",
+                    title: "Invalid Series Range",
+                    text: "The 'Start' series cannot be greater than the 'End' series.",
+                });
+                seriesOrStart.value = ''
+            }
+            break;
+        case 'or-end':
+            if(seriesOrEnd.value && parseInt(value) < parseInt(seriesOrStart.value)){
+                Swal.fire({
+                    icon: "warning",
+                    title: "Invalid Series Range",
+                    text: "The 'End' series cannot be less than the 'Start' series.",
+                });
+                seriesOrEnd.value = ''
+            }
+            break;
+        case 'pr-start':
+            if(seriesPrStart.value && parseInt(value) > parseInt(seriesPrEnd.value)){
+                Swal.fire({
+                    icon: "warning",
+                    title: "Invalid Series Range",
+                    text: "The 'Start' series cannot be greater than the 'End' series.",
+                });
+                seriesPrStart.value = ''
+            }
+            break;
+        case 'pr-end':
+            if(seriesPrEnd.value && parseInt(value) < parseInt(seriesPrStart.value)){
+                Swal.fire({
+                    icon: "warning",
+                    title: "Invalid Series Range",
+                    text: "The 'End' series cannot be less than the 'Start' series.",
+                });
+                seriesPrEnd.value = ''
+            }
+            break;
+    }
+}
 </script>
 <template>
     <div id="main-component">
@@ -934,7 +977,7 @@ const turnOffCounters = () => {
                                                     </div>
                                                     <div class="col-8">
                                                         <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesOrStart" required> -->
-                                                        <input 
+                                                        <!-- <input 
                                                             v-model.number="seriesOrStart"
                                                             required
                                                             step="0" 
@@ -942,11 +985,20 @@ const turnOffCounters = () => {
                                                             :max="seriesOrEnd"
                                                             :disabled="savingSeries"
                                                             @focusout="
-                                                            if (seriesOrStart <= 0) seriesOrStart = Number(seriesOrEnd) - 10;
-                                                            "
-                                                            @input="
+                                                            if (seriesOrStart <= 0) seriesOrStart = Number(seriesOrEnd) - 10, console.log(seriesOrStart);
                                                             if (seriesOrStart >= seriesOrEnd) seriesOrStart = (Number(seriesOrEnd)-10);
                                                             "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        /> -->
+                                                        <input 
+                                                            v-model.number="seriesOrStart"
+                                                            required
+                                                            step="0" 
+                                                            min="0"
+                                                            :max="seriesOrEnd"
+                                                            :disabled="savingSeries"
+                                                            @focusout="validateData('or-start', seriesOrStart)"
                                                             type="number"
                                                             class="form-control form-control-sm text-center"
                                                         />
@@ -966,7 +1018,7 @@ const turnOffCounters = () => {
                                                     </div>
                                                     <div class="col-8">
                                                         <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesOrEnd" required> -->
-                                                        <input 
+                                                        <!-- <input 
                                                             v-model.number="seriesOrEnd"
                                                             required
                                                             step="0" 
@@ -976,6 +1028,16 @@ const turnOffCounters = () => {
                                                             if (seriesOrStart <= 0 || !seriesOrStart) seriesOrStart = Number(seriesOrEnd) - 10;
                                                             if (seriesOrEnd <= seriesOrStart ) seriesOrEnd = Number(seriesOrStart) + 10;
                                                             "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        /> -->
+                                                        <input 
+                                                            v-model.number="seriesOrEnd"
+                                                            required
+                                                            step="0" 
+                                                            :min="Number(seriesOrStart) + 10"
+                                                            :disabled="savingSeries"
+                                                            @focusout="validateData('or-end', seriesOrEnd)"
                                                             type="number"
                                                             class="form-control form-control-sm text-center"
                                                         />
@@ -1001,7 +1063,7 @@ const turnOffCounters = () => {
                                                     </div>
                                                     <div class="col-8">
                                                         <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesPrStart" required> -->
-                                                        <input 
+                                                        <!-- <input 
                                                             v-model.number="seriesPrStart"
                                                             required
                                                             step="0" 
@@ -1014,6 +1076,17 @@ const turnOffCounters = () => {
                                                             @input="
                                                             if (seriesPrStart >= seriesPrEnd) seriesPrStart = (Number(seriesPrEnd)-10);
                                                             "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        /> -->
+                                                        <input 
+                                                            v-model.number="seriesPrStart"
+                                                            required
+                                                            step="0" 
+                                                            min="0"
+                                                            :max="seriesPrEnd"
+                                                            :disabled="savingSeries"
+                                                            @focusout="validateData('pr-start', seriesPrStart)"
                                                             type="number"
                                                             class="form-control form-control-sm text-center"
                                                         />
@@ -1033,7 +1106,7 @@ const turnOffCounters = () => {
                                                     </div>
                                                     <div class="col-8">
                                                         <!-- <input type="text" :disabled="savingSeries" class="form-control form-control-sm text-center" v-model="seriesPrEnd" required> -->
-                                                        <input 
+                                                        <!-- <input 
                                                             v-model.number="seriesPrEnd"
                                                             required
                                                             step="0" 
@@ -1043,6 +1116,16 @@ const turnOffCounters = () => {
                                                             if (seriesPrStart <= 0 || !seriesPrStart) seriesPrStart = Number(seriesPrEnd) - 10;
                                                             if (seriesPrEnd <= seriesPrStart ) seriesPrEnd = Number(seriesPrStart) + 10;
                                                             "
+                                                            type="number"
+                                                            class="form-control form-control-sm text-center"
+                                                        /> -->
+                                                        <input 
+                                                            v-model.number="seriesPrEnd"
+                                                            required
+                                                            step="0" 
+                                                            :min="Number(seriesPrStart) + 10"
+                                                            :disabled="savingSeries"
+                                                            @focusout="validateData('pr-end', seriesPrEnd)"
                                                             type="number"
                                                             class="form-control form-control-sm text-center"
                                                         />

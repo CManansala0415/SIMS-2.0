@@ -20,6 +20,8 @@ import {
 
 
 } from "../Fetchers.js";
+
+import { pesoConverter } from '../Generators.js'
 import Loader from '../snippets/loaders/Loading1.vue';
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
 import AccountingDownloadModal from '../snippets/modal/AccountingDownloadModal.vue';
@@ -58,6 +60,14 @@ const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const templatePricesData = ref([])
 const totalCost = ref(0)
+const totalItemCost = ref(0)
+const totalSubjCost = ref(0)
+const totalLecCost = ref(0)
+const totalLabCost = ref(0)
+const totalExactDiscount = ref(0)
+const totalPercentDiscount = ref(0)
+const totalPayment = ref(0)
+const templateArrayItems = ref(0)
 const booter = async () => {
     // getProgram().then((results) => {
     //     program.value = results
@@ -129,7 +139,7 @@ const paramsCourse = ref(0)
 
 
 onMounted(async () => {
-    getUserID().then(async(results1) => {
+    getUserID().then(async (results1) => {
         userID.value = results1.account.data.id
         accessData.value = results1.access
         emit('fetchUser', results1)
@@ -139,7 +149,7 @@ onMounted(async () => {
 
                 booting.value = 'Loading Students...'
                 bootingCount.value += 1
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,1).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -168,7 +178,7 @@ onMounted(async () => {
                 title: "Oops...",
                 text: "Something went wrong!",
                 footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
-            }).then(()=>{
+            }).then(() => {
                 preLoading.value = false
                 emit('doneLoading', false)
             });
@@ -181,7 +191,7 @@ onMounted(async () => {
             icon: "error",
             title: "Oops...",
             text: "Session expired, log in again",
-        }).then(()=>{
+        }).then(() => {
             router.push("/");
             window.stop()
         });
@@ -203,7 +213,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -211,7 +221,7 @@ const paginate = (mode) => {
             }
             break;
         case 'next':
- 
+
             if (offset.value >= studentCount.value) {
                 offset.value = studentCount.value
             } else {
@@ -219,7 +229,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -233,7 +243,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value,0).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
                     preLoading.value = false
@@ -247,7 +257,7 @@ const paginate = (mode) => {
                     title: "Search Failed",
                     text: "Please search a valid record",
                     icon: "error"
-                }).then(()=>{
+                }).then(() => {
                     preLoading.value = false
                 });
             }
@@ -286,42 +296,46 @@ const settlement = (stud) => {
     templatePricesData.value = []
     //get account first
     let a = student.value.map((e) => {
-    let b = accounts.value.findIndex((f) => {
-        return f.acs_enrid === e.enr_id
-    })
-    return {
-        ...e,
-        ...accounts.value[b],
-    }
+        let b = accounts.value.findIndex((f) => {
+            return f.acs_enrid === e.enr_id
+        })
+        return {
+            ...e,
+            ...accounts.value[b],
+        }
     })
 
     studentAccount.value = a
 
     // get latest balance
-    try{
-        
+    try {
+
         getPaymentDetails(studentAccount.value[0].acs_id, 1).then((results) => {
             let x = results.data.slice(-1).pop()
             grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : studentAccount.value[0].acs_amount
+            // console.log(x)
+            results.data.forEach((e) => {
+                totalPayment.value += Number(e.acy_payment)
+            })
         })
 
-        getChargesTemplateHeader (stud.enr_curriculum, stud.enr_quarter, stud.enr_program, stud.enr_course, stud.enr_gradelvl, stud.enr_section).then((results)=>{
+        getChargesTemplateHeader(stud.enr_curriculum, stud.enr_quarter, stud.enr_program, stud.enr_course, stud.enr_gradelvl, stud.enr_section).then((results) => {
             // console.log(results.template)
 
             for (const key in results.template) {
-                 templatePricesData.value.push({
+                templatePricesData.value.push({
                     ...results.template[key].data
                 })
             }
         })
 
-    }catch(err){
+    } catch (err) {
         Swal.fire({
             icon: "error",
             title: "Oops...",
             text: "Something went wrong!",
             footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
-        }).then(()=>{
+        }).then(() => {
             preLoading.value = false
             emit('doneLoading', false)
         });
@@ -340,122 +354,126 @@ const settlement = (stud) => {
 
 
     getMilestone(stud.enr_id).then((results) => {
-        // grandTotal.value = 0
-        milestone.value = results
+
+        /* ----------------------------------------
+         * RESET ALL TOTALS (VERY IMPORTANT)
+         * ---------------------------------------- */
         billLoading.value = false
+
+        grandTotal.value = 0
         totalCost.value = 0
-       
-        milestone.value = results.map((e, index) => {
-            let lab_amount = 0
-            let lec_amount = 0
-            let hrs_amount = 0
+        totalItemCost.value = 0
+        totalExactDiscount.value = 0
+        totalSubjCost.value = 0
+        totalLecCost.value = 0
+        totalLabCost.value = 0
 
-            let indexer = price.value.findIndex(f => {
-                lab_amount = f.acp_per_lab_unit ? f.acp_per_lab_unit : 0
-                lec_amount = f.acp_per_lec_unit ? f.acp_per_lec_unit : 0
-                hrs_amount = f.acp_per_hours ? f.acp_per_hours : 0
-                return e.subj_id === f.acp_subjid
-            });
+        milestone.value = results
 
-            if (indexer !== -1) {
+        /* ----------------------------------------
+         * PREP DATA
+         * ---------------------------------------- */
+        const templateArray = Object.values(templatePricesData.value[0] || {})
+        let mergedData = []
 
-                let grand = lab_amount + lec_amount + hrs_amount
-                let total = parseInt(grand * 100) / 100;
-                grandTotal.value += total
+        /* ----------------------------------------
+         * SUBJECT COMPUTATION
+         * ---------------------------------------- */
+        milestone.value.forEach(ms => {
 
-                return {
-                    ...e,
-                    lab_amount: lab_amount,
-                    lec_amount: lec_amount,
-                    hrs_amount: hrs_amount,
-                    total: total.toFixed(2)
-                }
+            let template = templateArray.find(tp =>
+                Number(tp.tuitemp_subjid) === Number(ms.mi_subjid)
+            )
+
+            let lecAmount = 0
+            let labAmount = 0
+            let totalPrice = 0
+
+            if (template) {
+                lecAmount = (template.tuitemp_lec_price || 0) * (template.tuitemp_lec || 0)
+                labAmount = (template.tuitemp_lab_price || 0) * (template.tuitemp_lab || 0)
+                totalPrice = lecAmount + labAmount
             } else {
-                return {
-                    ...e,
-                    lab_amount: 0,
-                    lec_amount: 0,
-                    hrs_amount: 0,
-                    total: 0
-                }
+                lecAmount = (ms.subj_lec_units_rate || 0) * (ms.subj_lec_units || 0)
+                labAmount = (ms.subj_lab_units_rate || 0) * (ms.subj_lab_units || 0)
+                totalPrice = lecAmount + labAmount
             }
 
+            // Track totals
+            totalSubjCost.value += totalPrice
+            totalLecCost.value += lecAmount
+            totalLabCost.value += labAmount
+
+            // Only billable subjects
+            if (Number(ms.mi_tag) !== 1) {
+                totalCost.value += totalPrice
+            }
+
+            mergedData.push({
+                ...ms,
+                ...(template || {}),
+                lec_amount: lecAmount,
+                lab_amount: labAmount,
+                total_price: totalPrice
+            })
         })
 
+        /* ----------------------------------------
+         * ITEMS & MISC CHARGES
+         * ---------------------------------------- */
+        templateArray.forEach(tp => {
+            if (
+                tp.tuitemp_subjid == null &&
+                (Number(tp.tuitemp_custype) === 3 || tp.tuitemp_custid == null)
+            ) {
+                const amount = Number(tp.tuitemp_price || 0) * Number(tp.tuitemp_quantity || 0)
+                totalCost.value += amount
+                totalItemCost.value += amount
+            }
+        })
+
+        /* ----------------------------------------
+         * DISCOUNTS (APPLIED LAST)
+         * ---------------------------------------- */
+        let discount = 0
+        const discountBase = totalCost.value // freeze base
+
+        templateArray.forEach(tp => {
+            if (tp.tuitemp_subjid == null && Number(tp.tuitemp_custype) === 4) {
+
+                if (tp.tuitemp_disc_type == 1) {
+                    // Percent discount
+                    const percentDiscount = discountBase * (Number(tp.tuitemp_price) / 100)
+                    discount += percentDiscount
+                    totalExactDiscount.value += percentDiscount
+                } else {
+                    // Fixed discount
+                    const fixedDiscount =
+                        Number(tp.tuitemp_price || 0) * Number(tp.tuitemp_quantity || 0)
+                    discount += fixedDiscount
+                    totalExactDiscount.value += fixedDiscount
+                }
+            }
+        })
+
+        /* ----------------------------------------
+         * FINAL TOTALS
+         * ---------------------------------------- */
+        totalCost.value = Math.max(0, totalCost.value - discount)
+        grandTotal.value = totalCost.value
+
+        templatePricesData.value = mergedData
+        templateArrayItems.value = templateArray
+
+        /* ----------------------------------------
+         * STUDENT ACCOUNT
+         * ---------------------------------------- */
         studentAccount.value = {
             ...x[0],
             ...stud,
             acr_amount: grandTotal.value
         }
-
-
-        let mergedData = []
-        let discount = 0
-        // let totalCost = 0
-
-        // Convert template object to array
-        let templateArray = Object.values(templatePricesData.value[0] || {})
-
-        milestone.value.forEach((ms) => {
-            let template = templateArray.find(tp =>
-                Number(tp.tuitemp_subjid) === Number(ms.mi_subjid)
-            )
-
-            let total_price = 0
-            let mergedItem = { ...ms }
-
-            if (template) {
-                // Merge template fields
-                Object.keys(template).forEach(key => {
-                    mergedItem[key] = template[key]
-                })
-
-                // Compute from template
-                total_price =
-                    ((template.tuitemp_lec_price || 0) * (template.tuitemp_lec || 0)) +
-                    ((template.tuitemp_lab_price || 0) * (template.tuitemp_lab || 0))
-
-                mergedItem.tuitemp_id = template.tuitemp_id
-            } else {
-                // Fallback to milestone rates
-                total_price =
-                    ((ms.subj_lec_units_rate || 0) * ((ms.subj_lec_units) || 0)) +
-                    ((ms.subj_lab_units_rate || 0) * ((ms.subj_lab_units) || 0))
-            }
-
-            // ✅ APPLY CONDITION HERE
-            // If mi_tag != 1, include in total cost
-            if (Number(ms.mi_tag) !== 1) {
-                totalCost.value += total_price
-            }
-
-            mergedItem.total_price = total_price
-            mergedData.push(mergedItem)
-        })
-
-        /*
-        |--------------------------------------------------------------------------
-        | Items & miscellaneous charges
-        |--------------------------------------------------------------------------
-        */
-        templateArray.forEach((tp) => {
-            if (tp.tuitemp_subjid == null && Number(tp.tuitemp_custype) == 3) {
-                totalCost.value += Number(tp.tuitemp_price || 0)
-            }else{
-                discount += Number(tp.tuitemp_price || 0) // if custype == 4 means deduction
-            }
-        })
-
-
-        totalCost.value = totalCost.value - discount
-        templatePricesData.value = mergedData
-        // console.log(templatePricesData.value)
-        // console.log(milestone.value)
-        // console.log(mergedData)
-        // console.log(discount)
-
     })
-
 }
 
 const settlePayments = () => {
@@ -463,7 +481,7 @@ const settlePayments = () => {
 }
 
 const showQRScanner = ref(false)
-const getData = (result) =>{
+const getData = (result) => {
     console.log(result)
     student.value = result
     showQRScanner.value = !showQRScanner
@@ -475,22 +493,24 @@ const getData = (result) =>{
 <template>
     <div class="small-font">
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Billing Tuition</h5>
+            <h5 class=" text-uppercase fw-bold">Student Scholarship</h5>
         </div>
 
         <div v-if="!balance" class="p-1 d-flex gap-2 justify-content-between mb-3">
             <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                <input type="text" v-model="searchFname" @keyup.enter="search()" class="form-control w-100"
+                    :disabled="preLoading ? true : false" placeholder="First Name" />
+                <input type="text" v-model="searchMname" @keyup.enter="search()" class="form-control w-100"
+                    :disabled="preLoading ? true : false" placeholder="Middle Name" />
+                <input type="text" v-model="searchLname" @keyup.enter="search()" class="form-control w-100"
+                    :disabled="preLoading ? true : false" placeholder="Last Name" />
+                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1"
+                    :disabled="preLoading ? true : false">
                     Search
                 </button>
-                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Scan QR 
+                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button"
+                    class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading ? true : false">
+                    Scan QR
                 </button>
             </div>
             <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
@@ -502,8 +522,8 @@ const getData = (result) =>{
         </div>
         <div v-else class="p-1 d-flex gap-2 justify-content-end mb-3">
             <div class="d-flex w-50 justify-content-end">
-                <button tabindex="-1" @click="balance=false" 
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading || billLoading ? true : false">
+                <button tabindex="-1" @click="balance = false" type="button" class="btn btn-sm btn-primary"
+                    :disabled="preLoading || billLoading ? true : false">
                     <font-awesome-icon icon="fa-solid fa-rotate-left" /> Back
                 </button>
             </div>
@@ -575,7 +595,7 @@ const getData = (result) =>{
                             {{ stud.acs_amount > 0 ? 'Yes' : 'No' }}
                         </td>
                         <td v-if="accessData[18].useracc_modifying == 1" class="align-middle p-2">
-                            <div  class="d-flex gap-2 justify-content-center">
+                            <div class="d-flex gap-2 justify-content-center">
                                 <button tabindex="-1" title="Balance" @click="settlement(stud)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-gear" />
@@ -613,173 +633,203 @@ const getData = (result) =>{
         </div>
 
         <div v-else class="overflow-auto">
-            <div v-if="!billLoading" class="d-flex flex-column gap-2">
-                <div class="fw-bold bg-secondary-subtle p-3">
-                    Statement of Account
-                </div>
-                <div class="d-flex gap-2">
-                    <div class="card w-100 text-start">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                Name:
-                               <input 
-                                    class="form-control form-control-sm text-uppercase"
-                                    :value="`${studentAccount.per_firstname || ''} ${studentAccount.per_middlename || ''} ${studentAccount.per_lastname || ''} ${studentAccount.per_suffixname || ''}`.trim()"
-                                    disabled
-                                    />
+            <div v-if="!billLoading" class="container overflow-hidden bg-secondary-subtle">
+                <div class="container my-4 print-area">
 
-                            </li>
-                            <li class="list-group-item">
-                                Contact:
-                                <input class="form-control form-control-sm" :value="'0'+studentAccount.per_contact"
-                                    disabled />
-                            </li>
-                            <li class="list-group-item">
-                                Email:
-                                <input class="form-control form-control-sm" :value="studentAccount.per_email"
-                                    disabled />
-                            </li>
-                            <li class="list-group-item">
-                                Enrollee ID:
-                                <input class="form-control form-control-sm" :value="studentAccount.acs_enrid"
-                                    disabled />
-                            </li>
-                        </ul>
+                    <!-- Print Button -->
+                    <div class="d-print-none mb-3 text-end">
+                        <button onclick="window.print()" class="btn btn-dark">
+                            🖨 Print Statement
+                        </button>
                     </div>
-                    <div class="card w-100 text-start">
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">
-                                Degree:
-                                <select class="form-control form-select-sm" disabled
-                                    v-model="studentAccount.enr_program">
-                                    <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}
-                                    </option>
-                                </select>
-                            </li>
-                            <li class="list-group-item">
-                                Course:
-                                <select class="form-control form-select-sm" disabled
-                                    v-model="studentAccount.enr_course">
-                                    <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}</option>
-                                </select>
-                            </li>
-                            <li class="list-group-item">
-                                Year / Grade Level:
-                                <select class="form-control form-select-sm" disabled
-                                    v-model="studentAccount.enr_gradelvl">
-                                    <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}</option>
-                                </select>
-                            </li>
-                            <li class="list-group-item">
-                                Section:
-                                <select class="form-control form-select-sm" disabled
-                                    v-model="studentAccount.enr_section">
-                                    <option v-for="(s, index) in section" :value="s.sec_id">{{ s.sec_name }}</option>
-                                </select>
-                            </li>
-                        </ul>
+
+                    <div class="card border shadow-sm">
+
+                        <!-- HEADER -->
+                        <div class="card-header bg-dark text-white py-3 print-header">
+                            <div class="text-center">
+                                <h4 class="mb-0 fw-bold">STATEMENT OF ACCOUNT</h4>
+                                <small class="opacity-75">Academic Billing Summary</small>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+                            <!-- ACCOUNT INFO -->
+                            <div class="row mb-4 small">
+                                <div class="col-6 text-start">
+                                    <p class="mb-1"><strong>Name:</strong>
+                                        {{ `${studentAccount.per_firstname || ''} ${studentAccount.per_middlename || ''}
+                                        ${studentAccount.per_lastname || ''} ${studentAccount.per_suffixname ||
+                                        ''}`.trim() }}
+                                    </p>
+                                    <p class="mb-1"><strong>Student No:</strong> {{ studentAccount.acs_enrid || 'N/A' }}
+                                    </p>
+                                    <p class="mb-1"><strong>Email:</strong> {{ studentAccount.per_email || 'N/A' }}</p>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <p class="mb-1"><strong>Course:</strong>
+                                        {{course.find(c => c.prog_id === studentAccount.enr_course)?.prog_code || '—'
+                                        }}
+                                    </p>
+                                    <p class="mb-1"><strong>Grade Level:</strong>
+                                        {{gradelvl.find(g => g.grad_id === studentAccount.enr_gradelvl)?.grad_name ||
+                                        '—' }}
+                                    </p>
+                                    <p class="mb-1"><strong>Section:</strong>
+                                        {{section.find(s => s.sec_id === studentAccount.enr_section)?.sec_name || '—'
+                                        }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- BREAKDOWN TABLE -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle soa-table">
+
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th class="text-end">Lec</th>
+                                            <th class="text-end">Lab</th>
+                                            <th class="text-end">Qty</th>
+                                            <th class="text-end">Units</th>
+                                            <th class="text-end text-muted">Lec Rate</th>
+                                            <th class="text-end text-muted">Lab Rate</th>
+                                            <th class="text-end text-muted">Item</th>
+                                            <th class="text-end">Line Total</th>
+                                            <th class="text-end fw-bold">Amount (₱)</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr v-if="!Object.keys(templateArrayItems).length && !milestoneLoading">
+                                            <td colspan="10" class="text-center text-danger fw-bold py-4">
+                                                No Billing Items Found
+                                            </td>
+                                        </tr>
+
+                                        <tr v-if="Object.keys(templateArrayItems).length && !milestoneLoading"
+                                            v-for="(c, index) in templateArrayItems" :key="index">
+
+                                            <td class="text-start">
+                                                <span class="fst-italic">{{ c.tuitemp_desc }}</span>
+                                                <span v-if="c.tuitemp_subjid" class="fw-bold"> ({{ c.subj_code
+                                                    }})</span>
+                                            </td>
+
+                                            <td class="text-end">{{ c.tuitemp_lec || '-' }}</td>
+                                            <td class="text-end">{{ c.tuitemp_lab || '-' }}</td>
+                                            <td class="text-end">{{ c.tuitemp_quantity || '-' }}</td>
+
+                                            <td class="text-end">
+                                                <span v-if="c.tuitemp_subjid">
+                                                    {{ (c.tuitemp_lec || 0) + (c.tuitemp_lab || 0) }}
+                                                </span>
+                                                <span v-else>
+                                                    {{ c.tuitemp_quantity || '-' }}
+                                                </span>
+                                            </td>
+
+                                            <td class="text-end text-muted">{{ c.tuitemp_lec_price || 0 }}</td>
+                                            <td class="text-end text-muted">{{ c.tuitemp_lab_price || 0 }}</td>
+                                            <td class="text-end text-muted">
+                                                <span v-if="c.tuitemp_disc_type == 1">
+                                                    {{ (c.tuitemp_price * c.tuitemp_quantity).toFixed(2) }}%
+                                                </span>
+                                                <span v-else>
+                                                    {{c.tuitemp_price * c.tuitemp_quantity}}
+                                                </span>
+                                            </td>
+
+                                            <td class="text-end">
+                                                <span v-if="c.tuitemp_subjid">
+                                                    {{ (c.tuitemp_lec_price || 0) + (c.tuitemp_lab_price || 0) }}
+                                                </span>
+                                                <span v-else>
+                                                    {{ (c.tuitemp_item_price || 0) * (c.tuitemp_quantity || 0) }}
+                                                </span>
+                                            </td>
+
+                                            <td class="text-end fw-bold">
+                                                <span v-if="c.tuitemp_subjid">
+                                                    {{ pesoConverter(
+                                                        ((c.tuitemp_lec_price || 0) * (c.tuitemp_lec || 0)) +
+                                                        ((c.tuitemp_lab_price || 0) * (c.tuitemp_lab || 0))
+                                                    ) }}
+                                                </span>
+                                                <span v-else>
+                                                    <span v-if="c.tuitemp_disc_type == 1">
+                                                        - {{ (c.tuitemp_price * c.tuitemp_quantity).toFixed(2) }}%
+                                                    </span>
+                                                    <span v-else>
+                                                        {{ pesoConverter(c.tuitemp_price * c.tuitemp_quantity) }}
+                                                    </span>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+
+                            <!-- SUMMARY -->
+                            <div class="row justify-content-end mt-4">
+                                <div class="col-md-6 col-lg-5">
+                                    <div class="border rounded p-3">
+
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Lecture Cost</span>
+                                            <span>{{ pesoConverter(totalLecCost) }}</span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Laboratory Cost</span>
+                                            <span>{{ pesoConverter(totalLabCost) }}</span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span>Other Charges</span>
+                                            <span>{{ pesoConverter(totalItemCost) }}</span>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="d-flex justify-content-between text-danger mb-1">
+                                            <span>Deductions / Discounts</span>
+                                            <span>- {{ pesoConverter(totalExactDiscount) }}</span>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between text-danger mb-1">
+                                            <span>Payments</span>
+                                            <span>- {{ pesoConverter(totalPayment) }}</span>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="d-flex justify-content-between fw-bold fs-5">
+                                            <span>Remaining Balance</span>
+                                            <span class="text-success">{{ pesoConverter(grandTotal) }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end fw-bold fs-5 mt-2">
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#settlementmodal"
+                                            @click="settlePayments()" class="btn btn-sm btn-dark">Add Payment</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FOOTER -->
+                            <p class="text-center small mt-4">
+                                This is a system-generated statement and is valid without signature.
+                            </p>
+
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div v-if="!billLoading" class="container overflow-hidden p-3">
-                <div class="row gy-2 gx-2">
-                    <div class="col-12">
-                        <div class="p-3 border bg-body-secondary">
-                            <span class="fw-bold">Subjects Enrolled</span>
-                        </div>
-                    </div>
-                    <div v-if="!Object.keys(templatePricesData).length && !milestoneLoading" class="p-1">
-                        <div class="shadow p-3 rounded-3 text-center border fw-bold text-danger">
-                            No Subjects Added
-                        </div>
-                    </div>
-                    <div v-if="!Object.keys(templatePricesData).length && milestoneLoading" class="p-1">
-                        <div class="shadow p-3 rounded-3 text-center border fw-bold text-danger">
-                            <Loader />
-                        </div>
-                    </div>
-                    <div v-if="Object.keys(templatePricesData).length && !milestoneLoading" class="col-12"
-                        v-for="(c, index) in templatePricesData">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <span class="fw-bold">{{ c.subj_code }}</span>
-                                    <p class="">{{ c.subj_name }}</p>
-                                    <p v-if="c.mi_crossenr" class="mt-3">Cross Enrolled to: <span class=" text-red-500">
-                                            {{ c.mi_crossenr }}</span></p>
-                                </div>
-                                <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <p><span class="fw-bold">Per Week: </span>{{ c.subj_hrs_week }}</p>
-                                    <p v-if="c.mi_tag == 1"><span class="fw-bold">Tags: </span>
-                                        Taken</p>
-                                    <p v-else-if="c.mi_tag == 2"><span class="fw-bold">Tags:
-                                        </span>Advance</p>
-                                    <p v-else-if="c.mi_tag == 3"><span class="fw-bold">Tags:
-                                        </span>Re-take / Back Subject</p>
-                                    <p v-else="c.mi_tag == 3"><span class="fw-bold">Tags:
-                                        </span>N/A</p>
-                                    <p><span class="fw-bold">Pre-requisite: </span>{{
-                                        c.subj_preq_code ? c.subj_preq_code : 'N/A' }}</p>
-                                    <p><span class="fw-bold">Grade: --</span></p>
-                                </div>
-                                <div class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text " id="inputGroup-sizing-default">Lecture</span>
-                                        <input type="text" class="form-control form-control-sm"
-                                            aria-label="Sizing example input"
-                                            aria-describedby="inputGroup-sizing-default" :value="c.subj_lec_units" disabled>
-                                    </div>
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text" id="inputGroup-sizing-default">Laboratory</span>
-                                        <input type="text" class="form-control form-control-sm"
-                                            aria-label="Sizing example input"
-                                            aria-describedby="inputGroup-sizing-default" :value="c.subj_lab_units" disabled>
-                                    </div>
-                                    <div class="input-group mb-1">
-                                        <span class="input-group-text" id="inputGroup-sizing-default">Total</span>
-                                        <input type="text" class="form-control form-control-sm"
-                                            aria-label="Sizing example input"
-                                            aria-describedby="inputGroup-sizing-default"
-                                            :value="(c.subj_lec_units) + (c.subj_lab_units)" disabled>
-                                    </div>
-                                </div>
-                                
-                                <!-- if may tuitemp_id means may data from acct tuition template -->
-                                <div v-if="c.tuitemp_id"  class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.tuitemp_lec_price) }}/Unit</p>
-                                    <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.tuitemp_lab_price) }}/Unit</p>
-                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.tuitemp_lec_price || 0) * ((c.tuitemp_lec) || 0)) + ((c.tuitemp_lab_price || 0) * ((c.tuitemp_lab) || 0))) }}</p>
-                                </div>
-                                <div v-else class="col p-3 border bg-white shadow d-flex flex-column text-start">
-                                    <p><span class="fw-bold">Lecture Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lec_units_rate) }}/Unit</p>
-                                    <p><span class="fw-bold">Laboratory Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(c.subj_lab_units_rate) }}/Unit</p>
-                                    <p><span class="fw-bold">Total Rate: </span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(((c.subj_lec_units_rate || 0) * ((c.subj_lec_units) || 0)) + ((c.subj_lab_units_rate || 0) * (c.subj_lab_units || 0))) }}</p>
-                                </div>
-                                
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12" v-if="Object.keys(templatePricesData).length">
-                        <div class=" d-flex justify-content-end gap-2 mt-3">
-                            <div class="d-flex gap-2 ">
-                                <div class="form-group text-start">
-                                    <label class="fw-bold">Total Cost</label>
-                                    <input class="form-control form-control-sm" :value="new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalCost.toFixed(2))" disabled />
-                                </div>
-                            </div>
-                            <div class="d-flex gap-2 ">
-                                <div class="form-group text-start">
-                                    <label class="fw-bold">Remaining Balance</label>
-                                    <input class="form-control form-control-sm" :value="new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(grandTotal)" disabled />
-                                </div>
-                                <div class="form-group align-content-end">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#settlementmodal"
-                                    @click="settlePayments()" class="btn btn-sm btn-dark">Add Payment</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+
             </div>
             <Loader v-else>
                 <p class="fw-semibold">Loading Please Wait...</p>
@@ -855,7 +905,7 @@ const getData = (result) =>{
                         @click="showQRScanner = false" id="hideqrscanner"></button>
                 </div>
                 <div class="modal-body">
-                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="2"/>
+                    <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="2" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

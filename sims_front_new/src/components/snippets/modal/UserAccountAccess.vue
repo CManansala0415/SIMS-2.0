@@ -196,7 +196,7 @@ const accessModuleData = ref(
                     access_disabled: 1,
                     access_viewing:0,
                     access_modifying:0
-                },
+                }, 
                 2: {
                     useracc_id:0,
                     access_id: 3,
@@ -254,6 +254,16 @@ const accessModuleData = ref(
                     access_id: 4,
                     access_value: 4,
                     access_description: 'Subject Rates',
+                    access_checked: 0,
+                    access_disabled: 1,
+                    access_viewing:0,
+                    access_modifying:0
+                },
+                4: {
+                    useracc_id:0,
+                    access_id: 5,
+                    access_value: 5,
+                    access_description: 'Scholarship',
                     access_checked: 0,
                     access_disabled: 1,
                     access_viewing:0,

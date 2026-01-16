@@ -1087,7 +1087,8 @@ class RegistrarController extends Controller
             */
             $totalCost = 0;
             $mergedMilestones = [];
-            $deductions = 0;
+            $deductions_fixed = 0;
+            $deductions_percent = 0;
 
             foreach ($milestonedata as $ms) {
 
@@ -1144,29 +1145,60 @@ class RegistrarController extends Controller
 
             
             foreach ($templatePricesData as $tp) {
+                // for items and other charges without subject ID
                 if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 3) {
-                    $totalCost += (float) ($tp->tuitemp_price ?? 0);
+                    $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                }
+                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid == null) {
+                    $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
                 }
             }
 
             foreach ($templatePricesData as $tp) {
                 if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 4) {
-                    $deductions += (float) ($tp->tuitemp_price ?? 0);
+                    if ($tp->tuitemp_disc_type == 1) {
+                        $deductions_percent += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    }else{
+                        $deductions_fixed += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    }
                 }
             }
 
-            $account = DB::table('def_accounts_settlement')
-            ->where('acs_enrid','=', $request->input('enr_id'))
-            ->update([
-                'acs_amount' => $totalCost-$deductions,
-                'acs_dateupdated' => $date,
-                'acs_updatedby' => $request->input('user_id'),
-            ]);
+            $soa = DB::table('def_accounts_student')
+                          ->where('soa_enrid', '=',  $request->input('enr_id'))
+                          ->where('soa_personid', '=',  $request->input('enr_personid'))
+                          ->where('soa_status', '=',  1)
+                          ->first();
 
+            $settlement = DB::table('def_accounts_settlement')
+                ->where('acs_enrid', '=',  $request->input('enr_id'))
+                ->where('acs_personid', '=',  $request->input('enr_personid'))
+                ->where('acs_status', '=',  1)
+                ->get();
 
+            if(!$soa){
+                 $account = DB::table('def_accounts_settlement')
+                    ->where('acs_enrid','=', $request->input('enr_id'))
+                    ->update([
+                        'acs_amount' => $totalCost-($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100))),
+                        'acs_dateupdated' => $date,
+                        'acs_updatedby' => $request->input('user_id'),
+                    ]);
+
+                $finance->generateStudentAccount($milestonedata, $templatePricesData, $settlement);
+                $msg = "Enrollment updated and student account generated.";
+                $status = 200;
+            }else{
+                $msg = "Enrollment updated. Student account already exists.";
+                $status = 409;
+            }
+           
             return [
                 'templatePricesData' => $templatePricesData,
                 'milestonedata' => $milestonedata,
+                'soa' => $soa,
+                'message' => $msg,
+                'status' => $status,
                 'totalCost' => $totalCost,
             ];
 
@@ -2367,7 +2399,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_lastname','ASC')
+                )->orderBy('def_employee.emp_id','desc')
                 ->get();
             }else{
                 $employee = DB::table('def_employee')
@@ -2375,7 +2407,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_lastname','ASC')
+                )->orderBy('def_employee.emp_id','desc')
                 ->limit($limit)
                 ->offset($offset)
                 ->get();
@@ -3021,12 +3053,12 @@ class RegistrarController extends Controller
                     'satemp.emp_middlename as sat_faculty_middlename',
                     'satemp.emp_lastname as sat_faculty_lastname',
                     'satemp.emp_suffixname as sat_faculty_suffixname',
-                    'mon_sched_day.occ_day as occ_mon',
-                    'tue_sched_day.occ_day as occ_tue',
-                    'wed_sched_day.occ_day as occ_wed',
-                    'thurs_sched_day.occ_day as occ_thurs',
-                    'fri_sched_day.occ_day as occ_fri',
-                    'sat_sched_day.occ_day as occ_sat'
+                    // 'mon_sched_day.occ_day as occ_mon',
+                    // 'tue_sched_day.occ_day as occ_tue',
+                    // 'wed_sched_day.occ_day as occ_wed',
+                    // 'thurs_sched_day.occ_day as occ_thurs',
+                    // 'fri_sched_day.occ_day as occ_fri',
+                    // 'sat_sched_day.occ_day as occ_sat'
                    
                 )
                 
