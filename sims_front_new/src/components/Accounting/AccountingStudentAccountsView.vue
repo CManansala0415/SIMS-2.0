@@ -38,12 +38,16 @@ import {
     getCity,
     getBarangay,
     updateApplicant,
-    getAcademicStatus
+    getAcademicStatus,
+    getScholarshipDetails,
+    addScholarshipDetails,
+    getStudentAccount
 } from "../Fetchers.js";
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 import SearchQR from '../snippets/tech/SearchQR.vue';
 import ApplicationMilestoneModal from '../snippets/modal/ApplicationMilestoneModal.vue';
 import AccountingStudentAcc from '../snippets/modal/AccountingStudentAcc.vue';
+import AccountingExaminationPermits from '../snippets/modal/AccountingExaminationPermits.vue';
 
 const limit = ref(10)
 const offset = ref(0)
@@ -57,7 +61,7 @@ const searchLname = ref('')
 const userID = ref('')
 const router = useRouter();
 const showForm = ref(false)
-const showFormModal = ref(false)
+const showStudAccModal = ref(false)
 const showEnroll = ref(false)
 const showIdentification = ref(false)
 const showPrintID = ref(false)
@@ -86,6 +90,15 @@ const fullName = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
 const accessData = ref([])
+const scholarshipType = ref('')
+const scholarshipAmount = ref(0)
+const scholarshipDetails = ref([])
+const scholarshipDescription = ref('')
+const scholarshipAccountId = ref('')
+const loadingScholarship = ref(true)
+const showScholarship = ref(false)
+const showStudPermitModal = ref(false)
+const studentSettlement = ref([])
 const emit = defineEmits(['fetchUser','doneLoading'])
 
 
@@ -177,6 +190,8 @@ const booter = async () => {
     getAcademicStatus(1,'cs_05').then((results) => {
         results[0].sett_status == 1? activeEnrollment.value = true: activeEnrollment.value = false
     })
+
+    
     // getCountry().then((results) => {
     //     country.value = results
     //     booting.value = 'Loading Countries'
@@ -212,6 +227,8 @@ const booter = async () => {
     //     bootingCount.value += 1
     //     emit('fetchUser', results)
     // })
+
+    
 }
 
 onMounted(async () => {
@@ -381,10 +398,29 @@ const goTo = () => {
 }
 
 const formMode = ref('')
-const editData = (id) => {
+const editData = (id, mode) => {
+
     editId.value = id
     formMode.value = id
-    showFormModal.value = !showFormModal.value
+    switch(mode){
+        case 1:
+            // student account
+            showStudAccModal.value = !showStudAccModal.value
+            break;
+        case 2:
+            //scholarship
+            loadingScholarship.value = true
+            scholarshipDetails.value = []
+            getStudentAccount(id).then((results) => {
+                studentSettlement.value = results.student_settlement
+                refreshState()
+            })
+            break;
+        case 3:
+            // permits
+            showStudPermitModal.value = !showStudPermitModal.value
+            break;
+    }
 }
 const enrollApplicant = (data) => {
     getAcademicStatus(1,'cs_05').then((results) => {
@@ -437,6 +473,124 @@ const viewApplicationFormModal = (data) => {
     showApplicationForm.value = !showApplicationForm.value
 }
 
+const addScholarship = () =>{
+    if(!scholarshipDescription.value || !scholarshipType.value || !scholarshipAmount.value || scholarshipAmount.value <= 0 || !scholarshipAccountId.value){
+         Swal.fire({
+            title: "Saving Declined",
+            html: `Please complete the form before adding`,
+            icon: "warning",
+            confirmButtonText: "Ok, Got it!"
+        });
+    }else{
+        let x = {
+            sch_description: scholarshipDescription.value,
+            sch_type: scholarshipType.value,
+            sch_personid: editId.value,
+            sch_value: scholarshipAmount.value,
+            sch_acsid: scholarshipAccountId.value,
+            user_id: userID.value
+        }
+
+        saveScholarship(1, x)
+        // scholarshipDetails.value.push(x)
+        // resetScholarshipDetails()
+
+    }
+    
+}
+
+const saveScholarship = async (mode, data) => {
+
+    const actionMap = {
+        1: {
+            title: 'New Record',
+            text: 'Are you sure you want to add this scholarship?',
+            confirmText: "Yes, Add it!"
+        },
+        2: {
+            title: 'Update',
+            text: 'Are you sure you want to update this scholarship? There’s no turning back.',
+            confirmText: "Yes, update it!"
+        },
+        3: {
+            title: 'Delete',
+            text: 'Are you sure you want to delete this scholarship? There’s no turning back.',
+            confirmText: "Yes, delete it!"
+        }
+    }
+
+    const action = actionMap[mode]
+    if (!action) return
+
+    const payload = {
+        ...data,
+        sch_mode: mode,
+        user_id: userID.value
+    }
+
+    const confirm = await Swal.fire({
+        title: action.title,
+        text: action.text,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: action.confirmText
+    })
+
+    if (!confirm.isConfirmed) return
+
+    Swal.fire({
+        title: "Processing",
+        text: "Please wait...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    })
+
+    try {
+        const results = await addScholarshipDetails(payload)
+        Swal.close()
+
+        if (results.status === 200) {
+            await Swal.fire({
+                title: "Success",
+                text: "Changes applied successfully",
+                icon: "success"
+            })
+
+            refreshState()
+
+        } else {
+            throw new Error('Request failed')
+        }
+
+    } catch (err) {
+        Swal.fire({
+            title: "Action Failed",
+            text: "Cannot proceed. Contact the Administrator for assistance.",
+            icon: "error"
+        })
+
+        refreshState()
+    }
+}
+
+const resetScholarshipDetails = () =>{
+    scholarshipDescription.value = ''
+    scholarshipType.value = ''
+    scholarshipAmount.value = ''
+    scholarshipAccountId.value = ''
+}
+
+const refreshState = () =>{
+    resetScholarshipDetails()
+    scholarshipDetails.value = []
+
+    getScholarshipDetails(editId.value).then((results) => {
+        scholarshipDetails.value = results.raw
+        loadingScholarship.value = false
+    })
+}
 </script>
 <template>
     <div>
@@ -509,12 +663,22 @@ const viewApplicationFormModal = (data) => {
                         <td class="align-middle">
                             {{ app.per_dateapplied }}
                         </td>
-                        <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
+                        <td v-if="accessData[0].useracc_modifying == 1" class="align-middled d-flex gap-1 justify-content-center">
                             <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id)"
-                                    type="button" title="Edit Record" class="btn btn-secondary btn-sm">
+                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id, 1)"
+                                    type="button" title="View Accounts" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-gear"/></button>
                             </div>
+                            <div class="d-flex gap-2 justify-content-center">
+                                <button data-bs-toggle="modal" data-bs-target="#scholarshipmodal" @click="editData(app.per_id, 2)"
+                                    type="button" title="Add Scholarship" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-graduation-cap"/></button>
+                            </div>
+                            <!-- <div class="d-flex gap-2 justify-content-center">
+                                <button data-bs-toggle="modal" data-bs-target="#permitmodal" @click="editData(app.per_id, 3)"
+                                    type="button" title="Permit" class="btn btn-secondary btn-sm">
+                                    <font-awesome-icon icon="fa-solid fa-id-card"/></button>
+                            </div> -->
                         </td> 
                         <td v-else class="align-middle">
                             N/A
@@ -555,10 +719,10 @@ const viewApplicationFormModal = (data) => {
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Accounts</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        @click="showFormModal = false"></button>
+                        @click="showStudAccModal = false"></button>
                 </div>
                 <div class="modal-body">
-                        <AccountingStudentAcc v-if="showFormModal" :personId="editId" :userId="userID"/>
+                        <AccountingStudentAcc v-if="showStudAccModal" :personId="editId" :userId="userID" :modeId="1"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -568,11 +732,173 @@ const viewApplicationFormModal = (data) => {
                     </div>
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                            @click="showFormModal = false">Close</button>
+                            @click="showStudAccModal = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Permits Modal -->
+    <div class="modal fade" id="permitmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Examination Permit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showStudPermitModal = false"></button>
+                </div>
+                <div class="modal-body">
+                        <AccountingExaminationPermits v-if="showStudPermitModal" :personId="editId" :userId="userID"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showStudAccModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Scholarship Modal -->
+    <div class="modal fade" id="scholarshipmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Scholarships</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showStudAccModal = false"></button>
+                </div>
+                <div class="modal-body overflow-auto" style="height: 500px;">
+                        <!-- <div class="w-100 d-flex justify-content-end p-2">
+                            <button type="button" class="btn btn-sm btn-dark" title="Save Updates">
+                                <font-awesome-icon icon="fa-solid fa-add"/> Add new
+                            </button>
+                        </div> -->
+                         <table class="table table-bordered">
+                            <thead>
+                                 <tr>
+                                    <td class="align-middle">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Description Here" v-model="scholarshipDescription"/>
+                                    </td>
+                                    <td class="align-middle">
+                                        <select class="form-select form-select-sm" v-model="scholarshipType">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option value="1">Percentage</option>
+                                            <option value="2">Amount</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <input v-if="scholarshipType" type="number" class="form-control form-control-sm" 
+                                         :placeholder="scholarshipType == 1? 'Enter Amount':'Enter percentage'" v-model="scholarshipAmount"/>
+                                        <span v-else>Please select scholarship type first</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <select class="form-select form-select-sm" v-model="scholarshipAccountId">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option v-for="(sts, index) in studentSettlement" :value="sts.acs_id">{{ sts.acs_accheader }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-sm btn-dark" title="Save Updates" @click="addScholarship()">
+                                            <font-awesome-icon icon="fa-solid fa-add"/> Add new
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="5" class="p-3 bg-secondary-subtle"></th>
+                                </tr>
+                                <tr>
+                                    <th>Scholarship Description</th>
+                                    <th>Discount Percentage</th>
+                                    <th>Discount Amount</th>
+                                    <th>Account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-if="!Object.keys(scholarshipDetails).length && loadingScholarship">
+                                    <td colspan="5">
+                                        <Loader/>
+                                    </td>
+                                </tr>
+                                <tr v-if="!Object.keys(scholarshipDetails).length && !loadingScholarship">
+                                    <td colspan="5">
+                                        No Scholarship Applied
+                                    </td>
+                                </tr>
+                                <tr v-for="(sch, index) in scholarshipDetails" v-if="Object.keys(scholarshipDetails).length && !loadingScholarship">
+                                    <td class="align-middle">
+                                        <input type="text" class="form-control form-control-sm" placeholder="Description Here" v-model="sch.sch_description"/>
+                                    </td>
+                                    <td class="align-middle">
+                                        <select class="form-select form-select-sm" v-model="sch.sch_type">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option value="1">Percentage</option>
+                                            <option value="2">Amount</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <input v-if="sch.sch_value" type="number" class="form-control form-control-sm" 
+                                         :placeholder="sch.sch_value == 1? 'Enter Amount':'Enter percentage'" v-model="sch.sch_value"/>
+                                        <span v-else>Please select scholarship type first</span>
+                                    </td>
+                                     <td class="align-middle">
+                                        <select class="form-select form-select-sm" v-model="sch.sch_acsid">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option v-for="(sts, index) in studentSettlement" :value="sts.acs_id">{{ sts.acs_accheader }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <button v-if="sch.sch_id" type="button" class="btn btn-sm btn-primary" title="Save Updates" @click="saveScholarship(2,sch)">
+                                                <font-awesome-icon icon="fa-solid fa-floppy-disk"/>  
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger" title="Delete Scholarship" @click="saveScholarship(3, sch)">
+                                                <font-awesome-icon icon="fa-solid fa-trash"/> 
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- <tr>
+                                    <td colspan="4">
+                                        <div class="d-flex justify-content-end">
+                                            <button type="button" class="btn btn-sm btn-success" title="Save Updates" @click="saveScholarship(1)">
+                                                <font-awesome-icon icon="fa-solid fa-floppy-disk"/>&nbsp;Save Scholarship
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr> -->
+
+                                <!-- More scholarship records can be added here -->
+                            </tbody>
+                         </table>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showStudAccModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 </template>

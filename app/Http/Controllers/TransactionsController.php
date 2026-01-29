@@ -11,7 +11,7 @@ class TransactionsController extends Controller
     public function getAccountsDetails()
     {
         $settlement = DB::table('def_accounts_settlement')
-                          ->where('acs_status', '=',  1)
+                        //   ->where('acs_status', '=',  1)
                           ->get();
         return $settlement;
     }
@@ -130,6 +130,7 @@ class TransactionsController extends Controller
                 // means bill for tuition
                 $request = DB::table('def_accounts_settlement')
                         ->where('acs_id', '=', $id)
+                        ->orderBy('acs_id','DESC')
                         ->get();
                 $count = DB::table('def_accounts_settlement')
                         ->where('acs_id', '=', $id)
@@ -212,7 +213,7 @@ class TransactionsController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             $header = $request->input('acr_reqitem').'-'.$request->input('acr_personid').'-'.$randomizer;
 
@@ -244,7 +245,7 @@ class TransactionsController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $s1 = DB::table('def_accounts_request')
             ->where('acr_id','=', $request['acr_id'])
             ->update([
@@ -268,7 +269,7 @@ class TransactionsController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
            if($request['acy_billtype'] == 1){
                 $s1 = DB::table('def_accounts_settlement')
@@ -280,8 +281,21 @@ class TransactionsController extends Controller
                     "acs_datesettled" => $date,
                     "acs_cashier" => $request['acy_cashier'],
                     "acs_updatedby" => $request['acy_cashier'],
+                    "acs_balance" => $request['acy_balance'],
                     "acs_dateupdated" => $date,
+                    // "acs_status" => $request['acy_balance'] == 0? 2:1,
                 ]);   
+
+                // need maging status 2 nung student_accounts para ma complete yung transaction
+                if($request['acy_balance'] == 0){
+                    $studentacc = DB::table('def_accounts_student')
+                    ->where('soa_acsid','=', $request['acy_accid'])
+                    ->update([
+                        "soa_dateupdated" => $date,
+                        "soa_updatedby" => $request['acy_cashier'],
+                        "soa_status" => 2,
+                    ]);   
+                }
            }else{
                 $s1 = DB::table('def_accounts_request')
                 ->where('acr_id','=', $request['acy_accid'])
@@ -614,7 +628,7 @@ class TransactionsController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             if(empty($request->input('acf_id'))){
 

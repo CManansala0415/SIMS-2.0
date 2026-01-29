@@ -67,7 +67,7 @@ class FinanceController extends Controller
 
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             if($request->input('sr_mode') == 1){
                 if($request->input('sr_receipt') == 1){
@@ -148,11 +148,26 @@ class FinanceController extends Controller
 
     public function getUsedSeries($seriesstart, $seriesend, $year, $prefix){
         try{
-             $query = DB::table('def_accounts_payment')
-            ->whereBetween('acy_series_pattern', [$seriesstart, $seriesend])
-            ->where('acy_series_year','=',$year)
-            ->where('acy_status','=',1)
+            // $query = DB::table('def_accounts_payment')
+            // ->whereBetween('acy_series_pattern', [$seriesstart, $seriesend])
+            // ->orderBy('acy_id','DESC')
+            // ->where('acy_series_year','=',$year)
+            // ->where('acy_status','=',1)
+            // ->get(); 
+            // 
+            // // bring this back if nag convert na sa int eto ALTER TABLE def_accounts_payment
+            // MODIFY acy_series_pattern INT;query run first then ito gamitin
+
+            $query = DB::table('def_accounts_payment')
+            ->whereRaw('CAST(acy_series_pattern AS UNSIGNED) BETWEEN ? AND ?', [
+                $seriesstart,
+                $seriesend
+            ])
+            ->where('acy_series_year', $year)
+            ->where('acy_status', 1)
+            ->orderBy('acy_id', 'DESC')
             ->get();
+
 
             $query? $status = 200 : $status = 500;
 
@@ -429,6 +444,7 @@ class FinanceController extends Controller
                             'tuitemp_gradelvl'      => $item['tuitemp_gradelvl'] ?? null,
                             'tuitemp_updatedby'    => $item['tuitemp_user'] ?? null,
                             'tuitemp_dateupdated'  => $date,
+                            'tuitemp_subjcode' => $item['tuitemp_subjcode'] ?? null
                         ]);
 
                     }else {
@@ -452,6 +468,7 @@ class FinanceController extends Controller
                             'tuitemp_gradelvl'      => $item['tuitemp_gradelvl'] ?? null,
                             'tuitemp_addedby'    => $item['tuitemp_user'] ?? null,
                             'tuitemp_dateadded'  => $date,
+                            'tuitemp_subjcode' => $item['tuitemp_subjcode'] ?? null
                         ]);
                     }
 
@@ -623,7 +640,7 @@ class FinanceController extends Controller
         }
     }
 
-    public function getTotalCharges($curr, $sem, $program, $course, $gradelvl, $section, $enrid){
+    public function getTotalCharges($curr, $sem, $program, $course, $gradelvl, $section, $enrid, $personid){
             $financedata = $this->getChargesTemplateHeader(
                 $curr ?: 0,
                 $sem ?: 0,
@@ -633,6 +650,13 @@ class FinanceController extends Controller
                 $section ?: 0,
                 $enrid ?: 0
             );
+
+            $scholarship = $this->getScholarshipDetails($personid);
+
+            $scholarshipdata = [];
+            foreach ($scholarship['raw'] as $row) {
+                 $scholarshipdata[] = $row;
+            }
 
             /*
             |--------------------------------------------------------------------------
@@ -757,8 +781,17 @@ class FinanceController extends Controller
                 }
             }
 
+            foreach ($scholarshipdata as $tp) {
+                if ($tp->sch_type == 1) {
+                    $deductions_percent += (float) ($tp->sch_value ?? 0);
+                }else{
+                    $deductions_fixed += (float) ($tp->sch_value ?? 0);
+                }
+            }
+
             return [
                 'subjects_amount' => $subjects_amount,
+                'scholarship' => $scholarshipdata,
                 'misc_amount' => $misc_amount,
                 'item_amount' => $item_amount,
                 'lab_amount' => $lab_amount,
@@ -860,7 +893,7 @@ class FinanceController extends Controller
                     'soa_lab_price' => $price->tuitemp_lab_price,
                     'soa_lec' => $price->tuitemp_lec,
                     'soa_lab' => $price->tuitemp_lab,
-
+                    'soa_subjcode' => $price->tuitemp_subjcode,
                     'soa_addedby' => $price->tuitemp_updatedby,
                     'soa_dateadded' => $date,
                 ]);
@@ -884,6 +917,90 @@ class FinanceController extends Controller
 
             ];
         } catch (Exception $ex) {
+            return [
+                'data' => 'No Data',
+                'status' => 500
+            ];
+        }
+    }
+
+    public function getSettlementDetails($id)
+    {
+        $settlement = DB::table('def_accounts_settlement')
+                        //   ->where('acs_status', '=',  1)
+                          ->where('acs_personid', '=',  $id)
+                          ->get();
+        return $settlement;
+    }
+
+    public function getScholarshipDetails($id)
+    {
+        // raw
+        $scholarship1 = DB::table('def_accounts_scholarship')
+                          ->where('sch_status', '=',  1)
+                          ->where('sch_personid', '=',  $id)
+                          ->get();
+
+        // joined
+        $scholarship2 = DB::table('def_accounts_scholarship as sch')
+        ->leftJoin('def_enrollment as enr', 'sch.sch_personid','=','enr.enr_personid') 
+        ->select(
+            'sch.*',
+            'enr.*',
+        )
+        ->where('sch.sch_status', '=',  1)
+        ->where('sch.sch_personid', '=',  $id)
+        ->get();
+
+         return [
+                'raw' => $scholarship1,
+                'joined' => $scholarship2,
+                'status' => 200
+            ];
+    }
+
+    public function addScholarshipDetails(Request $request)
+    {
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d H:i:s');
+        try{
+
+            if($request->input('sch_mode') == 1){ // insert
+                $query = DB::table('def_accounts_scholarship')
+                ->insert([
+                    'sch_value' => $request->input('sch_value'),
+                    'sch_description' => $request->input('sch_description'),
+                    'sch_type' => $request->input('sch_type'),
+                    'sch_personid' => $request->input('sch_personid'),
+                    'sch_addedby' => $request->input('user_id'),
+                    'sch_acsid' => $request->input('sch_acsid'),
+                    'sch_dateadded' => $date,
+                ]);
+
+            }else if($request->input('sch_mode') == 2){
+                $query = DB::table('def_accounts_scholarship')
+                ->where('sch_id','=', $request->input('sch_id'))
+                ->update([
+                    'sch_value' => $request->input('sch_value'),
+                    'sch_description' => $request->input('sch_description'),
+                    'sch_type' => $request->input('sch_type'),
+                    'sch_personid' => $request->input('sch_personid'),
+                    'sch_acsid' => $request->input('sch_acsid'),
+                    'sch_updatedby' => $request->input('user_id'),
+                    'sch_dateupdated' => $date,
+                ]);
+            }
+            else{
+                $query = DB::table('def_accounts_scholarship')
+                ->where('sch_id','=', $request->input('sch_id'))
+                ->delete();
+            }
+
+            return [
+                'data' => $request,
+                'status' => 200
+            ];
+        }catch (Exception $ex) {
             return [
                 'data' => 'No Data',
                 'status' => 500

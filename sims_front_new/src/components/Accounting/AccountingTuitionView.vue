@@ -262,7 +262,7 @@ const deactivateCharge = (data) =>{
                 }else{
                     Swal.fire({
                         title: "Saving Updates",
-                        text: "Please wait while we check all series details.",
+                        text: "Please wait while we check all necessary details.",
                         allowOutsideClick: false,
                         didOpen: () => {
                             Swal.showLoading();

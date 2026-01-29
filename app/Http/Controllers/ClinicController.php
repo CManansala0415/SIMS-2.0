@@ -12,7 +12,7 @@ class ClinicController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_clinic_checkup_students')->insert([
                 'clnc_complaint' => $request->input('clnc_complaint'),
                 'clnc_personid' => $request->input('clnc_personid'),
@@ -78,7 +78,7 @@ class ClinicController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_clinic_checkup_employees')->insert([
                 'clne_complaint' => $request->input('clne_complaint'),
                 'clne_personid' => $request->input('clne_personid'),
@@ -206,7 +206,7 @@ class ClinicController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $month = date('m', time());
             $year = date('Y', time());
 
@@ -283,7 +283,7 @@ class ClinicController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             $stock = $request->input('clmd_stock');
             $quantity = $request->input('clmd_quantity');
@@ -355,7 +355,7 @@ class ClinicController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             $stock = $request->input('clmd_stock');
             $quantity = $request->input('clmd_quantity');
@@ -425,7 +425,7 @@ class ClinicController extends Controller
     public function addClinicIshihara(Request $request, $type, $userid, $personid){
         //date time saving last to fix naten
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $data = $request->all();
 
         $randomizer = uniqid();
@@ -479,7 +479,7 @@ class ClinicController extends Controller
     public function addClinicHearing(Request $request, $type, $userid, $personid){
         //date time saving last to fix naten
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $data = $request->all();
 
         $randomizer = uniqid();
@@ -618,7 +618,7 @@ class ClinicController extends Controller
     public function addMedicalFileHeader(Request $request){
         //date time saving last to fix naten
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $data = $request->all();
 
         $randomizer = uniqid();

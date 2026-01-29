@@ -99,6 +99,14 @@ const edit = (data) => {
 const registerCurriculum = () => {
     saving.value = true
     // console.log(editData.value)
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all transaction details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     addCurriculum(editData.value).then((results) => {
         // alert('Successfull Registered')
         // location.reload()
@@ -107,6 +115,7 @@ const registerCurriculum = () => {
             text: "Successfully registered, refreshing the page",
             icon: "success"
         }).then(()=>{
+            Swal.close()
             location.reload()
         });
     })
@@ -259,7 +268,7 @@ const removeTag = (data, index) => {
     console.log(data) 
     Swal.fire({
         title: "Saving Updates",
-        text: "Please wait while we check all series details.",
+        text: "Please wait while we check all necessary details.",
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -296,7 +305,7 @@ const saveData = () => {
 
         Swal.fire({
             title: "Saving Updates",
-            text: "Please wait while we check all series details.",
+            text: "Please wait while we check all necessary details.",
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();

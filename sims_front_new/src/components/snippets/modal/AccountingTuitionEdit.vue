@@ -168,7 +168,7 @@ const setupLimiter = () => {
             acc[key] = [];
         }
 
-        acc[key].push(item);
+        acc[key].push(item); 
         return acc;
     }, {});
 
@@ -269,7 +269,7 @@ const saveCharges = () => {
 
     Swal.fire({
         title: "Saving Updates",
-        text: "Please wait while we check all series details.",
+        text: "Please wait while we check all necessary details.",
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -300,7 +300,7 @@ const saveCharges = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(() => {
-                // location.reload()
+                location.reload()
             });
         } else {
             Swal.fire({
@@ -365,7 +365,8 @@ const addMiscFee = (data, type) => {
             tuitemp_lab_price: data.subj_lab_units_rate,
             tuitemp_price: parseFloat(data.subj_lec_units_rate) + parseFloat(data.subj_lab_units_rate),
             tuitemp_type: type, // means misc item, 2 for subject and 3 for custom
-            tuitemp_user: userID.value
+            tuitemp_user: userID.value,
+            tuitemp_subjcode: data.subj_code
         }
 
         let check = subjFees.value.filter((e) => {
@@ -460,7 +461,7 @@ const manageDetails = () => {
     } else {
         Swal.fire({
             title: "Saving Updates",
-            text: "Please wait while we check all series details.",
+            text: "Please wait while we check all necessary details.",
             allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading();
@@ -542,7 +543,7 @@ const deleteMiscData = (mode, data, index) => {
             if (result.isConfirmed) {
                 Swal.fire({
                     title: "Saving Updates",
-                    text: "Please wait while we check all series details.",
+                    text: "Please wait while we check all necessary details.",
                     allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading();
@@ -1135,7 +1136,7 @@ const resolveGroupLabel = (groupKey) => {
                             <span class="fst-italic fw-bold text-info">Additional Charges</span>
                             <ul class="list-group mt-2">
                                 <li class="list-group-item" v-for="(cq, index) in customFees">
-                                    <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex justify-content-between align-items-center gap-1">
                                         <div class="w-50 d-flex justify-content-start align-items-center">
                                             <span>{{ cq.tuitemp_desc }}</span>
                                         </div>

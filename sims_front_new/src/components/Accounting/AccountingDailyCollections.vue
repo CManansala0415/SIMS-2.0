@@ -12,6 +12,10 @@ import {
     getCollectionStatus
 } from "../Fetchers.js";
 
+import {
+    pesoConverter
+} from "../Generators.js";
+
 import Loader from '../snippets/loaders/Loading1.vue';
 import LineChart from '../snippets/tech/LineChart.vue';
 import { getUserID } from "../../routes/user.js";
@@ -101,7 +105,7 @@ const getDateToday = () =>{
 }
 
 
-
+ 
 const checkHighlights = () =>{
   graphColor.value = counterStatus.value == false? 'bg-secondary-subtle':'bg-success'
   textColorHead.value = counterStatus.value == false? 'disabled-text':'enabled-text'
@@ -170,7 +174,7 @@ onMounted(async () => {
                         
                         // get lahat ng total collections amount ng counters
                         totalCountersAmount.value = countersData.value.reduce((sum, item) => sum + item.amount, 0);
-
+                        
                         let cashcollection = Array(7).fill(0);
 
                         // Loop through each data item
@@ -356,7 +360,7 @@ const saveSeries = (data) =>{
 
     Swal.fire({
         title: "Saving Updates",
-        text: "Please wait while we check all series details.",
+        text: "Please wait while we check all necessary details.",
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -681,7 +685,7 @@ const validateData = (type, value) =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Total Payment collected</p>
-                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalCountersAmount) }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ pesoConverter(totalCountersAmount) }}</h2>
                                         <small class="text-secondary">All Counters this week</small>
                                     </div>
                                 </div>
@@ -715,7 +719,7 @@ const validateData = (type, value) =>{
                                 <div class="d-flex justify-content-between text-muted small mt-2">
 
                                     <span v-for="(day, index) in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="day"  style="width: 10%">
-                                        <span class="text-primary fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(weekCollection[index]) }}</span>
+                                        <span class="text-primary fw-bold">{{ pesoConverter(weekCollection[index]) }}</span>
                                         <br/>
                                         {{ day }} 
                                     </span>
@@ -729,7 +733,7 @@ const validateData = (type, value) =>{
                                 <div class="card shadow border-0 rounded-3">
                                     <div class="card-body">
                                         <p class="text-muted small mb-1">Total Earnings</p>
-                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
+                                        <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ pesoConverter(totalDailyPayment) }}</h2>
                                         <small class="text-secondary">as of the date</small>
                                     </div>
                                 </div>
@@ -775,7 +779,7 @@ const validateData = (type, value) =>{
                                                 <li class="list-group-item" v-for="(cd, index) in countersData">
                                                    <div class="d-flex justify-content-between align-items-center">
                                                         <span>{{ cd.cashier }}</span> → 
-                                                        <span class="fw-bold text-primary">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(cd.amount) }}</span>
+                                                        <span class="fw-bold text-primary">{{ pesoConverter(cd.amount) }}</span>
                                                         <!-- <button @click="getSeries(cd)" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#seriesmodal">Edit Series</button> -->
                                                     </div>
                                                 </li>

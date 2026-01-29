@@ -17,7 +17,7 @@ class CommandController extends Controller
 
     public function setCommandUpdate(Request $req){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         try{
             switch($req['sett_code']){
@@ -181,7 +181,7 @@ class CommandController extends Controller
 
     public function updateCommandUsers(Request $req){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         try{
             if($req['mode'] == 1){
                 $s1 = DB::table('users')
@@ -245,7 +245,7 @@ class CommandController extends Controller
 
     public function saveCommandAccess(Request $req){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $request = $req->all();
         try{
             $if = '';
@@ -315,7 +315,7 @@ class CommandController extends Controller
 
     public function tagEmployeeAccount(Request $req){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         try{
             if($req['mode'] == 1){
                 $s1 = DB::table('def_employee')
@@ -373,7 +373,7 @@ class CommandController extends Controller
 
     public function setAcademicStatus(Request $req){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         try{
             if($req['mode'] == 1){
@@ -466,7 +466,7 @@ class CommandController extends Controller
                     ->leftJoin('def_section', 'def_enrollment.enr_section', '=', 'def_section.sec_id') 
 
                     ->select(  
-                        'def_enrollment.enr_id',
+                        'def_enrollment.*',
                         'def_person.*',
                         
                         'birthcountry.name as birthcountryname',
@@ -540,7 +540,7 @@ class CommandController extends Controller
                     'arc_semester' => $details->semester,
                     'arc_course' => $details->coursecode,
                     'arc_courseid' => $details->courseid,
-                    'arc_degree' => $details->enr_program,
+                    'arc_program' => $details->enr_program,
                     'arc_section' => $details->enr_section,
                     'arc_schoolyear' => 'SY '.$getschoolyear->sett_yearfrom.'-'.$getschoolyear->sett_yearto,
                     'arc_fullname' => $details->per_lastname.', '.$details->per_firstname.' '.$details->per_middlename.' '.$details->per_suffixname,
@@ -564,7 +564,7 @@ class CommandController extends Controller
                         'arc_subjectcode' => $mark->subj_code,
                         'arc_subjectname' => $mark->subj_name,
                         'arc_lecture' => $mark->subj_lec_units,
-                        'arc_laboratory' => $mark->subj_lab,
+                        'arc_laboratory' => $mark->subj_lab_units,
                         'arc_units' => $mark->subj_lec_units+$mark->subj_lab_units,
                         'arc_dateenrolled' => $mark->enr_dateenrolled,
                         'arc_prelimgrade' => $mark->grs_prelims,
@@ -576,17 +576,39 @@ class CommandController extends Controller
                         'arc_taken_generatedby' => $userid,
                     ]);    
                 }
-            }
+
+                $studentaccount = DB::table('def_accounts_settlement')
+                ->where('acs_enrid','=',$details->enr_id)
+                ->where('acs_status','=',1)
+                ->first();
+
+                // 1 means active, 2 means completed, 3 means leaved with balance, 0 means dropped
+                DB::table('def_accounts_settlement')
+                ->where('acs_enrid','=',$details->enr_id)
+                ->where('acs_status','=',1)
+                ->update([
+                    'acs_status' => DB::raw('CASE WHEN acs_balance = 0 THEN 2 ELSE 3 END')
+                ]);
+                // update student account details based on balance status
+                DB::table('def_accounts_student')
+                ->where('soa_enrid','=',$studentaccount->acs_enrid)
+                ->where('soa_acsid','=',$studentaccount->acs_id)
+                ->where('soa_status','=',1)
+                ->update([
+                    'soa_status' => $studentaccount->acs_balance == 0? 2:3
+                ]);
+
+            } 
         }
 
         // truncate these table to start new tables in fresh state after backuping important information
         DB::table('def_enrollment')->truncate();
         DB::table('def_milestone')->truncate();
-        DB::table('def_faculty_grading_header')->truncate();
-        DB::table('def_faculty_grading_sheet')->truncate();
-        DB::table('def_launch')->truncate();
-        DB::table('def_launch_faculty')->truncate();
-        DB::table('def_employee_load')->truncate();
+        // DB::table('def_faculty_grading_header')->truncate();
+        // DB::table('def_faculty_grading_sheet')->truncate();
+        // DB::table('def_launch')->truncate();
+        // DB::table('def_launch_faculty')->truncate();
+        // DB::table('def_employee_load')->truncate();
 
         return $data = [
             'date' => $date,
@@ -598,7 +620,7 @@ class CommandController extends Controller
 
     public function updateArchiveDetails(Request $req) {
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         $s1 = DB::table('server_archive_persons')
                     ->where('arc_personid','=', $req['arc_personid'])

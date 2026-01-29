@@ -22,7 +22,7 @@ const handleLogin = async () => {
         await axios({
             method: "POST",
             url: '/login',
-            data:{
+            data:{ 
                 email: form.value.email,
                 password: form.value.password
             }

@@ -225,7 +225,7 @@ const execute = (type, mode) => {
                                     <span class="fw-bold mt-3" id="percentage">0</span><span>% Completed</span>
                                 `,
                                 showConfirmButton: false,
-                                allowOutsideClick: false6
+                                allowOutsideClick: false
                             });
                             
                             resetStopwatch()

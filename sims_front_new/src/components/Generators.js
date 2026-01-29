@@ -157,10 +157,71 @@ const pesoConverter = (amount) => {
   return data;
 }
 
+const formatDateTime = (date) => {
+    if (!date) return ''
+
+    return new Date(date).toLocaleString('en-PH', {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    })
+}
+
+const getToken = async (email, password) => {
+    await axios.get('/sanctum/csrf-cookie')
+}
+
+let employeedata = {}
+const handleLogin = async () => {
+    await getToken();
+    try{
+        await axios({
+            method: "POST",
+            url: '/login',
+            data:{ 
+                email: email,
+                password: password
+            }
+        }).then(async (results) => {
+            await getUserID().then((results) => {
+                if(!results.employee){
+                  employeedata = {
+                    emp: results.employee,
+                    status:200
+                  }
+                }else{
+                  employeedata = {}  
+                }
+            })
+        });
+    }catch(err){
+        if(err.status == 422){
+          employeedata = {
+            emp:{},
+            status:422
+          }  
+        }else{
+          employeedata = {
+            emp:{},
+            status:500
+          }    
+        }
+    }
+
+    return employeedata
+}
+
 export {
     qrImageGenerator,
     pdfGenerator,
     imageFetcher,
     numberToWords,
-    pesoConverter
+    pesoConverter,
+    formatDateTime,
+    getToken,
+    handleLogin
 }

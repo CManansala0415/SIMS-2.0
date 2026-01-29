@@ -2809,11 +2809,11 @@ const getChargesTemplateHeader = async (curriculum, sem, program, course, gradel
 }
 
 let gettotalcharges = {}
-const getTotalCharges = async (curriculum, sem, program, course, gradelvl, section, enrid) => {
+const getTotalCharges = async (curriculum, sem, program, course, gradelvl, section, enrid, personid) => {
     try {
         await axios({
             method: "GET",
-            url: 'api/get-charge-total/' + curriculum + '/' + sem+ '/' + program + '/' + course+ '/' + gradelvl+ '/' + section + '/' + enrid,
+            url: 'api/get-charge-total/' + curriculum + '/' + sem+ '/' + program + '/' + course+ '/' + gradelvl+ '/' + section + '/' + enrid + '/' + personid,
         }).then(async (results) => {
             // console.log(results.data)
             gettotalcharges = results.data
@@ -2835,6 +2835,55 @@ const getStudentAccount = async (perid) => {
             getstudentaccount = results.data
         })
         return getstudentaccount
+    } catch (err) {
+        return err
+    }
+}
+
+let getsettlementdetails = {}
+const getSettlementDetails = async (perid) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-settlement-details/' + perid,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getsettlementdetails = results.data
+        })
+        return getsettlementdetails
+    } catch (err) {
+        return err
+    }
+}
+
+let getscholarshipdetails = {}
+const getScholarshipDetails = async (perid) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-scholarship-details/' + perid,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getscholarshipdetails = results.data
+        })
+        return getscholarshipdetails
+    } catch (err) {
+        return err
+    }
+}
+
+let addscholarshipdetails = {}
+const addScholarshipDetails = async (data) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/add-scholarship-details/',
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)s
+            addscholarshipdetails = results.data
+        })
+        return addscholarshipdetails
     } catch (err) {
         return err
     }
@@ -3013,6 +3062,9 @@ export {
     getSubjectsFromRegistrar,
     getChargesTemplateHeader,
     getTotalCharges,
-    getStudentAccount
+    getStudentAccount,
+    getSettlementDetails,
+    getScholarshipDetails,
+    addScholarshipDetails
 }
 

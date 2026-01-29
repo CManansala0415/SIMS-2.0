@@ -12,7 +12,9 @@ import {
     getEnrollmentSchedule,
     getLaunchChecker,
     getPaymentDetails,
-    getTotalCharges
+    getTotalCharges,
+    getStudentAccount,
+    getScholarshipDetails
 } from "../../Fetchers.js";
 import Loader from '../loaders/Loader1.vue';
 import {
@@ -75,7 +77,12 @@ const scheduleData = ref([])
 const grandTotal = ref(0)
 const paymentDetails = ref([])
 const chargeBreakdown = ref([])
+const totalPayment = ref(0)
 
+const booter = async () => {
+   
+    
+}
 onMounted(async () => {
     window.stop()
     enr_section.value = studentData.value.enr_section
@@ -88,109 +95,118 @@ onMounted(async () => {
         preloading.value = true
         milestoneLoading.value = true
 
-        getUserID().then((results) => {
-            userID.value = results.account.data.id
-        })
+        await booter().then(() => {
+            getUserID().then((results) => {
+                userID.value = results.account.data.id
+            })
 
-        getEnrollment(studentData.value.per_id).then((results) => {
-            enrolleeData.value = results
-            // for printing
-            studentID.value = results[0].ident_identification
-            studentSem.value = results[0].quar_code
-            studentSemId.value = results[0].quar_id
-            studentDateEnr.value = results[0].enr_dateenrolled
 
-            let curr = enrolleeData.value[0].enr_curriculum
-            let prog = enrolleeData.value[0].enr_program
-            let grad = enrolleeData.value[0].enr_gradelvl
-            let cour = enrolleeData.value[0].enr_course
-            
-            getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
-                settingscurr.value = results
-                //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
-                if(!curr){
-                    if (Object.keys(results).length == 0) {
-                        curr = 0
-                    } else {
-                        curr = settingscurr.value[0].sett_course_currid
-                    }
-                }
+            getEnrollment(studentData.value.per_id).then((results) => {
+                enrolleeData.value = results
+                // for printing
+                studentID.value = results[0].ident_identification
+                studentSem.value = results[0].quar_code
+                studentSemId.value = results[0].quar_id
+                studentDateEnr.value = results[0].enr_dateenrolled
 
-                // if(!enrolleeData.value[0].enr_curriculum){
-                //    curr = settingscurr.value[0].sett_course_currid
-                // }
-
-                enr_curriculum.value = curr
-                getCurriculumSubject(curr, 0, 0).then((results) => {
-                    currSubject.value = results
-
-                    // para to dun sa required subjects list ng milestones page
-                    milestoneSubject.value = currSubject.value.filter(e => {
-                        if (
-                            (e.currtag_gradelvl == enrolleeData.value[0].enr_gradelvl) &&
-                            (e.currtag_sem == enrolleeData.value[0].enr_quarter)
-                        ) {
-                            return e
+                let curr = enrolleeData.value[0].enr_curriculum
+                let prog = enrolleeData.value[0].enr_program
+                let grad = enrolleeData.value[0].enr_gradelvl
+                let cour = enrolleeData.value[0].enr_course
+                
+                getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
+                    settingscurr.value = results
+                    //if wala pa syang saved curriculum, automatic na base yung default sa settings na curriculum
+                    if(!curr){
+                        if (Object.keys(results).length == 0) {
+                            curr = 0
+                        } else {
+                            curr = settingscurr.value[0].sett_course_currid
                         }
-                    })
-                    // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
-                    milestoneSubject.value.forEach((e) => {
-                        addedSubject.value.push(e)
-                        addedSubjectId.value.push(e.subj_id)
-                    })
+                    }
 
-                    getMilestone(studentData.value.enr_id).then((results) => {
-                        milestone.value = results
-                        milestone.value.forEach((e) => {
+                    // if(!enrolleeData.value[0].enr_curriculum){
+                    //    curr = settingscurr.value[0].sett_course_currid
+                    // }
+
+                    enr_curriculum.value = curr
+                    getCurriculumSubject(curr, 0, 0).then((results) => {
+                        currSubject.value = results
+
+                        // para to dun sa required subjects list ng milestones page
+                        milestoneSubject.value = currSubject.value.filter(e => {
+                            if (
+                                (e.currtag_gradelvl == enrolleeData.value[0].enr_gradelvl) &&
+                                (e.currtag_sem == enrolleeData.value[0].enr_quarter)
+                            ) {
+                                return e
+                            }
+                        })
+                        // ginamit naten yung filtered by grade lvl and sem type para tama mag reflect sa list ng curriculum current subjects
+                        milestoneSubject.value.forEach((e) => {
                             addedSubject.value.push(e)
                             addedSubjectId.value.push(e.subj_id)
                         })
-                            // console.log('program: ', prog)
-                            // console.log('semester: ', studentSemId.value)
-                            // console.log('course: ', cour)
-                            // console.log('gradelevel: ', grad)
-                            // console.log('curriculum: ', curr)
-                            // console.log('section: ', enr_section.value)
 
-                        getLaunchChecker(
-                            prog,
-                            studentSemId.value,
-                            cour,
-                            grad,
-                            curr,
-                            enr_section.value
-                        ).then(async (results1) => {
+                        getMilestone(studentData.value.enr_id).then((results) => {
+                            milestone.value = results
+                            milestone.value.forEach((e) => {
+                                addedSubject.value.push(e)
+                                addedSubjectId.value.push(e.subj_id)
+                            })
+                                // console.log('program: ', prog)
+                                // console.log('semester: ', studentSemId.value)
+                                // console.log('course: ', cour)
+                                // console.log('gradelevel: ', grad)
+                                // console.log('curriculum: ', curr)
+                                // console.log('section: ', enr_section.value)
 
-                            // console.log(results1)
-                            getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results1.ln_id).then((results2) => {
-                                scheduleData.value = results2.data
-                                console.log(scheduleData.value)
-                                preloading.value = false
-                                milestoneLoading.value = false
+                            getLaunchChecker(
+                                prog,
+                                studentSemId.value,
+                                cour,
+                                grad,
+                                curr,
+                                enr_section.value
+                            ).then(async (results1) => {
 
-                                getPaymentDetails(enrolleeData.value[0].acs_id, 1).then((results) => {
-                                    let x = results.data.slice(-1).pop()
-                                    paymentDetails.value = results.data
-                                    grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : enrolleeData.value[0].acs_amount
-                                })
+                                // console.log(results1)
+                                getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results1.ln_id).then((results2) => {
+                                    scheduleData.value = results2.data
+                                    console.log(scheduleData.value)
+                                    preloading.value = false
+                                    milestoneLoading.value = false
 
-                                getTotalCharges(
-                                    enrolleeData.value[0].enr_curriculum, 
-                                    enrolleeData.value[0].enr_quarter, 
-                                    enrolleeData.value[0].enr_program, 
-                                    enrolleeData.value[0].enr_course, 
-                                    enrolleeData.value[0].enr_gradelvl, 
-                                    enrolleeData.value[0].enr_section, 
-                                    enrolleeData.value[0].enr_id, 
-                                ).then((results) => {
-                                    chargeBreakdown.value = results
+                                    getPaymentDetails(enrolleeData.value[0].acs_id, 1).then((results) => {
+                                        let x = results.data.slice(-1).pop()
+                                        paymentDetails.value = results.data
+                                        grandTotal.value = typeof x !== 'undefined' ? x.acy_balance : enrolleeData.value[0].acs_amount
+
+                                        results.data.forEach((e) => {
+                                            totalPayment.value += Number(e.acy_payment)
+                                        })
+                                    })
+
+                                    getTotalCharges(
+                                        enrolleeData.value[0].enr_curriculum, 
+                                        enrolleeData.value[0].enr_quarter, 
+                                        enrolleeData.value[0].enr_program, 
+                                        enrolleeData.value[0].enr_course, 
+                                        enrolleeData.value[0].enr_gradelvl, 
+                                        enrolleeData.value[0].enr_section, 
+                                        enrolleeData.value[0].enr_id,
+                                        enrolleeData.value[0].enr_personid
+                                    ).then((results) => {
+                                        chargeBreakdown.value = results
+                                        console.log(chargeBreakdown.value)
+                                    })
                                 })
                             })
+
+
                         })
 
-
                     })
-
                 })
             })
         })
@@ -857,17 +873,18 @@ function getScheduleGroupsForSubject(subjId) {
                         <span>Total Other Charges</span>
                         <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.misc_amount) : 0.00 }}</span>
                     </div>
-                    <div class="d-flex gap-1 justify-content-between">
-                        <span>Total Deductions</span>
-                        <span class="fw-bold"> - {{ chargeBreakdown.deductions?  pesoConverter(chargeBreakdown.deductions) : 0.00 }}</span>
-                    </div>
+                   
                     <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
                         <span>Total Tuition</span>
                         <span class="fw-bold">{{ enrolleeData[0].acs_amount?  pesoConverter(enrolleeData[0].acs_amount) : 0.00 }}</span>
                     </div>
+                     <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Deductions</span>
+                        <span class="fw-bold"> - {{ pesoConverter(chargeBreakdown.deductions) }}</span>
+                    </div>
                     <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
                         <span>Remaining Balance</span>
-                        <span class="fw-bold">{{  chargeBreakdown.overall_amount?  pesoConverter( chargeBreakdown.overall_amount) : 0.00 }}</span>
+                        <span class="fw-bold">{{  chargeBreakdown.overall_amount ? pesoConverter(chargeBreakdown.overall_amount - totalPayment) :enrolleeData[0].acs_amount }}</span>
                     </div>
                     <!-- <div class="d-flex gap-1 justify-content-between">
                         <span>Mode of Payment</span>

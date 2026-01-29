@@ -184,20 +184,23 @@ const monitorCurriculum = (data) => {
     currSubject.value = []
     addedSubject.value = []
     addedSubjectId.value = []
+    loadCurrItems.value = true
     getCurriculumSubject(data, 0, 0).then(async (results) => {
-        currSubject.value = results
-        currSubject.value = currSubject.value.filter(e => {
-            if (
-                (e.currtag_gradelvl == studentData.value.enr_gradelvl) &&
-                (e.currtag_sem == studentData.value.enr_quarter)
-            ) {
-                return e
-            }
-        })
+        if(results.length){
+            currSubject.value = results
+            currSubject.value = currSubject.value.filter(e => {
+                if (
+                    (e.currtag_gradelvl == studentData.value.enr_gradelvl) &&
+                    (e.currtag_sem == studentData.value.enr_quarter)
+                ) {
+                    return e
+                }
+            })
 
-        for await (const e of currSubject.value) {
-            addedSubject.value.push(e)
-        };
+            for await (const e of currSubject.value) {
+                addedSubject.value.push(e)
+            };
+        }
 
         loadCurrItems.value = false
     })
@@ -302,7 +305,7 @@ const saveData = async () => {
             // location.reload()
             // saving.value = false
             Swal.close()
-
+            // console.log(results)
             if(results.status == 200){
                 Swal.fire({
                     title: "Tagging Successful",
@@ -427,7 +430,7 @@ const filterCurriculum = () => {
                                         <span class="fw-bold">Curriculum</span>
                                         <select class="form-control form-select-sm w-100" v-model="enr_curriculum"
                                             @change="setData('curriculum', enr_curriculum)">
-                                            <option>-- Select Here --</option>
+                                            <option value="">-- Select Here --</option>
                                             <option v-for="(c, index) in curriculumFilter" :value="c.curr_id">{{ c.curr_code
                                                 }}
                                             </option>
@@ -534,7 +537,7 @@ const filterCurriculum = () => {
                                                                         <label for="cross" class="form-label">Cross Enrolled (School)</label>
                                                                         <input class="form-control form-control-sm" type="text" v-model="addedSubject[index].mi_crossenr">
                                                                     </div> -->
-                                                                    <div class="mb-1">
+                                                                    <!-- <div class="mb-1">
                                                                         <label for="cross" class="form-label">Subject Completion</label>
                                                                         <select class="form-select form-select-sm" v-model="addedSubject[index].mi_tag">
                                                                             <option value="">-- Select Type --</option>
@@ -542,7 +545,7 @@ const filterCurriculum = () => {
                                                                             <option :value="2">Advance</option>
                                                                             <option :value="3">Re-take / Back Subject</option>
                                                                         </select>
-                                                                    </div>
+                                                                    </div> -->
                                                                     <div class="mt-3 mb-1">
                                                                         <button @click="removeSubject(index)" type="button"
                                                                         class="btn btn-sm btn-danger w-100">Remove this Subject</button>
@@ -559,8 +562,10 @@ const filterCurriculum = () => {
                                 </div>
                                 <div class="col-12">
                                     <div class="d-flex flex-column gap-2 border p-3">
-                                        <p class="fst-italic"><span class="fw-bold text-primary">Note: </span> Ensure that the information encoded here are correct and validations based on the actual data of the student to avoid records mismatch.</p>   
-                                        <button @click="saveData()" :disabled="saving || !Object.keys(addedSubject).length? true:false" type="button" class="btn btn-success btn-md">Save Taggings</button> 
+                                        <p class="fst-italic"><span class="fw-bold text-primary">Note: </span> 
+                                            If the student enrolls specific subject only, you should select the curriculum where the subject belongs to before saving the changes.
+                                        </p>   
+                                        <button @click="saveData()" :disabled="saving || (!Object.keys(addedSubject).length || enr_curriculum == '')? true:false" type="button" class="btn btn-success btn-md">Save Taggings</button> 
                                     </div>
                                 </div>
                             </div>

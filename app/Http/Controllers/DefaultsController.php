@@ -315,7 +315,7 @@ class DefaultsController extends Controller
     public function addProgram(Request $request){
 
     date_default_timezone_set('Asia/Manila');
-    $date = date('Y-m-d h:i:s', time());
+    $date = date('Y-m-d H:i:s');
 
         if($request->input('deactivate') == true){
             try{
@@ -395,7 +395,7 @@ class DefaultsController extends Controller
     public function addSection(Request $request){
 
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
     
             if($request->input('deactivate') == true){
                 try{
@@ -466,7 +466,7 @@ class DefaultsController extends Controller
     public function addSubject(Request $request){
 
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
     
             if($request->input('deactivate') == true){
                 try{
@@ -566,7 +566,7 @@ class DefaultsController extends Controller
     public function addCurriculum(Request $request){
 
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
     
             if($request->input('deactivate') == true){
                 try{
@@ -644,7 +644,7 @@ class DefaultsController extends Controller
 
     public function addCurriculumTagging(Request $request){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         
         if($request->input('currtag_id') && $request->input('deactivate') == false){

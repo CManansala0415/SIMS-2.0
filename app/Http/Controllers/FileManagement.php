@@ -153,7 +153,7 @@ class FileManagement extends Controller
     public function uploadMedicalFileLink(Request $request) {
         //date time saving last to fix naten
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $data = $request->all();
 
         try{

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Loader from '../loaders/Loading1.vue';
-import { getUserID } from "../../../routes/user";
+import { getUserID } from "../../../routes/user.js";
 import {
     addPayment,
     getTransactionDetails,
@@ -12,7 +12,8 @@ import {
 } from "../../Fetchers.js";
 import {
     pdfGenerator,
-    numberToWords
+    numberToWords,
+    formatDateTime
 } from "../../Generators.js";
 import ProvisionalReceipt from '../forms/accountingforms/ProvisionalReceipt.vue';
 import OfficialReceipt from '../forms/accountingforms/OfficialReceipt.vue';
@@ -112,15 +113,16 @@ onMounted(() => {
 
             
             if(billType.value == 1){ // means tuition = 1 ,  request = 2
-                balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acs_amount
+                balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acs_balance
             }else{
                 balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acr_amount
             }
 
-            amountTobePaid.value = balance.value
+            balance.value = Number(balance.value)
+            amountTobePaid.value = balance.value.toFixed(2)
 
             payment.value.forEach((e) => {
-                paid.value += e.acy_payment
+                paid.value += Number(e.acy_payment)
             })
 
 
@@ -150,7 +152,7 @@ onMounted(() => {
                                 if (exist.data && exist.data.length > 0) {
                                     latestpattern = Math.max(...exist.data.map(item => Number(item.acy_series_pattern)));
                                 }
-                                
+
                                 seriesNoActual.value =receiptPrSeries.value[0].sr_prefix + '-' +receiptPrSeries.value[0].sr_year + '-' + (Number(latestpattern) + 1);
                                 checking.value = false
                             }
@@ -340,7 +342,7 @@ const initPayment = () => {
                 }
 
                 // console.log(seriesno.series)
-                // console.log(x)
+                console.log(x)
 
                 latestPayment.value = x
                 renderPayment(x)
@@ -367,7 +369,10 @@ const initPayment = () => {
 const renderPayment = (paymentdata) =>{
     if (billType.value == 1) {
         getTransactionDetails(0, 0, '', '', '', 2, accountId.value,1).then((results) => {
-            if (results.data[0].acs_status == 1) {
+            console.log(results.data[0].acs_status)
+            console.log(paymentdata.acs_status)
+            console.log(accountId.value)
+            if (results.data[0].acs_status == paymentdata.acs_status) {
                 addPayment(paymentdata).then((results) => {
                     if (results.status == 204) {
                         Swal.close();
@@ -425,7 +430,8 @@ const renderPayment = (paymentdata) =>{
                     text: "Cannot proceed payment. This Item is removed from registrar. Please refresh the page",
                     icon: "question"
                 }).then(()=>{
-                    location.reload()
+
+                    // location.reload()
                 });
             }
         })
@@ -493,16 +499,13 @@ const renderPayment = (paymentdata) =>{
     
 }
 
-
-
-
 </script>
 
 <template>
    
     <div class="d-flex flex-column p-2 gap-2">
         <div class="d-flex flex-wrap flex-column">
-            <p class="text-success fw-bold">Payment Settlement</p>
+            <!-- <p class="text-success fw-bold">Payment Settlement</p> -->
             <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Ensure that the details of the payment is correct.
                 </span></p>
@@ -632,6 +635,7 @@ const renderPayment = (paymentdata) =>{
                                         <th style="background-color: #237a5b;" class="text-white">Balance</th>
                                         <th style="background-color: #237a5b;" class="text-white">Mode</th>
                                         <th style="background-color: #237a5b;" class="text-white">Receipt</th>
+                                        <th style="background-color: #237a5b;" class="text-white">Series</th>
                                         <th style="background-color: #237a5b;" class="text-white">Date</th>
                                     </tr>
                                 </thead>
@@ -662,7 +666,10 @@ const renderPayment = (paymentdata) =>{
                                                 <option value="2">Official</option>
                                             </select>
                                         </td>
-                                        <td class="align-middle">{{ py.acy_datepaid }}</td>
+                                        <td class="align-middle">
+                                            {{ py.acy_series }}
+                                        </td>
+                                        <td class="align-middle">{{ formatDateTime(py.acy_datepaid) }}</td>
                                     </tr>
                                     <tr v-if="!checking && !Object.keys(payment).length">
                                         <td class="p-3 text-center" colspan="6">
@@ -685,7 +692,7 @@ const renderPayment = (paymentdata) =>{
                             <span class="fw-bold">Total Amount Paid: <span class="text-success">{{ paid
                             }}</span>
                             </span>
-                            <span class="fw-bold">Remaining Balance: <span class="text-danger">{{ balance
+                            <span class="fw-bold">Remaining Balance: <span class="text-danger">{{ balance.toFixed(2)
                             }}</span>
                             </span>
                         </div>

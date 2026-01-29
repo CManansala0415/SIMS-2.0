@@ -249,16 +249,16 @@ const viewType = ref(0)
                                         <span class="fw-bold">{{ c.arc_lecture + c.arc_laboratory }}</span>
                                     </td>
                                     <td class="align-middle" v-if="mtc.arc_migtype != 2">
-                                        <span class="text-primary">{{ c.arc_prelimgrade }}</span>
+                                        <span class="text-primary">{{ c.arc_prelimgrade || 0 }}</span>
                                     </td>
                                     <td class="align-middle" v-if="mtc.arc_migtype != 2">
-                                        <span class="text-primary">{{ c.arc_midtermgrade }}</span>
+                                        <span class="text-primary">{{ c.arc_midtermgrade || 0 }}</span>
                                     </td>
                                     <td class="align-middle" v-if="mtc.arc_migtype != 2">
-                                        <span class="text-primary">{{ c.arc_prefinalgrade }}</span>
+                                        <span class="text-primary">{{ c.arc_prefinalgrade || 0 }}</span>
                                     </td>
                                     <td class="align-middle" v-if="mtc.arc_migtype != 2">
-                                        <span class="text-primary">{{ c.arc_finalgrade }}</span>
+                                        <span class="text-primary">{{ c.arc_finalgrade || 0 }}</span>
                                     </td>
 
                                     <td class="align-middle" v-if="mtc.arc_migtype == 2">
@@ -268,10 +268,10 @@ const viewType = ref(0)
                                         <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ c.arc_grade }}</span>
                                     </td>
                                     <td class="align-middle">
-                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ c.arc_facultyname }}</span>
+                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ c.arc_facultyname? c.arc_facultyname:'N/A' }}</span>
                                     </td>
                                      <td class="align-middle">
-                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ parseInt(c.arc_grade) >= 3.00? 'Failed':'Passed' }}</span>
+                                        <span :class="parseInt(c.arc_grade) >= 3.00? 'align-middle text-danger':'align-middle text-primary'">{{ parseInt(c.arc_grade) <= 3.00? 'Passed':'Failed' }}</span>
                                     </td>
                                 </tr>
                             </tbody>

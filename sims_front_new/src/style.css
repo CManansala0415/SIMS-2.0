@@ -318,3 +318,40 @@ h1 {
   -moz-appearance: none; /* For Firefox */
   appearance: none;
 }
+
+.prelim-permit{
+  background-color: #52b7ff;
+}
+
+.midterm-permit{
+  background-color: #52ffb4;
+}
+
+.prefinal-permit{
+  background-color: #cbff52;
+}
+
+.final-permit{
+  background-color: #ff5263;
+}
+
+.temporary-permit{
+  background-color: #5a5a5a;
+}
+
+
+
+/* Temporary permit watermark */
+.temporary-permit-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-50deg);
+  font-size: calc(3vw + 3vh); /* scales dynamically */
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.2); /* slightly more visible */
+  text-align: center;
+  white-space: nowrap;
+  z-index: 0;
+  pointer-events: none;
+}

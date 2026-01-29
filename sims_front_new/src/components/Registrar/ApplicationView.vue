@@ -436,6 +436,9 @@ const viewApplicationFormModal = (data) => {
     showApplicationForm.value = !showApplicationForm.value
 }
 
+const hideModal = () => {
+    document.getElementById('closeenrollmentmodal').click();
+}
 </script>
 <template>
     <div>
@@ -513,9 +516,9 @@ const viewApplicationFormModal = (data) => {
                                 <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id)"
                                     type="button" title="Edit Record" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen"/></button>
-                                <button @click="deletePerson(app.per_id)" type="button" title="Delete Record"
+                                <!-- <button @click="deletePerson(app.per_id)" type="button" title="Delete Record"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-trash"
-                                    /></button>
+                                    /></button> -->
                                 <button data-bs-toggle="modal" data-bs-target="#enrollmentmodal" v-if="activeEnrollment"
                                     @click="enrollApplicant(app)" type="button" title="Enroll Applicant"
                                     class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-gear"
@@ -524,7 +527,7 @@ const viewApplicationFormModal = (data) => {
                                     type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip"/></button>
                                 <button data-bs-toggle="modal" data-bs-target="#milestonemodal" @click="viewMilestones(app)"
-                                    type="button" title="Assign Identification" class="btn btn-secondary btn-sm">
+                                    type="button" title="View Milestones" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-tag"/></button>
                                 <button data-bs-toggle="modal" data-bs-target="#applicationformmodal" @click="viewApplicationFormModal(app.per_id)"
                                     type="button" title="print application form" class="btn btn-secondary btn-sm">
@@ -605,7 +608,7 @@ const viewApplicationFormModal = (data) => {
                 </div>
                 <div class="modal-body">
                     <EnrollmentModal v-if="showEnroll" :personid="editId" :personname="fullName"
-                        :gradelvldata="gradelvl" :programdata="degree" :quarterdata="quarter" :coursedata="course" />
+                        :gradelvldata="gradelvl" :programdata="degree" :quarterdata="quarter" :coursedata="course" @close-modal="hideModal()"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -614,7 +617,7 @@ const viewApplicationFormModal = (data) => {
                             else (Data Privacy Act of 2012)</small>
                     </div>
                     <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="closeenrollmentmodal"
                             @click="showEnroll = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>

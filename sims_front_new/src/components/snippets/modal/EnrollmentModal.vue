@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { enrollApplicant, getEnrollment, getCommandUpdate } from "../../Fetchers.js";
+import { enrollApplicant, getEnrollment, getCommandUpdate, getSettlementDetails } from "../../Fetchers.js";
 import { getUserID } from "../../../routes/user";
 import Loader1 from '../loaders/Loader1.vue';
 const userID = ref('')
@@ -22,7 +22,11 @@ const props = defineProps({
 
 
 
-defineEmits(['close-modal', 'add-new']);
+const emit = defineEmits(['close-modal'])
+const close = () => {
+    window.stop()
+    emit('close-modal')
+}
 
 const personID = computed(() => {
     return props.personid
@@ -52,6 +56,7 @@ const enrollChecker = ref(true)
 const saving = ref(false)
 const search = ref('')
 const preLoading = ref(true)
+const accounts = ref([])
 const enrollData = ref({
     userid: '',
     personid: '',
@@ -71,9 +76,14 @@ const booter = async () => {
     getCommandUpdate().then((results) => {
         settings.value=results
     })
+
+    getSettlementDetails(personID.value).then((results) => {
+        accounts.value=results
+    })
   
 }
 const enrolleeData = ref([])
+const hasBalance = ref(false)
 onMounted(async () => {
     window.stop()
     try {
@@ -82,21 +92,40 @@ onMounted(async () => {
         filteredQuarter.value = quarter.value
 
         await booter().then(() => {
+           
             getEnrollment(personID.value).then((results) => {
-                if (results.length != 0) {
-                    enrolleeData.value = results[0]
-                    detectCourse(enrolleeData.value.enr_course)
-                    enrollData.value.gradelvl = enrolleeData.value.enr_gradelvl
-                    enrollData.value.program = enrolleeData.value.enr_program
-                    enrollData.value.quarter = enrolleeData.value.enr_quarter
-                    enrollData.value.course = enrolleeData.value.enr_course
-                    enrollData.value.lrn = enrolleeData.value.enr_lrn
-                } else {
-                    enrolleeData.value = []
-                    enrollData.value.quarter = settings.value[0].sett_semester
+
+                hasBalance.value = accounts.value.some(a => parseFloat(a.acs_balance) > 0);
+                // console.log('Has Balance:', hasBalance.value);
+
+                if(hasBalance.value){
+                    Swal.fire({
+                        title: "Enrollment Restricted",
+                        text: "This applicant has an outstanding balance. Please settle the account before proceeding with enrollment.",
+                        icon: "warning"
+                    }).then(()=>{
+                        enrollChecker.value = true
+                        preLoading.value = false
+                        close();
+                    });
+                }else{
+                    if (results.length != 0) {
+                        enrolleeData.value = results[0]
+                        detectCourse(enrolleeData.value.enr_course)
+                        enrollData.value.gradelvl = enrolleeData.value.enr_gradelvl
+                        enrollData.value.program = enrolleeData.value.enr_program
+                        enrollData.value.quarter = enrolleeData.value.enr_quarter
+                        enrollData.value.course = enrolleeData.value.enr_course
+                        enrollData.value.lrn = enrolleeData.value.enr_lrn
+                    } else {
+                        enrolleeData.value = []
+                        enrollData.value.quarter = settings.value[0].sett_semester
+                    }
+                    enrollChecker.value = false
+                    preLoading.value = false
                 }
-                enrollChecker.value = false
-                preLoading.value = false
+                
+                
             })
 
         })
@@ -165,6 +194,15 @@ const enroll = () => {
         (enrollData.value.course) &&
         (enrollData.value.gradelvl)
     ) {
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        
         saving.value = true
         enrollData.value.personid = personID.value
         enrollData.value.userid = userID.value
@@ -177,6 +215,7 @@ const enroll = () => {
                     text: "Unknown error occured, try again later",
                     icon: "error"
                 }).then(()=>{
+                    Swal.close()
                     // location.reload()
                 });
             } else {
@@ -187,6 +226,7 @@ const enroll = () => {
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             }

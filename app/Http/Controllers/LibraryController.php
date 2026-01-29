@@ -181,7 +181,7 @@ class LibraryController extends Controller
     public function addBooksDdc(Request $request){
         try{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             if($request->input('lbrc_mode') == 1){
                 $primary = DB::table('def_library_book_ddc')
@@ -224,7 +224,7 @@ class LibraryController extends Controller
     public function addBookInformation(Request $request){
         try{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             if($request->input('lbrb_mode') == 1){
                 $primary = DB::table('def_library_book_accession')
@@ -287,7 +287,7 @@ class LibraryController extends Controller
     public function addBorrowedBooks(Request $request){
         //date time saving last to fix naten
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $data = $request->all();
         
         foreach ($data as $key => $value) {
@@ -472,7 +472,7 @@ class LibraryController extends Controller
     public function updateBorrowedBooks(Request $request){
         //date time saving last to fix naten
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         
         try{
             $primary = DB::table('def_library_book_borrow')
@@ -543,7 +543,7 @@ class LibraryController extends Controller
 
     public function deactivateLibraryCard(Request $request){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         try{
             $primary = DB::table('def_library_card_issue')
             ->where('lbrd_id','=', $request->input('lbrd_id'))
@@ -568,7 +568,7 @@ class LibraryController extends Controller
 
     public function addLibraryCard(Request $request){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         $code = 'LB-'.$request->input('lbrd_dateissued').$request->input('lbrd_enrid');
 
         try{

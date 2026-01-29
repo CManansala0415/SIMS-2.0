@@ -175,7 +175,7 @@ class FacultyController extends Controller
 
     public function addGradingSheetHeader(Request $request, $type){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         try{
             if( $type == 2){
@@ -213,7 +213,7 @@ class FacultyController extends Controller
     }
     public function addGradingSheetGrade(Request $request){
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         try{
             $data = $request->all();

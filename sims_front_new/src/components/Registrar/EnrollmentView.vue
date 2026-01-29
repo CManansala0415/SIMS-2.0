@@ -148,23 +148,32 @@ onMounted(async () => {
                     student.value = results.data
                     studentCount.value = results.count
 
-                    console.log(paymentDetails.value)
                     let x = student.value.map((e) => {
+                        
                         let y = accounts.value.findIndex((f) => {
-                            return f.acs_enrid === e.enr_id
+                            return f.acs_enrid === e.enr_id && f.acs_status == 1
                         })
 
+                        
+                        // get first latest account
                         let acsid = accounts.value
-                        .filter(f => f.acs_enrid === e.enr_id)
+                        .filter(f => f.acs_enrid === e.enr_id && f.acs_status == 1)
                         .map(f => ({
-                            acs_id: f.acs_id
+                            acs_id: f.acs_id,
+                            acs_status: f.acs_status
+
                         }))
 
-                        // console.log(accounts.value)
-                        let pay = paymentDetails.value.findIndex((f) => {
+                        //filter payments by latest account id
+                        let filterpayments = paymentDetails.value.filter((f) => {
                             return f.acy_accid === acsid[0].acs_id
                         })
 
+                        // if may laman si filterpayments means nakapag bayad nasya ng dp
+                        let paid = false
+                        if(Object.keys(filterpayments).length){
+                            paid = true
+                        }
 
                         // stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
@@ -179,19 +188,17 @@ onMounted(async () => {
                             }
                         }
 
-                        console.log(paymentDetails.value)
-
                         return {
                             ...e,
                             profile_picture: z,
-                            is_paid: pay != -1 ? true : false,
+                            is_paid: paid,
                             ...accounts.value[y],
                         }
 
                     })
 
                     student.value = x
-
+                    console.log(student.value)
                     
 
                     preLoading.value = false
@@ -562,15 +569,24 @@ const dropStudent = (id) => {
     //     return false;
     // }
     Swal.fire({
-        title: "Delete Record",
+        title: "Drop Student",
         text: "Are you sure you want to drop this student? this action cannot be reverted",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Im Delete it!"
+        confirmButtonText: "Yes, Im Gonna Drop it!"
     }).then(async (result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             let x = {
                 enr_updatedby: userID.value,
                 enr_id: id
@@ -578,13 +594,23 @@ const dropStudent = (id) => {
             deleteEnrollment(x).then((results) => {
                 // alert('Student Dropped')
                 // location.reload()
-                Swal.fire({
-                    title: "Update Success",
-                    text: "Student dropped, refreshing the page",
-                    icon: "success"
-                }).then(() => {
-                    location.reload()
-                });
+                if(results.status != 200){
+                    Swal.fire({
+                        title: "Update Failed",
+                        text: "Dropping student failed, try again later",
+                        icon: "error"
+                    });
+                    return
+                }else{
+                    Swal.fire({
+                        title: "Update Success",
+                        text: "Student dropped, refreshing the page",
+                        icon: "success"
+                    }).then(() => {
+                        Swal.close()
+                        location.reload()
+                    });
+                }
             })
         }
     });
@@ -831,14 +857,14 @@ const getData = (result) => {
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-pen" />
                                 </button>
-                                <!-- v-if="stud.acs_amount > 0" -->
-                                <button v-if="stud.acs_amount > 0" tabindex="-1" title="Print Grades"
+                                <!-- v-if="Number(stud.acs_amount) > 0" -->
+                                <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Grades"
                                     data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print" />
                                 </button>
-                                <!-- v-if="stud.acs_amount > 0" -->
-                                <button v-if="stud.acs_amount > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal"
+                                <!-- v-if="Number(stud.acs_amount) > 0" -->
+                                <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal"
                                     data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-print" />
@@ -847,8 +873,8 @@ const getData = (result) => {
                                     class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-trash" />
                                 </button>
-                                <!-- v-if="stud.acs_amount > 0" -->
-                                <button v-if="stud.acs_amount > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
+                                <!-- v-if="Number(stud.acs_amount) > 0" -->
+                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
                                     type="button" title="print ID" class="btn btn-secondary btn-sm">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip" />
                                 </button>

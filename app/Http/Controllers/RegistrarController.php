@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 Use DateTime;
+use Exception;
 
 class RegistrarController extends Controller
 {
@@ -153,7 +154,7 @@ class RegistrarController extends Controller
                 try{
                     //date time saving last to fix naten
                     date_default_timezone_set('Asia/Manila');
-                    $date = date('Y-m-d h:i:s', time());
+                    $date = date('Y-m-d H:i:s');
                     $primary = DB::table('def_person')->insert([
                         'per_firstname' => $request->input('per_firstname'),
                         'per_middlename' => $request->input('per_middlename'),
@@ -294,7 +295,7 @@ class RegistrarController extends Controller
     {
         try{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $s1 = DB::table('def_person')
                 ->where('per_id','=', $req['per_id'])
                 ->update([
@@ -406,7 +407,7 @@ class RegistrarController extends Controller
         try{
 
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             $s1 = DB::table('def_person')
                 ->where('per_id','=', $req['per_id'])
@@ -474,6 +475,7 @@ class RegistrarController extends Controller
             ->orderBy('def_enrollment.enr_dateenrolled','DESC')
             ->where('def_enrollment.enr_personid', '=' , $id)
             ->where('def_enrollment.enr_status', '=' , 1)
+            ->where('def_accounts_settlement.acs_status', '=' , 1)
             ->get();
         return $enrollment; 
        
@@ -484,7 +486,7 @@ class RegistrarController extends Controller
        try{
             // $finance = new FinanceController();
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             $primary = DB::table('def_enrollment')->insert([
                 'enr_enrby' => $request->input('userid'),
@@ -513,8 +515,15 @@ class RegistrarController extends Controller
                 // );
                 // return $data;
 
+                
+                // $randomizer = uniqid();
+                $randomizer = date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(3)));
+
+                $accheader = 'ACC-'.$request->input('personid').'-' . $randomizer;
+
                 $primary = DB::table('def_accounts_settlement')->insert([
                     'acs_personid' => $request->input('personid'),
+                    'acs_accheader' => $accheader,
                     'acs_enrid' => $enr->enr_id,
                     'acs_dateadded' => $date,
                 ]);
@@ -955,7 +964,7 @@ class RegistrarController extends Controller
     {
         
         // date_default_timezone_set('Asia/Manila');
-        // $date = date('Y-m-d h:i:s', time());
+        // $date = date('Y-m-d H:i:s');
         // $primary = DB::table('def_milestone')->insert([
         //     'mi_enrid' =>  $request->input('enr_id'),
         //     'mi_subjid' =>  $request->input('subj_id'),
@@ -973,7 +982,7 @@ class RegistrarController extends Controller
             $milestoneid = $milestone->mi_id;
 
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_milestone')
             ->where('mi_id','=', $milestoneid)
             ->update([
@@ -986,7 +995,7 @@ class RegistrarController extends Controller
 
         }else{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_milestone')->insert([
                 'mi_enrid' =>  $request->input('enr_id'),
                 'mi_subjid' =>  $request->input('subj_id'),
@@ -1039,7 +1048,7 @@ class RegistrarController extends Controller
         try{
             
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_enrollment')
             ->where('enr_id','=', $request->input('enr_id'))
             ->update([
@@ -1164,6 +1173,25 @@ class RegistrarController extends Controller
                 }
             }
 
+            $scholarship_percent = 0;
+            $scholarship_fixed = 0;
+
+            $scholarship = DB::table('def_accounts_scholarship')
+                          ->where('sch_status', '=',  1)
+                          ->where('sch_personid', '=',  $request->input('enr_personid'))
+                          ->get();
+
+            foreach ($scholarship as $tp) {
+                if ($tp->sch_status == 1) {
+                    if ($tp->sch_type == 1) { // 1 percent 2 amount
+                        $scholarship_percent += $tp->sch_value;
+                    }else{
+                        $scholarship_fixed += $tp->sch_value;
+                    }
+                }
+            }
+            
+
             $soa = DB::table('def_accounts_student')
                           ->where('soa_enrid', '=',  $request->input('enr_id'))
                           ->where('soa_personid', '=',  $request->input('enr_personid'))
@@ -1177,10 +1205,18 @@ class RegistrarController extends Controller
                 ->get();
 
             if(!$soa){
+
+                $final = $totalCost
+                        -(
+                            ($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100)))+
+                            ($scholarship_fixed + ($totalCost * (float) ($scholarship_percent / 100)))
+                        );
+
                  $account = DB::table('def_accounts_settlement')
                     ->where('acs_enrid','=', $request->input('enr_id'))
+                    ->where('acs_status','=', 1)
                     ->update([
-                        'acs_amount' => $totalCost-($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100))),
+                        'acs_amount' => $final,
                         'acs_dateupdated' => $date,
                         'acs_updatedby' => $request->input('user_id'),
                     ]);
@@ -1213,7 +1249,7 @@ class RegistrarController extends Controller
     {
         try{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_milestone')
             ->where('mi_id','=', $request->input('mi_id'))
             ->update([
@@ -1452,7 +1488,7 @@ class RegistrarController extends Controller
     {
        try{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             $primary = DB::table('def_launch')->insert([
                 'ln_dtype' => $request->input('ln_dtype'),
@@ -1476,7 +1512,7 @@ class RegistrarController extends Controller
     public function addSchedule(Request $request)
     {
        date_default_timezone_set('Asia/Manila');
-       $date = date('Y-m-d h:i:s', time());
+       $date = date('Y-m-d H:i:s');
 
        try{
             if($request->input('sched_id')){
@@ -2362,7 +2398,7 @@ class RegistrarController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $primary = DB::table('def_employee')->insert([
                 'emp_firstname' => $request->input('emp_firstname'),
                 'emp_middlename' => $request->input('emp_middlename'),
@@ -2479,7 +2515,7 @@ class RegistrarController extends Controller
     {
         try{
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
             $s1 = DB::table('def_employee')
                 ->where('emp_id','=', $req['emp_id'])
                 ->update([
@@ -2511,7 +2547,7 @@ class RegistrarController extends Controller
     public function addEmployeeLoad(Request $request)
     {
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
         try{
 
             if($request->input('ld_id') == 0){
@@ -2571,31 +2607,53 @@ class RegistrarController extends Controller
 
     public function deleteEnrollment(Request $request)
     {
-        // $s1 = DB::table('def_enrollment')
-        // ->where('enr_id','=', $request['enr_id'])
-        // ->delete();
-        // return 200; 
-
-        try{
+        try {
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
-            $s1 = DB::table('def_enrollment')
-                ->where('enr_id','=', $request['enr_id'])
+            $date = now();
+
+            DB::beginTransaction();
+
+            DB::table('def_enrollment')
+                ->where('enr_id', $request->enr_id)
+                ->delete();
+
+            DB::table('def_milestone')
+                ->where('mi_enrid', $request->enr_id)
+                ->delete();
+
+            DB::table('def_accounts_settlement')
+                ->where('acs_enrid', $request->enr_id)
+                ->where('acs_status', 1)
                 ->update([
-                    "enr_status" => 0,
-                    "enr_updatedby" =>$request['enr_updatedby'],
-                    "enr_dateupdated" => $date,
+                    'acs_status'      => 0,
+                    'acs_updatedby'   => $request->enr_updatedby,
+                    'acs_dateupdated' => $date,
                 ]);
-            return $data = [
-                'status' => 204,
-            ];
+
+            DB::table('def_accounts_student')
+                ->where('soa_enrid', $request->enr_id)
+                ->update([
+                    'soa_status'      => 0,
+                    'soa_updatedby'   => $request->enr_updatedby,
+                    'soa_dateupdated' => $date,
+                ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status'  => 200,
+                'message' => 'Enrollment successfully deleted',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 500,
+                'message' => $e->getMessage(),
+            ]);
         }
-        catch (Exception $ex) {
-            return $data = [
-                'status' => 500,
-            ];
-        }
-       
     }
 
 
@@ -2654,7 +2712,7 @@ class RegistrarController extends Controller
     public function addScheduledFaculty(Request $request)
     {
         date_default_timezone_set('Asia/Manila');
-        $date = date('Y-m-d h:i:s', time());
+        $date = date('Y-m-d H:i:s');
 
         if(empty($request['lf_id'])){
             try{
@@ -2708,7 +2766,7 @@ class RegistrarController extends Controller
         return 200; 
 
         // date_default_timezone_set('Asia/Manila');
-        // $date = date('Y-m-d h:i:s', time());
+        // $date = date('Y-m-d H:i:s');
 
         // $s1 = DB::table('def_launch_faculty')
         // ->where('lf_id','=', $request['lf_id'])
@@ -2776,7 +2834,7 @@ class RegistrarController extends Controller
         try{
             //date time saving last to fix naten
             date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d h:i:s', time());
+            $date = date('Y-m-d H:i:s');
 
             if($request->input('ident_idno')){
                 $primary = DB::table('def_student_identification')
