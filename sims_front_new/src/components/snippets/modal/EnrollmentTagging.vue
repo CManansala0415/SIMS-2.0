@@ -1,7 +1,18 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "../../../routes/user";
-import { getCurriculumSubject, getEnrollment, getMilestone, addMilestone, updateEnrollment, updateMilestone, getCommandUpdateCurriculum, getAcademicStatus, getArchiveMerge } from "../../Fetchers.js";
+import { 
+    getSectionCount, 
+    getLaunchChecker, 
+    getCurriculumSubject, 
+    getEnrollment, 
+    getMilestone, 
+    addMilestone, 
+    updateEnrollment, 
+    updateMilestone, 
+    getCommandUpdateCurriculum, 
+    getAcademicStatus, 
+    getArchiveMerge } from "../../Fetchers.js";
 import Loader from '../loaders/Loader1.vue';
 
 import { useRouter, useRoute } from 'vue-router'
@@ -56,6 +67,7 @@ const activeEnrollment = ref(false)
 const milestoneCompData = ref([])
 const milestoneCompHeader = ref([])
 const milestoneCompLoading = ref(true)
+const sectionSlots = ref([])
 
 onMounted(async () => {
     window.stop()
@@ -79,7 +91,7 @@ onMounted(async () => {
             );
 
             milestoneCompData.value = Object.groupBy(results, item => item.arc_id);
-           
+            
             // console.log(milestoneCompData.value )
             // console.log(milestoneCompHeader.value )
            
@@ -92,15 +104,16 @@ onMounted(async () => {
         getUserID().then((results) => {
             userID.value = results.account.data.id
         })
-
+ 
         getEnrollment(studentData.value.per_id).then((results) => {
             enrolleeData.value = results
             let curr = enrolleeData.value[0].enr_curriculum
             let prog = enrolleeData.value[0].enr_program
             let grad = enrolleeData.value[0].enr_gradelvl
             let cour = enrolleeData.value[0].enr_course
-
-            // console.log(curr)
+            let quar = enrolleeData.value[0].enr_quarter
+            let sec = enrolleeData.value[0].enr_section
+            
 
             getCommandUpdateCurriculum(prog, grad, cour).then((results) => {
                 settingscurr.value=results
@@ -117,10 +130,24 @@ onMounted(async () => {
                         curr = settingscurr.value[0].sett_course_currid
                     }
                 }
+
                
+                getSectionCount(prog, quar, cour, grad, curr, sec).then((e)=>{
+                    sectionSlots.value = e.sections;
+
+                    if(!enr_section.value){ // auto select if walang section
+                        const nextSection = sectionSlots.value.find(s => !s.is_full);
+                        enr_section.value = nextSection?.sec_id ?? null;
+                    }
+                    
+                    getSectionSlot(enr_section.value)
+                })
+                
+                
                 // if(!enrolleeData.value[0].enr_curriculum){
                 //    curr = settingscurr.value[0].sett_course_currid
                 // }
+
                 enr_curriculum.value = curr
                 getCurriculumSubject(curr, 0, 0).then((results) => {
                     currSubject.value = results
@@ -252,82 +279,113 @@ const setData = (type, data) => {
             break;
         case 'section':
             enr_section.value = data
+            getSectionSlot(enr_section.value)
             break;
     }
 }
 
+
+const slotsAvailable = ref(0);
+const slotsCount = ref(0);
+const getSectionSlot = (sectionId) => {
+    const slot = sectionSlots.value.find(e => e.sec_id === Number(sectionId));
+    if (!sectionId) {
+        slotsAvailable.value = 0;
+        slotsCount.value = 0;
+        return;
+    }
+    slotsAvailable.value = slot?.available_slots ?? 0;
+    slotsCount.value = slot?.slots ?? 0;
+};
+
+
+
 const saving = ref(false)
 const saveData = async () => {
-    saving.value = true
-    Swal.fire({
-        title: "Saving Updates",
-        text: "Please wait while we check all details.",
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-    addedSubject.value = addedSubject.value.map(itemObj => {
-        return {
-            ...itemObj,
-            enr_id: studentData.value.enr_id,
-            user_id: userID.value,
-            mi_tag: itemObj.mi_tag ? itemObj.mi_tag : '',
-            mi_crossenr: itemObj.mi_crossenr ? itemObj.mi_crossenr : ''
-        }
-    })
 
-    // let counter = 0
-    // addedSubject.value.forEach(async (e) => {
-    //     addMilestone(e).then((results) => {
-    //         counter+=1
-    //         counter==Object.keys(addedSubject.value).length? saving.value = false:saving.value = true
-    //     })
-    // })
-
-    let counter = 0
-    let x = {
-        ...studentData.value,
-        enr_updatedby: userID.value,
-        enr_section: enr_section.value,
-        enr_curriculum: enr_curriculum.value,
-        user_id: userID.value
+    let allowSection = false
+    if(enr_section.value == studentData.value.enr_section){
+        allowSection = true
+    }else{
+        slotsAvailable.value > 0? allowSection=true:false
     }
 
-    for await (const e of addedSubject.value) {
-        counter += 1
-        addMilestone(e).then((results) => { })
-    }
-    if (counter == Object.keys(addedSubject.value).length) {
-        updateEnrollment(x).then((results) => {
-            // alert('Tagging Successful')
-            // //router.replace({ name: 'Academics', params: { id: 2}});
-            // location.reload()
-            // saving.value = false
-            Swal.close()
-            // console.log(results)
-            if(results.status == 200){
-                Swal.fire({
-                    title: "Tagging Successful",
-                    text: "Changes applied, refreshing the page",
-                    icon: "success"
-                }).then(()=>{
-                    location.reload()
-                });
-            }else{
-                Swal.fire({
-                    title: "Cannot Alter Records",
-                    text: "Unable to save changes, due to the account is already forwarded to accounting. Please contact the system administrator for assistance.",
-                    icon: "error"
-                }).then(()=>{
-                    saving.value = false
-                });
-            }
-            
+    if(!enr_section.value || !enr_curriculum.value || !allowSection){
+        Swal.fire({
+            title: "Requirements",
+            text: "Please fillout curriculum and section",
+            icon: "question"
         })
+    }else{
+        saving.value = true
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+        addedSubject.value = addedSubject.value.map(itemObj => {
+            return {
+                ...itemObj,
+                enr_id: studentData.value.enr_id,
+                user_id: userID.value,
+                mi_tag: itemObj.mi_tag ? itemObj.mi_tag : '',
+                mi_crossenr: itemObj.mi_crossenr ? itemObj.mi_crossenr : ''
+            }
+        })
+
+        // let counter = 0
+        // addedSubject.value.forEach(async (e) => {
+        //     addMilestone(e).then((results) => {
+        //         counter+=1
+        //         counter==Object.keys(addedSubject.value).length? saving.value = false:saving.value = true
+        //     })
+        // })
+
+        let counter = 0
+        let x = {
+            ...studentData.value,
+            enr_updatedby: userID.value,
+            enr_section: enr_section.value,
+            enr_curriculum: enr_curriculum.value,
+            user_id: userID.value
+        }
+
+        for await (const e of addedSubject.value) {
+            counter += 1
+            addMilestone(e).then((results) => { })
+        }
+        if (counter == Object.keys(addedSubject.value).length) {
+            updateEnrollment(x).then((results) => {
+                // alert('Tagging Successful')
+                // //router.replace({ name: 'Academics', params: { id: 2}});
+                // location.reload()
+                // saving.value = false
+                Swal.close()
+                // console.log(results)
+                if(results.status == 200){
+                    Swal.fire({
+                        title: "Tagging Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        location.reload()
+                    });
+                }else{
+                    Swal.fire({
+                        title: "Cannot Alter Records",
+                        text: "Unable to save changes, due to the account is already forwarded to accounting. Please contact the system administrator for assistance.",
+                        icon: "error"
+                    }).then(()=>{
+                        saving.value = false
+                    });
+                }
+                
+            })
+        }
     }
-
-
 }
 
 
@@ -383,7 +441,7 @@ const filterCurriculum = () => {
 
 <template>
     <div class="d-flex flex-wrap w-100 ">
-        <div v-if="!Object.keys(currSubject).length && preloading"
+        <div v-if="preloading"
             class="d-flex w-100 mt-4 justify-content-center align-content-center">
             <Loader />
         </div>
@@ -438,14 +496,23 @@ const filterCurriculum = () => {
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="p-3 border shadow d-flex flex-column gap-2 card">
-                                        <span class="fw-bold">Section</span>
-                                        <select class="form-control form-select-sm w-100" v-model="enr_section"
-                                            @change="setData('section', enr_section)">
-                                            <option>-- Select Here --</option>
-                                            <option v-for="(s, index) in sectionFilter" :value="s.sec_id">{{ s.sec_name }}
-                                            </option>
-                                        </select>
+                                    <div class="p-3 border shadow card d-flex h-100">
+                                        <div class="d-flex justify-content-between">
+                                            <div class="w-100 d-flex flex-column justify-content-center align-items-center">
+                                                <span class="fw-bold mb-2">Section</span>
+                                                <select class="form-control form-select-sm w-100" v-model="enr_section"
+                                                    @change="setData('section', enr_section)">
+                                                    <option disabled="">-- Select Here --</option>
+                                                    <option v-for="(s, index) in sectionSlots" :value="s.sec_id">{{ s.sec_name }} 
+                                                    </option>
+                                                </select>
+                                            </div>
+                                            <div class="w-100 d-flex flex-column justify-content-center align-items-center">
+                                                <span class="fw-bold mb-2">Slots Count: {{ slotsCount }}</span>
+                                                <small class="text-success" v-if="slotsAvailable > 0">{{ slotsAvailable }} Remaining</small>
+                                                <small class="text-danger" v-else>Slots Full!</small>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- <div class="col-4">
@@ -483,7 +550,7 @@ const filterCurriculum = () => {
                                                         <tr v-else v-for="(s, index) in subjectFilter"
                                                             @click="addSubject(s)">
                                                             <td
-                                                                :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                                                :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start bg-secondary-subtle text-black' : 'align-middle text-start bg-white text-black'">
                                                                 <p class="fw-bold ">{{ s.subj_code }}</p>
                                                                 <p class=" fst-italic">{{ s.subj_name }}</p>
                                                             </td>
@@ -547,8 +614,8 @@ const filterCurriculum = () => {
                                                                         </select>
                                                                     </div> -->
                                                                     <div class="mt-3 mb-1">
-                                                                        <button @click="removeSubject(index)" type="button"
-                                                                        class="btn btn-sm btn-danger w-100">Remove this Subject</button>
+                                                                        <button v-if="!a.mi_id" @click="removeSubject(index)" type="button"
+                                                                        class="btn btn-sm btn-danger w-100">Remove</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -565,7 +632,7 @@ const filterCurriculum = () => {
                                         <p class="fst-italic"><span class="fw-bold text-primary">Note: </span> 
                                             If the student enrolls specific subject only, you should select the curriculum where the subject belongs to before saving the changes.
                                         </p>   
-                                        <button @click="saveData()" :disabled="saving || (!Object.keys(addedSubject).length || enr_curriculum == '')? true:false" type="button" class="btn btn-success btn-md">Save Taggings</button> 
+                                        <button @click="saveData()" :disabled="saving" type="button" class="btn btn-success btn-md" v-if="!addedSubject[0].mi_id">Save Taggings</button> 
                                     </div>
                                 </div>
                             </div>
@@ -665,9 +732,9 @@ const filterCurriculum = () => {
                                                     <th class="border p-2">
                                                         <span class="fw-bold">Finals</span>
                                                     </th>
-                                                    <th class="border p-2" v-if="activeEnrollment">
+                                                    <!-- <th class="border p-2" v-if="activeEnrollment">
                                                         <span class="fw-bold">Action</span>
-                                                    </th>
+                                                    </th> -->
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -711,10 +778,10 @@ const filterCurriculum = () => {
                                                      <td class="align-middle">
                                                         <span class="text-primary">{{ c.grs_finals?c.grs_finals:0 }}</span>
                                                     </td>
-                                                    <td v-if="activeEnrollment" class="align-middle">
+                                                    <!-- <td v-if="activeEnrollment" class="align-middle">
                                                          <button type="button" @click="deleteSubject(c.mi_id, index)"
                                                             class="mb-2 btn btn-sm btn-danger">&times;</button>
-                                                    </td>
+                                                    </td> -->
                                                 </tr>
                                             </tbody>
                                         </table>

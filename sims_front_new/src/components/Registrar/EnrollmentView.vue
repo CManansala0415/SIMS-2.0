@@ -198,7 +198,6 @@ onMounted(async () => {
                     })
 
                     student.value = x
-                    console.log(student.value)
                     
 
                     preLoading.value = false

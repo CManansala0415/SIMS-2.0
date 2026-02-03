@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum'])->get('/get-province', [DefaultsController::c
 Route::middleware(['auth:sanctum'])->get('/get-city', [DefaultsController::class,'getCity']);
 Route::middleware(['auth:sanctum'])->get('/get-barangay', [DefaultsController::class,'getBarangay']);
 Route::middleware(['auth:sanctum'])->get('/get-demograph', [DefaultsController::class,'getDemograph']);
-Route::middleware(['auth:sanctum'])->get('/get-academicdefaults', [DefaultsController::class,'getAcademicDefaults']);
+Route::middleware(['auth:sanctum'])->get('/get-academic-defaults', [DefaultsController::class,'getAcademicDefaults']);
 Route::middleware(['auth:sanctum'])->get('/get-tagged-subject', [DefaultsController::class,'getTaggedSubject']);
 Route::middleware(['auth:sanctum'])->get('/get-subject', [DefaultsController::class,'getSubject']);
 Route::middleware(['auth:sanctum'])->post('/add-program', [DefaultsController::class,'addProgram']);
@@ -78,6 +78,8 @@ Route::middleware(['auth:sanctum'])->post('/add-milestone', [RegistrarController
 Route::middleware(['auth:sanctum'])->get('/get-milestone/{curr}', [RegistrarController::class,'getMilestone']);
 Route::middleware(['auth:sanctum'])->post('/update-enrollment', [RegistrarController::class,'updateEnrollment']);
 Route::middleware(['auth:sanctum'])->post('/update-milestone', [RegistrarController::class,'updateMilestone']);
+Route::middleware(['auth:sanctum'])->get('/get-section-count', [RegistrarController::class,'getSectionCount']);
+
 
 
 Route::middleware(['auth:sanctum'])->get('/get-building', [DefaultsController::class,'getBuilding']);

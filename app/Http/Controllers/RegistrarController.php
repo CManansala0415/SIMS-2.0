@@ -1049,14 +1049,7 @@ class RegistrarController extends Controller
             
             date_default_timezone_set('Asia/Manila');
             $date = date('Y-m-d H:i:s');
-            $primary = DB::table('def_enrollment')
-            ->where('enr_id','=', $request->input('enr_id'))
-            ->update([
-                'enr_curriculum' => $request->input('enr_curriculum'),
-                'enr_section' => $request->input('enr_section'),
-                'enr_updatedby' => $request->input('enr_updatedby'),
-                'enr_dateupdated' => $date,
-            ]);
+           
 
             $finance = new FinanceController();
             $financedata = $finance->getChargesTemplateHeader(
@@ -1226,8 +1219,17 @@ class RegistrarController extends Controller
                 $status = 200;
             }else{
                 $msg = "Enrollment updated. Student account already exists.";
-                $status = 409;
+                $status = 409; 
             }
+
+            $primary = DB::table('def_enrollment')
+            ->where('enr_id','=', $request->input('enr_id'))
+            ->update([
+                'enr_curriculum' => $request->input('enr_curriculum'),
+                'enr_section' => $request->input('enr_section'),
+                'enr_updatedby' => $request->input('enr_updatedby'),
+                'enr_dateupdated' => $date,
+            ]);
            
             return [
                 'templatePricesData' => $templatePricesData,
@@ -1332,6 +1334,78 @@ class RegistrarController extends Controller
        }
        
     }
+
+    public function getSectionCount(Request $params)
+    {
+        /**
+         * 1️⃣ Get launch (DO NOT filter by section)
+         */
+        $launch = DB::table('def_launch')
+            ->where('ln_status', 1)
+            ->where('ln_dtype', $params->enr_program)
+            ->where('ln_quarter', $params->enr_quarter)
+            ->where('ln_course', $params->enr_course)
+            ->where('ln_gradelvl', $params->enr_gradelvl)
+            ->when($params->filled('enr_curriculum'), function ($query) use ($params) {
+                $query->where('ln_curriculum', $params->enr_curriculum);
+            })
+            ->first();
+
+        /**
+         * 2️⃣ Get all active sections
+         */
+        $controller = new DefaultsController();
+        $sections = collect($controller->getSection());
+
+        /**
+         * 3️⃣ Count enrollments per section
+         */
+        $enrollmentCounts = DB::table('def_enrollment')
+            ->select('enr_section', DB::raw('COUNT(*) as total'))
+            ->where('enr_status', 1)
+            ->where('enr_program', $params->enr_program)
+            ->where('enr_quarter', $params->enr_quarter)
+            ->where('enr_course', $params->enr_course)
+            ->where('enr_gradelvl', $params->enr_gradelvl)
+            ->when($params->filled('enr_curriculum'), function ($q) use ($params) {
+                $q->where('enr_curriculum', $params->enr_curriculum);
+            })
+            ->groupBy('enr_section')
+            ->pluck('total', 'enr_section');
+
+        /**
+         * 4️⃣ Slot limit (from launch)
+         */
+        $slotLimit = $launch?->ln_slots ?? 0;
+
+        /**
+         * 5️⃣ Build per-section status
+         */
+        $sectionStatus = $sections->map(function ($section) use ($enrollmentCounts, $slotLimit) {
+            $current = $enrollmentCounts[$section->sec_id] ?? 0;
+
+            return [
+                'sec_id'            => $section->sec_id,
+                'sec_name'          => $section->sec_name,
+                'sec_code'          => $section->sec_code,
+                'slots'             => $slotLimit,
+                'current_enrolled'  => $current,
+                'available_slots'   => max(0, $slotLimit - $current),
+                'is_full'           => $slotLimit > 0 && $current >= $slotLimit,
+            ];
+        });
+
+        /**
+         * 6️⃣ Response
+         */
+        return [
+            'launch'   => $launch,
+            'sections' => $sectionStatus->values(),
+            'params'   => $params->all(),
+        ];
+    }
+
+    
     public function getlaunchChecker(Request $params)
     {
         if($params->ln_year != 0){ 

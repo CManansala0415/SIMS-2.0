@@ -75,6 +75,7 @@ onMounted(async () => {
     studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
     studentSettlements.value = accountRes.student_settlement || []
     selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
+
     loadAccount()
     preLoading.value = false
 })
@@ -105,7 +106,6 @@ const loadAccount = async () =>{
     })
 
     filteredStudentSettlement.value = data1[0]
-    console.log(filteredStudentSettlement.value)
 
     let data2 = studentAccounts.value.filter((e)=>{
         if(e.soa_acsid == selectedAcsId.value){
@@ -234,21 +234,22 @@ const resetTotals = () => {
     grandTotal.value = 0
 }
 
-const settlement = () => {
+const settlement = (mode) => {
     studentPayment.value = []
     let x = {
         acs_id: selectedAccountHeader.value.soa_acsid,
-        per_id: selectedAccountHeader.value.soa_personidd,
-        enr_id: selectedAccountHeader.value.acs_enrid,
+        per_id: selectedAccountHeader.value.soa_personid,
+        enr_id: selectedAccountHeader.value.soa_enrid,
         per_firstname: selectedAccountHeader.value.per_firstname,
         per_middlename: selectedAccountHeader.value.per_middlename,
         per_lastname: selectedAccountHeader.value.per_lastname,
         per_suffixname: selectedAccountHeader.value.per_suffixname,
         acs_balance: grandTotal.value,
-        acs_status:filteredStudentSettlement.value.acs_status
+        acs_status:filteredStudentSettlement.value.acs_status,
+        by_pass: mode
     }
 
-    // console.log(filteredStudentSettlement.value)
+    console.log(selectedAccountHeader.value)
     studentPayment.value = x
 
     showPaymentModal.value = !showPaymentModal.value
@@ -669,20 +670,18 @@ const printPermit = (mode) =>{
                                             <!-- AUTHORIZATION -->
                                             <div class="p-1 text-center mt-2" style="font-size: 10px;">
                                                 <div class="fw-bold mb-1">AUTHORIZATION</div>
-                                                <table class="w-100">
-                                                    <tr>
-                                                        <td class="text-center">
-                                                            Prepared By<br/>
-                                                            __________________________<br/>
-                                                            Signature / Date
-                                                        </td>
-                                                        <td class="text-center">
-                                                            Approved By<br/>
-                                                            __________________________<br/>
-                                                            Signature / Date
-                                                        </td>
-                                                    </tr>
-                                                </table>
+                                                <div class="d-flex justify-content-between gap-1 w-100">
+                                                    <div class="text-center">
+                                                        Prepared By<br/>
+                                                        __________________________<br/>
+                                                        Signature / Date
+                                                    </div>
+                                                    <div class="text-center">
+                                                        Approved By<br/>
+                                                        __________________________<br/>
+                                                        Signature / Date
+                                                    </div>
+                                                </div>
 
                                                 <div class="mt-2">
                                                     Official Seal / Stamp
@@ -795,7 +794,15 @@ const printPermit = (mode) =>{
 
                                     <div class="d-flex justify-content-end">
                                         <!-- Add Payment button only in mode 2 -->
-                                        <button v-if="modeID === 2" type="button" @click="settlement()"
+                                        <button v-if="modeID === 1 " type="button" @click="settlement(true)"
+                                            class="btn btn-sm btn-dark">
+                                            Add By Pass Payment
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <!-- Add Payment button only in mode 2 -->
+                                        <button v-if="modeID === 2" type="button" @click="settlement(false)"
                                             class="btn btn-sm btn-dark">
                                             Add Payment
                                         </button>
@@ -806,7 +813,7 @@ const printPermit = (mode) =>{
                                     <span class="text-success">Account is settled on {{ formatDateTime(filteredStudentSettlement.acs_dateupdated) }}</span>
                                      <!-- Add Payment button only in mode 2 -->
                                     <div>
-                                        <button v-if="modeID === 2" type="button" @click="settlement()"
+                                        <button type="button" @click="settlement(false)"
                                             class="btn btn-sm btn-dark mt-2">
                                             View Payment Details
                                         </button>

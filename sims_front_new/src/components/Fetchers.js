@@ -174,7 +174,7 @@ const getAcademicDefaults = async () => {
     try {
         await axios({
             method: "GET",
-            url: 'api/get-academicdefaults/',
+            url: 'api/get-academic-defaults/',
         }).then(async (results) => {
             // console.log(results.data)
             academicdefaults = results.data
@@ -2889,6 +2889,30 @@ const addScholarshipDetails = async (data) => {
     }
 }
 
+let getsectioncount = {}
+const getSectionCount = async (enr_program, enr_quarter, enr_course, enr_gradelvl, enr_curriculum, enr_section) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-section-count/',
+            params: {
+                enr_program: enr_program,
+                enr_quarter: enr_quarter,
+                enr_course: enr_course,
+                enr_gradelvl: enr_gradelvl,
+                enr_curriculum: enr_curriculum,
+                enr_section: enr_section
+            },
+        }).then(async (results) => {
+            // console.log(results.data)
+            getsectioncount = results.data
+        })
+        return getsectioncount
+    } catch (err) {
+        return err
+    }
+}
+
 
 export {
 
@@ -3065,6 +3089,7 @@ export {
     getStudentAccount,
     getSettlementDetails,
     getScholarshipDetails,
-    addScholarshipDetails
+    addScholarshipDetails,
+    getSectionCount
 }
 

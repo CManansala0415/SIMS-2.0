@@ -285,11 +285,11 @@ const saveLaunch = async () => {
                                 To create a semester launch, select the appropiate academic status and refresh the page
                             </span></p>
                     </div>
-                    <!-- <div class="d-flex flex-wrap form-group">
+                    <div class="d-flex flex-wrap form-group">
                         <label for="slot">Slots</label>
                         <input v-model="launch.ln_slots" required type="text" class="form-control form-control-sm"
                             title="Click Edit to modify details" id="slot" aria-describedby="slot" />
-                    </div> -->
+                    </div>
                     <div class="d-flex flex-column text-start form-group">
                         <label for="year">Academic Year (From/To)</label>
                         <div class="d-flex gap-1" id="year">

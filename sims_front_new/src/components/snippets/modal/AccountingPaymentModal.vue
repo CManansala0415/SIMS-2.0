@@ -38,7 +38,8 @@ const seriesNoStart = ref('')
 const seriesNoLimit = ref('')
 const seriesNoActual = ref('')
 const paymentMode = ref('')
-const amountPaid = ref('')
+const amountPaid = ref(0)
+const byPassRemarks = ref('')
 const amountTobePaid = ref(0)
 const userID = ref(0)
 const userName = ref('')
@@ -56,7 +57,7 @@ const bankTransferName = ref('')
 const bankTransferNo = ref('')
 
 const setValues = () => {
-    amountPaid.value = 0
+    amountPaid.value = account.value.by_pass? amountTobePaid.value:0
     chequeBankName.value = ''
     chequeNo.value = ''
     bankTransferName.value = ''
@@ -77,6 +78,8 @@ onMounted(() => {
             evt.preventDefault();
         }
     });
+
+    
 
     checking.value = true
     // amountTobePaid.value = account.value.acr_amount? account.value.acr_amount:''
@@ -191,6 +194,12 @@ onMounted(() => {
 
                                 }
                             }
+                        }
+
+                        if(account.value.by_pass){
+                            amountPaid.value = amountTobePaid.value
+                        }else{
+                            amountPaid.value = 0
                         }
                     })
 
@@ -339,10 +348,12 @@ const initPayment = () => {
                     acy_cheque_bank: chequeBankName.value,
                     acy_bank_no: bankTransferNo.value,
                     acy_transferred_bank: bankTransferName.value,
+                    acy_remarks: byPassRemarks.value,
+                    
                 }
 
                 // console.log(seriesno.series)
-                console.log(x)
+                // console.log(x)
 
                 latestPayment.value = x
                 renderPayment(x)
@@ -550,7 +561,7 @@ const renderPayment = (paymentdata) =>{
                             step="0.01" 
                             min="0.00"
                             :max="amountTobePaid"
-                            :disabled="balance == 0"
+                            :disabled="balance == 0 || account.by_pass"
                             @input="
                             if (amountPaid < 0) amountPaid = 0;
                             if (amountPaid > amountTobePaid) amountPaid = amountTobePaid;
@@ -598,7 +609,7 @@ const renderPayment = (paymentdata) =>{
 
                     <div class="form-group p-1">
                         <label class="text-xs">Amount to be paid</label>
-                        <input v-model="amountTobePaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text"
+                        <input v-model="amountTobePaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text""
                             class="form-control form-control-sm" disabled />
                     </div>
                     <div class="form-group p-1">
@@ -610,6 +621,11 @@ const renderPayment = (paymentdata) =>{
                         <label class="text-xs">Remaining Balance</label>
                         <input :value="(amountTobePaid - amountPaid).toFixed(2)" onkeydown="return /[a-z, ]/i.test(event.key)"
                             type="text" class="form-control form-control-sm" disabled />
+                    </div>
+                    <div class="form-group p-1" v-if="account.by_pass">
+                        <label class="text-xs">Remarks</label>
+                        <textarea v-model="byPassRemarks" style="height: 200px;" required minlength="5"
+                            type="text" class="form-control form-control-sm"></textarea>
                     </div>
                     <div class="mt-3 d-flex justify-content-center align-content-center">
                         <button v-if="balance != 0" :disabled="disabler ? true : false" type="submit"
@@ -634,6 +650,7 @@ const renderPayment = (paymentdata) =>{
                                         <th style="background-color: #237a5b;" class="text-white">Amount</th>
                                         <th style="background-color: #237a5b;" class="text-white">Balance</th>
                                         <th style="background-color: #237a5b;" class="text-white">Mode</th>
+                                        <th style="background-color: #237a5b;" class="text-white">Remarks</th>
                                         <th style="background-color: #237a5b;" class="text-white">Receipt</th>
                                         <th style="background-color: #237a5b;" class="text-white">Series</th>
                                         <th style="background-color: #237a5b;" class="text-white">Date</th>
@@ -659,6 +676,9 @@ const renderPayment = (paymentdata) =>{
                                                 class="form-control form-control-sm" />
                                             <input v-if="py.acy_mode == 3" disabled :value="py.acy_cheque_no" type="text"
                                                 class="form-control form-control-sm" />
+                                        </td>
+                                        <td class="align-middle">
+                                            {{ py.acy_remarks }}
                                         </td>
                                         <td class="align-middle">
                                             <select class="form-control form-select-sm" v-model="py.acy_receipt" disabled>

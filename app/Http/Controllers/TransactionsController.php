@@ -327,6 +327,7 @@ class TransactionsController extends Controller
                     'acy_series_prefix' => $request->input('acy_series_prefix'),
                     'acy_series_year' => $request->input('acy_series_year'),
                     'acy_series_pattern' => $request->input('acy_series_pattern'),
+                    'acy_remarks' => $request->input('acy_remarks'),
 
                 ]);
                 return $data = [
