@@ -2,7 +2,6 @@
 import { ref, onMounted, computed, nextTick } from 'vue';
 import { getUserID } from "../../../routes/user";
 import Loader from '../loaders/Loading1.vue';
-import LoaderSmall from '../loaders/Loader1.vue';
 
 import {
     editAccountingTuition,
@@ -22,6 +21,7 @@ import {
 } from "../../Generators.js";
 
 import { useRouter, useRoute } from 'vue-router';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 const router = useRouter();
 
 const props = defineProps({
@@ -657,13 +657,13 @@ const resolveGroupLabel = (groupKey) => {
                 </span></p>
         </div>
         <div class="d-flex flex-column gap-2 small-font">
-            <LoaderSmall v-if="preLoading" />
+            <NeuLoader2 v-if="preLoading" />
             <div v-else class="w-100">
-                <form @submit.prevent="saveCharges" class="card text-start h-100">
-                    <div class="d-flex flex-column gap-2 w-100 p-3">
+                <form @submit.prevent="saveCharges" class="neu-card p-4 text-start h-100">
+                    <div class="d-flex flex-column gap-2 w-100 ">
                         <div class="form-group">
                             <label>Template Type</label>
-                            <select v-model="actType" class="form-control form-select-sm" required>
+                            <select v-model="actType" class="neu-input neu-select" required>
                                 <option value="" disabled>Select Type</option>
                                 <option value="1">Tuition</option>
                                 <option value="2">Charges</option>
@@ -671,35 +671,35 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
                         <div class="form-group">
                             <label>Tuition Fee Setup Description</label>
-                            <input v-model="actDescription" required type="text" class="form-control form-control-sm"
+                            <input v-model="actDescription" required type="text" class="neu-input"
                                 :disabled="actType ? false : true" />
                         </div>
                         <div class="form-group">
                             <label>Semester</label>
-                            <select v-model="actSem" class="form-control form-select-sm" required
+                            <select v-model="actSem" class="neu-input neu-select" required
                                 :disabled="actType ? false : true">
                                 <option value="0" v-if="actType == 2">All Semesters</option>
-                                <option value="" v-else disabled>-- Select Semester -- </option>
+                                <option value="" v-else disabled>Select Semester</option>
                                 <option :value="quar.quar_id" v-for="(quar, index) in quarter">{{ quar.quar_desc }}
                                 </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Program</label>
-                            <select v-model="actProgram" class="form-control form-select-sm" required
+                            <select v-model="actProgram" class="neu-input neu-select" required
                                 :disabled="actType ? false : true">
                                 <option value="0" v-if="actType == 2">All Programs</option>
-                                <option value="" v-else disabled>-- Select Program -- </option>
+                                <option value="" v-else disabled>Select Program</option>
                                 <option :value="prog.dtype_id" v-for="(prog, index) in program">{{ prog.dtype_desc }}
                                 </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Grade / Year Level</label>
-                            <select v-model="actGradelvl" class="form-control form-select-sm"
+                            <select v-model="actGradelvl" class="neu-input neu-select"
                                 :disabled="actType ? false : true">
                                 <option value="0" v-if="actType == 2">All Grade Levels</option>
-                                <option value="" v-else disabled>-- Select Grade Level -- </option>
+                                <option value="" v-else disabled>Select Grade Level</option>
                                 <template v-for="(grad, index) in gradelvl">
                                     <option v-if="actProgram == grad.grad_dtypeid" :value="grad.grad_id">{{
                                         grad.grad_name }}</option>
@@ -708,10 +708,10 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
                         <div class="form-group">
                             <label>Course</label>
-                            <select v-model="actCourse" class="form-control form-select-sm"
+                            <select v-model="actCourse" class="neu-input neu-select"
                                 :disabled="actType ? false : true" @change="checkCurr()">
                                 <option value="0" v-if="actType == 2">All Courses</option>
-                                <option value="" v-else disabled>-- Select Course -- </option>
+                                <option value="" v-else disabled>Select Course</option>
                                 <template v-for="(cour, index) in course">
                                     <option v-if="actProgram == cour.prog_progtype" :value="cour.prog_id">{{
                                         cour.prog_name }}</option>
@@ -720,15 +720,15 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
                         <div v-if="actType == 1 && actProgram != 0" class="form-group">
                             <label>Curriculum</label>
-                            <select class="form-select form-select-sm mt-2" v-model="actCurriculum" required>
-                                <option value="" disabled>-- Select Curriculum -- </option>
+                            <select class="neu-input neu-select mt-2" v-model="actCurriculum" required>
+                                <option value="" disabled>Select Curriculum</option>
                                 <option v-for="(cd, index) in curriculumData" :value="cd.curr_id"> {{ cd.curr_code }}
                                 </option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Section</label>
-                            <select v-model="actSection" class="form-control form-select-sm"
+                            <select v-model="actSection" class="neu-input neu-select"
                                 :disabled="actType ? false : true">
                                 <option value="0">All Sections</option>
                                 <template v-for="(sec, index) in section">
@@ -738,7 +738,7 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
                         <div class="d-flex mt-3">
                             <button :disabled="saving || !actType ? true : false" type="submit"
-                                class="btn btn-sm btn-primary w-100">Save
+                                class="neu-btn neu-green p-2"> <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save
                             </button>
                         </div>
                     </div>
@@ -755,20 +755,20 @@ const resolveGroupLabel = (groupKey) => {
                 </span></p>
         </div> -->
         <div v-if="preLoading" class="w-100 h-100 d-flex justify-content-center align-items-center">
-            <Loader />
+            <NeuLoader2 />
         </div>
         <div v-else class="d-flex gap-2 small-font">
             <div class="row g-2 w-100 p-2">
-                <div class="col-md-5 border">
+                <div class="col-md-12 col-lg-5 border">
                     <div class="row g-2 w-100 p-2">
-                        <div class="col-md-12">
+                        <div class="col-md-12 neu-card p-3">
                             <p class="mb-2 fw-bold">Additional Items</p>
                             <input :disabled="preLoading ? true : false" v-model="miscFeesMainSearch"
-                                @keyup="searchItem(1)" type="text" class="form-control form-control-sm mb-2"
+                                @keyup="searchItem(1)" type="text" class="neu-input mb-3"
                                 placeholder="Search Item Here..." />
-                            <div class="border overflow-auto py-2 bg-secondary-subtle" style="height: 320px;">
+                            <div class="neu-card-inner p-3 overflow-auto py-2" style="height: 320px;">
                                 <ul class="list-group">
-                                    <li class="list-group-item" v-for="(misc, index) in miscFeesMainFiltered"
+                                    <li class="list-group-item bg-transparent" v-for="(misc, index) in miscFeesMainFiltered"
                                         @click="addMiscFee(misc, 1), clickSubmit('assess')">
                                         <div class="d-flex justify-content-between">
                                             <span>{{ misc.acf_desc }}</span>
@@ -777,10 +777,10 @@ const resolveGroupLabel = (groupKey) => {
                                                 }).format(misc.acf_price) }}</span>
                                         </div>
                                     </li>
-                                    <li class="list-group-item"
+                                    <li class="list-group-item bg-transparent"
                                         v-if="!Object.keys(miscFeesMainFiltered).length && !preLoading">No Record Found
                                     </li>
-                                    <li class="list-group-item"
+                                    <li class="list-group-item bg-transparent"
                                         v-if="!Object.keys(miscFeesMainFiltered).length && preLoading">Loading Items...
                                     </li>
                                 </ul>
@@ -876,34 +876,34 @@ const resolveGroupLabel = (groupKey) => {
                                 </ul>
                             </div>
                         </div> -->
-                        <div class="col-md-12">
+                        <div class="col-md-12 neu-card p-3">
                             <p class="mb-2 fw-bold">Custom Items</p>
                             <div class="row g-1 mb-2">
                                 <div class="col-md-12">
                                     <input v-model="customDescription" :disabled="preLoading ? true : false" type="text"
-                                        class="form-control form-control-sm" placeholder="Description" />
+                                        class="neu-input" placeholder="Description" />
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-3">
                                     <input v-model.number="customPrice" required step="0.01" min="0.00"
                                         :disabled="preLoading ? true : false" @input="
                                         if (customPrice <= 0) customPrice = 0;" type="number"
-                                        class="form-control form-control-sm amount-text" placeholder="Price" />
+                                        class="neu-input amount-text" placeholder="Price" />
                                 </div>
                                 <!-- <div class="col-md-2">
-                                    <input :disabled="preLoading? true:false" type="text" class="form-control form-control-sm" placeholder=""/>
+                                    <input :disabled="preLoading? true:false" type="text" class="neu-input" placeholder=""/>
                                 </div> -->
-                                <div class="col-md-6 d-flex gap-1">
+                                <div class="col-md-9 d-flex gap-1">
                                     <button @click="addMiscFee([], 3), clickSubmit('assess')"
-                                        class="btn btn-sm btn-primary w-100">Add as Item</button>
+                                        class="neu-btn-sm neu-white">Add as Item</button>
                                     <button @click="addMiscFee([], 4), clickSubmit('assess')"
-                                        class="btn btn-sm btn-info w-100">Discount =</button>
+                                        class="neu-btn-sm neu-white">Discount =</button>
                                     <button @click="addMiscFee([], 5), clickSubmit('assess')"
-                                        class="btn btn-sm btn-info w-100">Discount %</button>
+                                        class="neu-btn-sm neu-white">Discount %</button>
                                 </div>
                             </div>
-                            <div class="col-md-12 border overflow-auto py-2 bg-secondary-subtle" style="height: 320px;">
+                            <div class="neu-card-inner p-3 col-md-12 overflow-auto py-2" style="height: 320px;">
                                 <ul class="list-group">
-                                    <li class="list-group-item" v-for="(cust, index) in customFees">
+                                    <li class="list-group-item bg-transparent" v-for="(cust, index) in customFees">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <span>{{ cust.tuitemp_desc ? cust.tuitemp_desc : 'N/A' }}</span>
                                             <span>
@@ -920,7 +920,7 @@ const resolveGroupLabel = (groupKey) => {
                                                 </span>
                                             </span>
 
-                                            <!-- <button class="btn btn-sm btn-danger" 
+                                            <!-- <button class="neu-btn neu-red p-2" 
                                                 @click="customFees.splice(index, 1), clickSubmit('assess')">
                                                 <font-awesome-icon icon="fa-solid fa-trash" />
                                             </button> -->
@@ -936,8 +936,8 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
                     </div>
                 </div>
-                <div class="col-md-7 border d-flex flex-column justify-content-between">
-                    <div class="w-100 p-4 shadow mb-2">
+                <div class="col-md-12 col-lg-7 border d-flex flex-column justify-content-between">
+                    <div class="w-100 p-4 mb-2">
                         <span class="mb-2 fw-bold">Payment Breakdown</span>
                     </div>
                     <form @submit.prevent="manageDetails"
@@ -945,47 +945,49 @@ const resolveGroupLabel = (groupKey) => {
                         <button type="submit" id="submitDetails" hidden></button>
                         <div class="col-md-12 text-start mb-2">
                             <span class="fst-italic fw-bold text-success">Additional Items</span>
-                            <ul class="list-group mt-2">
-                                <li class="list-group-item" v-for="(mf, index) in miscFees">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="w-50 d-flex justify-content-start align-items-center">
-                                            <span>{{ mf.tuitemp_desc }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-start align-items-center">
-                                            <span>{{ new Intl.NumberFormat('en-PH', {
-                                                style: 'currency', currency: 'PHP'
-                                                }).format(mf.tuitemp_price) }}</span>
-                                        </div>
-                                        <div class="d-flex justify-content-start align-items-center">
-                                            <span>Qty</span> &nbsp;
-                                            <!-- <input min="1" minlength="1" type="number" required
-                                                :value="mf.tuitemp_quantity"
-                                                @focusout="c = $event.target.value, clickSubmit('assess')"
-                                                class="form-control form-control-sm" /> -->
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    required
-                                                    class="form-control form-control-sm"
+                            <div class="neu-card-inner p-3 mt-3">
+                                <ul class="list-group mt-2">
+                                    <li class="list-group-item bg-transparent" v-for="(mf, index) in miscFees">
+                                        <div class="d-flex justify-content-between align-items-center neu-card p-3">
+                                            <div class="w-50 d-flex justify-content-start align-items-center">
+                                                <span>{{ mf.tuitemp_desc }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-start align-items-center">
+                                                <span>{{ new Intl.NumberFormat('en-PH', {
+                                                    style: 'currency', currency: 'PHP'
+                                                    }).format(mf.tuitemp_price) }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-start align-items-center">
+                                                <span>Qty</span> &nbsp;
+                                                <!-- <input min="1" minlength="1" type="number" required
                                                     :value="mf.tuitemp_quantity"
-                                                    @focus="oldQty = mf.tuitemp_quantity"
-                                                    @focusout="($event.target.value != oldQty) && (mf.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
-                                                />
+                                                    @focusout="c = $event.target.value, clickSubmit('assess')"
+                                                    class="neu-input" /> -->
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        required
+                                                        class="neu-input"
+                                                        :value="mf.tuitemp_quantity"
+                                                        @focus="oldQty = mf.tuitemp_quantity"
+                                                        @focusout="($event.target.value != oldQty) && (mf.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
+                                                    />
+                                            </div>
+                                            <div class="d-flex justify-content-start align-items-center">
+                                                <button class="neu-btn neu-red p-2" type="button" v-if="!activeEnrollment"
+                                                    @click="deleteMiscData(1, mf, index)">
+                                                    <font-awesome-icon icon="fa-solid fa-trash" />
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-start align-items-center">
-                                            <button class="btn btn-sm btn-danger" type="button" v-if="!activeEnrollment"
-                                                @click="deleteMiscData(1, mf, index)">
-                                                <font-awesome-icon icon="fa-solid fa-trash" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item" v-if="!Object.keys(miscFees).length && !preLoading">No
-                                    Record
-                                    Found</li>
-                                <li class="list-group-item" v-if="!Object.keys(miscFees).length && preLoading">Loading
-                                    Items...</li>
-                            </ul>
+                                    </li>
+                                    <li class="list-group-item bg-transparent" v-if="!Object.keys(miscFees).length && !preLoading">No
+                                        Record
+                                        Found</li>
+                                    <li class="list-group-item bg-transparent" v-if="!Object.keys(miscFees).length && preLoading">Loading
+                                        Items...</li>
+                                </ul>
+                            </div>
                         </div>
                         <!-- <div class="col-md-12 text-start mb-2" v-if="chargeType == 1">
                             <span class="fst-italic fw-bold text-primary">Subjects Prices</span>
@@ -1030,7 +1032,7 @@ const resolveGroupLabel = (groupKey) => {
                                         </div>
                                         <div class="d-flex justify-content-center align-items-center">
                                            <div class="d-flex gap-1 justify-content-center align-items-center w-50">
-                                                <button class="btn btn-sm btn-danger " 
+                                                <button class="neu-btn neu-red p-2 " 
                                                     @click="deleteMiscData(2, sj, index)" type="button">
                                                     <font-awesome-icon icon="fa-solid fa-trash"/>
                                                 </button>
@@ -1044,82 +1046,84 @@ const resolveGroupLabel = (groupKey) => {
                         </div> -->
                         <div class="col-md-12 text-start mb-2" v-if="chargeType == 1">
                             <span class="fst-italic fw-bold text-primary">Subjects Prices</span>
-                            <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey">
-                                <p class="fw-bold p-2 bg-dark rounded-3 text-white mt-2">{{ resolveGroupLabel(groupKey)
-                                    }}
-                                </p>
-                                <li class="list-group-item" v-for="(sj, index) in items" :key="index">
-                                    <div class="d-flex justify-content-between align-items-center">
+                            <div class="neu-card-inner p-3 mt-3">
+                                <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey">
+                                    <li class="list-group-item bg-transparent">
+                                        <p class="fw-bold p-3 mt-2 neu-card">{{ resolveGroupLabel(groupKey)}}</p>
+                                    </li>
+                                    <li class="list-group-item bg-transparent" v-for="(sj, index) in items" :key="index">
+                                        <div class=" neu-card p-3 d-flex justify-content-between align-items-center">
 
-                                        <div class="w-50 d-flex justify-content-start align-items-center">
-                                            <span class="w-50">{{ sj.tuitemp_desc }}</span>
-                                        </div>
-                                        <div class="w-25 d-flex justify-content-start align-items-center">
-                                            <div class="d-flex flex-column gap-1">
-                                                <div class="input-group input-group-sm">
-                                                    <span class="input-group-text">Lec ({{ sj.tuitemp_lec }})</span>
-                                                    <input
-                                                        type="number"
-                                                        step="0.01"
-                                                        min="0"
-                                                        required
-                                                        class="form-control"
-                                                        placeholder="Price Per Unit"
-                                                        :value="sj.tuitemp_lec_price"
-                                                        @focus="oldLecPrice = sj.tuitemp_lec_price"
-                                                        @input="$event.target.value <= 0 && ($event.target.value = 0)"
-                                                        @focusout="
-                                                            $event.target.value != oldLecPrice
-                                                                ? (sj.tuitemp_lec_price = $event.target.value, clickSubmit('assess'))
-                                                                : null
-                                                        "
-                                                    />
-                                                </div>
-                                                <div class="input-group input-group-sm">
-                                                    <span class="input-group-text">Lab ({{ sj.tuitemp_lab }})</span>
-                                                    <input
-                                                        type="number"
-                                                        step="0.01"
-                                                        min="0"
-                                                        required
-                                                        class="form-control"
-                                                        placeholder="Price Per Unit"
-                                                        :disabled="sj.tuitemp_lab == 0"
-                                                        :value="sj.tuitemp_lab_price"
-                                                        @focus="oldLabPrice = sj.tuitemp_lab_price"
-                                                        @input="$event.target.value <= 0 && ($event.target.value = 0)"
-                                                        @focusout="
-                                                            $event.target.value != oldLabPrice
-                                                                ? (sj.tuitemp_lab_price = $event.target.value, clickSubmit('assess'))
-                                                                : null
-                                                        "
-                                                    />
-                                                </div>
+                                            <div class="w-50 d-flex justify-content-start align-items-center">
+                                                <span class="w-50">{{ sj.tuitemp_desc }}</span>
+                                            </div>
+                                            <div class="w-25 d-flex justify-content-start align-items-center">
+                                                <div class="d-flex flex-column gap-1">
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <span class="">Lec ({{ sj.tuitemp_lec }})</span>
+                                                        <input
+                                                            type="number"
+                                                            step="0.01"
+                                                            min="0"
+                                                            required
+                                                            class="neu-input"
+                                                            placeholder="Price Per Unit"
+                                                            :value="sj.tuitemp_lec_price"
+                                                            @focus="oldLecPrice = sj.tuitemp_lec_price"
+                                                            @input="$event.target.value <= 0 && ($event.target.value = 0)"
+                                                            @focusout="
+                                                                $event.target.value != oldLecPrice
+                                                                    ? (sj.tuitemp_lec_price = $event.target.value, clickSubmit('assess'))
+                                                                    : null
+                                                            "
+                                                        />
+                                                    </div>
+                                                    <div class="d-flex gap-2 align-items-center">
+                                                        <span class="">Lab ({{ sj.tuitemp_lab }})</span>
+                                                        <input
+                                                            type="number"
+                                                            step="0.01"
+                                                            min="0"
+                                                            required
+                                                            class="neu-input"
+                                                            placeholder="Price Per Unit"
+                                                            :disabled="sj.tuitemp_lab == 0"
+                                                            :value="sj.tuitemp_lab_price"
+                                                            @focus="oldLabPrice = sj.tuitemp_lab_price"
+                                                            @input="$event.target.value <= 0 && ($event.target.value = 0)"
+                                                            @focusout="
+                                                                $event.target.value != oldLabPrice
+                                                                    ? (sj.tuitemp_lab_price = $event.target.value, clickSubmit('assess'))
+                                                                    : null
+                                                            "
+                                                        />
+                                                    </div>
 
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="w-25 d-flex justify-content-center align-items-center">
-                                            <div class="d-flex flex-column gap-2 text-start">
-                                                <span>{{ pesoConverter((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
-                                                <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * sj.tuitemp_lab) }}</span>
+                                            <div class="w-25 d-flex justify-content-center align-items-center">
+                                                <div class="d-flex flex-column gap-2 text-start">
+                                                    <span>{{ pesoConverter((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
+                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * sj.tuitemp_lab) }}</span>
+                                                </div>
                                             </div>
+                                            <!-- <div class="d-flex justify-content-center align-items-center">
+                                            <div class="d-flex gap-1 justify-content-center align-items-center w-50">
+                                                    <button class="neu-btn neu-red p-2 " 
+                                                        @click="deleteMiscData(2, sj, index)" type="button">
+                                                        <font-awesome-icon icon="fa-solid fa-trash"/>
+                                                    </button>
+                                                </div>     
+                                            </div> -->
                                         </div>
-                                        <!-- <div class="d-flex justify-content-center align-items-center">
-                                           <div class="d-flex gap-1 justify-content-center align-items-center w-50">
-                                                <button class="btn btn-sm btn-danger " 
-                                                    @click="deleteMiscData(2, sj, index)" type="button">
-                                                    <font-awesome-icon icon="fa-solid fa-trash"/>
-                                                </button>
-                                            </div>     
-                                        </div> -->
-                                    </div>
-                                </li>
-                                <li class="list-group-item" v-if="!Object.keys(subjFees).length && !preLoading">No
-                                    Record
-                                    Found</li>
-                                <li class="list-group-item" v-if="!Object.keys(subjFees).length && preLoading">Loading
-                                    Items...</li>
-                            </ul>
+                                    </li>
+                                    <li class="list-group-item bg-transparent" v-if="!Object.keys(subjFees).length && !preLoading">No
+                                        Record
+                                        Found</li>
+                                    <li class="list-group-item bg-transparent" v-if="!Object.keys(subjFees).length && preLoading">Loading
+                                        Items...</li>
+                                </ul>
+                            </div>
                         </div>
                         <!-- <div class="col-md-12">
                            <div class="col-md-12">
@@ -1134,56 +1138,58 @@ const resolveGroupLabel = (groupKey) => {
                         </div> -->
                         <div class="col-md-12 text-start mb-2">
                             <span class="fst-italic fw-bold text-info">Additional Charges</span>
-                            <ul class="list-group mt-2">
-                                <li class="list-group-item" v-for="(cq, index) in customFees">
-                                    <div class="d-flex justify-content-between align-items-center gap-1">
-                                        <div class="w-50 d-flex justify-content-start align-items-center">
-                                            <span>{{ cq.tuitemp_desc }}</span>
-                                        </div>
-                                        <div class="w-25 d-flex justify-content-start align-items-center">
-                                            <span v-if="cq.tuitemp_custype == 3">{{ pesoConverter(cq.tuitemp_price) }}</span>
-                                            <span v-else class="text-danger">
-                                                <span v-if="cq.tuitemp_disc_type == 1">
-                                                    - {{ cq.tuitemp_price }}%
+                            <div class="neu-card-inner p-3 mt-3">
+                                <ul class="list-group mt-2">
+                                    <li class="list-group-item bg-transparent" v-for="(cq, index) in customFees">
+                                        <div class="d-flex justify-content-between align-items-center gap-1 neu-card p-3">
+                                            <div class="w-50 d-flex justify-content-start align-items-center">
+                                                <span>{{ cq.tuitemp_desc }}</span>
+                                            </div>
+                                            <div class="w-25 d-flex justify-content-start align-items-center">
+                                                <span v-if="cq.tuitemp_custype == 3">{{ pesoConverter(cq.tuitemp_price) }}</span>
+                                                <span v-else class="text-danger">
+                                                    <span v-if="cq.tuitemp_disc_type == 1">
+                                                        - {{ cq.tuitemp_price }}%
+                                                    </span>
+                                                    <span v-else>
+                                                        - {{ pesoConverter(cq.tuitemp_price) }} 
+                                                    </span>
                                                 </span>
-                                                <span v-else>
-                                                    - {{ pesoConverter(cq.tuitemp_price) }} 
-                                                </span>
-                                            </span>
-                                        </div>
-                                        <div class="w-25 d-flex justify-content-start align-items-center">
-                                            <span>Qty</span> &nbsp;
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                required
-                                                class="form-control form-control-sm"
-                                                :value="cq.tuitemp_quantity"
-                                                @focus="oldQty = cq.tuitemp_quantity"
-                                                @focusout="($event.target.value != oldQty) && (cq.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
-                                            />
+                                            </div>
+                                            <div class="w-25 d-flex justify-content-start align-items-center">
+                                                <span>Qty</span> &nbsp;
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    required
+                                                    class="neu-input"
+                                                    :value="cq.tuitemp_quantity"
+                                                    @focus="oldQty = cq.tuitemp_quantity"
+                                                    @focusout="($event.target.value != oldQty) && (cq.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
+                                                />
 
+                                            </div>
+                                            <div>
+                                                <button class="neu-btn neu-red p-2" v-if="!activeEnrollment"
+                                                    @click="deleteMiscData(3, cq, index)" type="button">
+                                                    <font-awesome-icon icon="fa-solid fa-trash" />
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <button class="btn btn-sm btn-danger" v-if="!activeEnrollment"
-                                                @click="deleteMiscData(3, cq, index)" type="button">
-                                                <font-awesome-icon icon="fa-solid fa-trash" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="list-group-item" v-if="!Object.keys(customFees).length && !preLoading">No
-                                    Record
-                                    Found</li>
-                                <li class="list-group-item" v-if="!Object.keys(customFees).length && preLoading">Loading
-                                    Items...</li>
-                            </ul>
+                                    </li>
+                                    <li class="list-group-item bg-transparent" v-if="!Object.keys(customFees).length && !preLoading">No
+                                        Record
+                                        Found</li>
+                                    <li class="list-group-item bg-transparent" v-if="!Object.keys(customFees).length && preLoading">Loading
+                                        Items...</li>
+                                </ul>
+                            </div>
                         </div>
                     </form>
-                    <div class="w-100 p-3 border rounded mb-2">
+                    <div class="w-100 p-3 mb-2 neu-card">
 
                         <!-- CHARGES -->
-                        <div class="mb-3">
+                        <div class="mb-3 px-4">
                             <div class="fw-bold text-uppercase small border-bottom pb-1 mb-2">
                                 Charges
                             </div>
@@ -1212,7 +1218,7 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
 
                         <!-- DEDUCTIONS -->
-                        <div class="mb-3">
+                        <div class="mb-3 px-4">
                             <div class="fw-bold text-uppercase small border-bottom pb-1 mb-2 text-danger">
                                 Deductions
                             </div>
@@ -1247,7 +1253,7 @@ const resolveGroupLabel = (groupKey) => {
                         </div>
 
                         <!-- GRAND TOTAL -->
-                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3 px-4">
                             <span class="fw-bold fs-5">Grand Total</span>
                             <span class="fw-bold fs-4 text-dark">
                                 {{ pesoConverter(totalFees) }}
@@ -1256,9 +1262,9 @@ const resolveGroupLabel = (groupKey) => {
 
                     </div>
 
-                    <div class="w-100 p-4 border mb-2 d-flex justify-content-end gap-2" v-if="!activeEnrollment">
+                    <div class="w-100 mb-2 d-flex justify-content-end gap-2" v-if="!activeEnrollment">
                         <!-- <button type="button" class="btn btn-sm btn-warning" @click="clickSubmit('clear')">Reset Details</button> -->
-                        <button type="button" class="btn btn-sm btn-success" @click="clickSubmit('save')">Save
+                        <button type="button" class="neu-btn neu-green p-2" @click="clickSubmit('save')"> <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save
                             Details</button>
                     </div>
                 </div>

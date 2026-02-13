@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import ProgramForms from '../snippets/forms/ProgramSettingsForm.vue';
 import SectionForms from '../snippets/forms/SectionSettingsForm.vue';
 import SubjectForms from '../snippets/forms/SubjectSettingsForm.vue';
@@ -244,95 +244,101 @@ const mode = (type) => {
         <h5 class=" text-uppercase fw-bold">Registrar Settings</h5>
     </div>
 
-    <Loader v-if="preLoading" />
+    <NeuLoader1 v-if="preLoading" />
     <div v-else>
         <div v-if="accessData == 1">
             <div v-if="form == 1">
-                <div class="container">
+                <div class="container small-font">
                     <div class="row gap-2">
 
-                        <div class="col card shadow-sm mb-2">
-                            <div class="card-header">Settings</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Programs</h5>
-                                <p class="card-text justify-text small-font">Contains Program (Courses & Strands) list
-                                    for
-                                    academic tracks, to modify settings click action to access settings.</p>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-sm btn-dark w-100" @click="mode(1)">Take Action</button>
-                            </div>
-                        </div>
-                        <div class="col card shadow-sm mb-2">
-                            <div class="card-header">Settings</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Sections</h5>
-                                <p class="card-text justify-text small-font">Contains Sections list for students class
-                                    grouping,
-                                    to modify settings click action to access settings.</p>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-sm btn-dark w-100" @click="mode(2)">Take Action</button>
+                        <div class="col neu-card mb-2 p-4">
+                            <div class="d-flex flex-column justify-content-around w-100 h-100">
+                                <div class="p-3">Programs</div>
+                                <div class="p-4 neu-card-inner">
+                                    <p class="card-text justify-text small-font">Contains Program (Courses & Strands) list
+                                        for
+                                        academic tracks, to modify settings click action to access settings.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="neu-btn neu-green w-100 p-2" @click="mode(1)"><font-awesome-icon icon="fa-solid fa-gear"  /> Take Action</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="col card shadow-sm mb-2">
-                            <div class="card-header">Settings</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Subject</h5>
-                                <p class="card-text justify-text small-font">Contains Subject list for students &
-                                    faculties
-                                    to
-                                    be taken and to be grouped to create a curriculum, to modify settings click action
-                                    to
-                                    access
-                                    settings.</p>
+                        <div class="col neu-card mb-2 p-4">
+                            <div class="d-flex flex-column justify-content-around w-100 h-100">
+                                <div class="p-3">Sections</div>
+                                <div class="p-4 neu-card-inner">
+                                    <p class="card-text justify-text small-font">Contains Sections list for students class
+                                        grouping,
+                                        to modify settings click action to access settings.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="neu-btn neu-green w-100 p-2" @click="mode(2)"><font-awesome-icon icon="fa-solid fa-gear"  /> Take Action</button>
+                                </div>
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-sm btn-dark w-100" @click="mode(3)">Take Action</button>
+                        </div>
+                        <div class="col neu-card mb-2 p-4">
+                            <div class="d-flex flex-column justify-content-around w-100 h-100">
+                                <div class="p-3">Subject</div>
+                                <div class="p-4 neu-card-inner">
+                                    <p class="card-text justify-text small-font">Contains Subject list for students &
+                                        faculties
+                                        to
+                                        be taken and to be grouped to create a curriculum, to modify settings click action
+                                        to
+                                        access
+                                        settings.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="neu-btn neu-green w-100 p-2" @click="mode(3)"><font-awesome-icon icon="fa-solid fa-gear"  /> Take Action</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row gap-2">
-                        <div class="col card shadow-sm mb-2">
-                            <div class="card-header">Settings</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Curriculum</h5>
-                                <p class="card-text justify-text small-font">Contains Curriculum list to make a course
-                                    pack
-                                    that
-                                    contains all the units and subjects needed for the semester, to modify settings
-                                    click
-                                    action
-                                    to access settings.</p>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-sm btn-dark w-100" @click="mode(4)">Take Action</button>
-                            </div>
-                        </div>
-                        <div class="col card shadow-sm mb-2">
-                            <div class="card-header">Settings</div>
-                            <div class="card-body">
-                                <h5 class="card-title">User Account</h5>
-                                <p class="card-text justify-text small-font">Contains User accounts for system access,
-                                    manage
-                                    level of restrictions and update credentials, to modify settings click action to
-                                    access
-                                    settings.</p>
-                            </div>
-                            <div class="card-footer">
-                                <button class="btn btn-sm btn-dark w-100" @click="mode(5)">Take Action</button>
+                        <div class="col neu-card mb-2 p-4">
+                            <div class="d-flex flex-column justify-content-around w-100 h-100">
+                                <div class="p-3">Curriculum</div>
+                                <div class="p-4 neu-card-inner">
+                                    <p class="card-text justify-text small-font">Contains Curriculum list to make a course
+                                        pack
+                                        that
+                                        contains all the units and subjects needed for the semester, to modify settings
+                                        click
+                                        action
+                                        to access settings.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="neu-btn neu-green w-100 p-2" @click="mode(4)"><font-awesome-icon icon="fa-solid fa-gear"  /> Take Action</button>
+                                </div>
                             </div>
                         </div>
-                        <div class="col card shadow-sm mb-2">
-                            <div class="card-header">Settings</div>
-                            <div class="card-body">
-                                <h5 class="card-title">Command Center</h5>
-                                <p class="card-text justify-text small-font">Take control over academic activity, such
-                                    as
-                                    registration and disabling events.</p>
+                        <div class="col neu-card mb-2 p-4">
+                            <div class="d-flex flex-column justify-content-around w-100 h-100">
+                                <div class="p-3">User Account</div>
+                                <div class="p-4 neu-card-inner">
+                                    <p class="card-text justify-text small-font">Contains User accounts for system access,
+                                        manage
+                                        level of restrictions and update credentials, to modify settings click action to
+                                        access
+                                        settings.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="neu-btn neu-green w-100 p-2" @click="mode(5)"><font-awesome-icon icon="fa-solid fa-gear"  /> Take Action</button>
+                                </div>
                             </div>
-                            <div class="card-footer">
-                                <button class="btn btn-sm btn-dark w-100" @click="mode(6)">Take Action</button>
+                        </div>
+                        <div class="col neu-card mb-2 p-4">
+                            <div class="d-flex flex-column justify-content-around w-100 h-100">
+                                <div class="p-3">Command Center</div>
+                                <div class="p-4 neu-card-inner">
+                                    <p class="card-text justify-text small-font">Take control over academic activity, such
+                                        as
+                                        registration and disabling events.</p>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="neu-btn neu-green w-100 p-2" @click="mode(6)"><font-awesome-icon icon="fa-solid fa-gear"  /> Take Action</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -340,63 +346,71 @@ const mode = (type) => {
             </div>
 
             <div v-if="form == 2">
-                <Loader v-if="preLoading" />
+                <NeuLoader1 v-if="preLoading" />
                 <div v-else>
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-                    </div>
+                    <!-- <div class="d-flex w-100 justify-content-end mb-3">
+                        <div class="d-flex">
+                            <button class="neu-btn neu-blue p-2" @click="form = 1"><font-awesome-icon
+                                    icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                        </div>
+                    </div> -->
                     <div class="">
                         <ProgramForms :degreeData="degree" :programData="program" :courseData="course"
-                            :userIdData="userID" :title="settingsTitle" :semesterData="semester" />
+                            :userIdData="userID" :title="settingsTitle" :semesterData="semester" @close="form = 1"/>
                     </div>
                 </div>
             </div>
             <div v-if="form == 3">
 
-                <Loader v-if="preLoading" />
+                <NeuLoader1 v-if="preLoading" />
                 <div v-else>
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-                    </div>
+                    <!-- <div class="d-flex w-100 justify-content-end mb-3">
+                        <div class="d-flex">
+                            <button class="neu-btn neu-blue p-2" @click="form = 1"><font-awesome-icon
+                                    icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                        </div>
+                    </div> -->
                     <div class="">
-                        <SectionForms :sectionData="section" :userIdData="userID" :title="settingsTitle" />
+                        <SectionForms :sectionData="section" :userIdData="userID" :title="settingsTitle" @close="form = 1"/>
                     </div>
                 </div>
             </div>
             <div v-if="form == 4">
-                <Loader v-if="preLoading" />
+                <NeuLoader1 v-if="preLoading" />
                 <div v-else>
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-                    </div>
+                    <!-- <div class="d-flex w-100 justify-content-end mb-3">
+                        <div class="d-flex">
+                            <button class="neu-btn neu-blue p-2" @click="form = 1"><font-awesome-icon
+                                    icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                        </div>
+                    </div> -->
                     <div class="">
                         <SubjectForms :subjectData="subject" :specializationData="specialization" :programData="program"
-                            :userIdData="userID" :title="settingsTitle" />
+                            :userIdData="userID" :title="settingsTitle" @close="form = 1"/>
                     </div>
                 </div>
             </div>
             <div v-if="form == 5">
-                <Loader v-if="preLoading" />
+                <NeuLoader1 v-if="preLoading" />
                 <div v-else>
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-                    </div>
+                    <!-- <div class="d-flex w-100 justify-content-end mb-3">
+                        <div class="d-flex">
+                            <button class="neu-btn neu-blue p-2" @click="form = 1"><font-awesome-icon
+                                    icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                        </div>
+                    </div> -->
                     <div class="">
                         <CurriculumForms :subjectData="subject" :curriculumData="curriculum" :programData="program"
                             :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
-                            :title="settingsTitle" />
+                            :title="settingsTitle" @close="form = 1" />
                     </div>
                 </div>
             </div>
             <div v-if="form == 6">
-                <Loader v-if="preLoading" />
+                <NeuLoader1 v-if="preLoading" />
                 <div v-else>
                     <!-- <div class="d-flex justify-content-end mb-3">
-                <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
+                <button class="neu-btn" @click="form = 1"><font-awesome-icon
                         icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
             </div> -->
                     <div class="">
@@ -405,16 +419,18 @@ const mode = (type) => {
                 </div>
             </div>
             <div v-if="form == 7">
-                <Loader v-if="preLoading" />
+                <NeuLoader1 v-if="preLoading" />
                 <div v-else>
-                    <div class="d-flex justify-content-end mb-3">
-                        <button class="btn btn-sm btn-info text-white" @click="form = 1"><font-awesome-icon
-                                icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
-                    </div>
+                    <!-- <div class="d-flex w-100 justify-content-end mb-3">
+                        <div class="d-flex">
+                            <button class="neu-btn neu-blue p-2" @click="form = 1"><font-awesome-icon
+                                    icon="fa-solid fa-rotate-left" size="sm" /> Back</button>
+                        </div>
+                    </div> -->
                     <div class="">
                         <CommandSettings :subjectData="subject" :curriculumData="curriculum" :programData="program"
                             :courseData="course" :quarterData="quarter" :gradelvlData="gradelvl" :userIdData="userID"
-                            :title="settingsTitle" />
+                            :title="settingsTitle" @close="form = 1"/>
                     </div>
                 </div>
             </div>

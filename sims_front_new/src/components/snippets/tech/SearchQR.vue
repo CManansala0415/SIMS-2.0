@@ -59,19 +59,19 @@ const focusInput = () =>{
 
 <template>
     <div id="scanner">
-        <div class="mb-3 small-font d-flex flex-column gap-2" tabindex="-1">
+        <div class="mb-3 small-font d-flex flex-column gap-2 text-dim" tabindex="-1">
             <span><span class="text-success fw-bold">Note: </span>&nbsp;Make sure that the scanner is plugged in</span>
-            <div v-if="inactive" class="alert alert-danger" role="alert">
+            <div v-if="inactive" class="alert alert-danger neu-card-inner" role="alert">
                 Please click enable to start scanning
             </div>
-            <div v-if="active" class="alert alert-info" role="alert">
+            <div v-if="active" class="alert alert-info neu-card-inner" role="alert">
                 Scanner is now running...
             </div>
-            <div v-if="progress" class="alert alert-success" role="alert">
+            <div v-if="progress" class="alert alert-success neu-card-inner" role="alert">
                 <!-- <Loader v-if="preLoading"/> -->
                 Information detected, redirecting please wait...
             </div>
-            <button class="btn btn-sm btn-primary" @click=" () => $refs.focusTrap.activate(), focusInput()" tabindex="-1">Enable Scanning</button>
+            <button class="neu-btn neu-purple p-2" @click=" () => $refs.focusTrap.activate(), focusInput()" tabindex="-1"><font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Enable Scanning</button>
         </div>
         <focus-trap :active="false" ref="focusTrap">
             <input id="qrInput" type="text" class="form-control" v-model="refid" @keyup.enter="scan()" :disabled="disabler" tabindex="-1" style="opacity:0; height: 0; width: 0; padding: 0;"/>

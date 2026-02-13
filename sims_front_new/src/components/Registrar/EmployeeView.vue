@@ -9,7 +9,9 @@ import {
     getSubject
 } from "../Fetchers.js";
 import { getUserID } from "../../routes/user";
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+
 // import EmployeeForm from './EmployeeForm.vue'
 import EmployeeAccountTagging from '../snippets/modal/EmployeeAccountTagging.vue';
 import Employee from '../snippets/modal/EmployeeModal.vue';
@@ -246,112 +248,120 @@ onMounted(async () => {
             <h5 class=" text-uppercase fw-bold">Employee Management</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <!-- <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
-                         /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div> -->
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Search
-                </button>
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addemployeemodal"
-                    @click="newEmployeeModal = true, employeeToUpdate = []" type="button" class="btn btn-sm btn-primary"
-                    :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> Add New
-                </button>
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">#</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Status</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(employee).length" v-for="(emp, index) in employee">
-                        <td class="align-middle">
-                            {{ emp.emp_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ emp.emp_firstname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ emp.emp_middlename ? emp.emp_middlename : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ emp.emp_lastname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ emp.emp_suffixname ? emp.emp_suffixname : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ emp.emp_status == 1 ? 'Acitve' : 'Inactive' }}
-                        </td>
-                        <td v-if="accessData[4].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editemployeemodal"
-                                    @click="updateEmployee(emp)" type="button" title="Edit Record"
-                                    class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen"/></button>
-                                <button @click="removeEmployee(emp.emp_id)" type="button" title="Set as Inactive"
-                                    class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-trash"
-                                    /></button>
-                                <button data-bs-toggle="modal" data-bs-target="#assignemployeemodal"
-                                    @click="tagEmployee(emp)" type="button" title="Tag Subjects"
-                                    class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-tag"
-                                    /></button>
-                                <button data-bs-toggle="modal" data-bs-target="#accountemployeemodal"
-                                    @click="AccountEmployee(emp)" type="button" title="Tag Account"
-                                    class="btn btn-secondary btn-sm"> <font-awesome-icon icon="fa-solid fa-user-plus"
-                                    /></button>    
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(employee).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(employee).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(employee).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+
+        <div v-else >
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <!-- <div class="input-group w-50">
+                    <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
+                            /></span>
+                    <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
+                </div> -->
+                <div class="d-flex gap-2 justify-content-center align-content-center">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ employeeCount }})</span> items</p>
+                <div class="d-flex flex-wrap justify-content-end">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addemployeemodal"
+                        @click="newEmployeeModal = true, employeeToUpdate = []" type="button" class="neu-btn neu-green"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add"  /> Add New
+                    </button>
+                </div>
             </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3" style="text-transform:uppercase">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">#</th>
+                            <th style="color:#555555">First Name</th>
+                            <th style="color:#555555">Middle Name</th>
+                            <th style="color:#555555">Last Name</th>
+                            <th style="color:#555555">Suffix Name</th>
+                            <th style="color:#555555">Status</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(employee).length" v-for="(emp, index) in employee">
+                            <td class="align-middle">
+                                {{ emp.emp_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ emp.emp_firstname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ emp.emp_middlename ? emp.emp_middlename : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ emp.emp_lastname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ emp.emp_suffixname ? emp.emp_suffixname : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ emp.emp_status == 1 ? 'Acitve' : 'Inactive' }}
+                            </td>
+                            <td v-if="accessData[4].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editemployeemodal"
+                                        @click="updateEmployee(emp)" type="button" title="Edit Record"
+                                        class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen"/></button>
+                                    <button @click="removeEmployee(emp.emp_id)" type="button" title="Set as Inactive"
+                                        class="neu-btn-sm neu-white"> <font-awesome-icon icon="fa-solid fa-trash"
+                                        /></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#assignemployeemodal"
+                                        @click="tagEmployee(emp)" type="button" title="Tag Subjects"
+                                        class="neu-btn-sm neu-white"> <font-awesome-icon icon="fa-solid fa-tag"
+                                        /></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#accountemployeemodal"
+                                        @click="AccountEmployee(emp)" type="button" title="Tag Account"
+                                        class="neu-btn-sm neu-white"> <font-awesome-icon icon="fa-solid fa-user-plus"
+                                        /></button>    
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(employee).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(employee).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <NeuLoader1 />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(employee).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ employeeCount }})</span> items</p>
+                </div>
+            </div>    
         </div>
     </div>
 
@@ -365,7 +375,7 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="newEmployeeModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <Employee v-if="newEmployeeModal" :useriddata="userID" :genderData="gender"
                         :civilstatusData="civilstatus" />
                 </div>
@@ -395,7 +405,7 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="updateEmployeeModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <Employee v-if="updateEmployeeModal" :useriddata="userID" :genderData="gender"
                         :civilstatusData="civilstatus" :employeeData="employeeToUpdate" :toUpdate="true" />
                 </div>
@@ -425,7 +435,7 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="tagEmployeeModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <EmployeeTags v-if="tagEmployeeModal" :subjectData="subject" :employeeData="employeeToUpdate"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -454,7 +464,7 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="accountEmployeeModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <EmployeeAccountTagging v-if="accountEmployeeModal" :employeeData="employeeToUpdate" :userId="userID"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

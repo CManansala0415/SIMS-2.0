@@ -15,7 +15,8 @@ import {
     getCurriculumSubject,
     getAcademicDefaults
 } from "../Fetchers.js";
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 
 import LaunchSemesterModal from '../snippets/modal/LaunchSemesterModal.vue';
 import LaunchScheduleModal from '../snippets/modal/LaunchScheduleModal.vue';
@@ -227,101 +228,112 @@ onMounted(async () => {
         <h5 class=" text-uppercase fw-bold">Semester Launch</h5>
     </div>
 
-    <div v-if="sched">
-        <LaunchScheduleModal  :launchData="launchData" :buildingData="building" :classroomData="classroom" @close-sched="showSched()"/>
+    <div v-if="preLoading">
+        <NeuLoader1 />
     </div>
     <div v-else>
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#adddatamodal"
-                    @click="showForm = !showForm" type="button" class="btn btn-sm btn-primary"
-                    :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div>
+        <div v-if="sched">
+            <LaunchScheduleModal  :launchData="launchData" :buildingData="building" :classroomData="classroom" @close-sched="showSched()"/>
         </div>
-
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-
-                        <th style="background-color: #237a5b;" class="text-white">S.Y</th>
-                        <th style="background-color: #237a5b;" class="text-white">Semester</th>
-                        <th style="background-color: #237a5b;" class="text-white">Degree</th>
-                        <th style="background-color: #237a5b;" class="text-white">Course</th>
-                        <th style="background-color: #237a5b;" class="text-white">Section</th>
-                        <th style="background-color: #237a5b;" class="text-white">Grade Level</th>
-                        <!-- <th style="background-color: #237a5b;" class="text-white">Slots</th> -->
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(launch).length" v-for="(ln, index) in launch">
-                        <td class="align-middle">
-                            {{ ln.ln_year }}
-                        </td>
-                        <td class="align-middle">
-                            {{ ln.quar_desc }}
-                        </td>
-                        <td class="align-middle">
-                            {{ ln.dtype_desc }}
-                        </td>
-                        <td class="align-middle">
-                            {{ ln.prog_name }}
-                        </td>
-                        <td class="align-middle">
-                            {{ ln.sec_name }}
-                        </td>
-                        <td class="align-middle">
-                            {{ ln.grad_name }}
-                        </td>
-                        <!-- <td class="align-middle">
-                            {{ ln.ln_slots }}
-                        </td> -->
-                        <td v-if="accessData[3].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button 
-                                    @click="showSched(launch[index])" type="button" title="Edit Record"
-                                    class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen" /></button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(launch).length">
-                        <td class="p-3 text-center" colspan="8">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(launch).length">
-                        <td class="p-3 text-center" colspan="8">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(launch).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="d-flex gap-2 w-50">
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
+                    <button @click="search()" type="button" class="neu-btn neu-blue w-25" tabindex="-1"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ launchCount }})</span> items</p>
+                <div class="d-flex flex-wrap justify-content-end">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#adddatamodal"
+                        @click="showForm = !showForm" type="button" class="neu-btn neu-green"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+
+                            <th style="color:#555555">S.Y</th>
+                            <th style="color:#555555">Semester</th>
+                            <th style="color:#555555">Degree</th>
+                            <th style="color:#555555">Course</th>
+                            <th style="color:#555555">Section</th>
+                            <th style="color:#555555">Grade Level</th>
+                            <!-- <th style="color:#555555">Slots</th> -->
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(launch).length" v-for="(ln, index) in launch">
+                            <td class="align-middle">
+                                {{ ln.ln_year }}
+                            </td>
+                            <td class="align-middle">
+                                {{ ln.quar_desc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ ln.dtype_desc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ ln.prog_name }}
+                            </td>
+                            <td class="align-middle">
+                                {{ ln.sec_name }}
+                            </td>
+                            <td class="align-middle">
+                                {{ ln.grad_name }}
+                            </td>
+                            <!-- <td class="align-middle">
+                                {{ ln.ln_slots }}
+                            </td> -->
+                            <td v-if="accessData[3].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button 
+                                        @click="showSched(launch[index])" type="button" title="Edit Record"
+                                        class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen" /></button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(launch).length">
+                            <td class="p-3 text-center" colspan="8">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(launch).length">
+                            <td class="p-3 text-center" colspan="8">
+                                <div class="m-3">
+                                    <NeuLoader1 />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="btn btn-sm btn-secondary">Prev</button>
+                        <button :disabled="Object.keys(launch).length < 10 ? true : false" @click="paginate('next')"
+                            class="btn btn-sm btn-secondary">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ launchCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
+    
  
 
     <!-- Launch Modal -->
@@ -334,7 +346,7 @@ onMounted(async () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showForm = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <LaunchSemesterModal v-if="showForm" :degreeData="degree" :semesterData="semester"
                         :courseData="course" :sectionData="section" :gradelvlData="gradelvl"
                         :curriculumData="curriculum" />

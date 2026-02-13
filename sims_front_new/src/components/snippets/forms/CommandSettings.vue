@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import {
     addCurriculum, addCurriculumTagging, getCurriculumSubject, setAcademicStatus, getAcademicStatus, setCommandUpdate
 } from "../../Fetchers.js";
-import Loading1 from '../loaders/Loading1.vue';
+import NeuLoader1 from '../loaders/NeuLoader1.vue';
 import Loader1 from '../loaders/Loader1.vue';
 import CommandCenterModal from '../modal/CommandCenterModal.vue';
 import AcademicYear from './commandcenterforms/AcademicYear.vue';
@@ -391,280 +391,289 @@ const resetStopwatch = () => {
 
 </script>
 <template>
-    <div>
-        <div class="p-3 d-flex align-content-center justify-content-center">
-            <p class="text-uppercase fw-bold green-mid text-white rounded-3 p-2 small-font">{{ title }}</p>
+    <div class="small-font">
+        <div class="p-3">
+            <p class="text-uppercase fw-bold">{{ title }}</p>
         </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
+        </div>
+        <div v-else>
+            <div class="p-3 d-flex gap-1 justify-content-end">
+                <div class="d-flex w-25 justify-content-end gap-2">
+                    <button class="neu-btn neu-blue p-2" :disabled="preLoading ? true : false"
+                        @click="$emit('close')"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm" /> Back
+                    </button>
+                </div>
+            </div>
+            <div class="border p-3 neu-card-inner">
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button class="nav-link active" id="assign-tab" data-bs-toggle="tab" data-bs-target="#nav-assign"
+                            type="button" role="tab" aria-controls="nav-assign" aria-selected="false">Assign</button>
+                        <button class="nav-link" id="event-tab" data-bs-toggle="tab" data-bs-target="#nav-event"
+                            type="button" role="tab" aria-controls="nav-event" aria-selected="true">Event</button>
+                        <button class="nav-link" id="reset-tab" data-bs-toggle="tab" data-bs-target="#nav-reset"
+                            type="button" role="tab" aria-controls="nav-reset" aria-selected="true">Reset</button>
+                    </div>
+                </nav>
+                <div class="tab-content rounded-top-0 rounded-bottom-3 border-0 text-dim" id="nav-tabContent">
+                    <div class="tab-pane fade neu-bg neu-card rounded-top-0 show active" id="nav-assign" role="tabpanel" aria-labelledby="assign-tab">
+                        <div class="table-responsive p-3">
+                            <table class="neu-table-flat">
+                                <thead>
+                                    <tr>
+                                        <th style="color:#555555">Target</th>
+                                        <th style="color:#555555">Notes</th>
+                                        <th style="color:#555555" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Academic Year
+                                        </td>
+                                        <td class="align-middle">
+                                            Set academic year to be followed by system.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                                @click="execute(1, 1)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Semester
+                                        </td>
+                                        <td class="align-middle">
+                                            Set semester/term to be followed by system.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                            @click="execute(1, 2)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Dowpayment
+                                        </td>
+                                        <td class="align-middle">
+                                            Set default downpayment for enrollment.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                            @click="execute(1, 3)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Curriculum
+                                        </td>
+                                        <td class="align-middle">
+                                            Set curriculum to be used by default, but it is still updatable during enrollment..
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                            @click="execute(1, 4)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <!-- <tr>
+                                        <td class="align-middle">
+                                            Section
+                                        </td>
+                                        <td class="align-middle">
+                                            Set count of enrollees to be registered in a section, you can also determine by
+                                            category or random.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                            @click="execute(1, 5)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr> -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nav-event" role="tabpanel" aria-labelledby="event-tab">
+                        <div class="table-responsive border p-3 small-font">
+                            <table class="neu-table">
+                                <thead>
+                                    <tr>
+                                        <th style="color:#555555">Target</th>
+                                        <th style="color:#555555">Notes</th>
+                                        <th style="color:#555555" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Start Enrollment
+                                        </td>
+                                        <td class="align-middle">
+                                            Trigger enrollment status to active.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 1)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Stop Enrollment
+                                        </td>
+                                        <td class="align-middle">
+                                            Trigger enrollment status to Inactive.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 2)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Start Semester
+                                        </td>
+                                        <td class="align-middle">
+                                            Start Semester
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 3)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            End Semester
+                                        </td>
+                                        <td class="align-middle">
+                                            Stop Semester
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 4)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Archive Semester
+                                        </td>
+                                        <td class="align-middle">
+                                            Generate and save all current semester information to the server.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 5)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Enable Encoding of Grades (All Terms)
+                                        </td>
+                                        <td class="align-middle">
+                                            Allow encoding of grades (All Terms)
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 6)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Disable Encoding of Grades (All Terms)
+                                        </td>
+                                        <td class="align-middle">
+                                            Restrict encoding of grades (All Terms)
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 7)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Encoding of Grades
+                                        </td>
+                                        <td class="align-middle">
+                                            Encoding of Grades to a specific term
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white" data-bs-toggle="modal" data-bs-target="#executemodal"
+                                                @click="execute(1, 6)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nav-reset" role="tabpanel" aria-labelledby="reset-tab">
+                        <div class="table-responsive border p-3 small-font">
+                            <table class="neu-table">
+                                <thead>
+                                    <tr>
+                                        <th style="color:#555555">Target</th>
+                                        <th style="color:#555555">Notes</th>
+                                        <th style="color:#555555" class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Enrollees
+                                        </td>
+                                        <td class="align-middle">
+                                            Delete all enrollees to current database and return to empty and fresh state.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Faculty / Employee
+                                        </td>
+                                        <td class="align-middle">
+                                            Delete all employees to current database and return to empty and fresh state.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Subject Loadings
+                                        </td>
+                                        <td class="align-middle">
+                                            Delete all subjects tagged to faculty and return to empty and fresh state.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Semester Launch
+                                        </td>
+                                        <td class="align-middle">
+                                            Delete all created launch, schedules, tagged faculties, room assignments and
+                                            reset
+                                            availabilities.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle">
+                                            Schedules
+                                        </td>
+                                        <td class="align-middle">
+                                            Delete all schedules and return all time and rooms to available.
+                                        </td>
+                                        <td class="align-middle">
+                                            <button type="button" class="neu-btn-sm neu-white"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-        <div class="border p-3">
-            <nav>
-                <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                    <button class="nav-link active" id="assign-tab" data-bs-toggle="tab" data-bs-target="#nav-assign"
-                        type="button" role="tab" aria-controls="nav-assign" aria-selected="false">Assign</button>
-                    <button class="nav-link" id="event-tab" data-bs-toggle="tab" data-bs-target="#nav-event"
-                        type="button" role="tab" aria-controls="nav-event" aria-selected="true">Event</button>
-                    <button class="nav-link" id="reset-tab" data-bs-toggle="tab" data-bs-target="#nav-reset"
-                        type="button" role="tab" aria-controls="nav-reset" aria-selected="true">Reset</button>
-                </div>
-            </nav>
-
-            <Loading1 v-show="preLoading" class="mt-5"></Loading1>
-            <div v-show="!preLoading" class="tab-content" id="nav-tabContent">
-                <div  class="tab-pane fade  show active" id="nav-assign" role="tabpanel" aria-labelledby="assign-tab">
-                    <div class="table-responsive border p-3 small-font">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #237a5b;" class="text-white">Target</th>
-                                    <th style="background-color: #237a5b;" class="text-white">Notes</th>
-                                    <th style="background-color: #237a5b;" class="text-white">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="align-middle">
-                                        Academic Year
-                                    </td>
-                                    <td class="align-middle">
-                                        Set academic year to be followed by system.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
-                                            @click="execute(1, 1)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Semester
-                                    </td>
-                                    <td class="align-middle">
-                                        Set semester/term to be followed by system.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
-                                        @click="execute(1, 2)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Dowpayment
-                                    </td>
-                                    <td class="align-middle">
-                                        Set default downpayment for enrollment.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
-                                        @click="execute(1, 3)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Curriculum
-                                    </td>
-                                    <td class="align-middle">
-                                        Set curriculum to be used by default, but it is still updatable during enrollment..
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
-                                        @click="execute(1, 4)">Execute</button>
-                                    </td>
-                                </tr>
-                                <!-- <tr>
-                                    <td class="align-middle">
-                                        Section
-                                    </td>
-                                    <td class="align-middle">
-                                        Set count of enrollees to be registered in a section, you can also determine by
-                                        category or random.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
-                                        @click="execute(1, 5)">Execute</button>
-                                    </td>
-                                </tr> -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="nav-event" role="tabpanel" aria-labelledby="event-tab">
-                    <div class="table-responsive border p-3 small-font">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #237a5b;" class="text-white">Target</th>
-                                    <th style="background-color: #237a5b;" class="text-white">Notes</th>
-                                    <th style="background-color: #237a5b;" class="text-white">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="align-middle">
-                                        Start Enrollment
-                                    </td>
-                                    <td class="align-middle">
-                                        Trigger enrollment status to active.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 1)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Stop Enrollment
-                                    </td>
-                                    <td class="align-middle">
-                                        Trigger enrollment status to Inactive.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 2)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Start Semester
-                                    </td>
-                                    <td class="align-middle">
-                                        Start Semester
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 3)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        End Semester
-                                    </td>
-                                    <td class="align-middle">
-                                        Stop Semester
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 4)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Archive Semester
-                                    </td>
-                                    <td class="align-middle">
-                                        Generate and save all current semester information to the server.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 5)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Enable Encoding of Grades (All Terms)
-                                    </td>
-                                    <td class="align-middle">
-                                        Allow encoding of grades (All Terms)
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 6)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Disable Encoding of Grades (All Terms)
-                                    </td>
-                                    <td class="align-middle">
-                                        Restrict encoding of grades (All Terms)
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" @click="execute(2, 7)">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Encoding of Grades
-                                    </td>
-                                    <td class="align-middle">
-                                        Encoding of Grades to a specific term
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font" data-bs-toggle="modal" data-bs-target="#executemodal"
-                                            @click="execute(1, 6)">Execute</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="nav-reset" role="tabpanel" aria-labelledby="reset-tab">
-                    <div class="table-responsive border p-3 small-font">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="background-color: #237a5b;" class="text-white">Target</th>
-                                    <th style="background-color: #237a5b;" class="text-white">Notes</th>
-                                    <th style="background-color: #237a5b;" class="text-white">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="align-middle">
-                                        Enrollees
-                                    </td>
-                                    <td class="align-middle">
-                                        Delete all enrollees to current database and return to empty and fresh state.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Faculty / Employee
-                                    </td>
-                                    <td class="align-middle">
-                                        Delete all employees to current database and return to empty and fresh state.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Subject Loadings
-                                    </td>
-                                    <td class="align-middle">
-                                        Delete all subjects tagged to faculty and return to empty and fresh state.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Semester Launch
-                                    </td>
-                                    <td class="align-middle">
-                                        Delete all created launch, schedules, tagged faculties, room assignments and
-                                        reset
-                                        availabilities.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle">
-                                        Schedules
-                                    </td>
-                                    <td class="align-middle">
-                                        Delete all schedules and return all time and rooms to available.
-                                    </td>
-                                    <td class="align-middle">
-                                        <button type="button" class="btn btn-dark small-font">Execute</button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
 
             </div>
-
         </div>
 
     </div>
@@ -672,14 +681,14 @@ const resetStopwatch = () => {
     <!-- Edit Medical Modal -->
     <div class="modal fade" id="executemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Execute</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showCommandCenterModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg small-font">
                     <AcademicYear v-if="formValue == 1 && showCommandCenterModal" :userIdData="userID"/>
                     <AcademicSemester v-if="formValue == 2 && showCommandCenterModal" :quarterdata="quarter" :userIdData="userID"/>
                     <AcademicDownpayment v-if="formValue == 3 && showCommandCenterModal" :userIdData="userID"/>
@@ -705,3 +714,11 @@ const resetStopwatch = () => {
         </div>
     </div>
 </template>
+<style>
+.nav-link {
+    color: rgb(92, 92, 92);
+}
+.nav-link:hover {
+    color: rgb(27, 155, 106);
+}
+</style>

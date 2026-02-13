@@ -533,7 +533,7 @@ class ClinicController extends Controller
 
     public function getMedicalIshihara($id, $headerid){
         $clinicaldata = DB::table('def_clinic_examination_ishihara as cli')
-            ->leftJoin('users as usc', 'usc.id', '=', 'clh.cler_addedby')
+            ->leftJoin('users as usc', 'usc.id', '=', 'cli.cler_addedby')
             ->leftJoin('def_employee as emp', 'emp.emp_accid', '=', 'usc.id')
             ->select(  
                 'cli.*',

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { getStudentFiltering } from "../../Fetchers.js";
-import Loader1 from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import Loading1 from '../loaders/Loading1.vue';
 
 const props = defineProps({
@@ -93,41 +93,41 @@ const paginate = (mode) => {
         <div class="p-1 d-flex gap-2 justify-content-between mb-3">
             <div class="d-flex gap-2 w-100">
                 <div class="d-flex gap-2 w-100">
-                    <select @change="paramsGradelvl = 0, paramsCourse= 0" class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
+                    <select @change="paramsGradelvl = 0, paramsCourse= 0" class="neu-input neu-select" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
                         <option value="0" >--Select Program--</option>
                         <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
                     </select>
-                    <!-- <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsDegree" :disabled="preLoading?true:false">
+                    <!-- <select class="neu-input neu-select" tabindex="-1" v-model="paramsDegree" :disabled="preLoading?true:false">
                         <option value="0" >--Select Degree--</option>
                         <option v-for="(d, index) in degree" :value="d.deg_id" v-show="d.deg_type == paramsProgram">{{ d.deg_desc }}</option>
                     </select> -->
-                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
+                    <select class="neu-input neu-select" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
                         <option value="0" >--Select Course--</option>
                         <option v-for="(c, index) in course" :value="c.prog_id" v-show="c.prog_progtype == paramsProgram">{{ c.prog_code }}</option>
                     </select>
-                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsGradelvl" :disabled="preLoading?true:false">
+                    <select class="neu-input neu-select" tabindex="-1" v-model="paramsGradelvl" :disabled="preLoading?true:false">
                         <option value="0" >--Select Grade Level--</option>
                         <option v-for="(g, index) in gradelvl" :value="g.grad_id" v-show="g.grad_dtypeid == paramsProgram">{{ g.grad_name }}</option>
                     </select>
-                    <div class="d-flex justify-content-center align-content-center">
-                        <button @click="paginate('search')" type="button" class="btn btn-sm btn-secondary text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                            Search
+                    <div class="d-flex justify-content-center align-content-center w-50">
+                        <button @click="paginate('search')" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                            <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
                         </button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover" style="text-transform:uppercase">
+            <table class="neu-table mb-3" style="text-transform:uppercase">
                 <thead>
                     <tr>
-                        <th style="background-color: #237a5b;" class="text-white">#</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Details</th>
-                        <th style="background-color: #237a5b;" class="text-white">Date Applied</th>
+                        <th>#</th>
+                        <th>First Name</th>
+                        <th>Middle Name</th>
+                        <th>Last Name</th>
+                        <th>Suffix Name</th>
+                        <th>Details</th>
+                        <th>Date Applied</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -180,7 +180,7 @@ const paginate = (mode) => {
                     <tr v-if="preLoading && !Object.keys(students).length" style="text-transform:none">
                         <td class="p-3 text-center" colspan="7">
                             <div class="m-3">
-                                <Loader1 />
+                                <NeuLoader2 />
                             </div>
                         </td>
                     </tr>
@@ -189,9 +189,9 @@ const paginate = (mode) => {
             <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
                 <div class="d-flex gap-1">
                     <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
+                        class="neu-btn neu-light-gray">Prev</button>
                     <button :disabled="Object.keys(students).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+                        class="neu-btn neu-dark-gray">Next</button>
                 </div>
                 <p class="">showing total of <span class="font-semibold">({{ Object.keys(students).length }})</span> items</p>
             </div>

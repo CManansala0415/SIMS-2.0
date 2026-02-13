@@ -108,6 +108,14 @@ const save = () => {
         sett_code: 'cs_04',
         sett_course_addedby: userID.value
     }
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     setCommandUpdate(x).then((results) => {
         if (results.status == 200) {
             // alert('Update Successful')
@@ -117,6 +125,7 @@ const save = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close()
                 // location.reload()
             });
         } else {
@@ -127,6 +136,7 @@ const save = () => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close()
                 // location.reload()
             });
         }
@@ -142,7 +152,7 @@ onMounted(async () => {
 
         <div class="d-flex flex-wrap form-group">
             <label>Program</label>
-            <select class="form-control w-100" tabindex="-1" v-model="programId" @change="filterData(1)" required>
+            <select class="neu-input neu-select" tabindex="-1" v-model="programId" @change="filterData(1)" required>
                 <option value="0">-- Select Here --</option>
                 <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
             </select>
@@ -150,7 +160,7 @@ onMounted(async () => {
 
         <div class="d-flex flex-wrap form-group">
             <label>Grade Level</label>
-            <select class="form-control w-100" tabindex="-1" v-model="gradelvlId" :disabled="programId != 0? false:true" @change="filterData(2)" required>
+            <select class="neu-input neu-select" tabindex="-1" v-model="gradelvlId" :disabled="programId != 0? false:true" @change="filterData(2)" required>
                 <option value="0">-- Select Here --</option>
                 <option v-for="(g, index) in filteredGradelvl" :value="g.grad_id">{{ g.grad_name }}</option>
             </select>
@@ -158,7 +168,7 @@ onMounted(async () => {
 
         <div class="d-flex flex-wrap form-group mb-2">
             <label>Course</label>
-            <select class="form-control w-100" tabindex="-1" v-model="courseId" :disabled="gradelvlId != 0? false:true" @change="filterData(3)" required>
+            <select class="neu-input neu-select" tabindex="-1" v-model="courseId" :disabled="gradelvlId != 0? false:true" @change="filterData(3)" required>
                 <option value="0">-- Select Here --</option>
                 <option v-for="(c, index) in filteredCourse" :value="c.prog_id"> {{ c.prog_code }}</option>
             </select>
@@ -166,7 +176,7 @@ onMounted(async () => {
 
         <div class="d-flex flex-wrap form-group">
             <label>Curriculum</label>
-            <select class="form-control w-100" tabindex="-1" v-model="currId" :disabled="gradelvlId != 0? false:true" required>
+            <select class="neu-input neu-select" tabindex="-1" v-model="currId" :disabled="gradelvlId != 0? false:true" required>
                 <option value="0">-- Select Here --</option>
                 <option v-for="(curr, index) in filteredCurriculum" :value="curr.curr_id">
                     {{ curr.curr_code }}
@@ -174,8 +184,8 @@ onMounted(async () => {
             </select>
         </div>
 
-        <button type="submit" class="btn btn-sm btn-success mt-3 w-100" :disabled="saving ? true : false">
-            Save
+        <button type="submit" class="neu-btn neu-green p-2 mt-3 " :disabled="saving? true:false">
+            <font-awesome-icon icon="fa-solid fa-wrench"/> Save
         </button>
     </form>
 </template>

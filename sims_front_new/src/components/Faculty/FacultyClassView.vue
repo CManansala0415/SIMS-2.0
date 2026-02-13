@@ -3,6 +3,8 @@ import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
 // import Enroll from '../snippets/modal/Enrollment.vue';
 // import ApplicationForm from './ApplicationForm.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import { getUserID } from "../../routes/user.js";
 import {
     getFacultyAssignment,
@@ -287,149 +289,166 @@ function getScheduleGroupsForSubject(subjId) {
             <h5 class=" text-uppercase fw-bold">Faculty Loads</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <!-- <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-if="!showForm" v-model="searchValue" @keyup.enter="search(1)" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div> -->
-            <div class="d-flex w-100 justify-content-start gap-1">
-                <!-- <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData()"
-                    type="button" class="btn btn-sm btn-primary w-25" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-                <button @click="switcher = 0" tabindex="-1" type="button" :disabled="preLoading ? true : false"
-                    :class="switcher == 0 ? 'btn btn-sm btn-dark active w-25' : 'btn btn-sm btn-dark w-25'">
-                    Sections
-                </button>
-                <button @click="switcher = 1" tabindex="-1" type="button" :disabled="preLoading ? true : false"
-                    :class="switcher == 1 ? 'btn btn-sm btn-dark active w-25' : 'btn btn-sm btn-dark w-25'">
-                    Preparations
-                </button> -->
-                <!-- <select v-model="switcher" class="form-select w-25" :disabled="preLoading ? true : false">
-                    <option value="0">Sections</option>
-                    <option value="1">Preparations</option>
-                </select> -->
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div v-if="!showForm" class="table-responsive border p-3 small-font">
-            <table v-if="switcher == 0" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">No.</th>
-                        <th style="background-color: #237a5b;" class="text-white">Year</th>
-                        <th style="background-color: #237a5b;" class="text-white">Course</th>
-                        <th style="background-color: #237a5b;" class="text-white">Section Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(groupedAssignmentSection).length"
-                        v-for="(app, index) in groupedAssignmentSection">
-                        <td class="align-middle">
-                            {{ index }}
-                        </td>
-                        <td class="align-middle">
-                            <select :value="groupedAssignmentSection[index][0].ln_gradelvl" disabled
-                                class="form-select-sm" title="Click Edit to modify details">
-                                <option v-for="(gr, index) in gradelvl" :value="gr.grad_id">{{ gr.grad_name }}</option>
-                            </select>
-                        </td>
-                        <td class="align-middle">
-                            {{ groupedAssignmentSection[index][0].prog_name }}
-                        </td>
-                        <td class="align-middle">
-                            {{ groupedAssignmentSection[index][0].sec_name }}
-                        </td>
-                        <td class="align-middle">
-                           <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                data-bs-target="#editdatamodal" title="View Subjects"
-                                @click="subjectDetails(true,index)">
-                                <font-awesome-icon icon="fa-solid fa-eye" />
-                                View Subjects
-                            </button>
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(groupedAssignmentSection).length">
-                        <td class="align-middle" colspan="5">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
-                        <td class="align-middle" colspan="5">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table v-if="switcher == 1" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">No.</th>
-                        <th style="background-color: #237a5b;" class="text-white">Year</th>
-                        <th style="background-color: #237a5b;" class="text-white">Course</th>
-                        <th style="background-color: #237a5b;" class="text-white">Section Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(groupedAssignmentSection).length"
-                        v-for="(app, index) in groupedAssignmentSection">
-                        <td class="align-middle">
-                            {{ index }}
-                        </td>
-                        <td class="align-middle">
-                            <select :value="groupedAssignmentSection[index][0].ln_gradelvl" disabled
-                                class="form-select-sm" title="Click Edit to modify details">
-                                <option v-for="(gr, index) in gradelvl" :value="gr.grad_id">{{ gr.grad_name }}</option>
-                            </select>
-                        </td>
-                        <td class="align-middle">
-                            {{ groupedAssignmentSection[index][0].prog_name }}
-                        </td>
-                        <td class="align-middle">
-                            {{ groupedAssignmentSection[index][0].sec_name }}
-                        </td>
-                        <td class="align-middle">
-                            <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                data-bs-target="#editdatamodal" title="View Subjects"
-                                @click="subjectDetails(true,index)">
-                                <font-awesome-icon icon="fa-solid fa-eye" />
-                                View Subjects
-                            </button>
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(groupedAssignmentSection).length">
-                        <td class="align-middle" colspan="5">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
-                        <td class="align-middle" colspan="5">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <div v-else>
+            <div class="p-1 d-flex gap-2 justify-content-between mb-3">
+                <!-- <div class="input-group w-50">
+                    <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
+                    <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
+                        v-if="!showForm" v-model="searchValue" @keyup.enter="search(1)" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
+                </div> -->
+                <div class="d-flex w-100 justify-content-start gap-1">
+                    <!-- <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData()"
+                        type="button" class="btn btn-sm btn-primary w-25" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                    <button @click="switcher = 0" tabindex="-1" type="button" :disabled="preLoading ? true : false"
+                        :class="switcher == 0 ? 'btn btn-sm btn-dark active w-25' : 'btn btn-sm btn-dark w-25'">
+                        Sections
+                    </button>
+                    <button @click="switcher = 1" tabindex="-1" type="button" :disabled="preLoading ? true : false"
+                        :class="switcher == 1 ? 'btn btn-sm btn-dark active w-25' : 'btn btn-sm btn-dark w-25'">
+                        Preparations
+                    </button> -->
+                    <!-- <select v-model="switcher" class="form-select w-25" :disabled="preLoading ? true : false">
+                        <option value="0">Sections</option>
+                        <option value="1">Preparations</option>
+                    </select> -->
+                </div>
+            </div>
+            <div v-if="!showForm" class="table-responsive border p-3 small-font">
+                <table v-if="switcher == 0" class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">No.</th>
+                            <th style="color:#555555">Year</th>
+                            <th style="color:#555555">Course</th>
+                            <th style="color:#555555">Section Name</th>
+                            <th style="color:#555555" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(groupedAssignmentSection).length"
+                            v-for="(app, index) in groupedAssignmentSection">
+                            <td class="align-middle">
+                                {{ index }}
+                            </td>
+                            <td class="align-middle">
+                                <!-- <select :value="groupedAssignmentSection[index][0].ln_gradelvl" disabled
+                                    class="form-select-sm" title="Click Edit to modify details">
+                                    <option v-for="(gr, index) in gradelvl" :value="gr.grad_id">{{ gr.grad_name }}</option>
+                                </select> -->
+                                <span class="p-1 d-inline-block">
+                                {{ gradelvl.find(g => g.grad_id === groupedAssignmentSection[index][0].ln_gradelvl)?.grad_name || '—' }}
+                                </span>
+                                
+                            </td>
+                            <td class="align-middle">
+                                {{ groupedAssignmentSection[index][0].prog_name }}
+                            </td>
+                            <td class="align-middle">
+                                {{ groupedAssignmentSection[index][0].sec_name }}
+                            </td>
+                            <td class="align-middle">
+                            <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                    data-bs-target="#editdatamodal" title="View Subjects"
+                                    @click="subjectDetails(true,index)">
+                                    <font-awesome-icon icon="fa-solid fa-eye" />
+                                    View Subjects
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(groupedAssignmentSection).length">
+                            <td class="align-middle text-center" colspan="5">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
+                            <td class="align-middle text-center" colspan="5">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <table v-if="switcher == 1" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">No.</th>
+                            <th style="color:#555555">Year</th>
+                            <th style="color:#555555">Course</th>
+                            <th style="color:#555555">Section Name</th>
+                            <th style="color:#555555" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(groupedAssignmentSection).length"
+                            v-for="(app, index) in groupedAssignmentSection">
+                            <td class="align-middle">
+                                {{ index }}
+                            </td>
+                            <td class="align-middle">
+                                <!-- <select :value="groupedAssignmentSection[index][0].ln_gradelvl" disabled
+                                    class="form-select-sm" title="Click Edit to modify details">
+                                    <option v-for="(gr, index) in gradelvl" :value="gr.grad_id">{{ gr.grad_name }}</option>
+                                </select> -->
+                                <span class="p-1 d-inline-block">
+                                {{ gradelvl.find(g => g.grad_id === groupedAssignmentSection[index][0].ln_gradelvl)?.grad_name || '—' }}
+                                </span>
+                            </td>
+                            <td class="align-middle">
+                                {{ groupedAssignmentSection[index][0].prog_name }}
+                            </td>
+                            <td class="align-middle">
+                                {{ groupedAssignmentSection[index][0].sec_name }}
+                            </td>
+                            <td class="align-middle">
+                                <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                    data-bs-target="#editdatamodal" title="View Subjects"
+                                    @click="subjectDetails(true,index)">
+                                    <font-awesome-icon icon="fa-solid fa-eye" />
+                                    View Subjects
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(groupedAssignmentSection).length">
+                            <td class="align-middle text-center" colspan="5">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
+                            <td class="align-middle text-center" colspan="5">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Edit Medical Modal -->
+    <!-- Edit Modal -->
     <div class="modal fade" id="editdatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Subjects</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showSubjects = false"></button>
                 </div>
-                <div class="modal-body" v-if="showSubjects">
+                <div class="modal-body neu-bg" v-if="showSubjects">
                     <div class="d-flex flex-wrap flex-column">
                         <p class="text-success fw-bold">Subjects handled</p>
                         <p class=" fst-italic border p-3 rounded-3 bg-secondary-subtle small-font"><span
@@ -439,17 +458,17 @@ function getScheduleGroupsForSubject(subjId) {
                                 verify the subject to the assigned personnel and request for update.
                             </span></p>
                     </div>
-                    <div class="table-responsive border p-3 small-font">
-                        <table class="table table-hover">
+                    <div class="neu-card table-responsive border p-3 small-font neu-card">
+                        <table class="neu-table-flat">
                             <!-- [index] = index nung group, [0] = yung first item na nasa group -->
                                 <thead>
                                     <tr>
-                                        <th style="background-color: #237a5b;" class="text-white">No.</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Subject Code</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Subject Name</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Units</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Total Units</th>
-                                        <th style="background-color: #237a5b;" class="text-white" colspan="3">Schedule</th>
+                                        <th style="color:#555555">No.</th>
+                                        <th style="color:#555555">Subject Code</th>
+                                        <th style="color:#555555">Subject Name</th>
+                                        <th style="color:#555555">Units</th>
+                                        <th style="color:#555555" class="text-center">Total Units</th>
+                                        <th style="color:#555555" class="text-center" colspan="3">Schedule</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -464,16 +483,18 @@ function getScheduleGroupsForSubject(subjId) {
                                             {{ app.subj_name }}
                                         </td>
                                         <td class="align-middle">
-                                            <div class="input-group input-group-sm mb-1">
-                                                <span class=" input-group-text">Lecture Units</span>
-                                                <input v-model="app.subj_lec_units" type="text" class="form-control" disabled>
+                                            <div class="d-flex gap-2 mb-1">
+                                                <span class="">Lecture Units</span>
+                                                <!-- <input v-model="app.subj_lec_units" type="text" class="form-control" disabled> -->
+                                                 ({{ app.subj_lec_units }})
                                             </div>
-                                            <div class="input-group input-group-sm mb-1">
-                                                <span class=" input-group-text">Laboratory Units</span>
-                                                <input v-model="app.subj_lab_units" type="text" class="form-control" disabled>
+                                            <div class="d-flex gap-2 mb-1">
+                                                <span class="">Laboratory Units</span>
+                                                <!-- <input v-model="app.subj_lab_units" type="text" class="form-control" disabled> -->
+                                                 ({{ app.subj_lab_units }})
                                             </div>
                                         </td>
-                                        <td class="align-middle">
+                                        <td class="align-middle text-center">
                                             {{ app.subj_lec_units + app.subj_lab_units }}
                                         </td>
                                         <!-- Days -->
@@ -511,7 +532,9 @@ function getScheduleGroupsForSubject(subjId) {
                                     </tr>
                                     <tr v-if="!Object.keys(groupedAssignmentSection).length && !loadingSchedule && !Object.keys(scheduleData).length">
                                         <td class="align-middle" colspan="7">
-                                            No Records Found
+                                            <NeuLoader4/>
+                                            <p class="fw-bold m-0">Nothing here yet!</p>
+                                            <p>The hamster took a break 💤 — try adding something new.</p>
                                         </td>
                                     </tr>
                                     <tr v-if="loadingSchedule && !Object.keys(scheduleData).length">

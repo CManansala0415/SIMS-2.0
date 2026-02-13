@@ -17,7 +17,8 @@ import {
 } from "../../Generators.js";
 import ProvisionalReceipt from '../forms/accountingforms/ProvisionalReceipt.vue';
 import OfficialReceipt from '../forms/accountingforms/OfficialReceipt.vue';
-
+import NeuLoader4 from '../loaders/NeuLoader4.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 const props = defineProps({
     accountData: {
     },
@@ -514,207 +515,211 @@ const renderPayment = (paymentdata) =>{
 
 <template>
    
-    <div class="d-flex flex-column p-2 gap-2">
+    <div class="d-flex flex-column p-2 gap-3">
         <div class="d-flex flex-wrap flex-column">
             <!-- <p class="text-success fw-bold">Payment Settlement</p> -->
-            <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+            <p class="fst-italic border p-2 small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Ensure that the details of the payment is correct.
                 </span></p>
         </div>
-        <div class="d-flex align-content-center justify-content-center gap-2 small-font">
-            <Loader v-if="checking" />
-            <div v-else class="d-flex gap-1 w-100 ">
-
-                <form @submit.prevent="checkCounterStatus" class="card p-3 text-start w-25">
-                    <div class="form-group p-1">
-                        <label class="text-xs">Series No.</label>
-                        <input class="form-control form-control-sm" type="text"
-                            required v-model="seriesNoActual" disabled
-                        />
-                    </div>
-                    <div class="form-group p-1">
-                        <label class="text-xs">Receipt Type</label>
-                        <select class="form-control form-select-sm" required v-model="receiptType" disabled="">
-                            <!-- :disabled="balance == 0 ? true : false"> -->
-                            <option value="" disabled>--Select Receipt Type--</option>
-                            <option value="1">Provisional (PR)</option>
-                            <option value="2">Official (OR)</option>
-                        </select>
-                    </div>
-                    <div class="form-group p-1">
-                        <label class="text-xs">Mode of Payment</label>
-                        <select @change="setValues()" class="form-control form-select-sm" required v-model="paymentMode"
-                            :disabled="balance == 0 ? true : false">
-                            <option value="" disabled>--Select Payment Type--</option>
-                            <option value="1">Cash</option>
-                            <option value="2">Bank</option>
-                            <option value="3">Cheque</option>
-                            <option value="4">Credit</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group p-1">
-                        <label class="text-xs">Actual Payment</label>
-                        <input 
-                            v-model.number="amountPaid"
-                            required
-                            step="0.01" 
-                            min="0.00"
-                            :max="amountTobePaid"
-                            :disabled="balance == 0 || account.by_pass"
-                            @input="
-                            if (amountPaid < 0) amountPaid = 0;
-                            if (amountPaid > amountTobePaid) amountPaid = amountTobePaid;
-                            "
-                            type="number"
-                            class="form-control form-control-sm amount-text"
-                        />
-                        <!-- Helper message -->
-                        <small v-if="amountPaid === amountTobePaid" class="text-red-500">
-                            ⚠️ Maximum allowed is {{ amountTobePaid }}
-                        </small>
-                        <small v-else-if="amountPaid === 0" class="text-yellow-500">
-                            ⚠️ Minimum is 0
-                        </small>
-                    </div>
-
-
-
-                    <div v-if="paymentMode == 2" class="form-group p-1">
-                        <label class="text-xs">Bank Name</label>
-                        <input v-model="bankTransferName" required :disabled="balance == 0 ? true : false" type="text"
-                            class="form-control form-control-sm" />
-                    </div>
-                    <div v-if="paymentMode == 2" class="form-group p-1">
-                        <label class="text-xs">Bank No.</label>
-                        <input v-model="bankTransferNo" required :disabled="balance == 0 ? true : false"
-                            oninput="this.value = Math.abs(this.value)" type="number"
-                            class="form-control form-control-sm" />
-                    </div>
-
-                    <div v-if="paymentMode == 3" class="form-group p-1">
-                        <label class="text-xs">Bank Name</label>
-                        <input v-model="chequeBankName" required :disabled="balance == 0 ? true : false" type="text"
-                            class="form-control form-control-sm" />
-                    </div>
-                    <div v-if="paymentMode == 3" class="form-group p-1">
-                        <label class="text-xs">Cheque No.</label>
-                        <!-- <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
-                            oninput="this.value = Math.abs(this.value)" type="number"
-                            class="form-control form-control-sm" /> -->
-                        <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
-                             type="text"
-                            class="form-control form-control-sm" />
-                    </div>
-
-                    <div class="form-group p-1">
-                        <label class="text-xs">Amount to be paid</label>
-                        <input v-model="amountTobePaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text""
-                            class="form-control form-control-sm" disabled />
-                    </div>
-                    <div class="form-group p-1">
-                        <label class="text-xs">Amount Paid</label>
-                        <input v-model="amountPaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text"
-                            class="form-control form-control-sm" disabled />
-                    </div>
-                    <div class="form-group p-1">
-                        <label class="text-xs">Remaining Balance</label>
-                        <input :value="(amountTobePaid - amountPaid).toFixed(2)" onkeydown="return /[a-z, ]/i.test(event.key)"
-                            type="text" class="form-control form-control-sm" disabled />
-                    </div>
-                    <div class="form-group p-1" v-if="account.by_pass">
-                        <label class="text-xs">Remarks</label>
-                        <textarea v-model="byPassRemarks" style="height: 200px;" required minlength="5"
-                            type="text" class="form-control form-control-sm"></textarea>
-                    </div>
-                    <div class="mt-3 d-flex justify-content-center align-content-center">
-                        <button v-if="balance != 0" :disabled="disabler ? true : false" type="submit"
-                            class="btn btn-sm btn-success w-100">Proceed
-                            Payment</button>
-                        <p v-if="balance == 0 && account.acr_dateupdated" class="fw-bold text-success">Payment Completed
-                            ({{
-                                account.acr_dateupdated }})</p>
-                    </div>
-                </form>
-
-                <div class="p-3 card w-75 h-100">
-                    <div class="bg-secondary-subtle rounded-3 p-3 mb-3 fw-bold">
-                        Payment History
-                    </div>
-                    <div class="table-responsive border d-flex flex-column justify-content-between h-100"  >
-                        <div style="height:300px; overflow: auto;">
-                            <table class="table table-hover table-fixed">
-                                <thead>
-                                    <tr>
-                                        <th style="background-color: #237a5b;" class="text-white">Paid</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Amount</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Balance</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Mode</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Remarks</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Receipt</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Series</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="Object.keys(payment).length" v-for="(py, index) in payment">
-                                        <td class="align-middle">{{ py.acy_payment }}</td>
-                                        <td class="align-middle">{{ py.acy_amount }}</td>
-                                        <td class="align-middle text-danger fw-bold">{{ py.acy_balance }}</td>
-                                        <td class="align-middle">
-                                            <select class="form-control form-select-sm" required v-model="py.acy_mode"
-                                                disabled>
-                                                <option value="1">Cash</option>
-                                                <option value="2">Bank</option>
-                                                <option value="3">Cheque</option>
-                                            </select>
-                                            <input v-if="py.acy_mode == 2" disabled :value="py.acy_transferred_bank"
-                                                type="text" class="form-control form-control-sm" />
-                                            <input v-if="py.acy_mode == 2" disabled :value="py.acy_bank_no" type="text"
-                                                class="form-control form-control-sm" />
-                                            <input v-if="py.acy_mode == 3" disabled :value="py.acy_cheque_bank" type="text"
-                                                class="form-control form-control-sm" />
-                                            <input v-if="py.acy_mode == 3" disabled :value="py.acy_cheque_no" type="text"
-                                                class="form-control form-control-sm" />
-                                        </td>
-                                        <td class="align-middle">
-                                            {{ py.acy_remarks }}
-                                        </td>
-                                        <td class="align-middle">
-                                            <select class="form-control form-select-sm" v-model="py.acy_receipt" disabled>
-                                                <option value="1">Provisional</option>
-                                                <option value="2">Official</option>
-                                            </select>
-                                        </td>
-                                        <td class="align-middle">
-                                            {{ py.acy_series }}
-                                        </td>
-                                        <td class="align-middle">{{ formatDateTime(py.acy_datepaid) }}</td>
-                                    </tr>
-                                    <tr v-if="!checking && !Object.keys(payment).length">
-                                        <td class="p-3 text-center" colspan="6">
-                                            No Records Found
-                                        </td>
-                                    </tr>
-                                    <tr v-if="checking && !Object.keys(payment).length">
-                                        <td class="p-3 text-center" colspan="6">
-                                            <div class="m-3">
-                                                <Loader />
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
+        <div class="small-font">
+            <NeuLoader2 v-if="checking" />
+            <div v-else class="row mb-3">
+                <div class="col-md-12 col-lg-4">
+                    <form @submit.prevent="checkCounterStatus" class="neu-card p-3 text-start">
+                        <div class="form-group p-1">
+                            <label class="text-xs">Series No.</label>
+                            <input class="neu-input" type="text"
+                                required v-model="seriesNoActual" disabled
+                            />
                         </div>
-                        
-                        <div class="mt-3 d-flex gap-1 bg-secondary-subtle p-3 justify-content-end align-content-center">
-                            <span class="fw-bold">Total Amount Paid: <span class="text-success">{{ paid
-                            }}</span>
-                            </span>
-                            <span class="fw-bold">Remaining Balance: <span class="text-danger">{{ balance.toFixed(2)
-                            }}</span>
-                            </span>
+                        <div class="form-group p-1">
+                            <label class="text-xs">Receipt Type</label>
+                            <select class="neu-input neu-select" required v-model="receiptType" disabled="">
+                                <!-- :disabled="balance == 0 ? true : false"> -->
+                                <option value="" disabled>--Select Receipt Type--</option>
+                                <option value="1">Provisional (PR)</option>
+                                <option value="2">Official (OR)</option>
+                            </select>
+                        </div>
+                        <div class="form-group p-1">
+                            <label class="text-xs">Mode of Payment</label>
+                            <select @change="setValues()" class="neu-input neu-select" required v-model="paymentMode"
+                                :disabled="balance == 0 ? true : false">
+                                <option value="" disabled>--Select Payment Type--</option>
+                                <option value="1">Cash</option>
+                                <option value="2">Bank</option>
+                                <option value="3">Cheque</option>
+                                <option value="4">Credit</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group p-1">
+                            <label class="text-xs">Actual Payment</label>
+                            <input 
+                                v-model.number="amountPaid"
+                                required
+                                step="0.01" 
+                                min="0.00"
+                                :max="amountTobePaid"
+                                :disabled="balance == 0 || account.by_pass"
+                                @input="
+                                if (amountPaid < 0) amountPaid = 0;
+                                if (amountPaid > amountTobePaid) amountPaid = amountTobePaid;
+                                "
+                                type="number"
+                                class="neu-input amount-text"
+                            />
+                            <!-- Helper message -->
+                            <small v-if="amountPaid === amountTobePaid" class="text-red-500">
+                                ⚠️ Maximum allowed is {{ amountTobePaid }}
+                            </small>
+                            <small v-else-if="amountPaid === 0" class="text-yellow-500">
+                                ⚠️ Minimum is 0
+                            </small>
+                        </div>
+
+
+
+                        <div v-if="paymentMode == 2" class="form-group p-1">
+                            <label class="text-xs">Bank Name</label>
+                            <input v-model="bankTransferName" required :disabled="balance == 0 ? true : false" type="text"
+                                class="neu-input" />
+                        </div>
+                        <div v-if="paymentMode == 2" class="form-group p-1">
+                            <label class="text-xs">Bank No.</label>
+                            <input v-model="bankTransferNo" required :disabled="balance == 0 ? true : false"
+                                oninput="this.value = Math.abs(this.value)" type="number"
+                                class="neu-input" />
+                        </div>
+
+                        <div v-if="paymentMode == 3" class="form-group p-1">
+                            <label class="text-xs">Bank Name</label>
+                            <input v-model="chequeBankName" required :disabled="balance == 0 ? true : false" type="text"
+                                class="neu-input" />
+                        </div>
+                        <div v-if="paymentMode == 3" class="form-group p-1">
+                            <label class="text-xs">Cheque No.</label>
+                            <!-- <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
+                                oninput="this.value = Math.abs(this.value)" type="number"
+                                class="neu-input" /> -->
+                            <input v-model="chequeNo" required :disabled="balance == 0 ? true : false"
+                                type="text"
+                                class="neu-input" />
+                        </div>
+
+                        <div class="form-group p-1">
+                            <label class="text-xs">Amount to be paid</label>
+                            <input v-model="amountTobePaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text""
+                                class="neu-input" disabled />
+                        </div>
+                        <div class="form-group p-1">
+                            <label class="text-xs">Amount Paid</label>
+                            <input v-model="amountPaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text"
+                                class="neu-input" disabled />
+                        </div>
+                        <div class="form-group p-1">
+                            <label class="text-xs">Remaining Balance</label>
+                            <input :value="(amountTobePaid - amountPaid).toFixed(2)" onkeydown="return /[a-z, ]/i.test(event.key)"
+                                type="text" class="neu-input" disabled />
+                        </div>
+                        <div class="form-group p-1" v-if="account.by_pass">
+                            <label class="text-xs">Remarks</label>
+                            <textarea v-model="byPassRemarks" style="height: 200px;" required minlength="5"
+                                type="text" class="neu-input"></textarea>
+                        </div>
+                        <div class="mt-3 d-flex justify-content-center align-content-center">
+                            <button v-if="balance != 0" :disabled="disabler ? true : false" type="submit"
+                                class="neu-btn neu-green p-2">
+                                <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Proceed Payment</button>
+                            <p v-if="balance == 0 && account.acr_dateupdated" class="fw-bold text-success">Payment Completed
+                                ({{
+                                    account.acr_dateupdated }})</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-12 col-lg-8">
+                    <div class="p-3 neu-card-inner h-100">
+                        <div class="p-3 mb-3 fw-bold">
+                            Payment History
+                        </div>
+                        <div class="table-responsive border d-flex flex-column justify-content-between h-100 p-2"  >
+                            <div style="height:300px; overflow: auto;" class="neu-card p-3">
+                                <table class="neu-table-flat">
+                                    <thead>
+                                        <tr>
+                                            <th style="color:#555555">Paid</th>
+                                            <th style="color:#555555">Amount</th>
+                                            <th style="color:#555555">Balance</th>
+                                            <th style="color:#555555">Mode</th>
+                                            <th style="color:#555555">Remarks</th>
+                                            <th style="color:#555555">Receipt</th>
+                                            <th style="color:#555555">Series</th>
+                                            <th style="color:#555555">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="Object.keys(payment).length" v-for="(py, index) in payment">
+                                            <td class="align-middle">{{ py.acy_payment }}</td>
+                                            <td class="align-middle">{{ py.acy_amount }}</td>
+                                            <td class="align-middle text-danger fw-bold">{{ py.acy_balance }}</td>
+                                            <td class="align-middle">
+                                                <select class="neu-input neu-select" required v-model="py.acy_mode"
+                                                    disabled>
+                                                    <option value="1">Cash</option>
+                                                    <option value="2">Bank</option>
+                                                    <option value="3">Cheque</option>
+                                                </select>
+                                                <input v-if="py.acy_mode == 2" disabled :value="py.acy_transferred_bank"
+                                                    type="text" class="neu-input" />
+                                                <input v-if="py.acy_mode == 2" disabled :value="py.acy_bank_no" type="text"
+                                                    class="neu-input" />
+                                                <input v-if="py.acy_mode == 3" disabled :value="py.acy_cheque_bank" type="text"
+                                                    class="neu-input" />
+                                                <input v-if="py.acy_mode == 3" disabled :value="py.acy_cheque_no" type="text"
+                                                    class="neu-input" />
+                                            </td>
+                                            <td class="align-middle">
+                                                {{ py.acy_remarks }}
+                                            </td>
+                                            <td class="align-middle">
+                                                <select class="neu-input neu-select" v-model="py.acy_receipt" disabled>
+                                                    <option value="1">Provisional</option>
+                                                    <option value="2">Official</option>
+                                                </select>
+                                            </td>
+                                            <td class="align-middle">
+                                                {{ py.acy_series }}
+                                            </td>
+                                            <td class="align-middle">{{ formatDateTime(py.acy_datepaid) }}</td>
+                                        </tr>
+                                        <tr v-if="!checking && !Object.keys(payment).length">
+                                            <td class="p-3 text-center" colspan="8">
+                                                <NeuLoader4/>
+                                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                                <p>The hamster took a break 💤 — No payment has been recorded</p>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="checking && !Object.keys(payment).length">
+                                            <td class="p-3 text-center" colspan="8">
+                                                <div class="m-3">
+                                                    <Loader />
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-3 d-flex gap-1 bg-secondary-subtle p-3 justify-content-end align-content-center">
+                                <span class="fw-bold">Total Amount Paid: <span class="text-success">{{ paid
+                                }}</span>
+                                </span>
+                                <span class="fw-bold">Remaining Balance: <span class="text-danger">{{ balance.toFixed(2)
+                                }}</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>

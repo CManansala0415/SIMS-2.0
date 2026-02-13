@@ -4,6 +4,7 @@ import {
     updateBorrowedBooks,
 } from "../../Fetchers.js";
 
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 const props = defineProps({
     borrowerdata: {
@@ -70,6 +71,14 @@ const updateData = () => {
     }
 
     saving.value = true
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     updateBorrowedBooks(x).then((results) => {
         if (results.status != 200) {
             // alert('Return Failed')
@@ -79,6 +88,7 @@ const updateData = () => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close()
                 location.reload()
             });
         } else {
@@ -89,6 +99,7 @@ const updateData = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close()
                 location.reload()
             });
         }
@@ -100,58 +111,58 @@ const formType = ref(0)
 </script>
 
 <template>
-    <div class="">
+    <div class="neu-card-inner p-3">
         <div class="d-flex flex-wrap flex-column">
             <p class="text-success fw-bold">Borrower Name</p>
             <p class="fw-bold">{{ fullName }}</p>
-            <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+            <p class=" fst-italic p-2 small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Check and fillout required details to complete the transaction and the book to be marked as available.
                 </span></p>
         </div>
-        <div class="d-flex flex-wrap flex-column card p-3 small-font">
+        <div class="d-flex flex-wrap flex-column neu-card p-3 small-font">
             <form @submit.prevent="updateData()" class="d-flex flex-column gap-2">
                 <div class="d-flex flex-wrap form-group">
                     <label>Borrower Name</label>
                     <input v-model="fullName" disabled type="text"
-                        class="form-control form-control-sm" />
+                        class="neu-input" />
                 </div>
                 <div class="d-flex flex-wrap form-group">
                     <label>Book Title</label>
                     <textarea v-model="borrowerData.lbrb_title" disabled onkeydown="return /[a-z, ]/i.test(event.key)"
                         type="text"
-                        class="form-control form-control-sm">
+                        class="neu-input" style="height: 200px;">
                         </textarea>
                 </div>
                 <div class="d-flex flex-wrap form-group">
                     <label>Book Author</label>
                     <textarea v-model="borrowerData.lbrb_author" disabled onkeydown="return /[a-z, ]/i.test(event.key)"
                         type="text"
-                        class="form-control form-control-sm">
+                        class="neu-input">
                         </textarea>
                     <!-- <input v-model="borrowerData.lbrb_author" disabled onkeydown="return /[a-z, ]/i.test(event.key)"
                         type="text"
-                        class="form-control form-control-sm" /> -->
+                        class="neu-input" /> -->
                 </div>
                 <div class="d-flex flex-wrap form-group">
                     <label>Date Borrowed</label>
                     <input v-model="borrowerData.lbrr_dateborrowed" disabled
                         onkeydown="return /[a-z, ]/i.test(event.key)" type="date"
-                        class="form-control form-control-sm" />
+                        class="neu-input" />
                 </div>
                 <div class="d-flex flex-wrap form-group">
                     <label>Date Returned</label>
                     <input v-model="dayReturned" @change="computeDays" required
                         onkeydown="return /[a-z, ]/i.test(event.key)" type="date"
-                        class="form-control form-control-sm" />
+                        class="neu-input" />
                 </div>
                 <div class="d-flex flex-wrap form-group">
                     <label>Days Borrowed</label>
                     <input v-model="daysBorrowed" disabled onkeydown="return /[a-z, ]/i.test(event.key)" type="text"
-                        class="form-control form-control-sm" />
+                        class="neu-input" />
                 </div>
                 <div class="mt-2">
                     <button :disabled="saving ? true : false" type="submit"
-                        class="w-100 btn btn-sm btn-success">Return Book
+                        class="neu-btn neu-green"> <font-awesome-icon icon="fa-solid fa-wrench" /> Return Book
                     </button>
                 </div>
             </form>

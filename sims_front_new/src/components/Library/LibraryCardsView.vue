@@ -14,7 +14,9 @@ import { getStudent,
          deleteEnrollment,
          getAcademicDefaults,
         getStudentFiltering } from "../Fetchers.js";
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader2 from '../snippets/loaders/NeuLoader2.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import LibraryCard from '../snippets/modal/LibraryCardModal.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router'
@@ -313,118 +315,154 @@ const getData = (result) =>{
         <div class="p-3 mb-4 border-bottom">
             <h5 class=" text-uppercase fw-bold">Library Cards</h5>
         </div>
- 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Search
-                </button>
-                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Scan QR 
-                </button>
-            </div>
+        
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font"  style="text-transform:uppercase">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Profile</th>
-                        <th style="background-color: #237a5b;" class="text-white">Full Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Details</th>
-                        <th style="background-color: #237a5b;" class="text-white">Date Enrolled</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(student).length" v-for="(stud, index) in student">
-                        <td class="align-middle">
-                            <div class="d-flex flex-column justify-content-center align-content-center pe-none">
-                                <div class="d-flex justify-content-center align-content-center w-100">
-                                    <label @click="showLink = !showLink, linkId = index" :for="index" class="m-2">
-                                        <img :src="stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
-                                            class="img-size" />
-                                    </label>
-                                </div>
-                                <div v-if="showLink"
-                                    class="d-flex flex-column justify-content-center align-content-center p-2 w-100">
-                                    <form v-if="showLink && index == linkId" @submit.prevent="upload(stud.per_id)"
-                                        method="post" enctype="multipart/form-data">
-                                        <input type="file" :id="index" class="hidden" @change="handleImage">
-                                        <button type="submit" class="btn btn-primary btn-sm m-2"
-                                            :disabled="holdSubmit ? true : false">Upload Photo</button>
-                                    </form>
-                                    <p v-if="showLink && index == linkId" class="fw-regular">{{ image.name }}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="align-middle">
-                            {{ stud.per_firstname }} {{ stud.per_middlename }} {{ stud.per_lastname }} {{
-                            stud.per_suffixname }}
-                        </td>
-                        <td class="align-middle">
-                            <div class="d-flex flex-column gap-1">
-                                <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_program"
-                                    :id="index + 'program'">
-                                    <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}
-                                    </option>
-                                </select>
-                                <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_course"
-                                    :id="index + 'course'">
-                                    <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}</option>
-                                </select>
-                                <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_gradelvl"
-                                    :id="index + 'gradelvl'">
-                                    <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}</option>
-                                </select>
-                                <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_quarter"
-                                    :id="index + 'quarter'">
-                                    <option v-for="(q, index) in quarter" :value="q.quar_id">{{ q.quar_desc }}</option>
-                                </select>
-                            </div>
-                        </td>
-                        <td class="align-middle">
-                            {{ stud.enr_dateenrolled }}
-                        </td>
-                        <td v-if="accessData[9].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button tabindex="-1" title="Library Card" @click="showForm(stud)" data-bs-toggle="modal"
-                                    data-bs-target="#librarycardmodal" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen" />
-                                </button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(student).length">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(student).length"  style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(student).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="d-flex gap-2 justify-content-between align-content-center w-75">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
+                    <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-id-card"/> Scan QR 
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ studentCount }})</span> items</p>
+            </div>
+            <div class="table-responsive border p-3 small-font"  style="text-transform:uppercase">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Profile</th>
+                            <th style="color:#555555">Full Name</th>
+                            <th style="color:#555555">Details</th>
+                            <th style="color:#555555">Date Enrolled</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(student).length" v-for="(stud, index) in student">
+                            <td class="align-middle">
+                                <div class="d-flex flex-column justify-content-center align-content-center pe-none">
+                                    <div class="d-flex justify-content-center align-content-center w-100">
+                                        <label @click="showLink = !showLink, linkId = index" :for="index" class="m-2">
+                                            <img :src="stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
+                                                class="img-size neu-card p-2" />
+                                        </label>
+                                    </div>
+                                    <div v-if="showLink"
+                                        class="d-flex flex-column justify-content-center align-content-center p-2 w-100">
+                                        <form v-if="showLink && index == linkId" @submit.prevent="upload(stud.per_id)"
+                                            method="post" enctype="multipart/form-data">
+                                            <input type="file" :id="index" class="hidden" @change="handleImage">
+                                            <button type="submit" class="btn btn-primary btn-sm m-2"
+                                                :disabled="holdSubmit ? true : false">Upload Photo</button>
+                                        </form>
+                                        <p v-if="showLink && index == linkId" class="fw-regular">{{ image.name }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                {{ stud.per_firstname }} {{ stud.per_middlename }} {{ stud.per_lastname }} {{
+                                stud.per_suffixname }}
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="p-1 d-inline-block">
+                                    {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ course.find(c => c.prog_id === stud.enr_course)?.prog_code || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ gradelvl.find(g => g.grad_id === stud.enr_gradelvl)?.grad_name || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ quarter.find(q => q.quar_id === stud.enr_quarter)?.quar_desc || '—' }}
+                                    </span>
+
+                                </div>
+                            </td>
+                            <!-- <td class="align-middle">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="p-1 d-inline-block">
+                                    {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="p-1 d-inline-block">
+                                    {{ course.find(c => c.prog_id === stud.enr_course)?.prog_code || '—' }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="p-1 d-inline-block">
+                                    {{ gradelvl.find(g => g.grad_id === stud.enr_gradelvl)?.grad_name || '—' }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="p-1 d-inline-block">
+                                    {{ quarter.find(q => q.quar_id === stud.enr_quarter)?.quar_desc || '—' }}
+                                    </span>
+                                </div>
+                            </td> -->
+                            <td class="align-middle">
+                                {{ stud.enr_dateenrolled }}
+                            </td>
+                            <td v-if="accessData[9].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button tabindex="-1" title="Library Card" @click="showForm(stud)" data-bs-toggle="modal"
+                                        data-bs-target="#librarycardmodal" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen" />
+                                    </button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(student).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                    <p class="fw-bold m-0">Nothing here yet!</p>
+                                    <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(student).length"  style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(student).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ studentCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -439,7 +477,7 @@ const getData = (result) =>{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showCard = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg small-font">
                     <LibraryCard v-if="showCard" :useriddata="userID" :studentdata="showCardData" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

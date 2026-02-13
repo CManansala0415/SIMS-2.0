@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import LibraryBook from '../snippets/modal/LibraryBookModal.vue';
 import LibraryBorrow from '../snippets/modal/LibraryBorrowModal.vue';
 import { getUserID } from "../../routes/user";
@@ -236,92 +237,100 @@ const checkAvailability = () => {
             <h5 class=" text-uppercase fw-bold">Book Shelf</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                    @click="editData('', [], 2)" type="button" class="btn btn-sm btn-primary"
-                    :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#borrowdatamodal" type="button"
-                    @click="borrowData('', [], 2)"
-                    class="btn btn-sm btn-dark" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-gear" /> Borrow
-                </button>
-
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white w-25">#</th>
-                        <th style="background-color: #237a5b;" class="text-white w-50">Book</th>
-                        <th style="background-color: #237a5b;" class="text-white w-25">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(books).length" v-for="(app, index) in books">
-                        <td class="align-middle">
-                            <p>Accession No: <span class="fw-bold text-success"> {{ app.lbrb_accession_no ?
-                                app.lbrb_accession_no : 'N/A' }}</span></p>
-                        </td>
-                        <td class="align-middle text-start">
-                            <p><span class="fw-bold">Title: </span> {{ app.lbrb_title ? app.lbrb_title : 'N/A' }}</p>
-                            <p><span class="fw-bold">Author: </span> {{ app.lbrb_author ? app.lbrb_author : 'N/A' }}</p>
-                            <p>
-                                <span class="fw-bold">Status: </span>
-                                {{ borrowedBookId.includes(app.lbrb_accession_no) ? 'Unavailable' : 'Available' }}
-                            </p>
-                            <p>
-                                <span class="fw-bold">Borrow: </span>
-                                {{ borrowedBookId.includes(app.lbrb_id) ? 'Borrowed' : 'Not Borrowed' }}
-                            </p>
 
-
-
-                        </td>
-                        <td v-if="accessData[6].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                                    @click="editData(app.lbrb_id, app, 1)" type="button" title="Edit Record"
-                                    class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-gear"/> Modify Book</button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(books).length">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(books).length">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(books).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ booksCount }})</span> items</p>
+                <div class="d-flex w-25 justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                        @click="editData('', [], 2)" type="button" class="neu-btn neu-green"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-plus"/> Add New
+                    </button>
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#borrowdatamodal" type="button"
+                        @click="borrowData('', [], 2)"
+                        class="neu-btn neu-blue" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-tag"/> Borrow
+                    </button>
+
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">#</th>
+                            <th style="color:#555555" class="w-50">Book</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(books).length" v-for="(app, index) in books">
+                            <td class="align-middle">
+                                <p>Accession No: <span class="fw-bold text-success"> {{ app.lbrb_accession_no ?
+                                    app.lbrb_accession_no : 'N/A' }}</span></p>
+                            </td>
+                            <td class="align-middle text-start">
+                                <p><span class="fw-bold">Title: </span> {{ app.lbrb_title ? app.lbrb_title : 'N/A' }}</p>
+                                <p><span class="fw-bold">Author: </span> {{ app.lbrb_author ? app.lbrb_author : 'N/A' }}</p>
+                                <p>
+                                    <span class="fw-bold">Status: </span>
+                                    {{ borrowedBookId.includes(app.lbrb_accession_no) ? 'Unavailable' : 'Available' }}
+                                </p>
+                                <p>
+                                    <span class="fw-bold">Borrow: </span>
+                                    {{ borrowedBookId.includes(app.lbrb_id) ? 'Borrowed' : 'Not Borrowed' }}
+                                </p>
+
+
+
+                            </td>
+                            <td v-if="accessData[6].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                                        @click="editData(app.lbrb_id, app, 1)" type="button" title="Edit Record"
+                                        class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-gear"/> Modify Book</button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(books).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <tr v-if="preLoading && !Object.keys(books).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <NeuLoader1 />
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-dark-gray">Prev</button>
+                        <button :disabled="Object.keys(books).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-light-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ booksCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -336,7 +345,7 @@ const checkAvailability = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg small-font">
                     <LibraryBook v-if="showModal" :bookiddata="editId" :bookdata="bookData" :modedata="modeData"
                         :useriddata="userID" :borrowdata="borrowedBookId" />
                 </div>
@@ -366,7 +375,7 @@ const checkAvailability = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showBorrow = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg small-font">
                     <LibraryBorrow v-if="showBorrow" :bookdata="books" :borrowdata="borrowedBookId" :useriddata="userID" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 // import MedicalSupplies from '../snippets/modal/MedicalSupplies.vue';
 import { getUserID } from "../../routes/user.js";
 import { useRouter, useRoute } from 'vue-router';
@@ -236,89 +237,98 @@ const editData = (mode, data) => {
             <h5 class=" text-uppercase fw-bold">Clinic Medical Supplies</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(0)"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Item ID</th>
-                        <th style="background-color: #237a5b;" class="text-white">Description</th>
-                        <th style="background-color: #237a5b;" class="text-white">Type</th>
-                        <th style="background-color: #237a5b;" class="text-white">Stocks</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(medicalSupplies).length"
-                        v-for="(meds, index) in medicalSupplies">
-                        <td class="p-3 border border-mid-gray">
-                            {{ meds.clms_id }}
-                        </td>
-                        <td class="p-3 border border-mid-gray">
-                            {{ meds.clms_desc }}
-                        </td>
-                        <td class="p-3 border border-mid-gray">
-                            <span class="fw-bold" v-show="meds.clms_itemtype == 1">Consumables</span>
-                            <span class="fw-bold" v-show="meds.clms_itemtype == 2">Medicines</span>
-                            <span class="fw-bold" v-show="meds.clms_itemtype == 3">Equipments</span>
-                        </td>
-                        <td class="p-3 border border-mid-gray">
-                            {{ meds.clms_stocks }}
-                        </td>
-                        <td v-if="accessData[12].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                                    @click="editData(1, meds)" :disabled="saving ? true : false" type="button"
-                                    title="Edit Record" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen" /></button>
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                                    @click="editData(3, meds)" :disabled="saving ? true : false" type="button"
-                                    title="Replenish Stocks" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pills" /></button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(medicalSupplies).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(medicalSupplies).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(medicalSupplies).length < 10 ? true : false"
-                        @click="paginate('next')" class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-1 d-flex gap-2 justify-content-between mb-3">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                         v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ medicalSuppliesCount }})</span>
-                    items</p>
+                <div class="d-flex flex-wrap justify-content-end">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(0)"
+                        type="button" class="neu-btn neu-blue" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3" style="text-transform:uppercase">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Item ID</th>
+                            <th style="color:#555555">Description</th>
+                            <th style="color:#555555">Type</th>
+                            <th style="color:#555555">Stocks</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(medicalSupplies).length"
+                            v-for="(meds, index) in medicalSupplies">
+                            <td class="p-3 border border-mid-gray">
+                                {{ meds.clms_id }}
+                            </td>
+                            <td class="p-3 border border-mid-gray">
+                                {{ meds.clms_desc }}
+                            </td>
+                            <td class="p-3 border border-mid-gray">
+                                <span class="fw-bold" v-show="meds.clms_itemtype == 1">Consumables</span>
+                                <span class="fw-bold" v-show="meds.clms_itemtype == 2">Medicines</span>
+                                <span class="fw-bold" v-show="meds.clms_itemtype == 3">Equipments</span>
+                            </td>
+                            <td class="p-3 border border-mid-gray">
+                                {{ meds.clms_stocks }}
+                            </td>
+                            <td v-if="accessData[12].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                                        @click="editData(1, meds)" :disabled="saving ? true : false" type="button"
+                                        title="Edit Record" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen" /></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                                        @click="editData(3, meds)" :disabled="saving ? true : false" type="button"
+                                        title="Replenish Stocks" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pills" /></button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(medicalSupplies).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(medicalSupplies).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(medicalSupplies).length < 10 ? true : false"
+                            @click="paginate('next')" class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ medicalSuppliesCount }})</span>
+                        items</p>
+                </div>
             </div>
         </div>
+
+        
     </div>
 
     <!-- Application Modal -->
@@ -331,7 +341,7 @@ const editData = (mode, data) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showForm = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <ClinicMedicalSupplies v-if="showForm" :medicalSupplyData="medicalItem" :userData="userID" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

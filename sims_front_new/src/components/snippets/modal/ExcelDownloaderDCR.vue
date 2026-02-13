@@ -6,10 +6,10 @@ import {
   getAcademicDefaults
 
 } from "../../Fetchers.js";
-import Loading1 from '../loaders/Loading1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
-// import Loader from '../loaders/Loading1.vue';
+// import Loader from '../loaders/NeuLoader2.vue';
 
 const props = defineProps({
   datefrom: {
@@ -492,19 +492,19 @@ const exportToExcel = async () => {
 <template>
   <!-- style="width: 795px;  height:1215px;" -->
   <div v-if="isLoading" class="h-100 d-flex justify-content-center align-items-center">
-    <Loading1></Loading1>
+    <NeuLoader2></NeuLoader2>
   </div>
-  <div v-else class="d-flex flex-column justify-content-center align-items-center">
-    <div class="row border w-100 mb-2 p-4 shadow">
+  <div v-else class="d-flex flex-column justify-content-center align-items-center small-font">
+    <div class="row neu-card w-100 mb-2 p-4">
       <div class="col-md-4">
-        <select @change="filterItems()" class="form-control form-control-sm" v-model="billType">
+        <select @change="filterItems()" class="neu-input neu-select" v-model="billType">
           <option value="0">All Receipts</option>
           <option value="2">Official Receipt</option>
           <option value="1">Provisional Receipt</option>
         </select>
       </div>
       <div class="col-md-4 position-relative">
-        <input type="text" class="form-control form-control-sm" v-model="itemDesc" @keyup="searchItem()"
+        <input type="text" class="neu-input" v-model="itemDesc" @keyup="searchItem()"
           @focus="showSearch" @focusout="showSearch" placeholder="Search Item Here"
           :disabled="billType == 2 ? false : true" />
 
@@ -529,7 +529,7 @@ const exportToExcel = async () => {
       </div>
 
       <div class="col-md-4" @change="filterItems()">
-        <select class="form-control form-control-sm" v-model="orderBy">
+        <select class="neu-input neu-select"" v-model="orderBy">
           <option value="0">Default</option>
           <option value="1">Series Ascending Order</option>
           <option value="2">Series Descending Order</option>
@@ -537,9 +537,9 @@ const exportToExcel = async () => {
       </div>
 
     </div>
-    <div class="row border w-100  mb-3 p-4 shadow">
+    <div class="row neu-card w-100  mb-3 p-4 ">
       <div class="col-md-3">
-        <select v-model="actProgram" class="form-control form-select-sm" @change="filterItems()">
+        <select v-model="actProgram" class="neu-input neu-select" @change="filterItems()">
           <option value="0">-- Select All Program --</option>
           <option :value="prog.dtype_id" v-for="(prog, index) in program">
             {{ prog.dtype_desc }}
@@ -547,7 +547,7 @@ const exportToExcel = async () => {
         </select>
       </div>
       <div class="col-md-3">
-        <select v-model="actGradelvl" class="form-control form-select-sm" @change="filterItems()">
+        <select v-model="actGradelvl" class="neu-input neu-select" @change="filterItems()">
           <option value="0">-- Select All Grade Level --</option>
           <template v-for="(grad, index) in gradelvl">
             <option v-if="actProgram == grad.grad_dtypeid" :value="grad.grad_id">
@@ -557,7 +557,7 @@ const exportToExcel = async () => {
         </select>
       </div>
       <div class="col-md-3">
-        <select v-model="actCourse" class="form-control form-select-sm" @change="filterItems()">
+        <select v-model="actCourse" class="neu-input neu-select" @change="filterItems()">
           <option value="0">-- Select All Course</option>
           <template v-for="(cour, index) in course">
             <option v-if="actProgram == cour.prog_progtype" :value="cour.prog_id">
@@ -567,7 +567,7 @@ const exportToExcel = async () => {
         </select>
       </div>
       <div class="col-md-3">
-        <select v-model="actSection" class="form-control form-select-sm" @change="filterItems()">
+        <select v-model="actSection" class="neu-input neu-select" @change="filterItems()">
           <option value="0">-- Select All Section</option>
           <template v-for="(sec, index) in section">
             <option :value="sec.sec_id">{{ sec.sec_name }}</option>
@@ -575,14 +575,14 @@ const exportToExcel = async () => {
         </select>
       </div>
     </div>
-    <div class="d-flex flex-column gap-2 justify-content-center align-items-center p-3 border p-2 w-100" id="main-table">
+    <div class="neu-card-inner d-flex flex-column gap-2 justify-content-center align-items-center p-3 border p-2 w-100 text-dim" id="main-table">
       <!-- <select class="form-select form-select-sm w-50 mb-4" v-model="orientation">
         <option value="portrait">Portrait</option>
         <option value="landscape">Landscape</option>
       </select>   -->
       <div class="text-center mb-4">
         <!-- Title -->
-        <h5 class="mb-0 fw-bold text-uppercase">Collection List</h5>
+        <h5 class="mb-0 fw-bold text-uppercase text-dim">Collection List</h5>
         <!-- Date -->
         <div class="fw-semibold">
           From {{ dateFromString }} &nbsp; → &nbsp;
@@ -593,7 +593,7 @@ const exportToExcel = async () => {
           {{ closingSeries }}
         </div>
       </div>
-      <table class="table table-bordered table-striped table-sm align-middle">
+      <table class="neu-table-flat">
         <thead class="text-center">
           <tr>
             <th>Receipt</th>
@@ -660,7 +660,7 @@ const exportToExcel = async () => {
             </td>
           </tr>
           <tr v-if="!Object.keys(dcrItems).length">
-            <td colspan="13">No Items Found</td>
+            <td colspan="13"  class="text-center">No Items Found</td>
           </tr>
         </tbody>
 
@@ -709,8 +709,8 @@ const exportToExcel = async () => {
       </div>
     </div>
     <div class="d-flex justify-content-end mt-2 ">
-      <button @click="exportToExcel()" type="button" class="btn btn-sm btn-primary">
-        <i class="mr-2 fa-solid fa-file-excel"></i>Download Excel File
+      <button @click="exportToExcel()" type="button" class="neu-btn neu-green p-2">
+        <font-awesome-icon icon="fa-solid fa-file-excel"/> Download Excel File
       </button>
     </div>
   </div>

@@ -268,7 +268,7 @@ const settlement = () => {
             <Loader1 />
         </div>
 
-        <div v-else>
+        <div v-else> 
             <!-- ACCOUNT SELECT -->
             <div class="w-100 p-3 border shadow-lg text-start mb-3" v-if="!showPaymentModal">
                 <span class="fw-bold">Accounts</span>

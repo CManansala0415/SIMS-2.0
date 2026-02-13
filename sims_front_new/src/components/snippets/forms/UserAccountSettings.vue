@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../loaders/Loading1.vue';
-import AccessForm from '../modal/UserAccountAccess.vue';
+import NeuLoader1 from '../loaders/NeuLoader1.vue';
+import UserAccountAccess from '../modal/UserAccountAccess.vue';
+import NeuLoader4 from '../loaders/NeuLoader4.vue'
 
 import {
     getCommandUsers,
@@ -71,6 +72,14 @@ const banAccount = (id) => {
         updated_by: userID.value,
         mode: 2
     }
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     updateCommandUsers(x).then((results) => {
         if (results.status != 200) {
             // alert('Update Failed')
@@ -80,6 +89,7 @@ const banAccount = (id) => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close()
                 location.reload()
             });
         } else {
@@ -90,6 +100,7 @@ const banAccount = (id) => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close()
                 location.reload()
             });
         }
@@ -120,6 +131,14 @@ const handleAccount = async () => {
             password: password.value,
             password_confirmation: password.value
         }
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
         addCommandUsers(x).then((results) => {
             if (results.status != 200) {
                 // alert('Update Failed')
@@ -129,6 +148,7 @@ const handleAccount = async () => {
                     text: "Unknown error occured, try again later",
                     icon: "error"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             } else {
@@ -139,6 +159,7 @@ const handleAccount = async () => {
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             }
@@ -151,6 +172,14 @@ const handleAccount = async () => {
             mode: 1,
             updated_by: userID.value
         }
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
         updateCommandUsers(x).then((results) => {
             if (results.status != 200) {
                 // alert('Update Failed')
@@ -160,6 +189,7 @@ const handleAccount = async () => {
                     text: "Unknown error occured, try again later",
                     icon: "error"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             } else {
@@ -170,6 +200,7 @@ const handleAccount = async () => {
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             }
@@ -188,86 +219,96 @@ const accessData = async (data) => {
 
 </script>
 <template>
-    <div>
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData()"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-                <button class="btn btn-sm btn-info text-white" :disabled="preLoading ? true : false"
-                    @click="$emit('close')"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm" /> Back
-                </button>
-            </div>
+    <div class="small-font">
+        <div class="p-3">
+            <p class="text-uppercase fw-bold">User Account Settings</p>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">#</th>
-                        <th style="background-color: #237a5b;" class="text-white">Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Email</th>
-                        <th style="background-color: #237a5b;" class="text-white">Status</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(users).length" v-for="(app, index) in users">
-                        <td class="align-middle">
-                            {{ app.id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.name }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.email }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.status == 1 ? 'Active' : 'Inactive' }}
-                        </td>
-                        <td class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app)"
-                                    type="button" title="Edit Record" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen" /></button>
-                                <button data-bs-toggle="modal" data-bs-target="#accessdatamodal"
-                                    @click="accessData(app)" type="button" title="Edit Record"
-                                    class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-key" /></button>
-                                <button @click="banAccount(app.id)" type="button" title="Delete Record"
-                                    class="btn btn-secondary btn-sm"> <font-awesome-icon
-                                        icon="fa-solid fa-trash" /></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(users).length">
-                        <td class="p-3 text-center" colspan="5">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(users).length">
-                        <td class="p-3 text-center" colspan="5">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(users).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-if="preLoading">
+            <NeuLoader1/>
+        </div>
+        <div v-else>
+            <div class="p-3 d-flex gap-1 justify-content-between">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ usersCount }})</span> items</p>
+                <div class="d-flex w-25 justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData()"
+                        type="button" class="neu-btn neu-green" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                    <button class="neu-btn neu-blue" :disabled="preLoading ? true : false"
+                        @click="$emit('close')"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm" /> Back
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">#</th>
+                            <th style="color:#555555">Name</th>
+                            <th style="color:#555555">Email</th>
+                            <th style="color:#555555">Status</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(users).length" v-for="(app, index) in users">
+                            <td class="align-middle">
+                                {{ app.id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.name }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.email }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.status == 1 ? 'Active' : 'Inactive' }}
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app)"
+                                        type="button" title="Edit Record" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen" /></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#accessdatamodal"
+                                        @click="accessData(app)" type="button" title="Edit Record"
+                                        class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-key" /></button>
+                                    <button @click="banAccount(app.id)" type="button" title="Delete Record"
+                                        class="neu-btn-sm neu-white"> <font-awesome-icon
+                                            icon="fa-solid fa-trash" /></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(users).length">
+                            <td class="p-3 text-center" colspan="5">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(users).length">
+                            <td class="p-3 text-center" colspan="5">
+                                <div class="m-3">
+                                    <NeuLoader1 />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(users).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ usersCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -281,27 +322,27 @@ const accessData = async (data) => {
                     <h5 class="modal-title" id="staticBackdropLabel">Application</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <form @submit.prevent="handleAccount" class="d-flex flex-column align-items-start">
+                <div class="modal-body neu-bg small-font">
+                    <form @submit.prevent="handleAccount" class="d-flex flex-column align-items-start neu-card p-3">
                         <div class="mb-3 d-flex flex-column align-items-start w-100">
                             <label for="username" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" aria-describedby="name" v-model="name"
+                            <input type="text" class="neu-input" id="name" aria-describedby="name" v-model="name"
                                 required>
                         </div>
                         <div class="mb-3 d-flex flex-column align-items-start w-100">
                             <label for="username" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" aria-describedby="email" v-model="email"
+                            <input type="email" class="neu-input" id="email" aria-describedby="email" v-model="email"
                                 required>
                         </div>
                         <div v-if="addNew" class="w-100">
                             <div class="mb-3 d-flex flex-column align-items-start w-100">
                                 <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" aria-describedby="password"
+                                <input type="password" class="neu-input" id="password" aria-describedby="password"
                                     v-model="password" required>
                             </div>
                             <div class="mb-3 d-flex flex-column align-items-start w-100">
                                 <label for="confirm" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirm" aria-describedby="confirm"
+                                <input type="password" class="neu-input" id="confirm" aria-describedby="confirm"
                                     v-model="confirmpassword" required>
                             </div>
                         </div>
@@ -314,9 +355,9 @@ const accessData = async (data) => {
                                 Password Matched
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100"
+                        <button type="submit" class="neu-btn neu-green p-2"
                             :disabled="(saving || (password != confirmpassword || !password || !confirmpassword)) && addNew ? true : false">
-                            Save
+                            <font-awesome-icon icon="fa-solid fa-gear"/> Register
                         </button>
                     </form>
                 </div>
@@ -344,8 +385,8 @@ const accessData = async (data) => {
                     <h5 class="modal-title" id="staticBackdropLabel">Key Access</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @click="accessKey = false"></button>
                 </div>
-                <div class="modal-body">
-                    <AccessForm v-if="accessKey"  :accountDetail="accessModuleData" :userIdData="userID"/>
+                <div class="modal-body neu-bg">
+                    <UserAccountAccess v-if="accessKey"  :accountDetail="accessModuleData" :userIdData="userID"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

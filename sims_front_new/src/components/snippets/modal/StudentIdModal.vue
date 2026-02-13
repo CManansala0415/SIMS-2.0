@@ -5,7 +5,7 @@ import {
     addStudentIdentification
 } from "../../Fetchers.js";
 import { getUserID } from "../../../routes/user.js";
-import Loader from '../loaders/loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 const props = defineProps({
     studentData: {
@@ -21,6 +21,7 @@ const userID = ref('')
 const saving = ref(false)
 const preloading = ref(false)
 const identity = ref([])
+const fullName = ref('')
 onMounted(() => {
     preloading.value = true
     getUserID().then((results) => {
@@ -29,8 +30,15 @@ onMounted(() => {
             identity.value = results
             customNumber.value = identity.value.ident_identification
             studentLrn.value = identity.value.ident_lrn
+           fullName.value = (
+                studentInfo.value.per_firstname + ' ' +
+                (studentInfo.value.per_middlename ? studentInfo.value.per_middlename + ' ' : '') +
+                studentInfo.value.per_lastname +
+                (studentInfo.value.per_suffixname ? ' ' + studentInfo.value.per_suffixname : '')
+            ).trim()
+
             preloading.value = false
-            console.log(identity.value)
+            
         })
     })
 
@@ -87,35 +95,34 @@ const save = () => {
 
 <template>
     <div class="d-flex flex-column p-2 gap-2">
-        <Loader v-if="preloading"/>
+        <NeuLoader2 v-if="preloading"/>
         
         <form v-else @submit.prevent="save" class="flex flex-col gap-2 overflow-auto">
             <div class="d-flex flex-column">
                 <div class="d-flex flex-column">
                     <p class="fw-bold">Name</p>
-                    <p class="p-2 bg-secondary-subtle">{{ studentInfo.per_firstname }} {{ studentInfo.per_middlename }} {{
-                        studentInfo.per_lastname }} {{ studentInfo.per_suffixname }}</p>
+                    <input class="neu-input" :value="fullName" disabled="true"/>
                 </div>
                 <div class="d-flex flex-column">
                     <p class="fw-bold">Contact No.</p>
-                    <p v-if="studentInfo.per_contact" class="p-2 bg-secondary-subtle">{{ studentInfo.per_contact }}</p>
+                    <input v-if="studentInfo.per_contact" class="neu-input" :value=" studentInfo.per_contact" disabled="true"/>
                     <p v-else class="p-2 bg-secondary-subtle">N/A</p>
                 </div>
                 <div class="d-flex flex-column">
                     <p class="fw-bold">Email</p>
-                    <p v-if="studentInfo.per_email" class="p-2 bg-secondary-subtle">{{ studentInfo.per_email }}</p>
+                    <input v-if="studentInfo.per_email" class="neu-input" :value="studentInfo.per_email"/>
                     <p v-else class="p-2 bg-secondary-subtle">N/A</p>
                 </div>
                 <div class="d-flex flex-column border p-2">
                     <p class="fw-bold">LRN (for SHS only)</p>
                     <input v-model="studentLrn" :disabled="saving || identity.ident_lrn? true : false" placeholder="Ex. 20222121" type="text"
-                        class="form-control" tabindex="-1" />
+                        class="neu-input" tabindex="-1" />
                     <!-- <button type="button" :disabled="saving?true:false" class="p-2 bg-teal-500 text-white rounded-md disabled:opacity-70 disabled:cursor-not-allowed">Generate Identification</button> -->
                 </div>
                 <div class="d-flex flex-column border p-2">
                     <p class="fw-bold">Student Identification Number</p>
                     <input v-model="customNumber" :disabled="saving || identity.ident_identification? true : false" placeholder="Ex. 20222121" type="text"
-                        class="form-control" tabindex="-1" />
+                        class="neu-input" tabindex="-1" />
                     <!-- <button type="button" :disabled="saving?true:false" class="p-2 bg-teal-500 text-white rounded-md disabled:opacity-70 disabled:cursor-not-allowed">Generate Identification</button> -->
                 </div>
 
@@ -125,7 +132,7 @@ const save = () => {
                             it cannot be modified and it is for one time generation only.
                         </span></p>
                     <button v-if="!identity.ident_identification" type="submit" :disabled="saving ? true : false"
-                        class="btn btn-sm btn-primary w-100">Save
+                        class="neu-btn neu-blue w-100">Save
                         Identification</button>
                 </div>
             </div>

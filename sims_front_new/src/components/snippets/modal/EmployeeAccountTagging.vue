@@ -2,7 +2,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Loader from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     getCommandUsers,
     employeeAccountTag,
@@ -142,14 +142,14 @@ const saveTag = (mode) =>{
 
 </script>
 <template>
-    <Loader v-if="preLoading"/>
-    <div v-else class="d-flex gap-2 flex-column">
-        <input class="form-control form-control-sm" disabled :value="fullName"/>
-        <select class="form-select form-select-sm" v-model="accountId" :disabled="employee.emp_accid? true:false">
+    <NeuLoader2 v-if="preLoading"/>
+    <div v-else class="d-flex gap-2 flex-column neu-card p-3">
+        <input class="neu-input" disabled :value="fullName"/>
+        <select class="neu-input neu-select" v-model="accountId" :disabled="employee.emp_accid? true:false">
             <option value="0" disabled>--Select Account--</option>
             <option v-for="(acc, index) in accounts" :value="acc.id">{{ acc.name }}</option>
         </select>
-        <button v-if="!employee.emp_accid" class="btn btn-sm btn-success" @click="saveTag(1)">Tag Account</button>
-        <button v-else class="btn btn-sm btn-danger" @click="saveTag(2)">Remove Account</button>
+        <button v-if="!employee.emp_accid" class="neu-btn neu-green p-2" @click="saveTag(1)"><font-awesome-icon icon="fa-solid fa-floppy-disk"  /> Tag Account</button>
+        <button v-else class="neu-btn neu-red p-2" @click="saveTag(2)"><font-awesome-icon icon="fa-solid fa-trash"  /> Remove Account</button>
     </div>
 </template>

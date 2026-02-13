@@ -303,12 +303,22 @@ const handleLogout = async () => {
     confirmButtonText: "Yes, Im Going Out!"
   }).then(async(result) => {
     if (result.isConfirmed) {
+      Swal.fire({
+          title: "Loging Out",
+          text: "Please wait while we clean your trace",
+          allowOutsideClick: false,
+          didOpen: () => {
+              Swal.showLoading();
+          }
+      });
+
       await axios.post('/logout').then(()=>{
         Swal.fire({
           title: "Logged Out!",
           text: "You Have Been Logged Out",
           icon: "success"
         }).then(()=>{
+          Swal.close()
           router.push("/");
         });
       });
@@ -418,15 +428,15 @@ const active_class = ref("nav-static border p-2 active");
 
 </script>
 <template>
-  <div class="container border rounded-3 shadow p-5 flex-column bg-white">
+  <div class="container border rounded-3 shadow p-5 flex-column neu-card">
 
-    <nav class="navbar navbar-light bg-light mb-5">
+    <nav class="navbar mb-5">
       <div class="container-fluid">
 
         <div class="flex-column mb-2">
           <div class="row">
             <div class="col d-flex justify-content-start">
-              <h3 class="fw-bold">SIMS</h3>
+              <h3 class="fw-bold text-green">SIMS</h3>
             </div>
           </div>
           <div class="row">
@@ -462,7 +472,7 @@ const active_class = ref("nav-static border p-2 active");
                 data-bs-toggle="dropdown" aria-expanded="false">
                 Academic Status
               </button>
-              <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="notifications">
+              <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="notifications">
                 <li class="dropdown-item">SY {{ yrFromto }}-{{ yrFromInfo }}</li>
                 <li class="dropdown-item">{{ semInfo }} Semester</li>
                 <li class="dropdown-item">Enrollment is {{ enrollmentInfo }}</li>
@@ -474,7 +484,7 @@ const active_class = ref("nav-static border p-2 active");
           <span v-else class="fw-regular">Welcome <span class="fw-bold text-uppercase">{{ userName }}</span></span>
         </div>
       </div>
-      <div v-if="path != '/'" class="container w-100 m-0 border mb-4 mt-2">
+      <div v-if="path != '/'" class="container neu-card w-100 m-0 border p-2 mb-4 mt-2">
         <div class="row g-2">
           <div class="col-12 d-flex justify-content-between">
             <div v-if="fetchingUserAccess" class="d-flex gap-2 align-content-center flex-wrap">
@@ -488,13 +498,22 @@ const active_class = ref("nav-static border p-2 active");
               </nav>
             </div>
             <div v-else class="d-flex gap-2 align-content-center flex-wrap">
+              <!-- <div class="form-group col">
+                  <select class="neu-nav-btn neu-select">
+                      <option v-for="(admin, index) in administrativeAccess">
+                        <router-link :to="admin.link" @click="switchItem(admin.useracc_category,admin.useracc_modulecode) " class="dropdown-item">
+                          {{ admin.description }}
+                        </router-link>
+                      </option>
+                  </select>
+              </div> -->
               <nav class="nav gap-2 p-2">
                 <div class="dropdown">
                   <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
                     data-bs-toggle="dropdown" aria-expanded="false">
                     General
                   </button>
-                  <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                  <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                     <li><router-link to="/home" class="dropdown-item" href="#">Announcement</router-link></li>
                   </ul>
                 </div>
@@ -503,18 +522,12 @@ const active_class = ref("nav-static border p-2 active");
                     v-if="administrative > 0" data-bs-toggle="dropdown" aria-expanded="false">
                     Administrative
                   </button>
-                  <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                  <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                     <li v-for="(admin, index) in administrativeAccess">
                       <router-link :to="admin.link" @click="switchItem(admin.useracc_category,admin.useracc_modulecode) " class="dropdown-item">
                         {{ admin.description }}
                       </router-link>
                     </li>
-                    <!-- <li><router-link to="/registrar-application" class="dropdown-item"
-                        @click="switchItem(1, 1)">Registrar</router-link></li>
-                    <li><router-link to="/registrar-library-books" class="dropdown-item"
-                        @click="switchItem(1, 2)">Library</router-link></li>
-                    <li><router-link to="/registrar-clinical-students" class="dropdown-item"
-                        @click="switchItem(1, 3)">Clinic</router-link></li> -->
                   </ul>
                 </div>
                 <div class="dropdown">
@@ -522,14 +535,10 @@ const active_class = ref("nav-static border p-2 active");
                     v-if="transactions > 0" data-bs-toggle="dropdown" aria-expanded="false">
                     Transactions
                   </button>
-                  <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                  <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                     <li v-for="(transac, index) in transactionsAccess">
                       <router-link :to="transac.link" @click="switchItem(transac.useracc_category,transac.useracc_modulecode) " class="dropdown-item"
                         href="#">{{ transac.description }}</router-link></li>
-                    <!-- <li><router-link to="/accounting-items" @click="switchItem(2, 1)" class="dropdown-item"
-                        href="#">Accounting</router-link></li>
-                    <li><router-link to="/accounting-billing" @click="switchItem(2, 2)" class="dropdown-item"
-                        href="#">Billing / Cashier</router-link></li> -->
                   </ul>
                 </div>
                 <div class="dropdown">
@@ -537,15 +546,10 @@ const active_class = ref("nav-static border p-2 active");
                     data-bs-toggle="dropdown" aria-expanded="false">
                     Academics
                   </button>
-                  <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                  <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                     <li v-for="(academe, index) in academicsAccess">
                       <router-link :to="academe.link" @click="switchItem(academe.useracc_category,academe.useracc_modulecode) " class="dropdown-item"
                       href="#">{{ academe.description }}</router-link></li>
-                    <!-- <li><router-link to="/faculty-classes" @click="switchItem(3, 1)" class="dropdown-item"
-                        href="#">Faculty</router-link></li>
-                    <li><router-link to="" @click="switchItem(3, 1)" class="dropdown-item"
-                        href="#">Students</router-link>
-                    </li> -->
                   </ul>
                 </div>
               </nav>
@@ -559,7 +563,7 @@ const active_class = ref("nav-static border p-2 active");
                       data-bs-toggle="dropdown" aria-expanded="false">
                       Menu
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                       <li>
                         <router-link @click="checkPath('/registrar-application')" v-if="accessData[0].useracc_grant == 1" to="/registrar-application" class="dropdown-item" title="Student Application"
                           tabindex="-1">
@@ -619,7 +623,7 @@ const active_class = ref("nav-static border p-2 active");
                       data-bs-toggle="dropdown" aria-expanded="false">
                       Menu
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                       <li>
                         <router-link @click="checkPath('/registrar-library-books')" v-if="accessData[7].useracc_grant == 1" to="/registrar-library-books" class="dropdown-item" title="Book Inventory"
                           tabindex="-1">
@@ -654,7 +658,7 @@ const active_class = ref("nav-static border p-2 active");
                       data-bs-toggle="dropdown" aria-expanded="false">
                       Menu
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                       <li>
                         <router-link @click="checkPath('/registrar-clinical-students')" v-if="accessData[11].useracc_grant == 1" to="/registrar-clinical-students" class="dropdown-item" title="Clinical Records"
                           tabindex="-1">
@@ -683,7 +687,7 @@ const active_class = ref("nav-static border p-2 active");
                       data-bs-toggle="dropdown" aria-expanded="false">
                       Menu
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                       <li>
                         <router-link @click="checkPath('/daily-collections-accounting')" v-if="accessData[14].useracc_grant == 1" to="/daily-collections-accounting" class="dropdown-item" title="items" tabindex="-1">
                           <p class="m-2">Daily Collections</p>
@@ -725,7 +729,7 @@ const active_class = ref("nav-static border p-2 active");
                       data-bs-toggle="dropdown" aria-expanded="false">
                       Menu
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                       <li>
                         <router-link @click="checkPath('/daily-collections-cashier')" v-if="accessData[19].useracc_grant == 1" to="/daily-collections-cashier" class="dropdown-item" title="request" tabindex="-1">
                           <p class="m-2">Daily Collections</p>
@@ -752,7 +756,7 @@ const active_class = ref("nav-static border p-2 active");
                       data-bs-toggle="dropdown" aria-expanded="false">
                       Menu
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuButton2">
+                    <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
                       <!-- <li>
                         <router-link to="/faculty-classes" class="dropdown-item" tabindex="-1">
                           <p class="m-2">Faculty Loadings</p>
@@ -783,7 +787,7 @@ const active_class = ref("nav-static border p-2 active");
                 </nav>
               </div>
               <div class="d-flex align-content-center flex-wrap">
-                <button type="button" @click="handleLogout()" class="btn btn-sm btn-danger p-2" title="items"
+                <button type="button" @click="handleLogout()" class="neu-btn neu-red p-2" title="items"
                   :disabled="isLoading ? true : false" tabindex="-1"><font-awesome-icon icon="fa-solid fa-power-off" />
                   Logout
                 </button>

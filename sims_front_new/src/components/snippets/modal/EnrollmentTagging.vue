@@ -13,9 +13,10 @@ import {
     getCommandUpdateCurriculum, 
     getAcademicStatus, 
     getArchiveMerge } from "../../Fetchers.js";
-import Loader from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 import { useRouter, useRoute } from 'vue-router'
+import NeuLoader4 from '../loaders/NeuLoader4.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -68,7 +69,7 @@ const milestoneCompData = ref([])
 const milestoneCompHeader = ref([])
 const milestoneCompLoading = ref(true)
 const sectionSlots = ref([])
-
+const forUpdate = ref(false)
 onMounted(async () => {
     window.stop()
     enr_section.value = studentData.value.enr_section
@@ -178,11 +179,13 @@ onMounted(async () => {
                                 addedSubject.value.push(e)
                                 addedSubjectId.value.push(e.subj_id)
                             })
-                            
+
+                            forUpdate.value = addedSubject.value[0].mi_id? true:false
                         }
 
                         
-                       
+  
+                        
                         preloading.value = false
                         milestoneLoading.value = false
                         loadCurrItems.value = false
@@ -437,58 +440,60 @@ const filterCurriculum = () => {
     })
 
 }
+
+
 </script>
 
 <template>
     <div class="d-flex flex-wrap w-100 ">
         <div v-if="preloading"
             class="d-flex w-100 mt-4 justify-content-center align-content-center">
-            <Loader />
+            <NeuLoader2 />
         </div>
-        <div v-else class="w-100">
+        <div v-else class="w-100 small-font">
             <ul v-if="!saving" class="nav nav-tabs" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#ctab1" type="button"
+                    <button class="border-0 nav-link active" id="tab1" data-bs-toggle="tab" data-bs-target="#ctab1" type="button"
                         role="tab" aria-controls="ctab1" aria-selected="true">Academic Track</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab2" data-bs-toggle="tab" data-bs-target="#ctab2" type="button"
+                    <button class="border-0 nav-link" id="tab2" data-bs-toggle="tab" data-bs-target="#ctab2" type="button"
                         role="tab" aria-controls="ctab2" aria-selected="false">Currently Taking</button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab3" data-bs-toggle="tab" data-bs-target="#ctab3" type="button"
+                    <button class="border-0 nav-link" id="tab3" data-bs-toggle="tab" data-bs-target="#ctab3" type="button"
                         role="tab" aria-controls="ctab3" aria-selected="false">Permanent Record / Already Taken</button>
                 </li>
             </ul>
             <!-- <div v-if="activeEnrollment">
                 <span>Enrollment is already finished, updates are not allowed during this phase.</span>
             </div> -->
-            <div class="tab-content" id="myTabContent">
+            <div class="tab-content rounded-top-0 rounded-bottom-3 border-0 text-dim" id="myTabContent">
                 <div v-if="!activeEnrollment" class="tab-pane fade show active" id="ctab1" role="tabpanel" aria-labelledby="tab1">
                      <div class="container overflow-hidden p-3">
                         <span>Enrollment is already finished, updates are not allowed during this phase.</span>
                      </div>
                 </div>
-                <div v-else class="tab-pane fade show active" id="ctab1" role="tabpanel" aria-labelledby="tab1">
+                <div v-else class="tab-pane fade show active neu-bg neu-card rounded-top-0" id="ctab1" role="tabpanel" aria-labelledby="tab1">
                     <div v-if="!saving">
                         <div class="container overflow-hidden p-3">
                             <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2">
-                                <div class="col-12 border-bottom">
-                                    <div class="p-3">
-                                        <span class="fw-bold border bg-info text-white p-2 rounded-3">SUBJECTS TO BE ENROLLED</span>
+                                <!-- <div class="col-12 border-bottom">
+                                    <div class="p-3 neu-card p-2 rounded-3 neu-pastel-blue text-white">
+                                        <span class="fw-bold">SUBJECTS TO BE ENROLLED</span>
                                     </div>
-                                </div> 
-                                <div class="col-12">
-                                    <div class="p-3 d-flex flex-column">
-                                        <span class="fw-bold">Course</span>{{ e.prog_name }}
+                                </div>  -->
+                                <div class="col-12 border-bottom mb-3">
+                                    <div class="p-3 neu-card p-2 rounded-3 neu-pastel-purple text-white">
+                                         <span class="fw-bold">{{ e.prog_name }}</span>
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="p-3 border shadow d-flex flex-column gap-2 card">
+                                    <div class="p-3 neu-card d-flex flex-column gap-2 h-100">
                                         <span class="fw-bold">Curriculum</span>
-                                        <select class="form-control form-select-sm w-100" v-model="enr_curriculum"
+                                        <select class="neu-input neu-select" v-model="enr_curriculum"
                                             @change="setData('curriculum', enr_curriculum)">
-                                            <option value="">-- Select Here --</option>
+                                            <option disabled value="">-- Select Here --</option>
                                             <option v-for="(c, index) in curriculumFilter" :value="c.curr_id">{{ c.curr_code
                                                 }}
                                             </option>
@@ -496,13 +501,13 @@ const filterCurriculum = () => {
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="p-3 border shadow card d-flex h-100">
-                                        <div class="d-flex justify-content-between">
+                                    <div class="p-3 neu-card d-flex h-100">
+                                        <div class="d-flex justify-content-between w-100">
                                             <div class="w-100 d-flex flex-column justify-content-center align-items-center">
                                                 <span class="fw-bold mb-2">Section</span>
-                                                <select class="form-control form-select-sm w-100" v-model="enr_section"
+                                                <select class="neu-input neu-select" v-model="enr_section"
                                                     @change="setData('section', enr_section)">
-                                                    <option disabled="">-- Select Here --</option>
+                                                    <option disabled value="">-- Select Here --</option>
                                                     <option v-for="(s, index) in sectionSlots" :value="s.sec_id">{{ s.sec_name }} 
                                                     </option>
                                                 </select>
@@ -523,172 +528,176 @@ const filterCurriculum = () => {
                             </div>
                         </div>
                         <div class="container overflow-hidden p-3">
-                            <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2">
-                                <div class="col-12 mb-2">
-                                    <div class="p-3 border bg-body-secondary">
-                                        <span class="fw-bold">Subjects Enrolled</span>
+                            <div v-for="(e, index) in enrolleeData" class="d-flex flex-column neu-card-inner">
+                                <div class="w-100 mt-2">
+                                    <div class="p-3">
+                                        <span class="fw-bold">Subjects to be Enrolled</span>
                                     </div>
                                 </div>
-                                <div class="col-5">
-                                    <div class="d-flex flex-column gap-2 ">
-                                        <input v-model="searchSubject" class="form-control form-control-sm" @keyup="filteredSubject"
-                                            placeholder="Search Subjects Here..." />
-                                        <div class="p-3 card">
-                                            <div class="table-responsive border p-2 small-font" style="height: 500px;">
-                                                <table class="table table-hover">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Select Subjects</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-if="!Object.keys(subjectFilter).length">
-                                                            <td class="align-middle text-start">
-                                                                No Data Found
-                                                            </td>
-                                                        </tr>
-                                                        <tr v-else v-for="(s, index) in subjectFilter"
-                                                            @click="addSubject(s)">
-                                                            <td
-                                                                :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start bg-secondary-subtle text-black' : 'align-middle text-start bg-white text-black'">
-                                                                <p class="fw-bold ">{{ s.subj_code }}</p>
-                                                                <p class=" fst-italic">{{ s.subj_name }}</p>
-                                                            </td>
-                                                        </tr>
+                                <div class="w-100 d-flex gap-3 p-3">
+                                    <div class="w-50 neu-card p-3">
+                                        <div class="d-flex flex-column gap-2 ">
+                                            <input v-model="searchSubject" class="neu-input" @keyup="filteredSubject"
+                                                placeholder="Search Subjects Here..." />
+                                            <div class="p-3 neu-card-inner">
+                                                <div class="table-responsive" style="height: 500px;">
+                                                    <table class="neu-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Select Subjects</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-if="!Object.keys(subjectFilter).length">
+                                                                <td class="align-middle text-start">
+                                                                    No Data Found
+                                                                </td>
+                                                            </tr>
+                                                            <tr v-else v-for="(s, index) in subjectFilter"
+                                                                @click="addSubject(s)">
+                                                                <td
+                                                                    :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start neu-pastel-gray' : 'align-middle text-start '">
+                                                                    <p class="fw-bold ">{{ s.subj_code }}</p>
+                                                                    <p class=" fst-italic">{{ s.subj_name }}</p>
+                                                                </td>
+                                                            </tr>
 
-                                                    </tbody>
-                                                </table>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-7">
-                                    <div class="d-flex flex-column">
-                                        <div class="d-flex flex-column card">
-                                            <!-- <div class="shadow p-3">
-                                                <span class="fw-bold">Subjects and Units Applied</span>
-                                            </div> -->
-                                            <div class="container overflow-auto p-3" style="height: 578px;">
-                                                <div v-if="!Object.keys(addedSubject).length && !loadCurrItems" class="p-1">
-                                                <div class="shadow p-3 rounded-3 text-center border small-font fw-bold text-danger">
-                                                    No Subjects Added
-                                                </div>
-                                                </div>
-                                                <div v-if="!Object.keys(addedSubject).length && loadCurrItems" class="p-1">
-                                                <div class="shadow p-3 rounded-3 text-center border small-font fw-bold">
-                                                    <Loader/>
-                                                </div>
-                                                </div>
-                                                <div v-if="Object.keys(addedSubject).length && !loadCurrItems" v-for="(a, index) in addedSubject" class="row gy-1 gx-1 mb-1">
-                                                    <div class="col-12">
-                                                        <div class="p-3 border text-start">
-                                                            <div class="w-100 small-font">
-                                                                <div class="d-flex flex-column">
-                                                                    <div class="border-bottom d-flex flex-column text-start mb-3">
-                                                                        <span class="mt-3 fw-bold">{{ a.subj_code }}</span>
-                                                                        <span class="mb-3 fst-italic">{{ a.subj_name }}</span>
-                                                                    </div>
-                                                                    <div class="input-group input-group-sm mb-1">
-                                                                        <span class=" input-group-text">Lecture Units</span>
-                                                                        <input v-model="a.subj_lec_units" type="text" class="form-control form-control-sm" disabled>
-                                                                    </div>
-                                                                    <div class="input-group input-group-sm mb-1">
-                                                                        <span class=" input-group-text">Laboratory Units</span>
-                                                                        <input v-model="a.subj_lab_units" type="text" class="form-control form-control-sm" disabled>
-                                                                    </div>
-                                                                    <div class="input-group input-group-sm mb-3">
-                                                                        <span class=" input-group-text">Total Units / Hours</span>
-                                                                        <input :value="a.subj_lab_units + a.subj_lec_units" type="text" class="form-control form-control-sm" disabled>
-                                                                    </div>
-                                                                    <!-- <div class="mb-1">
-                                                                        <label for="cross" class="form-label">Cross Enrolled (School)</label>
-                                                                        <input class="form-control form-control-sm" type="text" v-model="addedSubject[index].mi_crossenr">
-                                                                    </div> -->
-                                                                    <!-- <div class="mb-1">
-                                                                        <label for="cross" class="form-label">Subject Completion</label>
-                                                                        <select class="form-select form-select-sm" v-model="addedSubject[index].mi_tag">
-                                                                            <option value="">-- Select Type --</option>
-                                                                            <option :value="1">Already Taken</option>
-                                                                            <option :value="2">Advance</option>
-                                                                            <option :value="3">Re-take / Back Subject</option>
-                                                                        </select>
-                                                                    </div> -->
-                                                                    <div class="mt-3 mb-1">
-                                                                        <button v-if="!a.mi_id" @click="removeSubject(index)" type="button"
-                                                                        class="btn btn-sm btn-danger w-100">Remove</button>
+                                    <div class="w-50 neu-card p-3">
+                                        <div class="d-flex flex-column">
+                                            <div class="d-flex flex-column ">
+                                                <!-- <div class="shadow p-3">
+                                                    <span class="fw-bold">Subjects and Units Applied</span>
+                                                </div> -->
+                                                <div class="container overflow-auto p-3" style="height: 578px;">
+                                                    <div v-if="!Object.keys(addedSubject).length && !loadCurrItems">
+                                                        <div class="p-3 rounded-4 text-center border small-font fw-bold neu-card">
+                                                            <NeuLoader4/>
+                                                            No Subjects Added
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="!Object.keys(addedSubject).length && loadCurrItems">
+                                                        <div class="p-3 rounded-4 text-center border small-font fw-bold neu-card">
+                                                            <NeuLoader2/>
+                                                        </div>
+                                                    </div>
+                                                    <div v-if="Object.keys(addedSubject).length && !loadCurrItems" v-for="(a, index) in addedSubject" class="d-flex flex-column mb-2 neu-card">
+                                                        <div class="w-100">
+                                                            <div class="p-3 text-start">
+                                                                <div class="w-100 small-font">
+                                                                    <div class="d-flex flex-column">
+                                                                        <div class="border-bottom d-flex flex-column text-start mb-3">
+                                                                            <span class="mt-3 fw-bold">{{ a.subj_code }}</span>
+                                                                            <span class="mb-3 fst-italic">{{ a.subj_name }}</span>
+                                                                        </div>
+                                                                        <div class="d-flex gap-2 mb-1 align-items-center">
+                                                                            <span class="w-25">Lecture Units</span>
+                                                                            <input v-model="a.subj_lec_units" type="text" class="neu-input w-75" disabled>
+                                                                        </div>
+                                                                        <div class="d-flex gap-2 mb-1 align-items-center">
+                                                                            <span class="w-25">Laboratory Units</span>
+                                                                            <input v-model="a.subj_lab_units" type="text" class="neu-input w-75" disabled>
+                                                                        </div>
+                                                                        <div class="d-flex gap-2 mb-3 align-items-center">
+                                                                            <span class="w-25">Total Units / Hours</span>
+                                                                            <input :value="a.subj_lab_units + a.subj_lec_units" type="text" class="neu-input w-75" disabled>
+                                                                        </div>
+                                                                        <!-- <div class="mb-1">
+                                                                            <label for="cross" class="form-label">Cross Enrolled (School)</label>
+                                                                            <input class="form-control form-control-sm" type="text" v-model="addedSubject[index].mi_crossenr">
+                                                                        </div> -->
+                                                                        <!-- <div class="mb-1">
+                                                                            <label for="cross" class="form-label">Subject Completion</label>
+                                                                            <select class="form-select form-select-sm" v-model="addedSubject[index].mi_tag">
+                                                                                <option value="">-- Select Type --</option>
+                                                                                <option :value="1">Already Taken</option>
+                                                                                <option :value="2">Advance</option>
+                                                                                <option :value="3">Re-take / Back Subject</option>
+                                                                            </select>
+                                                                        </div> -->
+                                                                        <div class="mt-3 mb-1">
+                                                                            <button v-if="!forUpdate" @click="removeSubject(index)" type="button"
+                                                                            class="neu-btn neu-red p-2">Remove</button>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
+                                                
                                             </div>
-                                            
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="d-flex flex-column gap-2 border p-3">
+                                
+                                <div class="w-100">
+                                    <div class="d-flex flex-column gap-2 p-3">
                                         <p class="fst-italic"><span class="fw-bold text-primary">Note: </span> 
                                             If the student enrolls specific subject only, you should select the curriculum where the subject belongs to before saving the changes.
                                         </p>   
-                                        <button @click="saveData()" :disabled="saving" type="button" class="btn btn-success btn-md" v-if="!addedSubject[0].mi_id">Save Taggings</button> 
+                                        <button @click="saveData()" :disabled="saving" type="button" class="neu-btn neu-green p-2" v-if="!forUpdate">Save Taggings</button> 
                                     </div>
                                 </div>
                             </div>
                         </div>    
                     </div>
                     <div v-else class="container overflow-hidden p-3">
-                        <Loader>Saving Items Please Wait...</Loader>
+                        <NeuLoader2>Saving Items Please Wait...</NeuLoader2>
                     </div>
                 </div>
                 <div class="tab-pane fade" id="ctab2" role="tabpanel" aria-labelledby="tab2">
                     <div class="container overflow-hidden p-3">
                         <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2 ">
-                            <div class="col-12 border-bottom">
-                                <div class="p-3">
-                                    <span class="fw-bold border bg-primary text-white p-2 rounded-3">Subjects Enrolled</span>
+                            <div class="col-12 border-bottom mb-3">
+                                <div class="p-3 neu-card p-2 rounded-3 neu-pastel-purple text-white">
+                                    <span class="fw-bold">Subjects Enrolled</span>
                                 </div>
                             </div>
-                            <div class="col-12 small-font">
-                                <div class="p-3 border shadow d-flex flex-column card justify-content-center align-items-center">
+                            <div class="col-12 small-font neu-card-inner">
+                                <div class="p-3 d-flex flex-column justify-content-center align-items-center">
                                         <div class="row w-100">
-                                            <div class="border p-2 col-12">
+                                            <div class="p-2 col-12">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Course: &nbsp;</span>{{ e.prog_name }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Grade Level: &nbsp;</span> {{e.grad_name }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Quarter: &nbsp;</span> {{ e.quar_desc}}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                  <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Curriculum Code: &nbsp;</span> {{
                                                         e.curr_code ? e.curr_code : 'N/A' }}
                                                  </div>
                                                 
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Section: &nbsp;</span> {{ e.sec_name ?
                                                         e.sec_name : 'N/A' }}
                                                  </div>
                                                 
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                  <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Enrolled: &nbsp;</span> {{
                                                         e.enr_dateenrolled }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                  <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Student ID: &nbsp;</span> {{
                                                         e.ident_identification }}
@@ -702,7 +711,7 @@ const filterCurriculum = () => {
                                                  </div>
                                             </div>
                                         </div>
-                                        <table class="table table-bordered">
+                                        <table class="neu-table">
                                             <thead>
                                                 <tr>
                                                     <th class="border p-2">
@@ -711,25 +720,25 @@ const filterCurriculum = () => {
                                                     <th class="border p-2">
                                                         <span class="fw-bold">Subjects Description</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Lec</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Lab</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Total</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Prelims</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Midterms</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Pre-Finals</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="border p-2 text-center">
                                                         <span class="fw-bold">Finals</span>
                                                     </th>
                                                     <!-- <th class="border p-2" v-if="activeEnrollment">
@@ -745,7 +754,7 @@ const filterCurriculum = () => {
                                                 </tr>
                                                 <tr v-if="!Object.keys(milestone).length && milestoneLoading" >
                                                     <td class="align-middle" :colspan="activeEnrollment?10:9">
-                                                        <Loader/>
+                                                        <NeuLoader2/>
                                                     </td>
                                                 </tr>
                                                 <tr v-if="Object.keys(milestone).length && !milestoneLoading" v-for="(c, index) in milestone">
@@ -757,26 +766,26 @@ const filterCurriculum = () => {
                                                         <span v-if="c.mi_crossenr" class="mt-3">Cross Enrolled to: <span
                                                                 class=" text-red-500"> {{ c.mi_crossenr }}</span></span>
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-center">
                                                         <span>{{ c.subj_lec_units }}</span>
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-center">
                                                         <span>{{ c.subj_lab_units }}</span>
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-center">
                                                         <span class="fw-bold">{{ c.subj_lec_units + c.subj_lab_units  }}</span>
                                                     </td>
-                                                    <td class="align-middle">
-                                                        <span class="text-primary">{{ c.grs_prelims?c.grs_prelims:0 }}</span>
+                                                    <td class="align-middle text-center">
+                                                        <span class="">{{ c.grs_prelims?c.grs_prelims:0 }}</span>
                                                     </td>
-                                                     <td class="align-middle">
-                                                        <span class="text-primary">{{ c.grs_midterms?c.grs_midterms:0 }}</span>
+                                                     <td class="align-middle text-center">
+                                                        <span class="">{{ c.grs_midterms?c.grs_midterms:0 }}</span>
                                                     </td>
-                                                     <td class="align-middle">
-                                                        <span class="text-primary">{{ c.grs_prefinals?c.grs_prefinals:0 }}</span>
+                                                     <td class="align-middle text-center">
+                                                        <span class="">{{ c.grs_prefinals?c.grs_prefinals:0 }}</span>
                                                     </td>
-                                                     <td class="align-middle">
-                                                        <span class="text-primary">{{ c.grs_finals?c.grs_finals:0 }}</span>
+                                                     <td class="align-middle text-center">
+                                                        <span class="">{{ c.grs_finals?c.grs_finals:0 }}</span>
                                                     </td>
                                                     <!-- <td v-if="activeEnrollment" class="align-middle">
                                                          <button type="button" @click="deleteSubject(c.mi_id, index)"
@@ -793,50 +802,50 @@ const filterCurriculum = () => {
                 <div class="tab-pane fade" id="ctab3" role="tabpanel" aria-labelledby="tab3">
                     <div class="container overflow-hidden p-3">
                         <div v-if="Object.keys(milestoneCompHeader).length" class="row gy-2 gx-2">
-                            <div class="col-12 border-bottom">
-                                <div class="p-3">
-                                    <span class="fw-bold border bg-primary text-white p-2 rounded-3">MILESTONE</span>
+                            <div class="col-12 border-bottom mb-3">
+                                <div class="p-3 neu-card p-2 rounded-3 neu-pastel-purple text-white">
+                                    <span class="fw-bold">MILESTONE</span>
                                 </div>
                             </div>
-                            <div class="col-12 small-font">
-                                <div class="p-3 border shadow d-flex flex-column card justify-content-center align-items-center mb-2"  v-for="(mtc, index) in milestoneCompHeader">
+                            <div class="col-12 small-font neu-card-inner">
+                                <div class="p-3 d-flex flex-column card justify-content-center align-items-center mb-2"  v-for="(mtc, index) in milestoneCompHeader">
                                         <div class="row w-100">
-                                            <div class="border p-2 col-12">
+                                            <div class="p-2 col-12">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Course: &nbsp;</span>{{ mtc.arc_coursename }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Grade Level: &nbsp;</span>{{ mtc.arc_yearlevel }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Quarter: &nbsp;</span>{{ mtc.arc_semester }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                  <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Curriculum Code: &nbsp;</span> {{
                                                         mtc.arc_curriculum ? mtc.arc_curriculum : 'N/A' }}
                                                  </div>
                                                 
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                 <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Section: &nbsp;</span> {{ mtc.arc_section ?
                                                         mtc.arc_section : 'N/A' }}
                                                  </div>
                                                 
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                  <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Date of Application: &nbsp;</span> {{
                                                         mtc.arc_dateapplied }}
                                                  </div>
                                             </div>
-                                            <div class="border p-2 col-4">
+                                            <div class="p-2 col-4">
                                                  <div class="d-flex flex align-items-start">
                                                     <span class="fw-bold">Student ID: &nbsp;</span> {{
                                                         mtc.arc_studentid }}
@@ -844,43 +853,43 @@ const filterCurriculum = () => {
                                             </div>
                                         </div>
                                         <div class="row w-100 mt-3">
-                                            <div class="border p-2 col-12">
+                                            <div class="p-2 col-12">
                                                  <div class="d-flex flex justify-content-center">
                                                     <span class="fw-bold">Subjects Taken</span>
                                                  </div>
                                             </div>
                                         </div>
-                                        <table class="table table-bordered">
+                                        <table class="neu-table">
                                             <thead>
                                                 <tr>
-                                                     <th class="border p-2">
+                                                     <th class="p-2">
                                                         <span class="fw-bold">Code</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2">
                                                         <span class="fw-bold">Subjects Description</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Lec</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Lab</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Total</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Prelims</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Midterms</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Pre-Finals</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2 text-center">
                                                         <span class="fw-bold">Finals</span>
                                                     </th>
-                                                    <th class="border p-2">
+                                                    <th class="p-2">
                                                         <span class="fw-bold">Faculty</span>
                                                     </th>
                                                 </tr>
@@ -893,7 +902,7 @@ const filterCurriculum = () => {
                                                 </tr>
                                                 <tr v-if="!Object.keys(milestoneCompData).length && milestoneCompLoading">
                                                     <td class="align-middle">
-                                                        <Loader/>
+                                                        <NeuLoader2/>
                                                     </td>
                                                 </tr>
                                                 <tr v-if="Object.keys(milestoneCompData).length && !milestoneCompLoading" v-for="(c, index) in milestoneCompData[mtc.arc_id]">
@@ -905,29 +914,29 @@ const filterCurriculum = () => {
                                                         <!-- <span v-if="c.mi_crossenr" class="mt-3">Cross Enrolled to: <span
                                                                 class=" text-red-500"> {{ c.mi_crossenr }}</span></span> -->
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-center">
                                                         <span>{{ c.arc_lecture }}</span>
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-center">
                                                         <span>{{ c.arc_laboratory }}</span>
                                                     </td>
-                                                    <td class="align-middle">
+                                                    <td class="align-middle text-center">
                                                         <span class="fw-bold">{{ c.arc_lecture + c.arc_laboratory  }}</span>
                                                     </td>
-                                                    <td class="align-middle">
-                                                        <span class="text-primary">{{ c.arc_prelimgrade }}</span>
+                                                    <td class="align-middle text-center">
+                                                        <span class="">{{ c.arc_prelimgrade }}</span>
+                                                    </td>
+                                                    <td class="align-middle text-center">
+                                                        <span class="">{{ c.arc_midtermgrade }}</span>
+                                                    </td>
+                                                    <td class="align-middle text-center">
+                                                        <span class="">{{ c.arc_prefinalgrade }}</span>
+                                                    </td>
+                                                    <td class="align-middle text-center">
+                                                        <span class="">{{ c.arc_finalgrade }}</span>
                                                     </td>
                                                     <td class="align-middle">
-                                                        <span class="text-primary">{{ c.arc_midtermgrade }}</span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span class="text-primary">{{ c.arc_prefinalgrade }}</span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span class="text-primary">{{ c.arc_finalgrade }}</span>
-                                                    </td>
-                                                    <td class="align-middle">
-                                                        <span class="text-primary">{{ c.arc_facultyname }}</span>
+                                                        <span class="">{{ c.arc_facultyname }}</span>
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -936,6 +945,7 @@ const filterCurriculum = () => {
                             </div>
                         </div>
                         <div v-else class="">
+                            <NeuLoader4/>
                             <span>No Milestone Found</span>
                         </div>
                     </div>
@@ -946,3 +956,11 @@ const filterCurriculum = () => {
     </div>
 
 </template>
+<style>
+.nav-link {
+    color: rgb(92, 92, 92);
+}
+.nav-link:hover {
+    color: rgb(27, 155, 106);
+}
+</style>

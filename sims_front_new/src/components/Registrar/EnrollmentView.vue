@@ -21,7 +21,8 @@ import {
     getAcademicDefaults,
     getPaymentDetails
 } from "../Fetchers.js";
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 // import PrintForm from '../snippets/modal/PrintForms.vue';
 import Taggings from '../snippets/modal/EnrollmentTagging.vue';
 import { getUserID } from "../../routes/user.js";
@@ -122,7 +123,7 @@ const booter = async () => {
         booting.value = 'Loading Accounts...'
         bootingCount.value += 1
     })
-    getPaymentDetails(0,1).then((results) => {
+    getPaymentDetails(0, 1).then((results) => {
         paymentDetails.value = results.data
     })
     // getUserID().then((results) => {
@@ -149,20 +150,20 @@ onMounted(async () => {
                     studentCount.value = results.count
 
                     let x = student.value.map((e) => {
-                        
+
                         let y = accounts.value.findIndex((f) => {
                             return f.acs_enrid === e.enr_id && f.acs_status == 1
                         })
 
-                        
+
                         // get first latest account
                         let acsid = accounts.value
-                        .filter(f => f.acs_enrid === e.enr_id && f.acs_status == 1)
-                        .map(f => ({
-                            acs_id: f.acs_id,
-                            acs_status: f.acs_status
+                            .filter(f => f.acs_enrid === e.enr_id && f.acs_status == 1)
+                            .map(f => ({
+                                acs_id: f.acs_id,
+                                acs_status: f.acs_status
 
-                        }))
+                            }))
 
                         //filter payments by latest account id
                         let filterpayments = paymentDetails.value.filter((f) => {
@@ -171,7 +172,7 @@ onMounted(async () => {
 
                         // if may laman si filterpayments means nakapag bayad nasya ng dp
                         let paid = false
-                        if(Object.keys(filterpayments).length){
+                        if (Object.keys(filterpayments).length) {
                             paid = true
                         }
 
@@ -198,7 +199,7 @@ onMounted(async () => {
                     })
 
                     student.value = x
-                    
+
 
                     preLoading.value = false
                     emit('doneLoading', false)
@@ -400,6 +401,16 @@ const paginate = (mode) => {
 // image uploading
 const formData = new FormData
 const upload = (personID, pictype, existing) => {
+
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     let old_pic = existing ? existing : 0
     holdSubmit.value = true
 
@@ -426,6 +437,7 @@ const upload = (personID, pictype, existing) => {
                             text: "Changes applied, refreshing the page",
                             icon: "success"
                         }).then(() => {
+                            Swal.close()
                             location.reload()
                             holdSubmit.value = false
                         });
@@ -437,6 +449,7 @@ const upload = (personID, pictype, existing) => {
                             text: "Upload Successful but Linking Failed, try again later",
                             icon: "question"
                         }).then(() => {
+                            Swal.close()
                             holdSubmit.value = false
                         });
                     }
@@ -449,6 +462,7 @@ const upload = (personID, pictype, existing) => {
                     text: "Upload failed, try again later",
                     icon: "error"
                 }).then(() => {
+                    Swal.close()
                     holdSubmit.value = false
                 });
             }
@@ -476,6 +490,7 @@ const upload = (personID, pictype, existing) => {
                             text: "Changes applied, refreshing the page",
                             icon: "success"
                         }).then(() => {
+                            Swal.close()
                             location.reload()
                             holdSubmit.value = false
                         });
@@ -487,6 +502,7 @@ const upload = (personID, pictype, existing) => {
                             text: "Upload Successful but Linking Failed, try again later",
                             icon: "question"
                         }).then(() => {
+                            Swal.close()
                             holdSubmit.value = false
                         });
                     }
@@ -499,6 +515,7 @@ const upload = (personID, pictype, existing) => {
                     text: "Upload failed, try again later",
                     icon: "error"
                 }).then(() => {
+                    Swal.close()
                     holdSubmit.value = false
                 });
             }
@@ -593,14 +610,14 @@ const dropStudent = (id) => {
             deleteEnrollment(x).then((results) => {
                 // alert('Student Dropped')
                 // location.reload()
-                if(results.status != 200){
+                if (results.status != 200) {
                     Swal.fire({
                         title: "Update Failed",
                         text: "Dropping student failed, try again later",
                         icon: "error"
                     });
                     return
-                }else{
+                } else {
                     Swal.fire({
                         title: "Update Success",
                         text: "Student dropped, refreshing the page",
@@ -645,97 +662,105 @@ const getData = (result) => {
             <h5 class=" text-uppercase fw-bold">Enrolled Students</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()" class="form-control w-100"
-                    :disabled="preLoading ? true : false" placeholder="First Name" />
-                <input type="text" v-model="searchMname" @keyup.enter="search()" class="form-control w-100"
-                    :disabled="preLoading ? true : false" placeholder="Middle Name" />
-                <input type="text" v-model="searchLname" @keyup.enter="search()" class="form-control w-100"
-                    :disabled="preLoading ? true : false" placeholder="Last Name" />
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1"
-                    :disabled="preLoading ? true : false">
-                    Search
-                </button>
-                <button @click="() => $refs.focusTrap.activate(), showQRScanner = true" data-bs-toggle="modal"
-                    data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100"
-                    tabindex="-1" :disabled="preLoading ? true : false">
-                    Scan QR
-                </button>
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#filterdatamodal"
-                    @click="showFilterModal = true" type="button" class="btn btn-sm btn-dark"
-                    :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-eye" /> View Student Listing
-                </button>
-            </div>
-            <!-- <div class="d-flex gap-2 w-100">
-                <div class="d-flex gap-2 w-100">
-                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
-                        <option value="0">Select Program</option>
-                        <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
-                    </select>
-                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsGradelvl" :disabled="preLoading?true:false">
-                        <option value="0">Select Grade Level</option>
-                        <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}</option>
-                    </select>
-                    <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
-                        <option value="0">Select Course</option>
-                        <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}</option>
-                    </select>
-                    <div class="d-flex justify-content-center align-content-center">
-                        <button @click="search()" type="button" class="btn btn-sm btn-secondary text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                            Search
-                        </button>
-                    </div>
+        <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
+            <div class="col-12 col-sm-8 col-lg-6">
+                <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
+                    style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                    <NeuLoader1 />
                 </div>
-            </div> -->
+            </div>
         </div>
 
-        <div class="table-responsive border p-3 small-font">
-            <div class="container">
-                <!-- <div class="row justify-content-center">
-                    <div class="col-12 col-sm-8 col-lg-6">
-                        <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
-                            style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                            <h3>Our Creative <span> Team</span></h3>
-                            <p>Appland is completely creative, lightweight, clean &amp; super responsive app landing
-                                page.</p>
-                            <div class="line"></div>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="d-flex gap-2 justify-content-center align-content-center">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()" class="neu-input"
+                        :disabled="preLoading ? true : false" placeholder="First Name" />
+                    <input type="text" v-model="searchMname" @keyup.enter="search()" class="neu-input"
+                        :disabled="preLoading ? true : false" placeholder="Middle Name" />
+                    <input type="text" v-model="searchLname" @keyup.enter="search()" class="neu-input"
+                        :disabled="preLoading ? true : false" placeholder="Last Name" />
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass" /> Search
+                    </button>
+                    <button @click="() => $refs.focusTrap.activate(), showQRScanner = true" data-bs-toggle="modal"
+                        data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-id-card" /> Scan QR
+                    </button>
+                </div>
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#filterdatamodal"
+                        @click="showFilterModal = true" type="button" class="neu-btn neu-green"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-eye" /> View Student Listing
+                    </button>
+                </div>
+                <!-- <div class="d-flex gap-2 w-100">
+                    <div class="d-flex gap-2 w-100">
+                        <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsProgram" :disabled="preLoading?true:false">
+                            <option value="0">Select Program</option>
+                            <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
+                        </select>
+                        <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsGradelvl" :disabled="preLoading?true:false">
+                            <option value="0">Select Grade Level</option>
+                            <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}</option>
+                        </select>
+                        <select class="form-select form-select-sm w-100" tabindex="-1" v-model="paramsCourse" :disabled="preLoading?true:false">
+                            <option value="0">Select Course</option>
+                            <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}</option>
+                        </select>
+                        <div class="d-flex justify-content-center align-content-center">
+                            <button @click="search()" type="button" class="btn btn-sm btn-secondary text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
+                                Search
+                            </button>
                         </div>
                     </div>
                 </div> -->
+            </div>
+
+            <div class="table-responsive border p-3 small-font">
+                <!-- <div class="row justify-content-center">
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
+                                style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <h3>Our Creative <span> Team</span></h3>
+                                <p>Appland is completely creative, lightweight, clean &amp; super responsive app landing
+                                    page.</p>
+                                <div class="line"></div>
+                            </div>
+                        </div>
+                    </div> -->
                 <div class="row justify-content-center" v-if="!preLoading && !Object.keys(student).length">
                     <div class="col-12 col-sm-8 col-lg-6">
                         <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
                             style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                            <h3>No Record Found</h3>
-                            <p>Enrollment Information is empty. Either the enrollment has not yet been started or it's
-                                just reseted to default.</p>
-                            <div class="line"></div>
+                            <NeuLoader4 />
+                            <p class="fw-bold m-0">Nothing here yet!</p>
+                            <p>The hamster took a break 💤 — try adding something new.</p>
                         </div>
                     </div>
                 </div>
-                <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
-                    <div class="col-12 col-sm-8 col-lg-6">
-                        <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
-                            style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                            <Loader />
+                <!-- <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
+                        <div class="col-12 col-sm-8 col-lg-6">
+                            <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
+                                style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                                <NeuLoader1 />
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </div> -->
                 <div class="row" v-if="!preLoading && Object.keys(student).length">
                     <!-- Single Advisor-->
                     <div class="col-12 col-md-6 col-lg-4" v-for="(stud, index) in student">
-                        <div class="single_advisor_profile wow fadeInUp border shadow" data-wow-delay="0.2s"
+                        <div class="single_advisor_profile wow fadeInUp rounded-4" data-wow-delay="0.2s"
                             style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
                             <!-- Team Thumb-->
-                            <div class="advisor_thumb">
+                            <div class="advisor_thumb rounded-top-4">
                                 <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
                                     class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
                                     <!-- stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
-                                    <img class=" img-size-card img_profile shadow" :src="stud.profile_picture" alt="">
+                                    <img class=" img-size-card img_profile" :src="stud.profile_picture" alt="">
                                 </div>
                                 <div v-if="showLinkProfile && index === linkId"
                                     class="upload-section d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm w-100">
@@ -747,18 +772,18 @@ const getData = (result) => {
 
                                         <!-- Custom Upload Button -->
                                         <label :for="'fileInput-' + index"
-                                            class="upload-label btn btn-outline-success btn-sm px-4 py-2 m-1">
+                                            class="btn btn-outline-info btn-sm px-3 py-1 m-1">
                                             <i class="fa fa-upload me-2"></i> Choose Photo
                                         </label>
 
                                         <!-- Submit & Cancel Buttons -->
                                         <div class="mt-2">
-                                            <button type="submit" class="btn btn-success btn-sm px-4 py-2 m-1"
+                                            <button type="submit" class="neu-btn neu-green px-4 py-2 m-1"
                                                 :disabled="holdSubmit">
                                                 <i class="fa fa-cloud-upload-alt me-2"></i> Upload
                                             </button>
 
-                                            <button type="button" class="btn btn-outline-danger btn-sm px-4 py-2 m-1"
+                                            <button type="button" class="neu-btn neu-red px-4 py-2 m-1"
                                                 @click="showLinkProfile = false">
                                                 <i class="fa fa-times me-2"></i> Cancel
                                             </button>
@@ -773,41 +798,46 @@ const getData = (result) => {
                             </div>
                             <!-- Team Details-->
                             <div class="single_advisor_details_info border-0 border-bottom border-top">
-                                <h6 class="text-uppercase fw-bold"  style="font-size: 13px;"> {{ stud.per_firstname }} {{ stud.per_middlename }} {{
-                                    stud.per_lastname }} {{
+                                <h6 class="text-uppercase fw-bold" style="font-size: 13px;"> {{ stud.per_firstname }} {{
+                                    stud.per_middlename }} {{
+                                        stud.per_lastname }} {{
                                         stud.per_suffixname }}</h6>
-                                <p v-if="stud.is_paid" class="text-success fw-bold" style="font-size: 10px;">Officially Enrolled</p>
-                                <p v-else class="text-danger fw-bold" style="font-size: 10px;">Not Officially Enrolled</p>
+                                <p v-if="stud.is_paid" class="text-success fw-bold" style="font-size: 10px;">Officially
+                                    Enrolled</p>
+                                <p v-else class="text-danger fw-bold" style="font-size: 10px;">Not Officially Enrolled
+                                </p>
                                 <div class="d-flex flex-column gap-1 mt-3">
-                                    <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_program"
-                                        :id="index + 'program'">
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_program" :id="index + 'program'">
                                         <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}
                                         </option>
                                     </select>
-                                    <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_course"
-                                        :id="index + 'course'">
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_course" :id="index + 'course'">
                                         <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}
                                         </option>
                                     </select>
-                                    <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_gradelvl"
-                                        :id="index + 'gradelvl'">
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_gradelvl" :id="index + 'gradelvl'">
                                         <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}
                                         </option>
                                     </select>
-                                    <select class="border-0 p-1" disabled tabindex="-1" v-model="stud.enr_quarter"
-                                        :id="index + 'quarter'">
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_quarter" :id="index + 'quarter'">
                                         <option v-for="(q, index) in quarter" :value="q.quar_id">{{ q.quar_desc }}
                                         </option>
                                     </select>
                                 </div>
                             </div>
                             <div class="advisor_thumb">
-                                <div v-if="stud.per_signature" @click="showLinkSignature = !showLinkSignature, linkId = index"
+                                <div v-if="stud.per_signature"
+                                    @click="showLinkSignature = !showLinkSignature, linkId = index"
                                     class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
                                     <img class="signature-size-card"
                                         :src="'http://localhost:8000/storage/signatures/' + stud.per_signature" alt="">
                                 </div>
-                                <div v-else class="text_guide img_hover p-3" @click="showLinkSignature = !showLinkSignature, linkId = index">
+                                <div v-else class="text_guide img_hover p-3"
+                                    @click="showLinkSignature = !showLinkSignature, linkId = index">
                                     <div
                                         class="signature-size-card-none d-flex justify-content-center align-items-center">
                                         <span class="text-muted">No Signature Uploaded</span>
@@ -816,7 +846,7 @@ const getData = (result) => {
 
                                 <div v-if="showLinkSignature && index == linkId"
                                     class="upload-section d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm w-100">
-                                    <form @submit.prevent="upload(stud.per_id,2,stud.per_signature)"
+                                    <form @submit.prevent="upload(stud.per_id, 2, stud.per_signature)"
                                         enctype="multipart/form-data" class="w-100 text-center">
                                         <!-- Hidden File Input -->
                                         <input type="file" :id="'fileInput-' + index" class="d-none"
@@ -824,18 +854,18 @@ const getData = (result) => {
 
                                         <!-- Custom Upload Button -->
                                         <label :for="'fileInput-' + index"
-                                            class="upload-label btn btn-outline-success btn-sm px-4 py-2 m-1">
+                                            class="upload-label btn btn-outline-success btn-sm px-3 py-1 m-1">
                                             <i class="fa fa-upload me-2"></i> Choose Photo
                                         </label>
 
                                         <!-- Submit & Cancel Buttons -->
                                         <div class="mt-2">
-                                            <button type="submit" class="btn btn-success btn-sm px-4 py-2 m-1"
+                                            <button type="submit" class="neu-btn neu-green px-4 py-2 m-1"
                                                 :disabled="holdSubmit">
                                                 <i class="fa fa-cloud-upload-alt me-2"></i> Upload
                                             </button>
 
-                                            <button type="button" class="btn btn-outline-danger btn-sm px-4 py-2 m-1"
+                                            <button type="button" class="neu-btn neu-red btn-sm px-4 py-2 m-1"
                                                 @click="showLinkSignature = false">
                                                 <i class="fa fa-times me-2"></i> Cancel
                                             </button>
@@ -850,31 +880,32 @@ const getData = (result) => {
 
                             </div>
 
-                            <div v-if="accessData[1].useracc_modifying == 1" class="d-flex gap-2 justify-content-center border p-3 bg-secondary-subtle">
+                            <div v-if="accessData[1].useracc_modifying == 1"
+                                class="d-flex gap-2 justify-content-center p-3 bg-transparent  rounded-bottom-4">
                                 <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
-                                    data-bs-toggle="modal" data-bs-target="#taggingmodal"
-                                    class="btn btn-secondary btn-sm">
+                                    data-bs-toggle="modal" data-bs-target="#taggingmodal" class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-pen" />
                                 </button>
                                 <!-- v-if="Number(stud.acs_amount) > 0" -->
                                 <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Grades"
                                     data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
-                                    class="btn btn-secondary btn-sm">
+                                    class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-print" />
                                 </button>
                                 <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt" data-bs-toggle="modal"
-                                    data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
-                                    class="btn btn-secondary btn-sm">
+                                <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt"
+                                    data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
+                                    class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-print" />
                                 </button>
                                 <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
-                                    class="btn btn-secondary btn-sm">
+                                    class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-trash" />
                                 </button>
                                 <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" data-bs-target="#printidmodal" @click="printID(stud)"
-                                    type="button" title="print ID" class="btn btn-secondary btn-sm">
+                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal"
+                                    data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="print ID"
+                                    class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip" />
                                 </button>
                             </div>
@@ -885,17 +916,18 @@ const getData = (result) => {
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(student).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(student).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ studentCount }})</span> items</p>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ studentCount }})</span> items</p>
             </div>
         </div>
+
     </div>
 
     <!-- Tagging Modal -->
@@ -908,7 +940,7 @@ const getData = (result) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showTaggingModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <Taggings v-if="showTaggingModal" :student="showFormData" :subject="subject" :section="section"
                         :curriculum="curriculum" />
                 </div>
@@ -938,7 +970,7 @@ const getData = (result) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showFilterModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <EnrollmentListFIlterModal v-if="showFilterModal" :gradelvldata="gradelvl" :programdata="program"
                         :coursedata="course" :degreedata="degree" />
                 </div>
@@ -968,7 +1000,7 @@ const getData = (result) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showPrintModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <EnrollmentPrintModal v-if="showPrintModal && printType == 1" :student="showFormData"
                         :subject="subject" :section="section" :curriculum="curriculum" />
                     <EnrollmentReceiptModal v-if="showPrintModal && printType == 2" :student="showFormData"
@@ -1000,7 +1032,7 @@ const getData = (result) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showPrintID = false"></button>
                 </div>
-                <div class="modal-body d-flex flex-column justify-content-center align-items-center">
+                <div class="modal-body d-flex flex-column justify-content-center align-items-center neu-bg">
                     <ApplicationPrintIdModal v-if="showPrintID" :studentdata="identificationData"
                         :useriddata="userID" />
                 </div>
@@ -1030,7 +1062,7 @@ const getData = (result) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" tabindex="-1"
                         @click="showQRScanner = false" id="hideqrscanner"></button>
                 </div>
-                <div class="modal-body" v-if="showQRScanner">
+                <div class="modal-body neu-bg" v-if="showQRScanner">
                     <SearchQR @fetchData="getData" modeData="2" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -1062,10 +1094,14 @@ const getData = (result) => {
 
 <style scoped>
 .img_profile {
-    border: 1px solid #ddd;
+    /* border: 1px solid #ddd; */
     border-radius: 100%;
     height: 150px;
     width: 150px;
+    padding: 10px;
+    box-shadow:
+        3px 3px 5px rgba(122, 122, 122, 0.8),
+        -3px -3px 5px rgba(255, 255, 255, 0.9);
 }
 
 .signature-size-card {
@@ -1082,7 +1118,7 @@ const getData = (result) => {
     position: relative;
     display: block;
     cursor: pointer;
-    background-color: rgb(243, 243, 243);
+    background-color: #e2e2e2;
 }
 
 .text_guide img {
@@ -1137,6 +1173,7 @@ const getData = (result) => {
 }
 
 .single_advisor_profile {
+    color: #4b4b4b;
     position: relative;
     margin-bottom: 50px;
     -webkit-transition-duration: 500ms;
@@ -1144,11 +1181,16 @@ const getData = (result) => {
     z-index: 1;
     /* border-radius: 15px; */
     /* border:2px solid #be0505; */
-    -webkit-box-shadow: 0 0.25rem 1rem 0 rgba(47, 91, 234, 0.125);
-    box-shadow: 0 0.25rem 1rem 0 rgba(47, 91, 234, 0.125);
+    /* -webkit-box-shadow: 0 0.25rem 1rem 0 rgba(47, 91, 234, 0.125);
+    box-shadow: 0 0.25rem 1rem 0 rgba(47, 91, 234, 0.125); */
+    box-shadow:
+        8px 8px 16px rgba(0, 0, 0, 0.15),
+        /* dark shadow */
+        -8px -8px 16px rgba(255, 255, 255, 0.5);
 }
 
 .single_advisor_profile .advisor_thumb {
+
     position: relative;
     z-index: 1;
     /* border-radius: 15px 15px 0 0; */
@@ -1212,7 +1254,7 @@ const getData = (result) => {
     -webkit-transition-duration: 500ms;
     transition-duration: 500ms;
     /* border-radius: 0 0 15px 15px; */
-    background-color: #ffffff;
+    background-color: #e2e2e2;
 }
 
 .single_advisor_profile .single_advisor_details_info::after {
@@ -1291,29 +1333,28 @@ const getData = (result) => {
 } */
 
 .upload-section {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 4px 4px 8px rgba(0,0,0,0.08),
-              -4px -4px 8px rgba(255,255,255,0.9);
-  transition: all 0.3s ease;
+    background: #e2e2e2;
+    border-radius: 12px;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.08),
+        -4px -4px 8px rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
 }
 
 .upload-section:hover {
-  box-shadow: 6px 6px 12px rgba(0,0,0,0.1),
-              -6px -6px 12px rgba(255,255,255,1);
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1),
+        -6px -6px 12px rgba(255, 255, 255, 1);
 }
 
 .upload-label {
-  background-color: #f9f9f9;
-  border: 1px solid #237a5b;
-  color: #237a5b;
-  border-radius: 6px;
-  transition: all 0.2s ease;
+    background-color: #f9f9f9;
+    border: 1px solid #237a5b;
+    color: #237a5b;
+    border-radius: 6px;
+    transition: all 0.2s ease;
 }
 
 .upload-label:hover {
-  background-color: #237a5b;
-  color: white;
+    background-color: #237a5b;
+    color: white;
 }
-
 </style>

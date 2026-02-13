@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../loaders/Loading1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
+import NeuLoader4 from '../loaders/NeuLoader4.vue';
+import { formatDateTime } from '../../Generators.js';
 import {
     getMedicalFiles,
     getMedicalFileHeaders,
@@ -153,6 +155,15 @@ const addNew = () => {
         confirmButtonText: "Yes, Im going to create it!"
     }).then(async (result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: "Generating Archive",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             let x = {
                 clfh_personid: personId.value,
                 clfh_desc: archiveDesc.value,
@@ -165,6 +176,7 @@ const addNew = () => {
                         text: "Changes applied, refreshing the page",
                         icon: "success"
                     }).then(()=>{
+                        Swal.close()
                         location.reload()
                     });
                 } else {
@@ -173,6 +185,7 @@ const addNew = () => {
                         text: "Error occured, contact your administrator",
                         icon: "error"
                     }).then(()=>{
+                        Swal.close()
                         location.reload()
                     });
                 }
@@ -197,6 +210,16 @@ const searchArchive = () => {
 const image = ref('')
 const formData = new FormData
 const upload = () => {
+    Swal.fire({
+        title: "Uploading File",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+
     uploading.value = true
     formData.set('image', image.value)
     uploadMedicalFileImage(formData, folderName.value).then((results) => {
@@ -216,6 +239,7 @@ const upload = () => {
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             })
@@ -225,7 +249,10 @@ const upload = () => {
                 title: "Upload Failed",
                 text: "Unknown error occured, try again later",
                 icon: "error"
-            })
+            }).then(()=>{
+                Swal.close()
+                location.reload()
+            });
         }
     })
 
@@ -244,52 +271,54 @@ const downloadImage = (folder, file) => {
 </script>
 
 <template>
-    <div class="d-flex flex-column p-2 gap-2">
+    <div class="d-flex flex-column p-3 gap-2 neu-card-inner">
         <div class="d-flex flex-wrap flex-column">
-            <p class="text-success fw-bold">Medical Archive</p>
-            <p class="fw-bold small-font fst-italic">Uploaded Results</p>
-            <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+            <p class="text-success fw-bold mb-3">Medical Archive</p>
+            <p class="m-0 fw-bold small-font fst-italic">Uploaded Results</p>
+            <p class="m-0 fst-italic p-2 small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Type the name of archive to search and click search to proceed. If no
                     results found the system will suggest to add a new archive.
                 </span></p>
         </div>
 
         <div v-if="!showImage" class="d-flex flex-column gap-2 small-font justify-content-center">
-            <div class="card shadow w-100">
+            <div class="neu-card w-100">
                 <div v-if="!preLoading" class="border p-2 align-content-center p-3">
-                    <div class="input-group">
+                    <div class="d-flex gap-2 justify-content-center align-content-center">
                         <input @keyup="searchArchive()" v-model="archiveDesc" type="text"
-                            class="form-control form-control-sm" placeholder="Archive Name" aria-label="Archive Name"
+                            class="neu-input" placeholder="Archive Name" aria-label="Archive Name"
                             aria-describedby="button-addon2">
                         <button :disabled="!archiveDesc || uploading ? true : false" tabindex="-1" type="button" @click="addNew()"
-                            class="btn btn-sm btn-dark" id="button-addon2">Add New</button>
+                            class="neu-btn neu-green w-25" id="button-addon2"><font-awesome-icon icon="fa-solid fa-plus"/> Add New</button>
                     </div>
                 </div>
                 <div v-if="!preLoading && !Object.keys(filteredMedicalFilesHeaders).length"
                     class="border p-2 align-content-center p-3">
-                    <span class="fw-bold text-danger">No Items Found</span>
+                    <NeuLoader4/>
+                    <p class="fw-bold m-0">Nothing here yet!</p>
+                    <p>The hamster took a break 💤 — try adding something new.</p>
                 </div>
                 <div v-if="preLoading && !Object.keys(filteredMedicalFilesHeaders).length"
                     class="border p-2 align-content-center">
-                    <Loader />
+                    <NeuLoader2 />
                 </div>
                 <div v-if="!preLoading && Object.keys(filteredMedicalFilesHeaders).length">
                     <div class="w-100 p-2">
                         <div>
-                            <table class="table table-hover">
+                            <table class="neu-table-flat">
                                 <thead>
                                     <tr>
-                                        <th style="background-color: #237a5b;" class="text-white">Date</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Archive Description
+                                        <th style="color:#555555" class="w-25">Date</th>
+                                        <th style="color:#555555" class="w-25">Archive Description
                                         </th>
-                                        <th style="background-color: #237a5b;" class="text-white">Uploader</th>
-                                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
+                                        <th style="color:#555555" class="w-25">Uploader</th>
+                                        <th style="color:#555555" class="text-center w-50">Commands</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(mef, index) in filteredMedicalFilesHeaders">
                                         <td class="align-middle">
-                                            {{ mef.clfh_dateadded }}
+                                            {{ formatDateTime(mef.clfh_dateadded) }}
                                         </td>
                                         <td class="align-middle">
                                             {{ mef.clfh_desc }}
@@ -298,8 +327,8 @@ const downloadImage = (folder, file) => {
                                             {{ mef.emp_firstname }} {{ mef.emp_lastname }}
                                         </td>
                                         <td class="align-middle">
-                                            <div class="d-flex gap-2 justify-content-center">
-                                                <select class="form-control form-select-sm"
+                                            <div class="d-flex flex-column gap-2 justify-content-center">
+                                                <select class="neu-input neu-select"
                                                     @change="folderSwitch(index)" :id="'files' + index">
                                                     <option value="0" disabled>-- Select File --</option>
                                                     <option value="1">CBC</option>
@@ -313,8 +342,8 @@ const downloadImage = (folder, file) => {
                                                     <option value="9">Physical Exam</option>
                                                 </select>
                                                 <button :disabled="saving ? true : false" type="button"
-                                                    @click="viewImage(mef.clfh_id)" class="btn btn-secondary btn-sm">
-                                                    <i class="mr-2 fa-solid fa-eye"></i>Results
+                                                    @click="viewImage(mef.clfh_id)" class="neu-btn-sm neu-white">
+                                                    <font-awesome-icon icon="fa-solid fa-eye"/> Results
                                                 </button>
                                             </div>
                                         </td>
@@ -328,7 +357,7 @@ const downloadImage = (folder, file) => {
                                     <tr v-if="preLoading && !Object.keys(filteredMedicalFilesHeaders).length">
                                         <td class="p-3 text-center" colspan="4">
                                             <div class="m-3">
-                                                <Loader />
+                                                <NeuLoader2 />
                                             </div>
                                         </td>
                                     </tr>
@@ -341,42 +370,47 @@ const downloadImage = (folder, file) => {
         </div>
 
         <div v-else class="d-flex flex-column gap-2 small-font justify-content-center">
-            <div v-if="!imageLoading" class="w-100 d-flex justify-content-end gap-2 mb-2">
-                <button :disabled="saving || uploading ? true : false" type="button" @click="viewImage(0)"
-                    class="btn btn-sm btn-primary">
-                    Back to List
-                </button>
-                <button :disabled="saving || uploading ? true : false" type="button" @click="downloadImage(folderName, fileName)"
-                    class="btn btn-sm btn-dark">
-                    Download
-                </button>
+            <div v-if="!imageLoading" class="w-100 d-flex justify-content-center gap-2 mb-2">
+                <div class="d-flex gap-2 w-50">
+                    <button :disabled="saving || uploading ? true : false" type="button" @click="viewImage(0)"
+                        class="neu-btn neu-blue p-2">
+                        <font-awesome-icon icon="fa-solid fa-rotate-left"/> Back to List
+                    </button>
+                    <button :disabled="saving || uploading ? true : false" type="button" @click="downloadImage(folderName, fileName)"
+                        class="neu-btn neu-green p-2">
+                        <font-awesome-icon icon="fa-solid fa-download"/> Download
+                    </button>
+                </div>
             </div>
             <div class="w-100">
                 <div v-if="imageLoading"
                     class="border w-100 d-flex flex-column justify-content-center align-content-center p-3">
-                    <Loader/>
+                    <NeuLoader2/>
                 </div>
                 <div v-else
-                    class="border w-100 d-flex flex-column justify-content-center align-content-center p-3">
+                    class=" w-100 d-flex flex-column justify-content-center align-content-center p-3">
                     <div v-if="fileName" class="flex flex-col justify-center items-center overflow-auto">
-                        <img :src="fileName ? 'http://localhost:8000/storage/clinic/' + folderName + '/' + fileName : '/img/profile_default.png'"
+                       <div class="neu-card-inner-dark neu-bg-dark p-3">
+                         <img :src="fileName ? 'http://localhost:8000/storage/clinic/' + folderName + '/' + fileName : '/img/profile_default.png'"
                             class="h-100 object-contain border-2 border-gray-300" />
+                       </div>
 
                     </div>
                     <div v-else class="flex flex-col gap-2 justify-center items-center">
-                        <p class="fw-bold text-danger">No Image Found</p>
-
                         <form @submit.prevent="upload()" method="post" enctype="multipart/form-data"
-                            class="row p-3 bg-secondary-subtle rounded-3 border justify-content-center align-content-center">
-                            <div class="col-auto">
-                                <input type="file" class="form-control form-control-sm" @change="handleImage">
-                            </div>
-                            <div class="col-auto">
-                                <button :disabled="!image || uploading ? true : false" type="submit"
-                                    class="btn btn-sm btn-dark">Upload Image File
-                                </button>
-                            </div>
+                            class="p-3 neu-card rounded-3 d-flex justify-content-center align-content-center">
+                                <div class="w-50 d-flex gap-2">
+                                     <input type="file" class="neu-input" @change="handleImage">
+                                    <button :disabled="!image || uploading ? true : false" type="submit"
+                                        class="neu-btn neu-purple p-2"><font-awesome-icon icon="fa-solid fa-upload"/> Upload Image File
+                                    </button>
+                                </div>
                         </form>
+                        <div class="h-100 neu-card p-4 mt-3">
+                            <NeuLoader4/>
+                            <p class="fw-bold m-0">Nothing here yet!</p>
+                            <p>The hamster took a break 💤 — try adding something new.</p>
+                        </div>
 
                     </div>
                 </div>

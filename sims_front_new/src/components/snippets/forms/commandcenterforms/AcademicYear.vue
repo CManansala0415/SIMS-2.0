@@ -23,6 +23,16 @@ const yearto = ref(0)
 
 const save = ()=>{
     saving.value = true
+
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     let x = {
         sett_yearfrom:yearfrom.value,
         sett_yearto:yearto.value,
@@ -38,6 +48,7 @@ const save = ()=>{
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close()
                 // location.reload()
             });
         } else {
@@ -48,6 +59,7 @@ const save = ()=>{
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close()
                 // location.reload()
             });
         }
@@ -55,19 +67,21 @@ const save = ()=>{
 }
 </script>
 <template>
-    <form @submit.prevent="save">
-        <div class="d-flex flex-wrap form-group">
-            <label for="edyearfrom">Year From</label>
-            <input type="number" class="form-control" v-model="yearfrom"
-                max="9999" min="1999" :disabled="saving?true:false" required>
+    <form @submit.prevent="save" >
+        <div class="d-flex gap-2 w-100">
+            <div class="d-flex flex-wrap form-group w-100">
+                <label for="edyearfrom">Year From</label>
+                <input type="number" class="neu-input" v-model="yearfrom"
+                    max="9999" min="1999" :disabled="saving?true:false" required>
+            </div>
+            <div class="d-flex flex-wrap form-group w-100">
+                <label for="edyearto">Year To</label>
+                <input type="number" class="neu-input" v-model="yearto"
+                    max="9999" min="1999" :disabled="saving?true:false" required>
+            </div>
         </div>
-        <div class="d-flex flex-wrap form-group">
-            <label for="edyearto">Year To</label>
-            <input type="number" class="form-control" v-model="yearto"
-                max="9999" min="1999" :disabled="saving?true:false" required>
-        </div>
-        <button type="submit" class="btn btn-sm btn-success mt-3 w-100" :disabled="saving? true:false">
-            Save
+        <button type="submit" class="neu-btn neu-green p-2 mt-3 " :disabled="saving? true:false">
+            <font-awesome-icon icon="fa-solid fa-wrench"/> Save
         </button>
     </form>
 

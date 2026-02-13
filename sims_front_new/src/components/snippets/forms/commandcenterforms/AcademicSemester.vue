@@ -30,6 +30,14 @@ const save = ()=>{
         sett_code:'cs_02',
         sett_updatedby:userID.value
     }
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
     setCommandUpdate(x).then((results)=>{
         if (results.status == 200) {
             // alert('Update Successful')
@@ -39,6 +47,7 @@ const save = ()=>{
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close()
                 // location.reload()
             });
         } else {
@@ -49,6 +58,7 @@ const save = ()=>{
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close()
                 // location.reload()
             });
         }
@@ -60,13 +70,13 @@ const save = ()=>{
     <form @submit.prevent="save">
         <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester / Quarter</label>
-            <select class="form-control" v-model="quarter">
+            <select class="neu-input neu-select" v-model="quarter">
                 <option value="" disabled>-- Select Type --</option>
                 <option v-for="(q, index) in semester" :value="q.quar_id">{{ q.quar_desc }}</option>
             </select>
         </div>
-        <button type="submit" class="btn btn-sm btn-success mt-3 w-100" :disabled="saving? true:false">
-            Save
+        <button type="submit" class="neu-btn neu-green p-2 mt-3 " :disabled="saving? true:false">
+            <font-awesome-icon icon="fa-solid fa-wrench"/> Save
         </button>
     </form>
     

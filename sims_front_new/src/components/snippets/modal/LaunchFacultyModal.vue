@@ -12,7 +12,7 @@ import {
     getFacultyAvailability,
 
 } from "../../Fetchers.js";
-import Loader from '../loaders/Loading1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import { getUserID } from "../../../routes/user.js";
 
 const props = defineProps({
@@ -402,12 +402,12 @@ onMounted(async () => {
 <template>
     <div class="p-7">
         <div v-if="preLoading" class="w-100 flex flex-col gap-2 justify-center items-center">
-            <Loader />
+            <NeuLoader2 />
         </div>
 
-        <div v-else class="overflow-auto border rounded-3 bg-body-secondary small-font p-3">
+        <div v-else class="neu-card overflow-auto border rounded-3 small-font p-3 text-dim">
             <!-- Header -->
-            <div class="table-header d-flex fw-bold text-white d-none d-md-flex">
+            <div class="table-header d-flex fw-bold d-none d-md-flex">
                 <div class="col-code text-center flex-fill">Code</div>
                 <div class="col-name text-center flex-fill">Subject</div>
                 <div class="col-faculty text-center flex-fill">Faculty</div>
@@ -418,12 +418,12 @@ onMounted(async () => {
             <div v-for="(sj, index) in curriculumSubject" :key="index"
                 class="table-row d-flex flex-column flex-md-row align-items-stretch">
                 <!-- Code -->
-                <div class="col-code flex-fill text-center fw-semibold">
+                <div class="col-code flex-fill text-center fw-semibold align-content-center">
                     <span class="d-md-none fw-bold text-success">Code: </span>{{ sj.subj_code }}
                 </div>
 
                 <!-- Subject -->
-                <div class="col-name flex-fill text-center">
+                <div class="col-name flex-fill text-center align-content-center">
                     <span class="d-md-none fw-bold text-success">Subject: </span>{{ sj.subj_name }}
                 </div>
 
@@ -431,7 +431,7 @@ onMounted(async () => {
                 <div class="col-faculty flex-fill">
                     <span class="d-md-none fw-bold text-success">Faculty: </span>
                     <select @change="detectLoad(index, sj.subj_id, sj.lock)" :id="'assignedFaculty' + index"
-                        :value="sj.faculty_id" :disabled="sj.lock" class="form-select form-select-sm w-100 text-center text-uppercase"
+                        :value="sj.faculty_id" :disabled="sj.lock" class="neu-input neu-select text-uppercase"
                         title="Click Edit to modify details">
                         <option value="" disabled>-- Select Faculty --</option>
                         <option v-for="(emp, i) in employee" :key="i" :value="emp.emp_id">
@@ -447,11 +447,11 @@ onMounted(async () => {
                     <template v-if="!sj.lock">
                         <div class="action-btns d-flex gap-2 justify-content-center">
                             <button :disabled="checking" @click="saveFaculty(index, sj.subj_id, 'add')" type="button"
-                                class="btn btn-sm btn-success flex-fill" title="Assign Faculty">
+                                class="neu-btn neu-green p-2 flex-fill" title="Assign Faculty">
                                 Assign
                             </button>
                             <button :disabled="checking" @click="saveFaculty(index, sj.subj_id, 'remove')" type="button"
-                                class="btn btn-sm btn-danger flex-fill" title="Remove Faculty">
+                                class="neu-btn neu-red p-2 flex-fill" title="Remove Faculty">
                                 Remove
                             </button>
                         </div>
@@ -470,7 +470,7 @@ onMounted(async () => {
 
 <style scoped>
 .table-header {
-    background-color: #198754;
+    /* background-color: #198754; */
     /* green accent */
     padding: 10px;
     border-radius: 6px 6px 0 0;
@@ -485,7 +485,10 @@ onMounted(async () => {
 }
 
 .table-row:hover {
-    background-color: rgba(25, 135, 84, 0.05);
+  cursor: pointer;
+  transform: translateY(-2px);
+  box-shadow: 8px 8px 20px #bebebe, -8px -8px 20px #ffffff;
+  color: #2c2c2c;
 }
 
 .table-row>div {
@@ -538,7 +541,10 @@ onMounted(async () => {
         border: 1px solid #dee2e6;
         border-radius: 10px;
         margin-bottom: 10px;
-        background: #fff;
+        /* background: #fff; */
+        box-shadow:
+            inset 3px 3px 6px rgba(0, 0, 0, 0.18),
+            inset -8px -8px 6px rgba(255, 255, 255, 0.3);
         flex-direction: column;
         align-items: flex-start;
         padding: 12px;

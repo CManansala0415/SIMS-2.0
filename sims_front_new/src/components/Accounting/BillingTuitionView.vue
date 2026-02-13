@@ -7,7 +7,8 @@ import { ref, onMounted, computed } from 'vue';
 // import MiniYellowBtn from '../snippets/buttons/MiniYellowBtn.vue';
 // import MiniTealBtn from '../snippets/buttons/MiniTealBtn.vue';
 // import RedBtn from '../snippets/buttons/RedBtn.vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 // import Enroll from '../snippets/modal/Enrollment.vue';
 import ApplicationModal from '../snippets/modal/ApplicationModal.vue';
 import ApplicationFormModal from '../snippets/modal/ApplicationFormModal.vue';
@@ -444,106 +445,113 @@ const viewApplicationFormModal = (data) => {
             <h5 class=" text-uppercase fw-bold">Billing Tuition</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <!-- <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
-                         /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
-            </div> -->
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Search
-                </button>
-                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Scan QR 
-                </button>
-            </div>
-            <!-- <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> New Record
-                </button>
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('old')"
-                    type="button" class="btn btn-sm btn-info" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> Old Record
-                </button>
-            </div> -->
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">#</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Date Applied</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(applicant).length" v-for="(app, index) in applicant">
-                        <td class="align-middle">
-                            {{ app.per_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_firstname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_middlename ? app.per_middlename : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_lastname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_dateapplied }}
-                        </td>
-                        <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id)"
-                                    type="button" title="Edit Record" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-gear"/></button>
-                            </div>
-                        </td> 
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(applicant).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(applicant).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(applicant).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <!-- <div class="input-group w-50">
+                    <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
+                            /></span>
+                    <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
+                        v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
+                </div> -->
+                <div class="d-flex gap-2 justify-content-center align-content-center">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
+                    <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-id-card"/> Scan QR 
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ applicantCount }})</span> items</p>
+                <!-- <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"
+                        type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
+                        <font-awesome-icon icon="fa-solid fa-add"  /> New Record
+                    </button>
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('old')"
+                        type="button" class="btn btn-sm btn-info" :disabled="preLoading? true:false">
+                        <font-awesome-icon icon="fa-solid fa-add"  /> Old Record
+                    </button>
+                </div> -->
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3 " style="text-transform:uppercase">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">#</th>
+                            <th style="color:#555555">First Name</th>
+                            <th style="color:#555555">Middle Name</th>
+                            <th style="color:#555555">Last Name</th>
+                            <th style="color:#555555">Suffix Name</th>
+                            <th style="color:#555555">Date Applied</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(applicant).length" v-for="(app, index) in applicant">
+                            <td class="align-middle">
+                                {{ app.per_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_firstname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_middlename ? app.per_middlename : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_lastname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_dateapplied }}
+                            </td>
+                            <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id)"
+                                        type="button" title="Edit Record" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-gear"/></button>
+                                </div>
+                            </td> 
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(applicant).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                No Records Found
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(applicant).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(applicant).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ applicantCount }})</span> items</p>
+                </div>
             </div>
         </div>
+
     </div>
 
 
@@ -557,7 +565,7 @@ const viewApplicationFormModal = (data) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showFormModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                         <AccountingStudentAcc v-if="showFormModal" :personId="editId" :userId="userID" :modeId="2"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

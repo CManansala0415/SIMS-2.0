@@ -31,8 +31,8 @@ const downloadExcel = () => {
 </script>
 
 <template>
-  <div class="table-responsive small-font overflow-auto border p-2 rounded-2 shadow" style="height:40rem;">
-    <table class="table table-hover" id="main-table">
+  <div class="table-responsive small-font p-2 " style="height:40rem;">
+    <table class="neu-table-flat" id="main-table">
       <thead>
         <tr>
           <th class="fw-bold p-3 bg-secondary-subtle">Student ID</th>
@@ -83,7 +83,9 @@ const downloadExcel = () => {
         </tr>
         <tr v-if="!Object.keys(gradingSheet).length">
           <td class="p-3 text-center border border-mid-gray" colspan="2">
-            No Records Found
+            <NeuLoader4/>
+            <p class="fw-bold m-0">Nothing here yet!</p>
+            <p>The hamster took a break 💤 — try adding something new.</p>
           </td>
         </tr>
       </tbody>
@@ -91,8 +93,8 @@ const downloadExcel = () => {
   </div>
   <div class="d-flex justify-content-end mt-2 ">
     <button @click="downloadExcel(index - 1)" type="button"
-      class="btn btn-sm btn-primary">
-      <i class="mr-2 fa-solid fa-file-excel"></i>Download Excel File
+      class="neu-btn neu-green p-2">
+      <font-awesome-icon icon="fa-solid fa-file-excel"/> Download Excel File
     </button>
   </div>
 </template>

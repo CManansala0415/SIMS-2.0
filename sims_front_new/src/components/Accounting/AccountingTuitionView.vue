@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 // import AccItem from '../snippets/modal/AccItem.vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
 import { getFeeDetails, getTuitionInformation, editAccountingTuition, getAcademicDefaults, getQuarter, getAcademicStatus } from '../Fetchers.js';
@@ -309,111 +310,119 @@ const deactivateCharge = (data) =>{
     <div>
         <div class="p-3 mb-4 border-bottom">
             <h5 class=" text-uppercase fw-bold">Tuition / Charges Setup</h5>
+        </div> 
+
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="itemModal(1)"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div>
-        </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white w-25">Description</th>
-                        <th style="background-color: #237a5b;" class="text-white w-10">Semester</th>
-                        <th style="background-color: #237a5b;" class="text-white w-10">Program</th>
-                        <th style="background-color: #237a5b;" class="text-white w-25">Course</th>
-                        <th style="background-color: #237a5b;" class="text-white w-10">Grade/Year Level</th>
-                        <th style="background-color: #237a5b;" class="text-white w-10">Section</th>
-                        <th style="background-color: #237a5b;" class="text-white w-10">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(tuitionInfo).length" v-for="(act, index) in tuitionInfo">
-                        <td class="align-middle">
-                            {{ act.act_description }}
-                        </td>
-                        <td class="align-middle">
-                             {{ act.quar_desc?act.quar_desc:'All Semester' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ act.prog_desc? act.prog_desc == 'Senior High-School'? 'SHS':act.prog_desc:'All Programs' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ act.prog_code?act.prog_code:'All Courses' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ act.gradelvl_desc?act.gradelvl_desc:'All Grade Levels' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ act.sec_desc?act.sec_desc:'All Sections' }}
-                        </td>
-                        <td v-if="accessData[16].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button  v-if="!activeEnrollment" class="btn btn-sm btn-secondary" data-bs-toggle="modal" @click="itemModal(2, act)"
-                                    data-bs-target="#editdatamodal" title="Edit Data">
-                                    <font-awesome-icon icon="fa-solid fa-pen" />
-                                </button>
-                                <button  v-if="!activeEnrollment" class="btn btn-sm btn-secondary"
-                                    title="Delete Item" @click="itemModal(4, act)">
-                                    <font-awesome-icon icon="fa-solid fa-trash" />
-                                </button>
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal" @click="itemModal(3, act)"
-                                    data-bs-target="#editdatamodal" title="Edit Data">
-                                    <font-awesome-icon icon="fa-solid fa-gear" />
-                                </button>
-                                <button v-if="!activeEnrollment" class="btn btn-sm" :class="act.act_status == 1?'btn-success':'btn-danger'" @click="deactivateCharge(act)"
-                                    :title="act.act_status == 1?'Active':'Inactive'">
-                                    <font-awesome-icon icon="fa-solid fa-power-off"/>
-                                </button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(tuitionInfo).length">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(tuitionInfo).length">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(tuitionInfo).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ tuitionInfoCount }})</span> items</p>
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="itemModal(1)"
+                        type="button" class="neu-btn neu-green" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555" class="w-25">Description</th>
+                            <th style="color:#555555" class="w-10">Semester</th>
+                            <th style="color:#555555" class="w-10">Program</th>
+                            <th style="color:#555555" class="w-25">Course</th>
+                            <th style="color:#555555" class="w-10">Grade/Year Level</th>
+                            <th style="color:#555555" class="w-10">Section</th>
+                            <th style="color:#555555" class="w-10 text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(tuitionInfo).length" v-for="(act, index) in tuitionInfo">
+                            <td class="align-middle">
+                                {{ act.act_description }}
+                            </td>
+                            <td class="align-middle">
+                                {{ act.quar_desc?act.quar_desc:'All Semester' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ act.prog_desc? act.prog_desc == 'Senior High-School'? 'SHS':act.prog_desc:'All Programs' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ act.prog_code?act.prog_code:'All Courses' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ act.gradelvl_desc?act.gradelvl_desc:'All Grade Levels' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ act.sec_desc?act.sec_desc:'All Sections' }}
+                            </td>
+                            <td v-if="accessData[16].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button  v-if="!activeEnrollment" class="neu-btn-sm neu-white" data-bs-toggle="modal" @click="itemModal(2, act)"
+                                        data-bs-target="#editdatamodal" title="Edit Data">
+                                        <font-awesome-icon icon="fa-solid fa-pen" />
+                                    </button>
+                                    <button  v-if="!activeEnrollment" class="neu-btn-sm neu-white"
+                                        title="Delete Item" @click="itemModal(4, act)">
+                                        <font-awesome-icon icon="fa-solid fa-trash" />
+                                    </button>
+                                    <button class="neu-btn-sm neu-white" data-bs-toggle="modal" @click="itemModal(3, act)"
+                                        data-bs-target="#editdatamodal" title="Edit Data">
+                                        <font-awesome-icon icon="fa-solid fa-gear" />
+                                    </button>
+                                    <button v-if="!activeEnrollment" class="neu-btn" :class="act.act_status == 1?'neu-green':'neu-red'" @click="deactivateCharge(act)"
+                                        :title="act.act_status == 1?'Active':'Inactive'">
+                                        <font-awesome-icon icon="fa-solid fa-power-off"/>
+                                    </button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(tuitionInfo).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(tuitionInfo).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(tuitionInfo).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ tuitionInfoCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Edit Medical Modal -->
+    <!-- Edit Modal -->
     <div class="modal fade" id="editdatamodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div 
             class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
-            :class="manageSetup ? 'modal-fullscreen' : 'modal-md'"
+            :class="manageSetup ? 'modal-fullscreen' : 'modal-lg'"
             >
             <div class="modal-content">
                 <div class="modal-header">
@@ -421,7 +430,7 @@ const deactivateCharge = (data) =>{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showAddItemModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <AccountingTuitionEdit v-if="showAddItemModal" :itemData="toBeEdited"
                     :courseData="course" :sectionData="section" :programData="program" :gradelvlData="gradelvl" :manageSetupData="manageSetup" :quarterData="quarter" :activeEnrollmentData="activeEnrollment"/>
                 </div>

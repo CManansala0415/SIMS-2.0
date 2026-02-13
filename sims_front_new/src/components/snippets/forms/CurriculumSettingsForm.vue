@@ -3,6 +3,8 @@ import { ref, onMounted, computed } from 'vue';
 import {
     addCurriculum, addCurriculumTagging, getCurriculumSubject
 } from "../../Fetchers.js";
+import NeuLoader4 from '../loaders/NeuLoader4.vue'
+import NeuLoader1 from '../loaders/NeuLoader1.vue'
 
 const props = defineProps({
     subjectData: {
@@ -70,6 +72,8 @@ const editData = ref({
     curr_to: '',
     curr_addedby: ''
 })
+
+const preLoading = ref(true)
 const edit = (data) => {
 
     editForm.value = !editForm.value
@@ -101,7 +105,7 @@ const registerCurriculum = () => {
     // console.log(editData.value)
     Swal.fire({
         title: "Saving Updates",
-        text: "Please wait while we check all transaction details.",
+        text: "Please wait while we check all necessary details.",
         allowOutsideClick: false,
         didOpen: () => {
             Swal.showLoading();
@@ -146,6 +150,7 @@ onMounted(async () => {
     filteredCourseModal.value = course.value
     filteredCurriculum.value = curriculum.value
     filteredSubject.value = subject.value
+    preLoading.value = false
 })
 
 const reset = () => {
@@ -343,86 +348,103 @@ const saveData = () => {
 }
 </script>
 <template>
-    <div>
-        <div class="p-3 d-flex align-content-center justify-content-center">
-            <p class="text-uppercase fw-bold green-mid text-white rounded-3 p-2 small-font">Curriculum Settings</p>
+    <div class="small-font">
+        <div class="p-3">
+            <p class="text-uppercase fw-bold">Curriculum Settings</p>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
+        <!-- <div class="p-3 d-flex gap-2 justify-content-between mb-3">
             <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
+                <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
                     v-model="searchValue" @keyup="search()" aria-describedby="searchaddon">
             </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end">
+            <div class="d-flex flex-wrap w-10 justify-content-end">
                 <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit()" type="button"
-                    class="btn btn-sm btn-primary">
+                    class="neu-btn neu-green">
                     <font-awesome-icon icon="fa-solid fa-add" /> Add New
                 </button>
             </div>
+        </div> -->
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Code</th>
-                        <th style="background-color: #237a5b;" class="text-white">Course</th>
-                        <th style="background-color: #237a5b;" class="text-white">Program</th>
-                        <th style="background-color: #237a5b;" class="text-white">From</th>
-                        <th style="background-color: #237a5b;" class="text-white">To</th>
-                        <th style="background-color: #237a5b;" class="text-white">Status</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(cr, index) in filteredCurriculum">
-                        <td class="align-middle ">
-                            {{ cr.curr_code }}
-                        </td>
-                        <td class="align-middle">
-                            <select class="form-control form-select-sm pe-none bg-transparent border-0 text-center"
-                                disabled v-model="cr.curr_progid">
-                                <option value="" disabled>-- Select Type --</option>
-                                <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_name }}</option>
-                            </select>
-                        </td>
-                        <td class="align-middle">
-                            <select class="form-control form-select-sm pe-none bg-transparent border-0 text-center"
-                                disabled v-model="cr.curr_progtype">
-                                <option value="" disabled>-- Select Type --</option>
-                                <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
-                            </select>
-                        </td>
-                        <td class="align-middle">
-                            {{ cr.curr_from }}
-                        </td>
-                        <td class="align-middle">
-                            {{ cr.curr_to }}
-                        </td>
-                        <td class="align-middle">
-                            {{ cr.curr_status == 1 ? 'Active' : 'Inactive' }}
-                        </td>
-                        <td class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit(cr)" type="button"
-                                    title="Edit Record" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen" /></button>
-                                <button @click="deactivate(cr.curr_id)" type="button" title="Delete Record"
-                                    class="btn btn-secondary btn-sm"> <font-awesome-icon
-                                        icon="fa-solid fa-trash" /></button>
-                                <button data-bs-toggle="modal" data-bs-target="#setdatamodal" @click="setData(cr)"
-                                    type="button" title="Tag Subjects" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-add" /></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr v-if="!Object.keys(filteredCurriculum).length">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+
+        <div v-else>
+            <div class="p-3 d-flex gap-1 justify-content-between">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
+                </div>
+                <div class="d-flex w-25 justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit()"
+                        type="button" class="neu-btn neu-green" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                    <button class="neu-btn neu-blue" :disabled="preLoading ? true : false"
+                        @click="$emit('close')"><font-awesome-icon icon="fa-solid fa-rotate-left" size="sm" /> Back
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-responsive border p-3">
+                <table class="neu-table">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Code</th>
+                            <th style="color:#555555">Course</th>
+                            <th style="color:#555555">Program</th>
+                            <th style="color:#555555">From</th>
+                            <th style="color:#555555">To</th>
+                            <th style="color:#555555">Status</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(cr, index) in filteredCurriculum">
+                            <td class="align-middle ">
+                                {{ cr.curr_code }}
+                            </td>
+                            <td class="align-middle">
+                                {{ course.find(c => c.prog_id === cr.curr_progid)?.prog_name || '—' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ program.find(p => p.dtype_id === cr.curr_progtype)?.dtype_desc || '—' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ cr.curr_from }}
+                            </td>
+                            <td class="align-middle">
+                                {{ cr.curr_to }}
+                            </td>
+                            <td class="align-middle">
+                                {{ cr.curr_status == 1 ? 'Active' : 'Inactive' }}
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit(cr)" type="button"
+                                        title="Edit Record" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen" /></button>
+                                    <button @click="deactivate(cr.curr_id)" type="button" title="Delete Record"
+                                        class="neu-btn-sm neu-white"> <font-awesome-icon
+                                            icon="fa-solid fa-trash" /></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#setdatamodal" @click="setData(cr)"
+                                        type="button" title="Tag Subjects" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-add" /></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr v-if="!Object.keys(filteredCurriculum).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -436,11 +458,11 @@ const saveData = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="editForm = false"></button>
                 </div>
-                <div class="modal-body">
-                    <form @submit.prevent="registerCurriculum()" class="d-flex flex-column p-2 gap-2">
+                <div class="modal-body neu-bg small-font">
+                    <form @submit.prevent="registerCurriculum()" class="d-flex flex-column p-3 neu-card gap-2">
                         <div class="d-flex flex-wrap flex-column">
                             <p class="text-success fw-bold">Curriculum Settings</p>
-                            <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span
+                            <p class=" fst-italic p-2 small-font"><span
                                     class="fw-bold">Note:
                                 </span><span class="italic">Ensure that the details of the following applicant are
                                     correct.
@@ -451,11 +473,11 @@ const saveData = () => {
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Curriculum Title</label>
                             <input v-model="editData.curr_code" required type="text"
-                                class="form-control form-control-sm" />
+                                class="neu-input" />
                         </div>
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Program</label>
-                            <select class="form-control" v-model="editData.curr_progtype"
+                            <select class="neu-input neu-select" v-model="editData.curr_progtype"
                                 @change="filterCourse(editData.curr_progtype)" required>
                                 <option value="" disabled>-- Select Type --</option>
                                 <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}</option>
@@ -463,7 +485,7 @@ const saveData = () => {
                         </div>
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Course</label>
-                            <select class="form-control" v-model="editData.curr_progid"
+                            <select class="neu-input neu-select" v-model="editData.curr_progid"
                                 :disabled="editData.curr_progtype ? false : true" required>
                                 <option value="" disabled>-- Select Type --</option>
                                 <option v-for="(cr, index) in filteredCourseModal" :value="cr.prog_id">{{ cr.prog_name
@@ -473,16 +495,16 @@ const saveData = () => {
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Year From</label>
                             <input v-model="editData.curr_from" required type="number" minlength="4" maxlength="4"
-                                class="form-control form-control-sm" />
+                                class="neu-input" />
                         </div>
                         <div class="d-flex flex-wrap form-group">
                             <label for="type">Year To</label>
                             <input v-model="editData.curr_to" required type="number" minlength="4" maxlength="4"
-                                class="form-control form-control-sm" />
+                                class="neu-input" />
                         </div>
                         <div class="d-flex flex-column mt-3">
                             <button :disabled="saving ? true : false" type="submit"
-                                class="btn btn-sm btn-primary">Register</button>
+                                class="neu-btn neu-green"><font-awesome-icon icon="fa-solid fa-gear"/> Register</button>
                         </div>
                     </form>
                 </div>
@@ -528,7 +550,7 @@ const saveData = () => {
                                 
                                 <div class="col">
                                     <label for="type">Semester</label>
-                                    <select class="form-control form-select-sm" v-model="activeQuarter">
+                                    <select class="neu-input neu-select form-select-sm" v-model="activeQuarter">
                                         <option value="" disabled>-- Select Quarter --</option>
                                         <option v-for="(qr, index) in quarter" :value="qr.quar_id">
                                             {{ qr.quar_desc }}
@@ -537,7 +559,7 @@ const saveData = () => {
                                 </div>
                                 <div class="col">
                                     <label for="type">Grade Level</label>
-                                    <select class="form-control form-select-sm" v-model="activeGradelvl">
+                                    <select class="neu-input neu-select form-select-sm" v-model="activeGradelvl">
                                         <option value="" disabled>-- Select Grade Level --</option>
                                         <option v-for="(gr, index) in gradelvl" :value="gr.grad_id"
                                             :disabled="gr.grad_dtypeid == currData.curr_progtype ? false : true">
@@ -561,7 +583,7 @@ const saveData = () => {
                                             <div class="border p-2 form-group">
                                                 <label for="type">Search Subject</label>
                                                 <input v-model="searchValueSubject" @keyup="searchSubject" type="text"
-                                                    :disabled="!loadItems ? true : false" class="form-control form-control-sm" />
+                                                    :disabled="!loadItems ? true : false" class="neu-input" />
                                             </div>
                                             <div class="table-responsive border p-2 small-font" style="height: 227px;">
                                                 <table class="table table-hover">

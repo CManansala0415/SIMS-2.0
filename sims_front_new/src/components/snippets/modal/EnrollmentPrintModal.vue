@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "../../../routes/user.js";
 import { getCurriculumSubject, getEnrollment, getMilestone, addMilestone, updateEnrollment, updateMilestone, getCommandUpdateCurriculum } from "../../Fetchers.js";
-import Loader from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     pdfGenerator
 } from "../../Generators.js";
@@ -559,12 +559,12 @@ const downloadPdf = () => {
     <div v-if="milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
         <div class="p-3 text-center" style="text-transform:none">
             <div class="m-3">
-                <Loader />
+                <NeuLoader2 />
             </div>
         </div>
     </div>
 
 
-    <button class="btn btn-success w-100 mt-3" @click="downloadPdf()" v-if="!milestoneLoading && Object.keys(milestone).length"
+    <button class="neu-btn neu-green p-2 mt-3" @click="downloadPdf()" v-if="!milestoneLoading && Object.keys(milestone).length"
         v-show="!milestoneLoading && Object.keys(milestone).length">Download Form</button>
 </template>

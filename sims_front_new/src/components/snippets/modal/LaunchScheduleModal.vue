@@ -10,7 +10,7 @@ import {
     getFacultyAvailability
 
 } from "../../Fetchers.js";
-import Loader from '../loaders/Loading1.vue';
+import NeuLoader1 from '../loaders/NeuLoader1.vue';
 import LaunchSchedulerModal from './LaunchSchedulerModal.vue';
 import LaunchOccupancyModal from './LaunchOccupancyModal.vue';
 import LaunchFacultyModal from './LaunchFacultyModal.vue';
@@ -70,157 +70,183 @@ const time = ref([
         timeid: '06000630A',
         timename: '6:00 - 6:30',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '06300700A',
         timename: '6:30 - 7:00',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '07000730A',
         timename: '7:00 - 7:30',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '07300800A',
         timename: '7:30 - 8:00',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '08000830A',
         timename: '8:00 - 8:30',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '08300900A',
         timename: '8:30 - 9:00',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '09000930A',
         timename: '9:00 - 9:30',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '09301000A',
         timename: '9:30 - 10:00',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '10001030A',
         timename: '10:00 - 10:30',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '10301100A',
         timename: '10:30 - 11:00',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '11001130A',
         timename: '11:00 - 11:30',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '11301200A',
         timename: '11:30 - 12:00',
         daytime: 'AM',
-        classname: 'border align-middle bg-primary-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '12001230P',
         timename: '12:00 - 12:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-warning-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '12300100P',
         timename: '12:30 - 1:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-warning-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '01000130P',
         timename: '01:00 - 01:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '01300200P',
         timename: '1:30 - 2:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '02000230P',
         timename: '2:00 - 2:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '02300300P',
         timename: '2:30 - 3:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '03000330P',
         timename: '3:00 - 3:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '03300400P',
         timename: '3:30 - 4:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '04000430P',
         timename: '4:00 - 4:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '04300500P',
         timename: '4:30 - 5:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '05000530P',
         timename: '5:00 - 5:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '05300600P',
         timename: '5:30 - 6:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '06000630P',
         timename: '6:00 - 6:30',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     },
     {
         timeid: '06300700P',
         timename: '6:30 - 7:00',
         daytime: 'PM',
-        classname: 'border align-middle bg-info-subtle small-font',
+        classname: 'p-1',
+        style:''
     }
 ])
 
@@ -1133,19 +1159,19 @@ const loadFaculty = () => {
 </script>
 <template>
     <div v-if="!preLoading" class="p-1 d-flex gap-2 justify-content-end mb-3">
-        <div class="d-flex flex-wrap w-50 justify-content-end">
-            <button tabindex="-1" @click="close" type="button" class="btn btn-sm btn-primary"
+        <div class="d-flex flex-wrap w-25 justify-content-end">
+            <button tabindex="-1" @click="close" type="button" class="neu-btn neu-blue p-2"
                 :disabled="preLoading ? true : false"> <font-awesome-icon icon="fa-solid fa-rotate-left" /> Back
             </button>
         </div>
     </div>
-    <div class="border p-3">
-        <div class="w-100">
+    <div class="border p-3 text-dim">
+        <div class="neu-card">
             <div class="w-100 align-content-center p-3">
                 <span class="fw-bold">{{ launch.prog_name }}({{ launch.prog_code }})</span>
             </div>
             <div class="d-flex gap-2 p-2 small-font mb-3">
-                <div class="w-100 border d-flex align-content-center justify-content-evenly rounded-2 shadow p-3">
+                <div class="w-100 border d-flex align-content-center justify-content-evenly p-3">
                     <span class="">Semester: &nbsp;<span class="text-success fw-bold">{{ launch.quar_code
                             }}</span></span>
                     <span class="">Degree: &nbsp;<span class="text-success fw-bold">{{ launch.dtype_desc
@@ -1160,7 +1186,7 @@ const loadFaculty = () => {
                 </div>
             </div>
         </div>
-        <div class="">
+        <div class="p-4 neu-card-inner">
             <div v-if="!preLoading && Object.keys(curriculum).length"
                 :class="saving || preLoading ? 'd-flex gap-2 pe-none p-3 bg-secondary-subtle justify-content-center' : 'd-flex gap-2 pe-auto p-3 bg-secondary-subtle justify-content-center'">
                 <!-- <button :disabled="saving || preLoading ? true : false" @click="loadSched()" tabindex="-1"
@@ -1169,13 +1195,13 @@ const loadFaculty = () => {
                 </button> -->
                 <button v-if="Object.keys(loadedSched).length" :disabled="saving || preLoading ? true : false"
                     @click="loadFaculty()" tabindex="-1" title="Load Faculties" type="button" data-bs-toggle="modal"
-                    data-bs-target="#facultymodal" class="btn btn-sm btn-dark">
-                    Assign Faculties
+                    data-bs-target="#facultymodal" class="neu-btn neu-light-gray p-2">
+                    <font-awesome-icon icon="fa-solid fa-user-plus"/> Assign Faculties
                 </button>
                 <button v-if="Object.keys(loadedSched).length" :disabled="saving || preLoading ? true : false"
                     @click="loadOccupancy()" tabindex="-1" title="Load Schedule" type="button" data-bs-toggle="modal"
-                    data-bs-target="#occupancymodal" class="btn btn-sm btn-dark">
-                    View Occupancy
+                    data-bs-target="#occupancymodal" class="neu-btn neu-light-gray p-2">
+                    <font-awesome-icon icon="fa-solid fa-eye"/> View Occupancy
                 </button>
 
             </div>
@@ -1194,11 +1220,11 @@ const loadFaculty = () => {
                     <p class="small-font">Please assign corresponding faculty for each subject first to access schedule
                         editor.</p>
                 </div>
-                <table v-else class="w-100 table-fixed calendar-table">
+                <table v-else class="w-100 table-fixed calendar-table small-font">
                     <thead>
                         <tr>
                             <th v-for="(hd, index) in headers" :key="index"
-                                class="p-3 text-center text-uppercase fw-bold">
+                                class="p-3 text-center text-uppercase">
                                 {{ hd.title }}
                             </th>
                         </tr>
@@ -1207,14 +1233,14 @@ const loadFaculty = () => {
                     <tbody>
                         <tr v-for="(tm, index) in loadedSched" :key="index">
                             <!-- Time Column -->
-                            <td class="time-cell text-center fw-semibold bg-light">
+                            <td class="time-cell text-center">
                                 {{ tm.timename }} {{ tm.daytime }}
                             </td>
 
                             <!-- Monday -->
-                            <td class="day-cell" :class="tm.classname">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <template v-if="tm.sched_mon_code">
-                                    <div class="sched-tile" data-bs-toggle="modal" data-bs-target="#schedulermodal"
+                                    <div class="sched-tile neu-pastel-grass" data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                         @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid, tm.sched_mon_mergeable, tm)">
                                         <div class="tile-code">{{ tm.sched_mon_code }}</div>
                                         <div class="tile-sec">{{ tm.mon_sec_name }}</div>
@@ -1231,12 +1257,12 @@ const loadFaculty = () => {
                             </td>
 
                             <!-- Tuesday -->
-                            <td class="day-cell" :class="tm.classname">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <template v-if="tm.sched_tue_code">
-                                    <div class="sched-tile bg-success-subtle border-success" data-bs-toggle="modal"
+                                    <div class="sched-tile neu-pastel-mint" data-bs-toggle="modal"
                                         data-bs-target="#schedulermodal"
                                         @click="assignSubject(tm.timeid, 'Tuesday', index, tm.sched_tue, tm.sched_tue_bid, tm.sched_tue_classrid, tm.sched_tue_mergeable, tm)">
-                                        <div class="tile-code text-success">{{ tm.sched_tue_code }}</div>
+                                        <div class="tile-code">{{ tm.sched_tue_code }}</div>
                                         <div class="tile-sec">{{ tm.tue_sec_name }}</div>
                                         <div class="tile-fac text-muted small">{{ tm.tue_faculty }}</div>
                                     </div>
@@ -1251,12 +1277,12 @@ const loadFaculty = () => {
                             </td>
 
                             <!-- Wednesday -->
-                            <td class="day-cell" :class="tm.classname">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <template v-if="tm.sched_wed_code">
-                                    <div class="sched-tile bg-info-subtle border-info" data-bs-toggle="modal"
+                                    <div class="sched-tile neu-pastel-sky" data-bs-toggle="modal"
                                         data-bs-target="#schedulermodal"
                                         @click="assignSubject(tm.timeid, 'Wednesday', index, tm.sched_wed, tm.sched_wed_bid, tm.sched_wed_classrid, tm.sched_wed_mergeable, tm)">
-                                        <div class="tile-code text-info">{{ tm.sched_wed_code }}</div>
+                                        <div class="tile-code">{{ tm.sched_wed_code }}</div>
                                         <div class="tile-sec">{{ tm.wed_sec_name }}</div>
                                         <div class="tile-fac text-muted small">{{ tm.wed_faculty }}</div>
                                     </div>
@@ -1271,12 +1297,12 @@ const loadFaculty = () => {
                             </td>
 
                             <!-- Thursday -->
-                            <td class="day-cell" :class="tm.classname">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <template v-if="tm.sched_thurs_code">
-                                    <div class="sched-tile bg-warning-subtle border-warning" data-bs-toggle="modal"
+                                    <div class="sched-tile neu-pastel-blue" data-bs-toggle="modal"
                                         data-bs-target="#schedulermodal"
                                         @click="assignSubject(tm.timeid, 'Thursday', index, tm.sched_thurs, tm.sched_thurs_bid, tm.sched_thurs_classrid, tm.sched_thurs_mergeable, tm)">
-                                        <div class="tile-code text-warning">{{ tm.sched_thurs_code }}</div>
+                                        <div class="tile-code">{{ tm.sched_thurs_code }}</div>
                                         <div class="tile-sec">{{ tm.thurs_sec_name }}</div>
                                         <div class="tile-fac text-muted small">{{ tm.thurs_faculty }}</div>
                                     </div>
@@ -1291,12 +1317,12 @@ const loadFaculty = () => {
                             </td>
 
                             <!-- Friday -->
-                            <td class="day-cell" :class="tm.classname">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <template v-if="tm.sched_fri_code">
-                                    <div class="sched-tile bg-danger-subtle border-danger" data-bs-toggle="modal"
+                                    <div class="sched-tile neu-pastel-purple" data-bs-toggle="modal"
                                         data-bs-target="#schedulermodal"
                                         @click="assignSubject(tm.timeid, 'Friday', index, tm.sched_fri, tm.sched_fri_bid, tm.sched_fri_classrid, tm.sched_fri_mergeable, tm)">
-                                        <div class="tile-code text-danger">{{ tm.sched_fri_code }}</div>
+                                        <div class="tile-code">{{ tm.sched_fri_code }}</div>
                                         <div class="tile-sec">{{ tm.fri_sec_name }}</div>
                                         <div class="tile-fac text-muted small">{{ tm.fri_faculty }}</div>
                                     </div>
@@ -1311,12 +1337,12 @@ const loadFaculty = () => {
                             </td>
 
                             <!-- Saturday -->
-                            <td class="day-cell" :class="tm.classname">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <template v-if="tm.sched_sat_code">
-                                    <div class="sched-tile bg-secondary-subtle border-secondary" data-bs-toggle="modal"
+                                    <div class="sched-tile neu-pastel-pink" data-bs-toggle="modal"
                                         data-bs-target="#schedulermodal"
                                         @click="assignSubject(tm.timeid, 'Saturday', index, tm.sched_sat, tm.sched_sat_bid, tm.sched_sat_classrid, tm.sched_sat_mergeable, tm)">
-                                        <div class="tile-code text-secondary">{{ tm.sched_sat_code }}</div>
+                                        <div class="tile-code">{{ tm.sched_sat_code }}</div>
                                         <div class="tile-sec">{{ tm.sat_sec_name }}</div>
                                         <div class="tile-fac text-muted small">{{ tm.sat_faculty }}</div>
                                     </div>
@@ -1335,25 +1361,25 @@ const loadFaculty = () => {
 
                 <div v-if="allow" class="mt-3 mb-3 w-100 d-flex gap-2 justify-content-end">
                     <button @click="clearSched()" tabindex="-1" title="Assign Schedule" type="button"
-                        class="btn btn-sm btn-dark">
-                        <i class="mr-2 fa-solid fa-arrows-rotate"></i>Refresh Schedule
+                        class="neu-btn neu-orange p-2">
+                        <font-awesome-icon icon="fa-solid fa-arrows-rotate"/> Refresh Schedule
                     </button>
                     <button @click="saveSched()" tabindex="-1" title="Assign Schedule" type="button"
-                        class=" btn btn-sm btn-primary">
-                        <i class="mr-2 fa-solid fa-floppy-disk"></i>Save Schedule
+                        class="neu-btn neu-green p-2">
+                        <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save Schedule
                     </button>
                 </div>
             </div>
 
             <div v-if="preLoading" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
-                    <Loader />
-                    <p class=" mt-3">This may take a while</p>
+                    <NeuLoader1 />
+                    <p class=" mt-3">This may take a while, the wheels are bit heavier</p>
                 </div>
             </div>
             <div v-if="saving" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
-                    <Loader />
+                    <NeuLoader1 />
                     <p class=" mt-3">{{ savingCount }} out of {{ Object.keys(scheduleList).length }}</p>
                     <p class=" mt-3">Saving Items Please Wait...</p>
                 </div>
@@ -1371,7 +1397,7 @@ const loadFaculty = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showScheduler = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <LaunchSchedulerModal v-if="showScheduler" :subjectData="filteredSubjects" :subjidData="addedSubjId"
                         :timeidData="timeId" :timedayData="timeDay" :buildingData="building" :classroomData="classroom"
                         :buildingIdData="buildingId" :classroomIdData="classroomId" :curriculumData="curriculum"
@@ -1404,7 +1430,7 @@ const loadFaculty = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showOccupancy = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <LaunchOccupancyModal :launchData="launch" :buildingData="building" :classroomData="classroom"
                         :headerData="headers" :timeData="time" />
                 </div>
@@ -1434,7 +1460,7 @@ const loadFaculty = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showFaculty = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <LaunchFacultyModal :subjectData="filteredSubjects" :curriculumIdData="launch.ln_curriculum"
                         :launchIdData="launch.ln_id" :semIdData="launch.ln_quarter"
                         :gradelvlData="launch.ln_gradelvl" />
@@ -1464,15 +1490,15 @@ input:focus {
 .calendar-table {
     border-collapse: collapse;
     width: 100%;
-    background-color: #f5f8ff;
+    /* background-color: #f5f8ff; */
 }
 
 .time-cell {
     width: 120px;
-    border-right: 2px solid #dee2e6;
+    border-right: 2px solid #ffffff;
     border-bottom: 1px solid #e9ecef;
     font-size: 0.9rem;
-    background-color: #fff !important;
+    /* background-color: #fff !important; */
 }
 
 .day-cell {
@@ -1486,20 +1512,25 @@ input:focus {
 
 /* Schedule tiles (for occupied cells) */
 .sched-tile {
-    background: #f0f6ff;
-    border: 1.4px solid #2f80ed;
+    /* background: #f0f6ff;*/
+    /* background: #f7f7f7;  */
+    /* border: 1.4px solid #2f80ed; */
     border-radius: 10px;
     padding: 10px 12px;
     width: 95%;
     margin: 0 auto;
-    box-shadow: 0 2px 0 rgba(47, 128, 237, 0.06);
+    box-shadow: 
+      2px 2px 7px rgba(119, 119, 119, 0.6),
+        -2px -2px 10px rgba(255, 255, 255, 0.6);
     cursor: pointer;
     transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .sched-tile:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 18px rgba(47, 128, 237, 0.12);
+    transform: translateY(-1px);
+    box-shadow: 
+      inset 2px 2px 7px rgba(119, 119, 119, 0.6),
+        inset -2px -2px 10px rgba(255, 255, 255, 0.6);
 }
 
 .tile-code {

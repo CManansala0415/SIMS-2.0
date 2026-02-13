@@ -2,12 +2,13 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getUserID } from "../../../routes/user.js";
-import Loader1 from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     getPerson,
     addStudentClinicalRecord,
     getStudentClinicalRecords
 } from "../../Fetchers.js";
+import { formatDateTime } from '../../Generators.js';
 
 const props = defineProps({
     genderData: {
@@ -269,6 +270,16 @@ const getAge = (bday) => {
 
 const updateMedicalRecords = () => {
     saving.value = true
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+
     addStudentClinicalRecord(clinicalRecords.value, 1).then((results) => {
         if (results.status == 200) {
             // alert('Update Successful')
@@ -278,6 +289,7 @@ const updateMedicalRecords = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close();
                 location.reload()
             });
         } else {
@@ -288,6 +300,7 @@ const updateMedicalRecords = () => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close();
                 location.reload()
             });
         }
@@ -297,10 +310,282 @@ const updateMedicalRecords = () => {
 </script>
 <template>
     <div v-if="checking">
-        <Loader1></Loader1>
+        <NeuLoader2></NeuLoader2>
     </div>
-    <div v-else class="d-flex flex-column gap-2 small-font">
-        <div class="accordion" id="medicalaccordion">
+    <div v-else class="d-flex flex-column gap-2 neu-card-inner p-4 text-dim small-font">
+        <div class="neu-card">
+            <div class="">
+                <div class="d-flex flex-column gap-2 p-4">
+                    <div class="text-start">
+                        <div class="row p-3">
+                             <div class="p-2">
+                                <p class="fw-bold m-0">Student Information</p>
+                            </div>
+                             <div class="col-md-12 col-lg-12 neu-card p-3 mb-3 mt-3">
+                                <p class="m-0 text-uppercase">&nbsp;{{ personal.per_lastname }}, {{ personal.per_firstname }} {{ personal.per_middlename }}</p>
+                            </div>
+                            <div class="col-md-12 col-lg-6 px-3">
+                                <p class="fw-bold">Personal Information</p>
+                                <p>Gender: <span class="text-uppercase">{{ gender.find(gen => gen.gen_id === personal.per_gender)?.gen_desc || '—' }}</span></p>
+                                <p>Civil Status: <span class="text-uppercase">{{ civilstatus.find(cv => cv.cv_id === personal.per_civilstatus)?.cv_desc || '—' }}</span></p>
+                                <p>Nationality: <span class="text-uppercase">{{ nationality.find(nat => nat.nat_id === personal.per_nationality)?.nat_desc || '—' }}</span></p>
+                                <p>Cellphone No.: <span class="text-uppercase">{{ personal.per_contact }}</span></p>
+                                <p>Email: <span class="text-uppercase">{{ personal.per_email }}</span></p>
+                            </div>
+                            <div class="col-md-12 col-lg-6 px-3">
+                                <p class="fw-bold">Birth Information</p>
+                                <p>Birthday: <span class="text-uppercase">{{ personal.per_birthday }}</span></p>
+                                <p>Age: <span class="text-uppercase">{{ age }}</span></p>
+                                <p>Birth Province: <span class="text-uppercase">{{ filteredBirthProvince.find(prov => prov.provCode === personal.per_birth_province)?.provDesc || '—' }}</span></p>
+                                <p>Birth City: <span class="text-uppercase">{{ filteredBirthCity.find(city => city.citymunCode === personal.per_birth_city)?.citymunDesc || '—' }}</span></p>
+                            </div>
+                            <div class="col-md-12 col-lg-6 px-3">
+                                <p class="fw-bold">Present Address</p>
+                                <p>Home: <span class="text-uppercase">{{ personal.per_home }}</span></p>
+                                <p>Region: <span class="text-uppercase">{{ filteredCurrRegion.find(reg => reg.regCode === personal.per_curr_region)?.regDesc || '—' }}</span></p>
+                                <p>Province: <span class="text-uppercase">{{ filteredCurrProvince.find(prov => prov.provCode === personal.per_curr_province)?.provDesc || '—' }}</span></p>
+                                <p>City: <span class="text-uppercase">{{ filteredCurrCity.find(city => city.citymunCode === personal.per_curr_city)?.citymunDesc || '—' }}</span></p>
+                                <p>Barangay: <span class="text-uppercase">{{ filteredCurrBarangay.find(bar => bar.brgyCode === personal.per_curr_barangay)?.brgyDesc || '—' }}</span></p>
+                                <p>Zipcode: <span class="text-uppercase">{{ personal.per_curr_zipcode }}</span></p>
+                            </div>
+                            <div class="col-md-12 col-lg-6 px-3">
+                                <p class="fw-bold">Present Address</p>
+                                <p>Home: <span class="text-uppercase">{{ personal.per_home }}</span></p>
+                                <p>Region: <span class="text-uppercase">{{ filteredPermRegion.find(reg => reg.regCode === personal.per_perm_region)?.regDesc || '—' }}</span></p>
+                                <p>Province: <span class="text-uppercase">{{ filteredPermProvince.find(prov => prov.provCode === personal.per_perm_province)?.provDesc || '—' }}</span></p>
+                                <p>City: <span class="text-uppercase">{{ filteredPermCity.find(city => city.citymunCode === personal.per_perm_city)?.citymunDesc || '—' }}</span></p>
+                                <p>Barangay: <span class="text-uppercase">{{ filteredPermBarangay.find(bar => bar.brgyCode === personal.per_perm_barangay)?.brgyDesc || '—' }}</span></p>
+                                <p>Zipcode: <span class="text-uppercase">{{ personal.per_perm_zipcode }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="neu-card">
+            <div class="">
+                <div class="d-flex flex-column gap-2 p-4">
+                    <div class="text-start">
+                        <div class="row p-3">
+                             <div class="p-2">
+                                <p class="fw-bold m-0">Medical Information</p>
+                            </div>
+                            <div class="col-md-12 col-lg-12 neu-card p-3 mb-3 mt-3">
+                                <p class="m-0 text-uppercase">&nbsp;{{ personal.per_lastname }}, {{ personal.per_firstname }} {{ personal.per_middlename }}</p>
+                            </div>
+                            <div class="col-md-12 col-lg-6 mb-3">
+                                <form @submit.prevent="updateMedicalRecords()" class="h-100">
+                                    <p class="fw-bold">Consultation Information</p>
+                                    <div class="w-100 d-flex flex-column gap-2 h-100">
+                                        <div class="form-group col text-start">
+                                            <label>1st Dose Vaccine</label>
+                                            <input v-model="clinicalRecords.clnc_1st_dose" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>2nd Dose Vaccine</label>
+                                            <input v-model="clinicalRecords.clnc_2nd_dose" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>3rd Dose Vaccine</label>
+                                            <input v-model="clinicalRecords.clnc_3rd_dose" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Family illness History</label>
+                                            <input v-model="clinicalRecords.clnc_fam_illness" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Social History</label>
+                                            <select class="neu-input neu-select"
+                                                v-model="clinicalRecords.clnc_social_history" required>
+                                                <option value="0">N/A</option>
+                                                <option value="1">Tobacco</option>
+                                                <option value="2">Alcohol</option>
+                                                <option value="3">Illicit Drug</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Medication</label>
+                                            <input v-model="clinicalRecords.clnc_medication" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Height (Ft)</label>
+                                            <input v-model="clinicalRecords.clnc_height" required type="number"
+                                                step="0.01" class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Weight (Kg)</label>
+                                            <input v-model="clinicalRecords.clnc_weight" required type="number"
+                                                step="0.01" class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Allergy</label>
+                                            <select class="neu-input neu-select"
+                                                v-model="clinicalRecords.clnc_allergy" required>
+                                                <option value="0">N/A</option>
+                                                <option value="1">Food</option>
+                                                <option value="2">Drug</option>
+                                                <option value="3">Chemicals</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Specify</label>
+                                            <input v-model="clinicalRecords.clnc_item" required
+                                                :disabled="clinicalRecords.clnc_allergy == 0 ? true : false" type="text"
+                                                class="neu-input disabled:cursor-not-allowed disabled:opacity-50" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Diet</label>
+                                            <input v-model="clinicalRecords.clnc_diet" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Chief Complaints / Assessment</label>
+                                            <textarea class="h-36 neu-input"
+                                                v-model="clinicalRecords.clnc_complaint" required>
+                                                </textarea>
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Evaluation</label>
+                                            <input v-model="clinicalRecords.clnc_evaluation" required type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        <div class="form-group col text-start">
+                                            <label>Intervention</label>
+                                            <input v-model="clinicalRecords.clnc_intervention" type="text"
+                                                class="neu-input" />
+                                        </div>
+                                        
+                                        <button :disabled="saving ? true : false" type="submit"
+                                            class="neu-btn neu-green w-100 mt-3 p-2">
+                                            <font-awesome-icon icon="fa-solid fa-plus"/> Add Data
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-12 col-lg-6 mb-3" style="height:70rem;">
+                                <p class="fw-bold">Medical Examinations Conducted</p>
+                                <div class="neu-card-inner w-100 p-3 h-100 overflow-auto ">
+                                    <div v-if="!Object.keys(clinicalRecordsList).length"
+                                        class="p-2 text-center">
+                                        <span class="fw-bold text-danger">No Medical Records Found</span>
+                                    </div>
+                                    <div v-else class="p-3 d-flex flex-column gap-2"> 
+                                        <div v-for="(stud, index) in clinicalRecordsList">
+                                            <div class="neu-card">
+                                                <ul class="list-group list-group-flush text-dim py-4">
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Medical information as of last checkup: <span
+                                                            class="fw-bold"> <br/>{{
+                                                                formatDateTime(stud.clnc_date)
+                                                            }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        1st Dose Vaccine: <span class="fw-bold">{{
+                                                            stud.clnc_1st_dose ?
+                                                                stud.clnc_1st_dose : 'N/A' }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        2nd Dose Vaccine: <span class="fw-bold">{{
+                                                            stud.clnc_2nd_dose ?
+                                                                stud.clnc_2nd_dose : 'N/A' }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        3rd Dose Vaccine: <span class="fw-bold">{{
+                                                            stud.clnc_3rd_dose ?
+                                                                stud.clnc_3rd_dose : 'N/A' }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Family Illness History: <span class="fw-bold">{{
+                                                            stud.clnc_fam_illness ?
+                                                                stud.clnc_fam_illness : 'No History' }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Social Illness History:
+                                                        <span v-if="stud.clnc_social_history == 0"
+                                                            class="fw-bold">No
+                                                            History</span>
+                                                        <span v-if="stud.clnc_social_history == 1"
+                                                            class="fw-bold">Tobacco</span>
+                                                        <span v-if="stud.clnc_social_history == 2"
+                                                            class="fw-bold">Alcohol</span>
+                                                        <span v-if="stud.clnc_social_history == 3"
+                                                            class="fw-bold">Illicit
+                                                            Drug</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Medication: <span class="fw-bold">{{
+                                                            stud.clnc_medication? stud.clnc_medication:'No Medication'
+                                                        }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Height: <span class="fw-bold">{{ stud.clnc_height
+                                                            }}ft</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Weight: <span class="fw-bold">{{ stud.clnc_weight
+                                                            }}Kg</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Has Allergy:
+                                                        <span v-if="stud.clnc_allergy == 0" class="fw-bold">No
+                                                            Allergy</span>
+                                                        <span v-if="stud.clnc_allergy == 1"
+                                                            class="fw-bold">Food</span>
+                                                        <span v-if="stud.clnc_allergy == 2"
+                                                            class="fw-bold">Drug</span>
+                                                        <span v-if="stud.clnc_allergy == 3"
+                                                            class="fw-bold">Chemical</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Specification: <span v-if="stud.clnc_allergy != 0"
+                                                            class="fw-bold">{{
+                                                                stud.clnc_item }}</span>
+                                                        <span v-else class="fw-bold">No Allergy</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Diet: <span v-if="stud.clnc_diet" class="fw-bold">{{
+                                                            stud.clnc_diet }}</span>
+                                                        <span v-else class="fw-bold">No Diet</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Complaint: <span class="fw-bold">{{ stud.clnc_complaint
+                                                            }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Evaluation: <span class="fw-bold">{{
+                                                            stud.clnc_evaluation
+                                                        }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        Intervention: <span class="fw-bold">{{
+                                                            stud.clnc_intervention ?
+                                                                stud.clnc_intervention : 'no interventions needed'
+                                                        }}</span>
+                                                    </li>
+                                                    <li class="list-group-item bg-transparent px-4">
+                                                        <button :disabled="saving ? true : false" type="button"
+                                                            class="neu-btn neu-purple p-2">
+                                                            <font-awesome-icon icon="fa-solid fa-print"/> Print Form
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="accordion" id="medicalaccordion">
             <div class="accordion-item">
                 <h2 class="accordion-header" id="personalheading">
                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -375,10 +660,10 @@ const updateMedicalRecords = () => {
                             </div>
                             <div class="form-group d-flex flex-column gap-2">
                                 <div class="row mb-2">
-                                    <!-- <div class="form-group col">
-                        <label for="exampleInputEmail1">Telephone No.</label>
-                        <input class="form-control" type="email" name="email" id="email" placeholder="Email">
-                    </div> -->
+                                    <div class="form-group col">
+                                        <label for="exampleInputEmail1">Telephone No.</label>
+                                        <input class="form-control" type="email" name="email" id="email" placeholder="Email">
+                                    </div>
                                     <div class="form-group col">
                                         <label for="cellphone">Cellphone No.</label>
                                         <input class="form-control" type="text" name="cellphone" id="cellphone"
@@ -620,7 +905,7 @@ const updateMedicalRecords = () => {
                                         </div>
                                         <div class="form-group col text-start">
                                             <label>Social History</label>
-                                            <select class="form-control form-select-sm"
+                                            <select class="neu-input neu-select"
                                                 v-model="clinicalRecords.clnc_social_history" required>
                                                 <option value="0">N/A</option>
                                                 <option value="1">Tobacco</option>
@@ -645,7 +930,7 @@ const updateMedicalRecords = () => {
                                         </div>
                                         <div class="form-group col text-start">
                                             <label>Allergy</label>
-                                            <select class="form-control form-select-sm"
+                                            <select class="neu-input neu-select"
                                                 v-model="clinicalRecords.clnc_allergy" required>
                                                 <option value="0">N/A</option>
                                                 <option value="1">Food</option>
@@ -809,6 +1094,6 @@ const updateMedicalRecords = () => {
                 </div>
             </div>
 
-        </div>
+        </div>-->
     </div>
 </template>

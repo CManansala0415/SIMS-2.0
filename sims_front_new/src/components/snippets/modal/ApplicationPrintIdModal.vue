@@ -257,6 +257,6 @@ const printForm = (studentid) => {
                     </div>
                 </div>
             </div>
-            <button class="btn btn-success mt-2" @click="printForm(studentData.studentid)">Download ID</button>
+            <button class="neu-btn neu-green mt-2" @click="printForm(studentData.studentid)">Download ID</button>
         </div>
 </template>

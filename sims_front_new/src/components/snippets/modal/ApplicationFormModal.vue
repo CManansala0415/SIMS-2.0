@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { addApplicant, getPerson, getFamily, getAward, getAttainment, updateApplicant, updatePersonDetails, deleteFamAwrAtt } from "../../Fetchers.js";
 import { getUserID } from "../../../routes/user.js";
-import Loader1 from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     pdfGenerator
 } from "../../Generators.js";
@@ -312,7 +312,7 @@ const downloadPdf = (filetype) => {
 </script>
 <template>
     <div v-if="checking">
-        <Loader1></Loader1>
+        <NeuLoader2></NeuLoader2>
     </div>
     <div v-else>
         <div class="d-flex justify-content-center mb-2" id="printform" style="font-size: 9.5px;">
@@ -760,7 +760,7 @@ const downloadPdf = (filetype) => {
             </div>
             <div class="form-group border rounded d-flex justify-content-center gap-2" tabindex="-1"
                 :disabled="saving ? true : false">
-                <button type="submit" class="btn btn-md btn-success w-100">
+                <button type="submit" class="neu-btn neu-green w-50 p-3">
                     <i class="mr-2 fa-solid fa-rotate-left"></i> Print and Download Form
                 </button>
 

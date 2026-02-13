@@ -7,7 +7,8 @@ import { ref, onMounted, computed } from 'vue';
 // import MiniYellowBtn from '../snippets/buttons/MiniYellowBtn.vue';
 // import MiniTealBtn from '../snippets/buttons/MiniTealBtn.vue';
 // import RedBtn from '../snippets/buttons/RedBtn.vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 // import Enroll from '../snippets/modal/Enrollment.vue';
 import ApplicationModal from '../snippets/modal/ApplicationModal.vue';
 import ApplicationFormModal from '../snippets/modal/ApplicationFormModal.vue';
@@ -48,6 +49,8 @@ import SearchQR from '../snippets/tech/SearchQR.vue';
 import ApplicationMilestoneModal from '../snippets/modal/ApplicationMilestoneModal.vue';
 import AccountingStudentAcc from '../snippets/modal/AccountingStudentAcc.vue';
 import AccountingExaminationPermits from '../snippets/modal/AccountingExaminationPermits.vue';
+import { formatDateTime } from '../Generators.js';
+import NeuLoader2 from '../snippets/loaders/NeuLoader2.vue';
 
 const limit = ref(10)
 const offset = ref(0)
@@ -245,7 +248,7 @@ onMounted(async () => {
             
                 getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results) => {
                     applicant.value = results.data
-                    applicantCount.value = results.count
+                    applicantCount.value = results.countw
                     
                     preLoading.value = false
                     emit('doneLoading', false)
@@ -598,114 +601,120 @@ const refreshState = () =>{
             <h5 class=" text-uppercase fw-bold">Student Accounts</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <!-- <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
-                         /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
-            </div> -->
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Search
-                </button>
-                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Scan QR 
-                </button>
-            </div>
-            <!-- <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> New Record
-                </button>
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('old')"
-                    type="button" class="btn btn-sm btn-info" :disabled="preLoading? true:false">
-                    <font-awesome-icon icon="fa-solid fa-add"  /> Old Record
-                </button>
-            </div> -->
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">#</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Date Applied</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(applicant).length" v-for="(app, index) in applicant">
-                        <td class="align-middle">
-                            {{ app.per_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_firstname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_middlename ? app.per_middlename : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_lastname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.per_dateapplied }}
-                        </td>
-                        <td v-if="accessData[0].useracc_modifying == 1" class="align-middled d-flex gap-1 justify-content-center">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id, 1)"
-                                    type="button" title="View Accounts" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-gear"/></button>
-                            </div>
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#scholarshipmodal" @click="editData(app.per_id, 2)"
-                                    type="button" title="Add Scholarship" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-graduation-cap"/></button>
-                            </div>
-                            <!-- <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#permitmodal" @click="editData(app.per_id, 3)"
-                                    type="button" title="Permit" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-id-card"/></button>
-                            </div> -->
-                        </td> 
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(applicant).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(applicant).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(applicant).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <!-- <div class="input-group w-50">
+                    <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
+                            /></span>
+                    <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
+                        v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
+                </div> -->
+                <div class="d-flex gap-2 justify-content-center align-content-center">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
+                    <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-id-card"/> Scan QR 
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ applicantCount }})</span> items</p>
+                <!-- <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('new')"
+                        type="button" class="btn btn-sm btn-primary" :disabled="preLoading? true:false">
+                        <font-awesome-icon icon="fa-solid fa-add"  /> New Record
+                    </button>
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData('old')"
+                        type="button" class="btn btn-sm btn-info" :disabled="preLoading? true:false">
+                        <font-awesome-icon icon="fa-solid fa-add"  /> Old Record
+                    </button>
+                </div> -->
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3" style="text-transform:uppercase">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">#</th>
+                            <th style="color:#555555">First Name</th>
+                            <th style="color:#555555">Middle Name</th>
+                            <th style="color:#555555">Last Name</th>
+                            <th style="color:#555555">Suffix Name</th>
+                            <th style="color:#555555">Date Applied</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(applicant).length" v-for="(app, index) in applicant">
+                            <td class="align-middle">
+                                {{ app.per_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_firstname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_middlename ? app.per_middlename : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_lastname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ formatDateTime(app.per_dateapplied) }}
+                            </td>
+                            <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id, 1)"
+                                        type="button" title="View Accounts" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-gear"/></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#scholarshipmodal" @click="editData(app.per_id, 2)"
+                                        type="button" title="Add Scholarship" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-graduation-cap"/></button>
+                                </div>
+                                <!-- <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#permitmodal" @click="editData(app.per_id, 3)"
+                                        type="button" title="Permit" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-id-card"/></button>
+                                </div> -->
+                            </td> 
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(applicant).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(applicant).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(applicant).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ applicantCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -721,7 +730,7 @@ const refreshState = () =>{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showStudAccModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                         <AccountingStudentAcc v-if="showStudAccModal" :personId="editId" :userId="userID" :modeId="1"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -750,7 +759,7 @@ const refreshState = () =>{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showStudPermitModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                         <AccountingExaminationPermits v-if="showStudPermitModal" :personId="editId" :userId="userID"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -779,38 +788,38 @@ const refreshState = () =>{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showStudAccModal = false"></button>
                 </div>
-                <div class="modal-body overflow-auto" style="height: 500px;">
+                <div class="modal-body overflow-auto neu-bg" style="height: 500px;">
                         <!-- <div class="w-100 d-flex justify-content-end p-2">
                             <button type="button" class="btn btn-sm btn-dark" title="Save Updates">
                                 <font-awesome-icon icon="fa-solid fa-add"/> Add new
                             </button>
                         </div> -->
-                         <table class="table table-bordered">
+                         <table class="neu-table small-font">
                             <thead>
                                  <tr>
                                     <td class="align-middle">
-                                        <input type="text" class="form-control form-control-sm" placeholder="Description Here" v-model="scholarshipDescription"/>
+                                        <input type="text" class="neu-input" placeholder="Description Here" v-model="scholarshipDescription"/>
                                     </td>
                                     <td class="align-middle">
-                                        <select class="form-select form-select-sm" v-model="scholarshipType">
+                                        <select class="neu-input neu-select" v-model="scholarshipType" :disabled="loadingScholarship? true:false">
                                             <option value="" disabled>-- Select Type --</option>
                                             <option value="1">Percentage</option>
                                             <option value="2">Amount</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
-                                        <input v-if="scholarshipType" type="number" class="form-control form-control-sm" 
-                                         :placeholder="scholarshipType == 1? 'Enter Amount':'Enter percentage'" v-model="scholarshipAmount"/>
+                                        <input v-if="scholarshipType" type="number" class="neu-input" 
+                                         :placeholder="scholarshipType == 1? 'Enter Amount':'Enter percentage'" v-model="scholarshipAmount" :disabled="loadingScholarship? true:false"/>
                                         <span v-else>Please select scholarship type first</span>
                                     </td>
                                     <td class="align-middle">
-                                        <select class="form-select form-select-sm" v-model="scholarshipAccountId">
+                                        <select class="neu-input neu-select" v-model="scholarshipAccountId" :disabled="loadingScholarship? true:false">
                                             <option value="" disabled>-- Select Type --</option>
                                             <option v-for="(sts, index) in studentSettlement" :value="sts.acs_id">{{ sts.acs_accheader }}</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
-                                        <button type="button" class="btn btn-sm btn-dark" title="Save Updates" @click="addScholarship()">
+                                        <button type="button" class="neu-btn neu-green p-2" title="Save Updates" @click="addScholarship()" :disabled="loadingScholarship? true:false">
                                             <font-awesome-icon icon="fa-solid fa-add"/> Add new
                                         </button>
                                     </td>
@@ -829,42 +838,44 @@ const refreshState = () =>{
                             <tbody>
                                 <tr v-if="!Object.keys(scholarshipDetails).length && loadingScholarship">
                                     <td colspan="5">
-                                        <Loader/>
+                                        <NeuLoader2/>
                                     </td>
                                 </tr>
                                 <tr v-if="!Object.keys(scholarshipDetails).length && !loadingScholarship">
-                                    <td colspan="5">
-                                        No Scholarship Applied
+                                    <td colspan="5" class="p-3 text-center">
+                                        <NeuLoader4/>
+                                        <p class="fw-bold m-0">Nothing here yet!</p>
+                                        <p>The hamster took a break 💤 — try adding something new.</p>
                                     </td>
                                 </tr>
                                 <tr v-for="(sch, index) in scholarshipDetails" v-if="Object.keys(scholarshipDetails).length && !loadingScholarship">
                                     <td class="align-middle">
-                                        <input type="text" class="form-control form-control-sm" placeholder="Description Here" v-model="sch.sch_description"/>
+                                        <input type="text" class="neu-input" placeholder="Description Here" v-model="sch.sch_description"/>
                                     </td>
                                     <td class="align-middle">
-                                        <select class="form-select form-select-sm" v-model="sch.sch_type">
+                                        <select class="neu-input neu-select" v-model="sch.sch_type">
                                             <option value="" disabled>-- Select Type --</option>
                                             <option value="1">Percentage</option>
                                             <option value="2">Amount</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
-                                        <input v-if="sch.sch_value" type="number" class="form-control form-control-sm" 
+                                        <input v-if="sch.sch_value" type="number" class="neu-input" 
                                          :placeholder="sch.sch_value == 1? 'Enter Amount':'Enter percentage'" v-model="sch.sch_value"/>
                                         <span v-else>Please select scholarship type first</span>
                                     </td>
                                      <td class="align-middle">
-                                        <select class="form-select form-select-sm" v-model="sch.sch_acsid">
+                                        <select class="neu-input neu-select" v-model="sch.sch_acsid">
                                             <option value="" disabled>-- Select Type --</option>
                                             <option v-for="(sts, index) in studentSettlement" :value="sts.acs_id">{{ sts.acs_accheader }}</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
                                         <div class="d-flex gap-1 justify-content-center">
-                                            <button v-if="sch.sch_id" type="button" class="btn btn-sm btn-primary" title="Save Updates" @click="saveScholarship(2,sch)">
+                                            <button v-if="sch.sch_id" type="button" class="neu-btn neu-green" title="Save Updates" @click="saveScholarship(2,sch)">
                                                 <font-awesome-icon icon="fa-solid fa-floppy-disk"/>  
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-danger" title="Delete Scholarship" @click="saveScholarship(3, sch)">
+                                            <button type="button" class="neu-btn neu-red" title="Delete Scholarship" @click="saveScholarship(3, sch)">
                                                 <font-awesome-icon icon="fa-solid fa-trash"/> 
                                             </button>
                                         </div>

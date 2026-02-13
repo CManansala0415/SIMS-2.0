@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { getUserID } from "../routes/user";
 import { useRouter } from 'vue-router'
+import NeuLoader3 from './snippets/loaders/NeuLoader3.vue';
 const router = useRouter();
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 const isLogging = ref(false)
@@ -77,17 +78,17 @@ const handleLogin = async () => {
 <template>
     <div class="container  w-100 m-0 p-0 h-100">
         <div class="row g-2">
-            <div class=" shadow border  col-5 p-5">
+            <div class="col-5 p-5 neu-card">
                 <h2 class="mb-5 fw-bolder">Login</h2>
                     <form @submit.prevent="handleLogin" class="d-flex flex-column align-items-start">
                         <div class="mb-3 d-flex flex-column align-items-start w-100">
                             <label for="username" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="username" aria-describedby="emailHelp" v-model="form.email" required>
+                            <input type="email" class="neu-input" id="username" aria-describedby="emailHelp" v-model="form.email" required>
                             <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
                         </div>
                         <div class="mb-1 d-flex flex-column align-items-start w-100">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" v-model="form.password" required>
+                            <input type="password" class="neu-input" id="password" v-model="form.password" required>
                         </div>
                         <div class="mb-3 form-check">
                             <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" onclick="password.type = this.checked? 'text':'password'">
@@ -95,7 +96,8 @@ const handleLogin = async () => {
                                 Show Password
                             </label>
                         </div>
-                        <button type="submit" class="btn btn-primary" :disabled="isLogging? true:false">
+                        <button type="submit" class="neu-btn neu-green p-2" :disabled="isLogging? true:false">
+                            <font-awesome-icon icon="fa-solid fa-key"/> &nbsp;
                             <span v-if="isLogging">Logging In...</span> 
                             <span v-else>Log me in</span> 
                         </button>
@@ -106,6 +108,9 @@ const handleLogin = async () => {
                     <div class="mb-2">
                         <p class=" fs-3 fw-bold">Welcome to SIMS</p>
                         <small class="form-text text-muted">School Information and Management System</small>
+                    </div>
+                    <div class="d-flex flex-column justify-content-center align-items-center">
+                        <NeuLoader3/>
                     </div>
                     <div class="mt-4 mb-4 justify-text p-5">
                         <p >

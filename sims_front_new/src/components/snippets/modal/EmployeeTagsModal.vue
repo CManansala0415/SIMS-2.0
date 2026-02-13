@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Loader from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     updateEmployee,
     addEmployee,
@@ -273,17 +273,17 @@ const refresh = () => {
 </script>
 <template>
     <div class="w-100 text-center p-3" v-if="checking">
-        <Loader />
+        <NeuLoader2 />
     </div>
-    <div v-else class="container">
-        <div class="row">
-            <div class="col">
+    <div v-else class="container text-dim small-font">
+        <div class="row gap-2">
+            <div class="col neu-card p-3">
                 <div class="d-flex flex-column gap-2 ">
-                    <input v-model="searchSubject" class="form-control" @keyup="filteredSubject"
+                    <input v-model="searchSubject" class="neu-input" @keyup="filteredSubject"
                         placeholder="Search Subjects Here..." />
-                    <div class="p-3 card">
+                    <div class="p-3 neu-card-inner">
                         <div class="table-responsive border p-2 small-font" style="height: 500px;">
-                            <table class="table table-hover">
+                            <table class="neu-table">
                                 <thead>
                                     <tr>
                                         <th>Select Subjects</th>
@@ -297,7 +297,7 @@ const refresh = () => {
                                     </tr>
                                     <tr v-else v-for="(s, index) in subjectFilter" @click="addSubject(s)" :class="savingLoads? 'pe-none':'pe-auto'">
                                         <td
-                                            :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                            :class="addedSubjectId.includes(s.subj_id) ? 'align-middle text-start neu-pastel-gray' : 'align-middle text-start '">
                                             <p class="fw-bold ">{{ s.subj_code }}</p>
                                             <p class=" fst-italic">{{ s.subj_name }}</p>
                                         </td>
@@ -309,14 +309,14 @@ const refresh = () => {
                     </div>
                 </div>
             </div>
-            <div class="col">
+            <div class="col neu-card p-3">
                 <div>
                     <div class="d-flex flex-column gap-2 ">
-                        <input v-model="addSearchSubject" class="form-control" @keyup="filteredAddedSubject"
+                        <input v-model="addSearchSubject" class="neu-input" @keyup="filteredAddedSubject"
                             placeholder="Search Subjects Here..." />
-                        <div class="p-3 card">
+                        <div class="p-3 neu-card-inner">
                             <div class="table-responsive border p-2 small-font" style="height: 500px;">
-                                <table class="table table-hover">
+                                <table class="w-100">
                                     <thead>
                                         <tr>
                                             <th>Added Subjects</th>
@@ -331,25 +331,25 @@ const refresh = () => {
                                         <tr v-else v-for="(s, index) in addedSubjectFilter">
                                             <td
                                                 class="align-middle text-start">
-                                                <div class="mt-2 w-100">
+                                                <div class="mt-2 w-100 neu-card p-3">
                                                     <div class="d-flex flex-column">
-                                                        <div class="border-bottom d-flex flex-column text-start mb-3">
-                                                            <span class="mt-3 fw-bold">{{ s.subj_code }}</span>
+                                                        <div class="mb-3">
+                                                            <span class="mt-3 fw-bold">{{ s.subj_code }}</span>&nbsp;
                                                             <span class="mb-3 fst-italic">{{ s.subj_name }}</span>
                                                         </div>
-                                                        <div class="input-group input-group-sm mb-1">
-                                                            <span class=" input-group-text">Lecture Units</span>
-                                                            <input v-model="s.subj_lec_units" type="text" class="form-control" disabled>
+                                                        <div class="mb-1">
+                                                            <span class="fw-semibold">Lecture Units</span>
+                                                            <input v-model="s.subj_lec_units" type="text" class="neu-input" disabled>
                                                         </div>
-                                                        <div class="input-group input-group-sm mb-1">
-                                                            <span class=" input-group-text">Laboratory Units</span>
-                                                            <input v-model="s.subj_lab_units" type="text" class="form-control" disabled>
+                                                        <div class="mb-1">
+                                                            <span class="fw-semibold">Laboratory Units</span>
+                                                            <input v-model="s.subj_lab_units" type="text" class="neu-input" disabled>
                                                         </div>
-                                                        <div class="input-group input-group-sm mb-3">
-                                                            <span class=" input-group-text">Total Units / Hours</span>
-                                                            <input :value="s.subj_lab_units + s.subj_lec_units" type="text" class="form-control" disabled>
+                                                        <div class="mb-3">
+                                                            <span class="fw-semibold">Total Units / Hours</span>
+                                                            <input :value="s.subj_lab_units + s.subj_lec_units" type="text" class="neu-input" disabled>
                                                         </div>  
-                                                        <button :disabled="savingLoads? true:false" @click="removeSubject(index, s.ld_id)" type="button" class="btn btn-sm btn-danger">&times; Remove</button> 
+                                                        <button :disabled="savingLoads? true:false" @click="removeSubject(index, s.ld_id)" type="button" class="neu-btn neu-red p-2">&times; Remove</button> 
                                                     </div>
                                                 </div>
                                             </td>
@@ -363,11 +363,11 @@ const refresh = () => {
                 </div>
             </div>
             <div class="col-12 p-2 d-flex align-content-center justify-content-end gap-2">
-                <button :disabled="savingLoads? true:false" @click="addedSubjectFilter = [], addedSubject = [], addedSubjectId = []" type="button" class="btn btn-info btn-sm text-white" tabindex="-1">
-                    Reset Added Subjects
+                <button :disabled="savingLoads? true:false" @click="addedSubjectFilter = [], addedSubject = [], addedSubjectId = []" type="button" class="neu-btn neu-orange p-2" tabindex="-1">
+                    <font-awesome-icon icon="fa-solid fa-arrows-rotate"/> Reset Added Subjects
                 </button>
-                <button :disabled="savingLoads? true:false" @click="saveLoad" type="button" class="btn btn-primary btn-sm" tabindex="-1">
-                    Save Subject Loads
+                <button :disabled="savingLoads? true:false" @click="saveLoad" type="button" class="neu-btn neu-green p-2" tabindex="-1">
+                    <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save Subject Loads
                 </button>
             </div>
         </div>

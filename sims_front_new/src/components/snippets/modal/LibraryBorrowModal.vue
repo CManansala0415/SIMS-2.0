@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import Loader from '../loaders/Loading1.vue';
+import NeuLoader2 from '../loaders/Loading1.vue';
 import {
     getStudent,
     getBooksAccession,
@@ -177,6 +177,14 @@ const borrowBook = () => {
         Object.keys(bookCart.value).length
     ) {
         saving.value = true
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
         let x = bookCart.value.map((e) => {
             return {
                 lbrr_cardid: cardId.value,
@@ -198,6 +206,7 @@ const borrowBook = () => {
                     text: "Unknown error occured, try again later",
                     icon: "error"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             } else {
@@ -208,6 +217,7 @@ const borrowBook = () => {
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             }
@@ -227,33 +237,33 @@ const borrowBook = () => {
 
 </script>
 <template>
-    <form @submit.prevent="registerApplicant()" class="w-100 gap-2 p-4 small-font">
+    <form @submit.prevent="registerApplicant()" class="w-100 gap-2 p-4 small-font neu-card-inner">
         <div class="row gap-2">
-            <div class="col p-4 card">
-                <div class="mb-2 p-3 bg-secondary-subtle rounded-2 align-content-center">
+            <div class="col p-4 neu-card">
+                <div class="mb-2 p-3 align-content-center">
                     <span class="fw-bold text-success">Step 1: </span>Search Borrower Information
                 </div>
-                <div class="d-flex flex-column gap-2 card p-3">
+                <div class="d-flex flex-column gap-2 p-4 neu-card-inner">
                     <div class="w-100 text-start form-group">
-                        <label class="fw-bold">Borrower Name</label>
+                        <label>Borrower Name</label>
                         <input required v-model="searchStudent" onkeydown="return /[a-z, ]/i.test(event.key)"
-                            type="text" class="form-control form-control-sm" />
+                            type="text" class="neu-input" />
                     </div>
                     <div class="w-100 text-start form-group">
-                        <label class="fw-bold">Borrower Card</label>
+                        <label>Borrower Card</label>
                         <input required disabled v-model="cardIdNo" type="text"
-                            class="form-control form-control-sm cursor-not-allowed bg-gray-200" />
+                            class="neu-input" />
                     </div>
                     <div class="w-100 text-start form-group">
-                        <button :disabled="saving ? true : false" @click="reset()" class="btn btn-sm btn-dark w-100"
-                            type="button">Search</button>
+                        <button :disabled="saving ? true : false" @click="reset()" class="neu-btn neu-purple p-2"
+                            type="button"><font-awesome-icon icon="fa-solid fa-user-plus"  /> Search Student</button>
                     </div>
                 </div>
-                <div class="border d-flex flex-column gap-2 overflow-auto mt-3" style="height:250px;">
-                    <table class="table table-hover table-fixed">
+                <div class="border d-flex flex-column gap-2 overflow-auto mt-3 neu-card-inner p-3" style="height:250px;">
+                    <table class="neu-table-flat table-fixed">
                         <thead>
                             <tr>
-                                <th class="bg-secondary-subtle">Select Student</th>
+                                <th>Select Student</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -262,7 +272,7 @@ const borrowBook = () => {
                                 @click="setBorrower(fs.per_id, fs.enr_id, fs.per_firstname, fs.per_lastname)">
 
                                 <td
-                                    :class="fs.per_id == borrowerPerid ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                    :class="fs.per_id == borrowerPerid ? 'align-middle text-start neu-pastel-gray' : 'align-middle text-start '">
                                     {{ fs.per_firstname }} {{ fs.per_middlename }} {{ fs.per_lastname }} {{
                                     fs.per_suffixname }}
                                 </td>
@@ -275,7 +285,7 @@ const borrowBook = () => {
                             <tr v-if="loadingStudents && !Object.keys(filteredStudent).length">
                                 <td class="p-3 text-center" colspan="1">
                                     <div class="m-3">
-                                        <Loader />
+                                        <NeuLoader2 />
                                     </div>
                                 </td>
                             </tr>
@@ -283,32 +293,32 @@ const borrowBook = () => {
                     </table>
                 </div>
             </div>
-            <div class="col p-4 card">
-                <div class="mb-2 p-3 bg-secondary-subtle rounded-2 align-content-center">
+            <div class="col p-4 neu-card">
+                <div class="mb-2 p-3 align-content-center">
                     <span class="fw-bold text-success">Step 2: </span>Search and add books to borrow
                 </div>
-                <div class="d-flex flex-column gap-2 card p-3">
+                <div class="d-flex flex-column gap-2 p-4 neu-card-inner">
                     <div class="w-100 text-start form-group">
-                        <label class="fw-bold">Book Information</label>
+                        <label>Book Information</label>
                         <input required v-model="searchBook" onkeydown="return /[a-z, ]/i.test(event.key)"
-                            type="text" class="form-control form-control-sm" />
+                            type="text" class="neu-input" />
                     </div>
                     <div class="w-100 text-start form-group">
-                        <label class="fw-bold">Book Count</label>
+                        <label>Book Count</label>
                         <input  required disabled v-model="Object.keys(bookCart).length"
                         onkeydown="return /[a-z, ]/i.test(event.key)" type="text" 
-                            class="form-control form-control-sm cursor-not-allowed bg-gray-200" />
+                            class="neu-input" />
                     </div>
                     <div class="w-100 text-start form-group">
-                        <button :disabled="(saving ? true : false)" @click="filterBook()" class="btn btn-sm btn-dark w-100"
-                            type="button">Search</button>
+                        <button :disabled="(saving ? true : false)" @click="filterBook()" class="neu-btn neu-blue p-2"
+                            type="button"><font-awesome-icon icon="fa-solid fa-book"  /> Search Book</button>
                     </div>
                 </div>
-                <div class="border d-flex flex-column gap-2 overflow-auto mt-3" style="height:250px;">
-                    <table class="table table-hover table-fixed">
+                <div class="border d-flex flex-column gap-2 overflow-auto mt-3 neu-card-inner p-3" style="height:250px;">
+                    <table class="neu-table-flat table-fixed">
                         <thead>
                             <tr>
-                                <th class="bg-secondary-subtle">Select Student</th>
+                                <th>Select Student</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -317,7 +327,7 @@ const borrowBook = () => {
                                 @click="addToCart('add', bk, index)">
 
                                 <td
-                                    :class="bookCartId.includes(bk.lbrb_id) ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                    :class="bookCartId.includes(bk.lbrb_id) ? 'align-middle text-start neu-pastel-gray' : 'align-middle text-start '">
                                     <p class="fw-bold fw-bold">Accession No: {{ bk.lbrb_accession_no }}</p>
                                     <p class="">{{ bk.lbrb_title }}</p>
                                 </td>
@@ -330,7 +340,7 @@ const borrowBook = () => {
                             <tr v-if="loadingBooks && !Object.keys(filteredBook).length">
                                 <td class="p-3 text-center" colspan="1">
                                     <div class="m-3">
-                                        <Loader />
+                                        <NeuLoader2 />
                                     </div>
                                 </td>
                             </tr>
@@ -338,45 +348,45 @@ const borrowBook = () => {
                     </table>
                 </div>
             </div>
-            <div class="col p-4 card">
-                <div class="mb-2 p-3 bg-secondary-subtle rounded-2 align-content-center">
+            <div class="col p-4 neu-card">
+                <div class="mb-2 p-3 align-content-center">
                     <span class="fw-bold text-success">Step 3: </span>Confirm books inside the cart
                 </div>
-                <div class="d-flex flex-column gap-2 card p-3">
+                <div class="d-flex flex-column gap-2 p-4 neu-card-inner">
                     <div class="w-100 text-start form-group">
-                        <label class="fw-bold">Borrower Name</label>
+                        <label>Borrower Name</label>
                         <input  disabled v-model="borrowerName" onkeydown="return /[a-z, ]/i.test(event.key)"
-                            type="text" class="form-control form-control-sm" />
+                            type="text" class="neu-input" />
                     </div>
                     <div class="w-100 text-start form-group">
-                        <label class="fw-bold">Borrower Card</label>
+                        <label>Borrower Card</label>
                         <input required disabled v-model="cardIdNo"
                         onkeydown="return /[a-z, ]/i.test(event.key)" type="text" 
-                            class="form-control form-control-sm cursor-not-allowed bg-gray-200" />
+                            class="neu-input" />
                     </div>
                     <div class="w-100 text-start form-group">
                         <button :disabled="(saving ? true : false) ||
                                 (!Object.keys(bookCart).length ? true : false) ||
-                                (!cardId ? true : false)" @click="borrowBook()" class="btn btn-sm btn-dark w-100"
-                            type="button">Borrow</button>
+                                (!cardId ? true : false)" @click="borrowBook()" class="neu-btn neu-green p-2"
+                            type="button"><font-awesome-icon icon="fa-solid fa-hand"  /> Borrow</button>
                     </div>
                 </div>
-                <div class="border d-flex flex-column gap-2 overflow-auto mt-3" style="height:250px;">
-                    <table class="table table-hover table-fixed">
+                <div class="border d-flex flex-column gap-2 overflow-auto mt-3 neu-card-inner p-3" style="height:250px;">
+                    <table class="neu-table-flat table-fixed">
                         <thead>
                             <tr>
-                                <th class="bg-secondary-subtle">Select Student</th>
+                                <th>Select Student</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-if="!loadingBooks && Object.keys(bookCart).length"
                                 v-for="(bk, index) in bookCart" :class="savingLoads ? 'pe-none' : 'pe-auto'" >
                                 <td
-                                    class="align-middle text-start bg-white text-black d-flex flex-column gap-3">
+                                    class="align-middle text-start neu-card text-black d-flex flex-column gap-3">
                                     <p class="fw-bold fw-bold">Accession No: {{ bk.lbrb_accession_no }}</p>
                                     <p class="">{{ bk.lbrb_title }}</p>
                                     <button @click="addToCart('remove', bk, index)"
-                                        class="btn btn-sm btn-danger"
+                                        class="neu-btn neu-red"
                                         type="button" title="Click to remove">
                                         Remove
                                     </button>
@@ -390,7 +400,7 @@ const borrowBook = () => {
                             <tr v-if="loadingBooks && !Object.keys(bookCart).length">
                                 <td class="p-3 text-center" colspan="1">
                                     <div class="m-3">
-                                        <Loader />
+                                        <NeuLoader2 />
                                     </div>
                                 </td>
                             </tr>

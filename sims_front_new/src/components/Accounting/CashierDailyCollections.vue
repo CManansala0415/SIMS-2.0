@@ -8,7 +8,10 @@ import {
     getSetSeries
 } from "../Fetchers.js";
 
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+import NeuLoader2 from '../snippets/loaders/NeuLoader2.vue';
+
 import LineChart from '../snippets/tech/LineChart.vue';
 import ExcelDownloaderDCR from  '../snippets/modal/ExcelDownloaderDCR.vue';
 
@@ -205,7 +208,6 @@ const maxDateTime = computed(() => {
 
 const filterDcr = () =>{
     
-
     totalDailyPayment.value = 0
     totalTuitionPayment.value = 0
     totalMiscPayment.value = 0
@@ -229,6 +231,15 @@ const filterDcr = () =>{
         });
     }else{
         fetchingCollection.value = true
+        Swal.fire({
+            title: "Loading Results",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         getAllPayments(transactionType.value, formattedDateFrom, formattedDateTo, userID.value).then((results) => {
             payment.value = results.data
             //sum all payment based sa date
@@ -237,6 +248,7 @@ const filterDcr = () =>{
                 totalTuitionPayment.value += pay.acy_billtype == 1 ? 1: 0
                 totalMiscPayment.value += pay.acy_billtype == 2 ? 1: 0
             })
+            Swal.close()
             fetchingCollection.value = false
 
         })
@@ -269,7 +281,9 @@ const downloadExcel = () =>{
             text: "The 'From' date cannot be later than the 'To' date. Select date first before generating excel ",
         });
     }else{
-        showExcelModal.value = !showExcelModal.value
+
+        console.log(showExcelModal.value)
+        showExcelModal.value = true
         document.getElementById('triggerModal').click();
     }
     
@@ -282,254 +296,247 @@ const downloadExcel = () =>{
             <h5 class="text-uppercase fw-bold">Cashier's Daily Collection</h5>
         </div>
 
-        <Loader v-if="preLoading" />
-        <div v-else class="table-responsive border p-3 small-font">
-            <div class="container-fluid py-3">
+        <div v-if="preLoading">
+            <NeuLoader1/>
+        </div>
 
-                <div class="row mb-3 border-0 border-bottom pb-3">
-                    <div class=" col-lg-3 d-flex align-content-center justify-content-start">
-                       <div class="d-flex flex-column align-items-start">
-                            <label class="fw-bold">Date From</label>
-                            <input 
-                            type="datetime-local" 
-                            class="form-control form-control-sm" 
-                            v-model="selectDateFrom"
-                            :max="maxDateTime"
-                            />
-                       </div>
-                    </div>
-
-                    <div class=" col-lg-3 d-flex align-content-center justify-content-start">
-                        <div class="d-flex flex-column align-items-start">
-                            <label class="fw-bold">Date To</label>
-                            <input 
-                            type="datetime-local" 
-                            class="form-control form-control-sm" 
-                            v-model="selectDateTo"
-                            :max="maxDateTime"
-                            />
-                       </div>
-                    </div>
-
-                     <div class=" col-lg-3 d-flex align-content-center justify-content-start">
-                        <div class="d-flex flex-column align-items-start">
-                            <label class="fw-bold">Transaction Type</label>
-                            <select class="form-select form-select-sm" v-model="transactionType">
-                                <option value="0" selected>All Transactions</option>
-                                <option value="1">Tuition</option>
-                                <option value="2">Miscellaneous / Items</option>
-                            </select>
-                       </div>
-                    </div>
-
-                    <div class=" col-lg-3 d-flex align-content-center justify-content-end gap-2">
-                        <div class="d-inline align-content-end justify-content-end">
-                            <button class="btn btn-primary btn-sm" @click="filterDcr()">Load Collection</button>
-                        </div>
-                        <div class="d-inline align-content-end justify-content-end">
-                            <button class="btn btn-success btn-sm" @click="downloadExcel()">Download Report</button>
-                            <button v-show="false" id="triggerModal" data-bs-toggle="modal" data-bs-target="#dcrexcelmodal"></button>
-                        </div>
-                    </div>
-                    
-                </div>
-
-                <div class="row g-3">
-                    <!-- Bar Chart Imitation -->
-                    <!-- <div class="col-lg-6 d-flex align-content-center justify-content-center">
-                        <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
-                            <div class="card-body d-flex flex-column align-content-center justify-content-center">
-                                <h6 class="fw-semibold mb-3">Total Collections (Week)</h6>
-
-                                <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
-                                    <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:60%;"></div>
-                                    <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
-                                    <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:80%;"></div>
-                                    <div class="bg-primary rounded-2" style="width:10%;height:100%;"></div>
-                                    <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:85%;"></div>
-                                    <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
-                                    <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:50%;"></div>
+        <div v-else>
+            <div class="table-responsive small-font text-dim">
+                <div class="p-3">
+                    <div class="row neu-card py-4 px-2 mb-3">
+                        <div class="col-md-12 col-lg-8 ">
+                            <div class="row">
+                                <div class="col-md-12 col-lg-4 text-start">
+                                        <label class="fw-bold">Date From</label>
+                                        <input type="datetime-local" class="neu-input"
+                                            v-model="selectDateFrom" :max="maxDateTime" />
                                 </div>
-
-                                <div class="d-flex justify-content-between text-muted small mt-2">
-                                    <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                <div class="col-md-12 col-lg-4 text-start">
+                                        <label class="fw-bold">Date To</label>
+                                        <input type="datetime-local" class="neu-input" v-model="selectDateTo"
+                                            :max="maxDateTime" />
+                                </div>
+                                <div class="col-md-12 col-lg-4 text-start">
+                                        <label class="fw-bold">Transaction Type</label>
+                                        <select class="neu-input neu-select" v-model="transactionType">
+                                            <option value="0" selected>All Transactions</option>
+                                            <option value="1">Tuition</option>
+                                            <option value="2">Miscellaneous / Items</option>
+                                        </select>
                                 </div>
                             </div>
                         </div>
-                    </div> -->
-                    <div class="col-lg-7 d-flex align-content-center justify-content-center">
-                        <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
-                            <div class="card-body d-flex flex-column align-content-center justify-content-center">
-                                <p class="fw-semibold mb-3">
-                                Total Collection (Current Week on your Counter)</p>
-                                <p class="text-muted small mt-2">
-                                    [{{ formattedWeekStart }} → {{ formattedWeekEnd }}]
-                                </p>
-                                
+                        <div class="col-md-12 col-lg-4 ">
+                            <div class="d-flex align-items-end justify-content-end w-100 h-100 gap-2">
+                                <button class="neu-btn neu-purple p-2" @click="filterDcr()">
+                                    <font-awesome-icon icon="fa-solid fa-folder"/> Load Collection</button>
+                                <button class="neu-btn neu-green p-2" @click="downloadExcel()">
+                                    <font-awesome-icon icon="fa-solid fa-file-excel"/> Download Excel</button>
+                                <button id="triggerModal" data-bs-toggle="modal" data-bs-target="#dcrexcelmodal" style="display:none">
+                                    <font-awesome-icon icon="fa-solid fa-file-excel"/> Download Excel</button>
+                            </div>
+                        </div>
+                    </div>
 
-                                <!-- Bars -->
-                                <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
-                                    <div
-                                        v-for="(height, index) in barHeights"
-                                        :key="index"
-                                        class="rounded-2 transition-all"
-                                        :class="[
-                                        'bg-success',
-                                        days[index] === currentDay ? 'opacity-100' : 'bg-opacity-50'
-                                        ]"
-                                        :style="{ width: '10%', height: height + '%' }"
-                                    >
+                    <div class="row neu-card py-4 px-2 mb-3">
+                        <!-- Bar Chart Imitation -->
+                        <!-- <div class="col-lg-6 d-flex align-content-center justify-content-center">
+                            <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
+                                <div class="card-body d-flex flex-column align-content-center justify-content-center">
+                                    <h6 class="fw-semibold mb-3">Total Collections (Week)</h6>
+
+                                    <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
+                                        <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:60%;"></div>
+                                        <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
+                                        <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:80%;"></div>
+                                        <div class="bg-primary rounded-2" style="width:10%;height:100%;"></div>
+                                        <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:85%;"></div>
+                                        <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
+                                        <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:50%;"></div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between text-muted small mt-2">
+                                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> -->
+                        <div class="col-md-12 col-lg-7 d-flex flex-column align-content-center justify-content-start text-dim">
+                            <div class="neu-card p-3">
+                                <div class="card-body d-flex flex-column align-content-center justify-content-center">
+                                    <p class="fw-semibold mb-3">
+                                    Total Collection (Current Week on your Counter)</p>
+                                    <p class="text-muted small mt-2">
+                                        [{{ formattedWeekStart }} → {{ formattedWeekEnd }}]
+                                    </p>
                                     
+
+                                    <!-- Bars -->
+                                    <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
+                                        <div
+                                            v-for="(height, index) in barHeights"
+                                            :key="index"
+                                            class="rounded-2 transition-all"
+                                            :class="[
+                                            'bg-success',
+                                            days[index] === currentDay ? 'opacity-100' : 'bg-opacity-50'
+                                            ]"
+                                            :style="{ width: '10%', height: height + '%' }"
+                                        >
+                                        
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Day labels -->
-                                <div class="d-flex justify-content-between text-muted small mt-2">
+                                    <!-- Day labels -->
+                                    <div class="d-flex justify-content-between text-muted small mt-2">
 
-                                    <span v-for="(day, index) in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="day"  style="width: 10%">
-                                        <span class="text-primary fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(weekCollection[index]) }}</span>
-                                        <br/>
-                                        {{ day }} 
-                                    </span>
+                                        <span v-for="(day, index) in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']" :key="day"  style="width: 10%">
+                                            <span class="text-primary fw-bold">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(weekCollection[index]) }}</span>
+                                            <br/>
+                                            {{ day }} 
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-5 col-sm-12">
-                        <div class="row g-3 mt-4 mb-4">
-                            <div class="col-md-12 col-sm-6">
-                                <div class="card shadow border-0 rounded-3">
-                                    <div class="card-body">
-                                        <p class="text-muted small mb-1">Total Earnings</p>
-                                        <h2 class="fw-bold mb-0">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
-                                        <small class="text-secondary">as of the date</small>
+                        <div class="col-lg-5 col-sm-12">
+                            <div class="row g-3">
+                                <div class="col-md-12 col-sm-6">
+                                    <div class="neu-card p-3">
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-1">Total Earnings</p>
+                                            <h2 class="fw-bold mb-0">{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(totalDailyPayment) }}</h2>
+                                            <small class="text-secondary">as of the date</small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-sm-6">
-                                <div class="card shadow border-0 rounded-3">
-                                    <div class="card-body">
-                                        <p class="text-muted small mb-1">Total Collections</p>
-                                        <h2 class="fw-bold mb-0">{{ Object.keys(payment).length }}</h2>
-                                        <small class="text-secondary">transactions</small>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="neu-card p-3">
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-1">Total Collections</p>
+                                            <h2 class="fw-bold mb-0">{{ Object.keys(payment).length }}</h2>
+                                            <small class="text-secondary">transactions</small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-sm-6">
-                                <div class="card shadow border-0 rounded-3">
-                                    <div class="card-body">
-                                        <p class="text-muted small mb-1">Tuition Payment</p>
-                                        <h2 class="fw-bold mb-0">{{ totalTuitionPayment }}</h2>
-                                        <small class="text-secondary">transactions</small>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="neu-card p-3">
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-1">Tuition Payment</p>
+                                            <h2 class="fw-bold mb-0">{{ totalTuitionPayment }}</h2>
+                                            <small class="text-secondary">transactions</small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-sm-6">
-                                <div class="card shadow border-0 rounded-3">
-                                    <div class="card-body">
-                                        <p class="text-muted small mb-1">Misc Payment</p>
-                                        <h2 class="fw-bold mb-0">{{ totalMiscPayment }}</h2>
-                                        <small class="text-secondary">transactions</small>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="neu-card p-3">
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-1">Misc Payment</p>
+                                            <h2 class="fw-bold mb-0">{{ totalMiscPayment }}</h2>
+                                            <small class="text-secondary">transactions</small>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-12 col-sm-6">
-                                <div class="card shadow border-0 rounded-3">
-                                    <div class="card-body">
-                                        <p class="text-muted small mb-1">Receipt Series</p>
-                                        <div class="p-2">
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Receipt Type</th>
-                                                        <th>Start Series</th>
-                                                        <th>End Series</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(rs, index) in receiptSeries">
-                                                        <td>
-                                                            <span v-if="rs.sr_receipt == 1">Official Receipt</span>
-                                                            <span v-if="rs.sr_receipt == 2">Provisional Receipt</span>
-                                                        </td>
-                                                        <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_start }}</td>
-                                                        <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_end }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                <div class="col-md-12 col-sm-6">
+                                    <div class="neu-card p-3">
+                                        <div class="card-body">
+                                            <p class="text-muted small mb-1">Receipt Series</p>
+                                            <div class="p-2">
+                                                <table class="neu-table-flat">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Receipt Type</th>
+                                                            <th>Start Series</th>
+                                                            <th>End Series</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(rs, index) in receiptSeries">
+                                                            <td>
+                                                                <span v-if="rs.sr_receipt == 1">Official Receipt</span>
+                                                                <span v-if="rs.sr_receipt == 2">Provisional Receipt</span>
+                                                            </td>
+                                                            <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_start }}</td>
+                                                            <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_end }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                
-                <div class="table-responsive border p-3 mt-4">
-                    <h6 class="fw-semibold mb-3">Transactions</h6>
-                    <table class="table table-hover table-fixed" style="text-transform:uppercase">
-                        <thead>
-                            <tr>
-                                <th style="background-color: #237a5b;" class="text-white">Payment ID</th>
-                                <th style="background-color: #237a5b;" class="text-white">Full Name</th>
-                                <th style="background-color: #237a5b;" class="text-white">Mode of Payment</th>
-                                <th style="background-color: #237a5b;" class="text-white">Date of Payment</th>
-                                <th style="background-color: #237a5b;" class="text-white">Transaction Type</th>
-                                <th style="background-color: #237a5b;" class="text-white">Detail</th>
-                                <th style="background-color: #237a5b;" class="text-white">Amount Paid</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-if="!fetchingCollection && Object.keys(payment).length" v-for="(pay, index) in payment">
-                                <td class="align-middle p-2">
-                                   {{ pay.acy_id }}
-                                </td>
-                                <td class="align-middle p-2">
-                                    <span v-if="pay.acy_billtype == 1">
-                                        {{ pay.per_firstname }} {{ pay.per_middlename? pay.per_middlename:' ' }} {{ pay.per_lastname }} {{pay.per_suffixname? pay.per_suffixname:' ' }}
-                                    </span>
-                                    <span v-if="pay.acy_billtype == 2">
-                                        {{ pay.acr_personname }}
-                                    </span>
-                                </td>
-                                <td class="align-middle p-2">
-                                   <span v-if="pay.acy_mode == 1"> Cash</span>
-                                   <span v-if="pay.acy_mode == 2"> Bank</span>
-                                   <span v-if="pay.acy_mode == 3"> Cheque</span>
-                                </td>
-                                <td class="align-middle p-2">
-                                   {{ pay.acy_datepaid.split('T')[0] }}
-                                </td>
-                                <td class="align-middle p-2">
-                                    <span v-if="pay.acy_billtype == 1"> Tuition</span>
-                                    <span v-if="pay.acy_billtype == 2"> Misc / Item</span>
-                                </td>
-                                <td class="align-middle p-2">
-                                    <span v-if="pay.acy_billtype == 1">N/A</span>
-                                    <span v-if="pay.acy_billtype == 2">{{ pay.acf_desc }}</span>
-                                </td>
-                                <td class="align-middle p-2 text-primary fw-bold">
-                                    {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(pay.acy_payment) }}
-                                </td>
-                            </tr>    
-                            <tr v-if="!fetchingCollection && !Object.keys(payment).length" style="text-transform:none">
-                                <td class="p-3 text-center" colspan="7">
-                                    No Records Found
-                                </td>
-                            </tr>
-                            <tr v-if="fetchingCollection && !Object.keys(payment).length" style="text-transform:none">
-                                <td class="p-3 text-center" colspan="7">
-                                    <div class="m-3">
-                                        <Loader />
-                                    </div>
-                                </td>
-                            </tr>
+                    
+                    
+                    <div class="row neu-card py-4 px-2 mb-3">
+                        <h6 class="fw-semibold mb-3">Transactions</h6>
+                        <table class="neu-table" style="text-transform:uppercase">
+                            <thead>
+                                <tr>
+                                    <th style="color:#555555">Payment ID</th>
+                                    <th style="color:#555555">Full Name</th>
+                                    <th style="color:#555555">Mode of Payment</th>
+                                    <th style="color:#555555">Date of Payment</th>
+                                    <th style="color:#555555">Transaction Type</th>
+                                    <th style="color:#555555">Detail</th>
+                                    <th style="color:#555555">Amount Paid</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-if="!fetchingCollection && Object.keys(payment).length" v-for="(pay, index) in payment">
+                                    <td class="align-middle p-2">
+                                    {{ pay.acy_id }}
+                                    </td>
+                                    <td class="align-middle p-2">
+                                        <span v-if="pay.acy_billtype == 1">
+                                            {{ pay.per_firstname }} {{ pay.per_middlename? pay.per_middlename:' ' }} {{ pay.per_lastname }} {{pay.per_suffixname? pay.per_suffixname:' ' }}
+                                        </span>
+                                        <span v-if="pay.acy_billtype == 2">
+                                            {{ pay.acr_personname }}
+                                        </span>
+                                    </td>
+                                    <td class="align-middle p-2">
+                                    <span v-if="pay.acy_mode == 1"> Cash</span>
+                                    <span v-if="pay.acy_mode == 2"> Bank</span>
+                                    <span v-if="pay.acy_mode == 3"> Cheque</span>
+                                    </td>
+                                    <td class="align-middle p-2">
+                                    {{ pay.acy_datepaid.split('T')[0] }}
+                                    </td>
+                                    <td class="align-middle p-2">
+                                        <span v-if="pay.acy_billtype == 1"> Tuition</span>
+                                        <span v-if="pay.acy_billtype == 2"> Misc / Item</span>
+                                    </td>
+                                    <td class="align-middle p-2">
+                                        <span v-if="pay.acy_billtype == 1">N/A</span>
+                                        <span v-if="pay.acy_billtype == 2">{{ pay.acf_desc }}</span>
+                                    </td>
+                                    <td class="align-middle p-2 text-primary fw-bold">
+                                        {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(pay.acy_payment) }}
+                                    </td>
+                                </tr>    
+                                <tr v-if="!fetchingCollection && !Object.keys(payment).length" style="text-transform:none">
+                                    <td class="p-3 text-center" colspan="7">
+                                        <NeuLoader4/>
+                                        <p class="fw-bold m-0">Nothing here yet!</p>
+                                        <p>The hamster took a break 💤 — try adding something new.</p>
+                                    </td>
+                                </tr>
+                                <tr v-if="fetchingCollection && !Object.keys(payment).length" style="text-transform:none">
+                                    <td class="p-3 text-center" colspan="7">
+                                        <div class="m-3">
+                                            <NeuLoader2 />
+                                        </div>
+                                    </td>
+                                </tr>
 
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div>
 
+                </div>
             </div>
         </div>
     </div>
@@ -547,7 +554,7 @@ const downloadExcel = () =>{
                         @click="showExcelModal = false"></button>
                 </div>
 
-                <div class="modal-body small-font">
+                <div class="modal-body neu-bg">
                     <ExcelDownloaderDCR v-if="showExcelModal"
                         :datefrom="selectDateFrom"
                         :dateto="selectDateTo"

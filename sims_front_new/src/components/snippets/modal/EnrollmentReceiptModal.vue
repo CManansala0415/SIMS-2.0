@@ -16,7 +16,7 @@ import {
     getStudentAccount,
     getScholarshipDetails
 } from "../../Fetchers.js";
-import Loader from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     pdfGenerator,
     pesoConverter
@@ -535,7 +535,7 @@ function getScheduleGroupsForSubject(subjId) {
 <template>
     <div class="col-12 border-bottom" v-if="!milestoneLoading && Object.keys(milestone).length">
         <div class="p-3 w-100 d-flex justify-content-center">
-            <select v-model="formType" class="form-select w-50">
+            <select v-model="formType" class="neu-input neu-select w-50">
                 <option value="1">Registrar</option>
                 <option value="2">Cashier</option>
             </select>
@@ -926,13 +926,13 @@ function getScheduleGroupsForSubject(subjId) {
     <div v-if="milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
         <div class="p-3 text-center" style="text-transform:none">
             <div class="m-3">
-                <Loader />
+                <NeuLoader2 />
             </div>
         </div>
     </div>
 
 
-    <button class="btn btn-success w-100 mt-3" @click="downloadPdf()"
+    <button class="neu-btn neu-green p-2 mt-3" @click="downloadPdf()"
         v-if="!milestoneLoading && Object.keys(milestone).length"
         v-show="!milestoneLoading && Object.keys(milestone).length">Download Form</button>
 

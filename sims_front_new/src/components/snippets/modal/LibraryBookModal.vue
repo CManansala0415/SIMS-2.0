@@ -71,6 +71,15 @@ onMounted(()=>{
 const registerBook = () =>{
     //1 means update 2 means add 3 means delete
     saving.value = true
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     let x = {}
     if(mode.value == 1){
         x = {
@@ -95,6 +104,7 @@ const registerBook = () =>{
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close()
                 location.reload()
             });
         }else{
@@ -105,6 +115,7 @@ const registerBook = () =>{
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close()
                 location.reload()
             });
         }
@@ -142,6 +153,15 @@ const deleteBook = () =>{
         confirmButtonText: "Yes, Im Delete it!"
     }).then(async (result) => {
         if (result.isConfirmed) {
+            saving.value = true
+             Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             let x = {
                 lbrb_id:bookId.value,
                 lbrb_updatedby: userId.value,
@@ -155,6 +175,7 @@ const deleteBook = () =>{
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             })
@@ -166,69 +187,71 @@ const formType = ref(0)
 </script>
 
 <template>
-    <div class="d-flex flex-column p-2 gap-2">
+    <div class="d-flex flex-column p-3 gap-2 neu-card-inner">
             <!-- <div class="border-0 border-b-2 border-gray-300 p-1 mb-4 flex justify-between items-center">
                     <p class="mb-2 text-md font-semibold">Book Information</p>   
                     <button :disabled="saving?true:false" type="button" @click="$emit('close-modal')" class="mb-2 bg-red-500 hover:bg-red-400 px-3 rounded-md font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed">&times;</button>  
             </div> -->
-            <div class="d-flex flex-wrap flex-column">
+            <div class="d-flex flex-wrap flex-column p-3">
                 <p class="text-success fw-bold">Book Details</p>
-                <p class="fw-bold">{{ book.lbrb_title }}</p>
-                <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+                <div v-if="book.lbrb_title" class="neu-card p-2 d-flex justify-content-center align-items-center mb-3">
+                    <p class="fw-bold m-0">{{ book.lbrb_title }}</p>
+                </div>
+                <p class=" fst-italic small-font"><span class="fw-bold">Note:
                     </span><span class="italic">Ensure that the details of the following applicant are correct.
                         To enroll this applicant, select the appropiate academic status and refresh the page.
                     </span></p>
             </div>
-            <form @submit.prevent="registerBook()" class="row gy-2 gx-2 p-2 border">
+            <form @submit.prevent="registerBook()" class="row gy-2 gx-2 p-3 border neu-card">
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Call No.</label>
                     <input v-model="book.lbrb_call_no"
-                        type="number" class="form-control form-control-sm"
+                        type="number" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Accession No.</label>
                     <input v-model="book.lbrb_accession_no"
                         required
-                        type="number" class="form-control form-control-sm"
+                        type="number" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-12 d-flex flex-wrap form-group">
                     <label class="">Title</label>
                     <textarea v-model="book.lbrb_title"
                         required
-                        type="text" class="form-control form-control-sm"
+                        type="text" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"></textarea>
                 </div>
                 <div class="col-12 d-flex flex-wrap form-group">
                     <label class="">Author</label>
                     <input v-model="book.lbrb_author"
                         required
-                        type="text" class="form-control form-control-sm"
+                        type="text" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Edition</label>
                     <input v-model="book.lbrb_edition"
-                        type="text" class="form-control form-control-sm"
+                        type="text" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Volume</label>
                     <input v-model="book.lbrb_volume"
-                        type="number" class="form-control form-control-sm"
+                        type="number" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Pages</label>
                     <input v-model="book.lbrb_pages"
                         required
-                        type="number" class="form-control form-control-sm"
+                        type="number" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Source</label>
-                    <select class="form-control form-select-sm"  v-model="book.lbrb_source"
+                    <select class="neu-input neu-select"  v-model="book.lbrb_source"
                     :disabled="borrowId.includes(book.lbrb_id)? true:false">
                         <option value="1">Donated</option>
                         <option value="2">School Funds</option>
@@ -240,13 +263,13 @@ const formType = ref(0)
                         min="0"
                         max="999999"
                         oninput="this.value = Math.abs(this.value)"
-                        type="number" class="form-control form-control-sm"
+                        type="number" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Publisher</label>
                     <input v-model="book.lbrb_publisher"
-                        type="text" class="form-control form-control-sm"
+                        type="text" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
@@ -255,21 +278,21 @@ const formType = ref(0)
                         required
                         min="1980"
                         max="3000"
-                        type="number" class="form-control form-control-sm"
+                        type="number" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
                 <div class="col-6 d-flex flex-wrap form-group">
                     <label class="">Date Received</label>
                     <input v-model="book.lbrb_datereceived"
-                        type="date" class="form-control form-control-sm"
+                        type="date" class="neu-input"
                         :disabled="borrowId.includes(book.lbrb_id)? true:false"/>
                 </div>
-                <div v-if="!borrowId.includes(book.lbrb_id)" class="mt-2 d-flex gap-2 justify-content-end">
-                    <button :disabled="saving?true:false" type="submit" class="btn btn-sm btn-primary">
-                        <i class="mr-2 fa-solid fa-floppy-disk"></i> Save Data
+                <div v-if="!borrowId.includes(book.lbrb_id)" class="mt-3 d-flex gap-2 justify-content-end">
+                    <button :disabled="saving?true:false" type="submit" class="neu-btn neu-green p-2">
+                        <font-awesome-icon icon="fa-solid fa-floppy-disk"  /> Save Data
                     </button>
-                    <button v-if="mode!=2" @click="deleteBook()" :disabled="saving?true:false" type="button" class="btn btn-sm btn-danger">
-                        <i class="mr-2 fa-solid fa-trash"></i> Delete Book
+                    <button v-if="mode!=2" @click="deleteBook()" :disabled="saving?true:false" type="button" class="neu-btn neu-red p-2">
+                        <font-awesome-icon icon="fa-solid fa-trash"  /> Delete Book
                     </button>
                 </div>
                 <div v-else class="mt-2 d-flex gap-2 justify-content-center p-2">

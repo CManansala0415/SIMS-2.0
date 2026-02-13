@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import LibraryDdcModal from '../snippets/modal/LibraryDdcModal.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
@@ -213,83 +214,90 @@ const editData = (id, data, mode) => {
             <h5 class=" text-uppercase fw-bold">Book DDC</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                    @click="editData('', [], 2)" type="button" class="btn btn-sm btn-primary"
-                    :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">ID</th>
-                        <th style="background-color: #237a5b;" class="text-white">DDC</th>
-                        <th style="background-color: #237a5b;" class="text-white">Title</th>
-                        <th style="background-color: #237a5b;" class="text-white">Status</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(booksDdc).length" v-for="(app, index) in booksDdc">
-                        <td class="align-middle">
-                            {{ app.lbrc_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.lbrc_ddc }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.lbrc_desc }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.lbrc_status == 1 ? 'Active' : 'Inactive' }}
-                        </td>
-                        <td v-if="accessData[8].useracc_modifying == 1"class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                                    @click="editData(app.lbrc_id, app, 1)" type="button" title="Edit Record"
-                                    class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-gear" /></button>
-                                <button @click="deleteDdc(app.lbrc_id)" type="button" title="Edit Record"
-                                    class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-trash" /></button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(booksDdc).length">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(booksDdc).length">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(booksDdc).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ booksDdcCount }})</span> items</p>
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                        @click="editData('', [], 2)" type="button" class="neu-btn neu-green"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">ID</th>
+                            <th style="color:#555555">DDC</th>
+                            <th style="color:#555555">Title</th>
+                            <th style="color:#555555">Status</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(booksDdc).length" v-for="(app, index) in booksDdc">
+                            <td class="align-middle">
+                                {{ app.lbrc_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.lbrc_ddc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.lbrc_desc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.lbrc_status == 1 ? 'Active' : 'Inactive' }}
+                            </td>
+                            <td v-if="accessData[8].useracc_modifying == 1"class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                                        @click="editData(app.lbrc_id, app, 1)" type="button" title="Edit Record"
+                                        class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-gear" /></button>
+                                    <button @click="deleteDdc(app.lbrc_id)" type="button" title="Edit Record"
+                                        class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-trash" /></button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(booksDdc).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(booksDdc).length">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <NeuLoader1 />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(booksDdc).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ booksDdcCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -304,7 +312,7 @@ const editData = (id, data, mode) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg small-font">
                     <LibraryDdcModal v-if="showModal" :ddciddata="editId" :ddcdata="ddcData" :modedata="modeData"
                         :useriddata="userID" />
                 </div>

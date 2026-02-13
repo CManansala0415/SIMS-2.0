@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { addEmployee,updateEmployee } from "../../Fetchers.js";
-import Loader1 from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 const props = defineProps({
     useriddata: {
@@ -136,47 +136,47 @@ const save = () => {
 </script>
 <template>
     <div v-if="checking">
-        <Loader1></Loader1>
+        <NeuLoader2></NeuLoader2>
     </div>
-    <form v-else method="post" @submit.prevent="registerApplicant()" class="d-flex flex-column gap-2">
+    <form v-else method="post" @submit.prevent="registerApplicant()" class="d-flex flex-column gap-2 neu-card text-dim small-font">
         <div class="form-group border p-4 rounded  d-flex flex-column gap-2">
-            <div class="form-group border-bottom">
-                <p class="fw-bold text-white bg-dark p-1 rounded-3">Personal Information</p>
+            <div class="form-group border-bottom neu-card p-2">
+                <p class="fw-bold m-0">Personal Information</p>
             </div>
             <div class="form-group d-flex flex-column gap-2">
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="firstname">First Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="firstname" aria-describedby="firstname"
+                        <input type="text" style="text-transform:uppercase" class="neu-input" id="firstname" aria-describedby="firstname"
                             v-model="personal.emp_firstname" required :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="middlename">Middle Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="middlename" aria-describedby="middlename"
+                        <input type="text" style="text-transform:uppercase" class="neu-input" id="middlename" aria-describedby="middlename"
                             v-model="personal.emp_middlename" :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="lastname">Last Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="lastname" aria-describedby="lastname"
+                        <input type="text" style="text-transform:uppercase" class="neu-input" id="lastname" aria-describedby="lastname"
                             v-model="personal.emp_lastname" required :disabled="saving ? true : false">
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="suffixname">Suffix Name</label>
-                        <input type="text" style="text-transform:uppercase" class="form-control" id="suffixname" aria-describedby="suffixname"
+                        <input type="text" style="text-transform:uppercase" class="neu-input" id="suffixname" aria-describedby="suffixname"
                             maxlength="3" v-model="personal.emp_suffixname" :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="gender">Gender</label>
-                        <select class="form-control" id="gender" v-model="personal.emp_gender" required
+                        <select class="neu-input" id="gender" v-model="personal.emp_gender" required
                             :disabled="saving ? true : false">
                             <option v-for="(gen, index) in gender" :value="gen.gen_id">{{ gen.gen_desc }}</option>
                         </select>
                     </div>
                     <div class="form-group col">
                         <label for="civilstatus">Civil Status</label>
-                        <select class="form-control" id="civilstatus" v-model="personal.emp_civilstatus" required
+                        <select class="neu-input" id="civilstatus" v-model="personal.emp_civilstatus" required
                             :disabled="saving ? true : false">
                             <option v-for="(cs, index) in civilstatus" :value="cs.cv_id">
                                 {{ cs.cv_desc }}
@@ -185,21 +185,21 @@ const save = () => {
                     </div>
                 </div>
             </div>
-            <div class="form-group border-bottom">
-                <p class="fw-bold text-white bg-dark p-1 rounded-3">Contact Information</p>
+            <div class="form-group border-bottom neu-card p-2">
+                <p class="fw-bold m-0">Contact Information</p>
             </div>
             <div class="form-group d-flex flex-column gap-2">
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="cellphone">Cellphone No.</label>
-                        <input class="form-control" type="text" name="cellphone" id="cellphone"
+                        <input class="neu-input" type="text" name="cellphone" id="cellphone"
                             placeholder="Cellphone No." v-model="personal.emp_contact"
                             onkeydown="return /[0-9]/i.test(event.key)" minlength="9" maxlength="9" 
                             :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="peremail">Email</label>
-                        <input class="form-control" type="peremail" name="peremail" id="peremail" placeholder="Email"
+                        <input class="neu-input" type="peremail" name="peremail" id="peremail" placeholder="Email"
                             v-model="personal.emp_email"  :disabled="saving ? true : false">
                     </div>
 
@@ -207,13 +207,13 @@ const save = () => {
                 <div class="row mb-2">
                     <div class="form-group col">
                         <label for="bday">Birthday</label>
-                        <input type="date" class="form-control" id="bday" aria-describedby="emailHelp"
+                        <input type="date" class="neu-input" id="bday" aria-describedby="emailHelp"
                             v-model="personal.emp_birthday" @focusout="getAge(personal.emp_birthday)" required
                             :disabled="saving ? true : false">
                     </div>
                     <div class="form-group col">
                         <label for="age">Age</label>
-                        <input type="number" class="form-control" id="age" aria-describedby="emailHelp" v-model="age"
+                        <input type="number" class="neu-input" id="age" aria-describedby="emailHelp" v-model="age"
                             disabled>
                     </div>
                 </div>
@@ -225,8 +225,8 @@ const save = () => {
                             conditions</label>
                     </div>
                     <div class="form-group border rounded d-flex justify-content-end gap-2" tabindex="-1">
-                        <button type="submit" class="btn btn-md btn-success w-100" tabindex="-1" :disabled="saving">
-                            <i class="mr-2 fa-solid fa-plus"></i> Register Employee
+                        <button type="submit" class="neu-btn neu-green p-2" tabindex="-1" :disabled="saving">
+                           <font-awesome-icon icon="fa-solid fa-add"/> Register Employee
                         </button>
                     </div>
                 </div>

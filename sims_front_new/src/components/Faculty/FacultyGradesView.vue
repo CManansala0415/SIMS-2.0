@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import ExcelDownloaderGrades from '../snippets/modal/ExcelDownloaderGrades.vue';
 // import TipForm from '../snippets/modal/TipForm.vue';
 // import ApplicationForm from './ApplicationForm.vue';
@@ -462,6 +464,14 @@ const generateSheet = (type) => {
         confirmButtonText: "Yes, proceed!",
     }).then(async (result) => {
         if (result.isConfirmed) {
+            Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             savingData.value = true
             //find lf_lnid para dun sa fetcher ng header ni grading sheet
             let indexer = groupedAssignmentSubject.value[filterSubjectId.value].findIndex(e => {
@@ -482,6 +492,7 @@ const generateSheet = (type) => {
                         text: "Changes applied, refreshing the page",
                         icon: "success"
                     }).then(()=>{
+                        Swal.close();
                         location.reload()
                     });
                 } else {
@@ -492,6 +503,7 @@ const generateSheet = (type) => {
                         text: "Unknown error occured, try again later",
                         icon: "error"
                     }).then(()=>{
+                        Swal.close();
                         location.reload()
                     });
                 }
@@ -512,21 +524,17 @@ const openTip = () => {
             <h5 class=" text-uppercase fw-bold">Grading Sheet</h5>
         </div>
     </div>
-    <div v-if="!showForm" class="table-responsive border p-3 small-font">
-        <table v-if="switcher == 0" class="table table-hover">
-            <thead>
-                <tr>
-                    <th style="background-color: #237a5b;" class="text-white">Course/Section</th>
-                    <th style="background-color: #237a5b;" class="text-white">Subject</th>
-                    <th style="background-color: #237a5b;" class="text-white">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-if="!preLoading && Object.keys(groupedAssignmentSection).length"
-                    >
-                   
-                    <td class="align-middle">
-                        <select class="form-select form-select-sm w-100" v-model="filterLnid">
+     <div v-if="preLoading">
+        <NeuLoader1/>
+    </div>
+
+    <div v-else class="">
+        <div v-if="!showForm" class="table-responsive border p-3 small-font">
+            <div v-if="switcher == 0">
+                <div class="row neu-card p-3 d-flex g-1">
+                    <div class="col-md-12 col-lg-5">
+                        <p>Course/Section</p>
+                        <select class="neu-input neu-select" v-model="filterLnid">
                             <option value="0">
                                 Select Class
                             </option>
@@ -534,9 +542,10 @@ const openTip = () => {
                                 {{ gps[0].prog_code }} ({{ gps[0].sec_name }} {{ gps[0].grad_name }} {{ gps[0].dtype_desc }}) 
                             </option>
                         </select>
-                    </td>
-                    <td class="align-middle">
-                        <select class="form-select form-select-sm w-100" v-model="filterSubjectId">
+                    </div>
+                    <div class="col-md-12 col-lg-5">
+                        <p>Subject</p>
+                        <select class="neu-input neu-select" v-model="filterSubjectId">
                             <option value="0">
                                 Select Subject
                             </option>
@@ -544,399 +553,387 @@ const openTip = () => {
                                 {{ gpa[0].subj_name }} {{ gpa[0].subj_code }}
                             </option>
                         </select>
-                    </td>
-                    <td class="align-middle">
-                        <div class="d-flex gap-1">
-                            <button :disabled="filteringData || savingData ? true : false" @click="filterSubject()"
-                                tabindex="-1" type="button" class="btn btn-sm btn-secondary w-100">
-                                <i class="mr-2 fa-solid fa-eye"></i>Open Grading Sheet
-                            </button>
-                            <!-- <button :disabled="filteringData || savingData ? true : false" @click="openTip()"
-                                tabindex="-1" type="button" class="btn btn-sm btn-secondary w-100">
-                                <i class="mr-2 fa-solid fa-question"></i>Open Help Tips
-                            </button> -->
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="!preLoading && !Object.keys(groupedAssignmentSection).length">
-                    <td class="align-middle" colspan="5">
-                        No Records Found
-                    </td>
-                </tr>
-                <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
-                    <td class="align-middle" colspan="5">
-                        <div class="m-3">
-                            <Loader />
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="table-responsive border p-3 small-font" style="text-transform:uppercase">
-            <table v-if="!preLoading && switcher == 0" class="table table-hover">
-                <thead>
-                    <tr>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Student ID</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Student Type</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Last Name</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">First Name</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Middle Name</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Suffix Name</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Preliminary</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Midterms</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Pre-finals</th>
-                        <th class="fw-bold p-3 bg-secondary-subtle">Finals</th> 
-                        <!-- <th class="text-xs bg-light-gray p-3">No.</th> -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="(!preLoading && Object.keys(finalStudentList).length) && (!filteringData)"
-                        v-for="(app, index) in finalStudentList">
-                        <td class="align-middle p-3">
-                            {{ app.grad_dtypeid == 2 ? app.ident_identification : app.enr_lrn }}
-                        </td>
-                        <td class="align-middle p-3">
-                            {{ app.grad_dtypeid == 2 ? 'College' : 'SHS' }}
-                        </td>
-                        <td class="align-middle p-3">
-                            {{ app.per_lastname ? app.per_lastname : '' }}
-                        </td>
-                        <td class="align-middle p-3">
-                            {{ app.per_firstname ? app.per_firstname : '' }}
-                        </td>
-                        <td class="align-middle p-3">
-                            {{ app.per_middlename ? app.per_middlename : 'N/A' }}
-                        </td>
-                        <td class="align-middle p-3">
-                            {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
-                        </td>
-                        <td class="align-middle p-3">
-                            <input v-if="
-                                (commands[7].sett_status == 1) &&
-                                (
-                                    (
-                                            app.grad_id == commands[7].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[7].sett_program &&
-                                            app.prog_id == commands[7].sett_course
-                                    )||
-                                    (
-                                            app.grad_id == commands[7].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[7].sett_program &&
-                                            commands[7].sett_course == 0
-                                    )||
-                                    (
-                                            app.grad_id == commands[7].sett_gradelvl &&
-                                            commands[7].sett_program == 0 &&
-                                            app.prog_id == commands[7].sett_course
-                                    )||
-                                    (
-                                            commands[7].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[7].sett_program &&
-                                            app.prog_id == commands[7].sett_course
-                                    )||
-
-                                    (
-                                            app.grad_id == commands[7].sett_gradelvl &&
-                                            commands[7].sett_program == 0 &&
-                                            commands[7].sett_course == 0
-                                    )||
-                                    (
-                                            commands[7].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[7].sett_program &&
-                                            commands[7].sett_course == 0
-                                    )||
-                                    (
-                                            commands[7].sett_gradelvl == 0 &&
-                                            commands[7].sett_program == 0 &&
-                                            app.prog_id == commands[7].sett_course
-                                    )||
-
-
-                                    (
-                                            commands[7].sett_gradelvl == 0 &&
-                                            commands[7].sett_program == 0 &&
-                                            commands[7].sett_course == 0
-                                    )
-                                )                                
-                                " 
-
-                                type="number" :id="'prelims' + app.enr_id" min="60" max="100" required
-                                :value="app.grs_prelims ? app.grs_prelims : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                @focusout="
-                                     e => {
-                                        let v = Number(e.target.value);
-                                        if (v < 60) v = 60;
-                                        if (v > 100) v = 100;
-                                        e.target.value = v;
-                                        app.grs_prelims = v;
-                                    }
-                                "
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
-                            <input v-else type="number" :id="'prelims' + app.enr_id" min="60" max="100" disabled
-                                :value="app.grs_prelims ? app.grs_prelims : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
-                        </td>
-                        <td class="align-middle p-3">
-                            <input v-if="
-                                (commands[8].sett_status == 1) &&
-                                (
-                                    (
-                                            app.grad_id == commands[8].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[8].sett_program &&
-                                            app.prog_id == commands[8].sett_course
-                                    )||
-                                    (
-                                            app.grad_id == commands[8].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[8].sett_program &&
-                                            commands[8].sett_course == 0
-                                    )||
-                                    (
-                                            app.grad_id == commands[8].sett_gradelvl &&
-                                            commands[8].sett_program == 0 &&
-                                            app.prog_id == commands[8].sett_course
-                                    )||
-                                    (
-                                            commands[8].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[8].sett_program &&
-                                            app.prog_id == commands[8].sett_course
-                                    )||
-
-                                    (
-                                            app.grad_id == commands[8].sett_gradelvl &&
-                                            commands[8].sett_program == 0 &&
-                                            commands[8].sett_course == 0
-                                    )||
-                                    (
-                                            commands[8].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[8].sett_program &&
-                                            commands[8].sett_course == 0
-                                    )||
-                                    (
-                                            commands[8].sett_gradelvl == 0 &&
-                                            commands[8].sett_program == 0 &&
-                                            app.prog_id == commands[8].sett_course
-                                    )||
-
-
-                                    (
-                                            commands[8].sett_gradelvl == 0 &&
-                                            commands[8].sett_program == 0 &&
-                                            commands[8].sett_course == 0
-                                    )
-                                )                                
-                                " 
-
-                                type="number" :id="'midterms' + app.enr_id" min="60" max="100" required
-                                :value="app.grs_midterms ? app.grs_midterms : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                @focusout="
-                                     e => {
-                                        let v = Number(e.target.value);
-                                        if (v < 60) v = 60;
-                                        if (v > 100) v = 100;
-                                        e.target.value = v;
-                                        app.grs_midterms = v;
-                                    }
-                                "
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
-                            <input v-else type="number" :id="'midterms' + app.enr_id" min="60" max="100" disabled
-                                :value="app.grs_midterms ? app.grs_midterms : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
-                        </td>
-                        <td class="align-middle p-3">
-                            <input v-if="
-                                (commands[9].sett_status == 1) &&
-                                (
-                                    (
-                                            app.grad_id == commands[9].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[9].sett_program &&
-                                            app.prog_id == commands[9].sett_course
-                                    )||
-                                    (
-                                            app.grad_id == commands[9].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[9].sett_program &&
-                                            commands[9].sett_course == 0
-                                    )||
-                                    (
-                                            app.grad_id == commands[9].sett_gradelvl &&
-                                            commands[9].sett_program == 0 &&
-                                            app.prog_id == commands[9].sett_course
-                                    )||
-                                    (
-                                            commands[9].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[9].sett_program &&
-                                            app.prog_id == commands[9].sett_course
-                                    )||
-
-                                    (
-                                            app.grad_id == commands[9].sett_gradelvl &&
-                                            commands[9].sett_program == 0 &&
-                                            commands[9].sett_course == 0
-                                    )||
-                                    (
-                                            commands[9].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[9].sett_program &&
-                                            commands[9].sett_course == 0
-                                    )||
-                                    (
-                                            commands[9].sett_gradelvl == 0 &&
-                                            commands[9].sett_program == 0 &&
-                                            app.prog_id == commands[9].sett_course
-                                    )||
-
-
-                                    (
-                                            commands[9].sett_gradelvl == 0 &&
-                                            commands[9].sett_program == 0 &&
-                                            commands[9].sett_course == 0
-                                    )
-                                )      
-                            " 
-                                type="number" :id="'prefinals' + app.enr_id" min="60" max="100" required
-                                :value="app.grs_prefinals ? app.grs_prefinals : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                @focusout="
-                                     e => {
-                                        let v = Number(e.target.value);
-                                        if (v < 60) v = 60;
-                                        if (v > 100) v = 100;
-                                        e.target.value = v;
-                                        app.grs_prefinals = v;
-                                    }
-                                "
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
-                            <input v-else type="number" :id="'prefinals' + app.enr_id" min="60" max="100" disabled
-                                :value="app.grs_prefinals ? app.grs_prefinals : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
-                        </td>
-                        <td class="align-middle p-3">
-                            <input v-if="
-                                (commands[10].sett_status == 1) &&
-                                (
-                                    (
-                                            app.grad_id == commands[10].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[10].sett_program &&
-                                            app.prog_id == commands[10].sett_course
-                                    )||
-                                    (
-                                            app.grad_id == commands[10].sett_gradelvl &&
-                                            app.grad_dtypeid == commands[10].sett_program &&
-                                            commands[10].sett_course == 0
-                                    )||
-                                    (
-                                            app.grad_id == commands[10].sett_gradelvl &&
-                                            commands[10].sett_program == 0 &&
-                                            app.prog_id == commands[10].sett_course
-                                    )||
-                                    (
-                                            commands[10].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[10].sett_program &&
-                                            app.prog_id == commands[10].sett_course
-                                    )||
-
-                                    (
-                                            app.grad_id == commands[10].sett_gradelvl &&
-                                            commands[10].sett_program == 0 &&
-                                            commands[10].sett_course == 0
-                                    )||
-                                    (
-                                            commands[10].sett_gradelvl == 0 &&
-                                            app.grad_dtypeid == commands[10].sett_program &&
-                                            commands[10].sett_course == 0
-                                    )||
-                                    (
-                                            commands[10].sett_gradelvl == 0 &&
-                                            commands[10].sett_program == 0 &&
-                                            app.prog_id == commands[10].sett_course
-                                    )||
-
-
-                                    (
-                                            commands[10].sett_gradelvl == 0 &&
-                                            commands[10].sett_program == 0 &&
-                                            commands[10].sett_course == 0
-                                    )
-                                )      
-                            " 
-                                type="number" :id="'finals' + app.enr_id" min="60" max="100" required
-                                :value="app.grs_finals ? app.grs_finals : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                @focusout="
-                                     e => {
-                                        let v = Number(e.target.value);
-                                        if (v < 60) v = 60;
-                                        if (v > 100) v = 100;
-                                        e.target.value = v;
-                                        app.grs_finals = v;
-                                    }
-                                "
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
-
-                            <input v-else type="number" :id="'finals' + app.enr_id" min="60" max="100" disabled
-                                :value="app.grs_finals ? app.grs_finals : 60"
-                                oninput="this.value = Math.abs(this.value)"
-                                class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
-                        </td>
-
-                    </tr>
-                    <tr v-if="(!preLoading && !Object.keys(finalStudentList).length) && (!filteringData)">
-                        <td class="p-3 text-center border border-mid-gray" colspan="10">
-                            No Grading Sheet Found
-                        </td>
-                    </tr>
-                    <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)">
-                        <td class="p-3 text-center border border-mid-gray" colspan="10">
-                            Loading Please Wait...
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="10">
-                            <div class="text-end" v-if="!preLoading">
-                                <span>showing total of <span class="font-semibold">({{ Object.keys(finalStudentList).length
-                                    }})</span> items</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-                
-            </table>
-        </div>
-        <div v-if="!preLoading && Object.keys(finalStudentList).length" class="w-100 mt-2">
-            <div class="d-flex shadow rounded-3 border w-100 justify-content-between p-3 gap-2">
-                <div class="w-75 align-content-center text-md-start">
-                    <span class="fw-bold text-primary">Note: </span><span class="italic">Once
-                        grading sheet is generated, it is linked to all records above.
-                        Once deleted, all the grades encoded above will be deleted too.
-                    </span>
+                    </div>
+                    <div class="col-md-12 col-lg-2 d-flex flex-column align-items-center justify-content-center">
+                        <p>Action</p>
+                        <button :disabled="filteringData || savingData ? true : false" @click="filterSubject()"
+                            tabindex="-1" type="button" class="neu-btn-sm neu-white">
+                            <font-awesome-icon icon="fa-solid fa-eye"  /> Open Grading Sheet
+                        </button>
+                         <!-- <button :disabled="filteringData || savingData ? true : false" @click="openTip()"
+                            tabindex="-1" type="button" class="btn btn-sm btn-secondary w-100">
+                            <i class="mr-2 fa-solid fa-question"></i>Open Help Tips
+                        </button> -->
+                    </div>
                 </div>
-                <div class="w-50 d-flex border justify-content-center align-content-center p-3 gap-2">
-                    <button v-if="!Object.keys(gradingHeader).length && commands[10].sett_status == 1"
-                        :disabled="savingData || filteringData ? true : false" @click="generateSheet(1)" type="button"
-                        class="btn btn-sm btn-dark w-100">
-                        <i class="mr-2 fa-solid fa-bolt"></i>Generate
-                    </button>
-                    <button v-else :disabled="savingData || filteringData ? true : false" @click="generateSheet(2)" v-show="commands[10].sett_status == 1"
-                        type="button" class="btn btn-sm btn-dark w-100">
-                        <i class="mr-2 fa-solid fa-trash"></i>Delete
-                    </button>
-                    <button v-if="Object.keys(gradingHeader).length && commands[10].sett_status == 1"
-                        :disabled="savingData || filteringData ? true : false" @click="saveGrades()" type="button"
-                        class="btn btn-sm btn-dark w-100">
-                        <i class="mr-2 fa-solid fa-floppy-disk"></i>Save
-                    </button>
-                    <button :disabled="savingData || filteringData ? true : false" @click="downloadExcel()"
-                        type="button" class="btn btn-sm btn-dark w-100"
-                        data-bs-toggle="modal" data-bs-target="#downloadgradesmodal">
-                        <i class="mr-2 fa-solid fa-file-excel"></i>Download
-                    </button>
+            </div>
+            <div class="neu-card table-responsive border p-3 small-font mt-3" style="text-transform:uppercase">
+                <table v-if="!preLoading && switcher == 0" class="neu-table-flat">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Student ID</th>
+                            <th style="color:#555555">Student Type</th>
+                            <th style="color:#555555">Last Name</th>
+                            <th style="color:#555555">First Name</th>
+                            <th style="color:#555555">Middle Name</th>
+                            <th style="color:#555555">Suffix Name</th>
+                            <th style="color:#555555">Preliminary</th>
+                            <th style="color:#555555">Midterms</th>
+                            <th style="color:#555555">Pre-finals</th>
+                            <th style="color:#555555">Finals</th> 
+                            <!-- <th class="text-xs bg-light-gray p-3">No.</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="(!preLoading && Object.keys(finalStudentList).length) && (!filteringData)"
+                            v-for="(app, index) in finalStudentList">
+                            <td class="align-middle p-3">
+                                {{ app.grad_dtypeid == 2 ? app.ident_identification : app.enr_lrn }}
+                            </td>
+                            <td class="align-middle p-3">
+                                {{ app.grad_dtypeid == 2 ? 'College' : 'SHS' }}
+                            </td>
+                            <td class="align-middle p-3">
+                                {{ app.per_lastname ? app.per_lastname : '' }}
+                            </td>
+                            <td class="align-middle p-3">
+                                {{ app.per_firstname ? app.per_firstname : '' }}
+                            </td>
+                            <td class="align-middle p-3">
+                                {{ app.per_middlename ? app.per_middlename : 'N/A' }}
+                            </td>
+                            <td class="align-middle p-3">
+                                {{ app.per_suffixname ? app.per_suffixname : 'N/A' }}
+                            </td>
+                            <td class="align-middle p-3">
+                                <input v-if="
+                                    (commands[7].sett_status == 1) &&
+                                    (
+                                        (
+                                                app.grad_id == commands[7].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[7].sett_program &&
+                                                app.prog_id == commands[7].sett_course
+                                        )||
+                                        (
+                                                app.grad_id == commands[7].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[7].sett_program &&
+                                                commands[7].sett_course == 0
+                                        )||
+                                        (
+                                                app.grad_id == commands[7].sett_gradelvl &&
+                                                commands[7].sett_program == 0 &&
+                                                app.prog_id == commands[7].sett_course
+                                        )||
+                                        (
+                                                commands[7].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[7].sett_program &&
+                                                app.prog_id == commands[7].sett_course
+                                        )||
+
+                                        (
+                                                app.grad_id == commands[7].sett_gradelvl &&
+                                                commands[7].sett_program == 0 &&
+                                                commands[7].sett_course == 0
+                                        )||
+                                        (
+                                                commands[7].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[7].sett_program &&
+                                                commands[7].sett_course == 0
+                                        )||
+                                        (
+                                                commands[7].sett_gradelvl == 0 &&
+                                                commands[7].sett_program == 0 &&
+                                                app.prog_id == commands[7].sett_course
+                                        )||
+
+
+                                        (
+                                                commands[7].sett_gradelvl == 0 &&
+                                                commands[7].sett_program == 0 &&
+                                                commands[7].sett_course == 0
+                                        )
+                                    )                                
+                                    " 
+
+                                    type="number" :id="'prelims' + app.enr_id" min="60" max="100" required
+                                    :value="app.grs_prelims ? app.grs_prelims : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    @focusout="
+                                        e => {
+                                            let v = Number(e.target.value);
+                                            if (v < 60) v = 60;
+                                            if (v > 100) v = 100;
+                                            e.target.value = v;
+                                            app.grs_prelims = v;
+                                        }
+                                    "
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                                <input v-else type="number" :id="'prelims' + app.enr_id" min="60" max="100" disabled
+                                    :value="app.grs_prelims ? app.grs_prelims : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
+                            </td>
+                            <td class="align-middle p-3">
+                                <input v-if="
+                                    (commands[8].sett_status == 1) &&
+                                    (
+                                        (
+                                                app.grad_id == commands[8].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[8].sett_program &&
+                                                app.prog_id == commands[8].sett_course
+                                        )||
+                                        (
+                                                app.grad_id == commands[8].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[8].sett_program &&
+                                                commands[8].sett_course == 0
+                                        )||
+                                        (
+                                                app.grad_id == commands[8].sett_gradelvl &&
+                                                commands[8].sett_program == 0 &&
+                                                app.prog_id == commands[8].sett_course
+                                        )||
+                                        (
+                                                commands[8].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[8].sett_program &&
+                                                app.prog_id == commands[8].sett_course
+                                        )||
+
+                                        (
+                                                app.grad_id == commands[8].sett_gradelvl &&
+                                                commands[8].sett_program == 0 &&
+                                                commands[8].sett_course == 0
+                                        )||
+                                        (
+                                                commands[8].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[8].sett_program &&
+                                                commands[8].sett_course == 0
+                                        )||
+                                        (
+                                                commands[8].sett_gradelvl == 0 &&
+                                                commands[8].sett_program == 0 &&
+                                                app.prog_id == commands[8].sett_course
+                                        )||
+
+
+                                        (
+                                                commands[8].sett_gradelvl == 0 &&
+                                                commands[8].sett_program == 0 &&
+                                                commands[8].sett_course == 0
+                                        )
+                                    )                                
+                                    " 
+
+                                    type="number" :id="'midterms' + app.enr_id" min="60" max="100" required
+                                    :value="app.grs_midterms ? app.grs_midterms : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    @focusout="
+                                        e => {
+                                            let v = Number(e.target.value);
+                                            if (v < 60) v = 60;
+                                            if (v > 100) v = 100;
+                                            e.target.value = v;
+                                            app.grs_midterms = v;
+                                        }
+                                    "
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                                <input v-else type="number" :id="'midterms' + app.enr_id" min="60" max="100" disabled
+                                    :value="app.grs_midterms ? app.grs_midterms : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
+                            </td>
+                            <td class="align-middle p-3">
+                                <input v-if="
+                                    (commands[9].sett_status == 1) &&
+                                    (
+                                        (
+                                                app.grad_id == commands[9].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[9].sett_program &&
+                                                app.prog_id == commands[9].sett_course
+                                        )||
+                                        (
+                                                app.grad_id == commands[9].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[9].sett_program &&
+                                                commands[9].sett_course == 0
+                                        )||
+                                        (
+                                                app.grad_id == commands[9].sett_gradelvl &&
+                                                commands[9].sett_program == 0 &&
+                                                app.prog_id == commands[9].sett_course
+                                        )||
+                                        (
+                                                commands[9].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[9].sett_program &&
+                                                app.prog_id == commands[9].sett_course
+                                        )||
+
+                                        (
+                                                app.grad_id == commands[9].sett_gradelvl &&
+                                                commands[9].sett_program == 0 &&
+                                                commands[9].sett_course == 0
+                                        )||
+                                        (
+                                                commands[9].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[9].sett_program &&
+                                                commands[9].sett_course == 0
+                                        )||
+                                        (
+                                                commands[9].sett_gradelvl == 0 &&
+                                                commands[9].sett_program == 0 &&
+                                                app.prog_id == commands[9].sett_course
+                                        )||
+
+
+                                        (
+                                                commands[9].sett_gradelvl == 0 &&
+                                                commands[9].sett_program == 0 &&
+                                                commands[9].sett_course == 0
+                                        )
+                                    )      
+                                " 
+                                    type="number" :id="'prefinals' + app.enr_id" min="60" max="100" required
+                                    :value="app.grs_prefinals ? app.grs_prefinals : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    @focusout="
+                                        e => {
+                                            let v = Number(e.target.value);
+                                            if (v < 60) v = 60;
+                                            if (v > 100) v = 100;
+                                            e.target.value = v;
+                                            app.grs_prefinals = v;
+                                        }
+                                    "
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                                <input v-else type="number" :id="'prefinals' + app.enr_id" min="60" max="100" disabled
+                                    :value="app.grs_prefinals ? app.grs_prefinals : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs bg-light-gray" />
+                            </td>
+                            <td class="align-middle p-3">
+                                <input v-if="
+                                    (commands[10].sett_status == 1) &&
+                                    (
+                                        (
+                                                app.grad_id == commands[10].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[10].sett_program &&
+                                                app.prog_id == commands[10].sett_course
+                                        )||
+                                        (
+                                                app.grad_id == commands[10].sett_gradelvl &&
+                                                app.grad_dtypeid == commands[10].sett_program &&
+                                                commands[10].sett_course == 0
+                                        )||
+                                        (
+                                                app.grad_id == commands[10].sett_gradelvl &&
+                                                commands[10].sett_program == 0 &&
+                                                app.prog_id == commands[10].sett_course
+                                        )||
+                                        (
+                                                commands[10].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[10].sett_program &&
+                                                app.prog_id == commands[10].sett_course
+                                        )||
+
+                                        (
+                                                app.grad_id == commands[10].sett_gradelvl &&
+                                                commands[10].sett_program == 0 &&
+                                                commands[10].sett_course == 0
+                                        )||
+                                        (
+                                                commands[10].sett_gradelvl == 0 &&
+                                                app.grad_dtypeid == commands[10].sett_program &&
+                                                commands[10].sett_course == 0
+                                        )||
+                                        (
+                                                commands[10].sett_gradelvl == 0 &&
+                                                commands[10].sett_program == 0 &&
+                                                app.prog_id == commands[10].sett_course
+                                        )||
+
+
+                                        (
+                                                commands[10].sett_gradelvl == 0 &&
+                                                commands[10].sett_program == 0 &&
+                                                commands[10].sett_course == 0
+                                        )
+                                    )      
+                                " 
+                                    type="number" :id="'finals' + app.enr_id" min="60" max="100" required
+                                    :value="app.grs_finals ? app.grs_finals : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    @focusout="
+                                        e => {
+                                            let v = Number(e.target.value);
+                                            if (v < 60) v = 60;
+                                            if (v > 100) v = 100;
+                                            e.target.value = v;
+                                            app.grs_finals = v;
+                                        }
+                                    "
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+
+                                <input v-else type="number" :id="'finals' + app.enr_id" min="60" max="100" disabled
+                                    :value="app.grs_finals ? app.grs_finals : 60"
+                                    oninput="this.value = Math.abs(this.value)"
+                                    class="border border-gray-300 rounded-md px-3 py-1 w-full text-xs" />
+                            </td>
+
+                        </tr>
+                        <tr v-if="(!preLoading && !Object.keys(finalStudentList).length) && (!filteringData)">
+                            <td class="p-3 text-center border border-mid-gray" colspan="10">
+                                No Grading Sheet Found
+                            </td>
+                        </tr>
+                        <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)">
+                            <td class="p-3 text-center border border-mid-gray" colspan="10">
+                                Loading Please Wait...
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10">
+                                <div class="text-end" v-if="!preLoading">
+                                    <span>showing total of <span class="font-semibold">({{ Object.keys(finalStudentList).length
+                                        }})</span> items</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    
+                </table>
+            </div>
+            <div v-if="!preLoading && Object.keys(finalStudentList).length" class="w-100 mt-2">
+                <div class="d-flex shadow rounded-3 border w-100 justify-content-between p-3 gap-2">
+                    <div class="w-75 align-content-center text-md-start">
+                        <span class="fw-bold text-primary">Note: </span><span class="italic">Once
+                            grading sheet is generated, it is linked to all records above.
+                            Once deleted, all the grades encoded above will be deleted too.
+                        </span>
+                    </div>
+                    <div class="w-50 d-flex border justify-content-center align-content-center p-3 gap-2">
+                        <button v-if="!Object.keys(gradingHeader).length && commands[10].sett_status == 1"
+                            :disabled="savingData || filteringData ? true : false" @click="generateSheet(1)" type="button"
+                            class="neu-btn neu-blue p-2">
+                            <font-awesome-icon icon="fa-solid fa-bolt"/> Generate
+                        </button>
+                        <button v-else :disabled="savingData || filteringData ? true : false" @click="generateSheet(2)" v-show="commands[10].sett_status == 1"
+                            type="button" class="neu-btn neu-red p-2">
+                            <font-awesome-icon icon="fa-solid fa-trash"/> Delete
+                        </button>
+                        <button v-if="Object.keys(gradingHeader).length && commands[10].sett_status == 1"
+                            :disabled="savingData || filteringData ? true : false" @click="saveGrades()" type="button"
+                            class="neu-btn neu-purple p-2">
+                            <font-awesome-icon icon="fa-solid fa-floppy-disk"/>Save
+                        </button>
+                        <button :disabled="savingData || filteringData ? true : false" @click="downloadExcel()"
+                            type="button" class="neu-btn neu-green p-2"
+                            data-bs-toggle="modal" data-bs-target="#downloadgradesmodal">
+                            <font-awesome-icon icon="fa-solid fa-file-excel"/> Download
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    
     <!-- Edit Medical Modal -->
     <div class="modal fade" id="downloadgradesmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" >
@@ -947,7 +944,7 @@ const openTip = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showExcelDownload = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <div class="d-flex flex-wrap flex-column">
                         <p class="text-success fw-bold">Generated Grading Sheet</p>
                         <!-- <p class=" fst-italic border p-3 rounded-3 bg-secondary-subtle small-font"><span
@@ -957,7 +954,7 @@ const openTip = () => {
                                 verify the student enrollment to the registrar's office.
                             </span></p> -->
                     </div>
-                    <div class="table-responsive border p-3 small-font">
+                    <div class="neu-card table-responsive border p-3 small-font">
                         <ExcelDownloaderGrades :gradingsheetdata="toBeDownloaded"/>
                     </div>
                 </div>

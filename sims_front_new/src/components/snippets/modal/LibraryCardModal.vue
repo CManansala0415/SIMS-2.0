@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../loaders/Loading1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     getLibraryCardIssue,
     getBorrowedBooksBy,
@@ -115,6 +115,14 @@ const deactivateCard = (card) => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             verifying.value = true
+            Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             getBorrowedBooksBy(card, student.value.per_id, student.value.enr_id).then((results) => {
                 let x = {
                     lbrd_id: card,
@@ -122,7 +130,6 @@ const deactivateCard = (card) => {
                     lbrd_personid: student.value.enr_id,
                     lbrd_user: userId.value,
                 }
-                console.log(results)
                 if (Object.keys(results).length) {
                     // alert('This card has an active borrowed books, to deactivate this card return all the books currently borrowed')
                     // verifying.value = false
@@ -131,6 +138,7 @@ const deactivateCard = (card) => {
                         text: "This card has an active borrowed books, to deactivate this card return all the books currently borrowed",
                         icon: "warning"
                     }).then(() => {
+                        Swal.close()
                         verifying.value = false
                     });
                 } else {
@@ -143,6 +151,7 @@ const deactivateCard = (card) => {
                                 text: "Changes applied, refreshing the page",
                                 icon: "success"
                             }).then(() => {
+                                Swal.close()
                                 location.reload()
                             });
                         } else {
@@ -153,6 +162,7 @@ const deactivateCard = (card) => {
                                 text: "Unknown error occured, try again later",
                                 icon: "error"
                             }).then(() => {
+                                Swal.close()
                                 location.reload()
                             });
                         }
@@ -172,6 +182,14 @@ const registerNewCard = () => {
         lbrd_issuedby: userId.value,
         lbrd_user: userId.value,
     }
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
 
     addLibraryCard(x).then((results) => {
         if (results.status == 200) {
@@ -182,6 +200,7 @@ const registerNewCard = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(() => {
+                Swal.close()
                 location.reload()
             });
         } else {
@@ -192,6 +211,7 @@ const registerNewCard = () => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(() => {
+                Swal.close()
                 location.reload()
             });
         }
@@ -199,43 +219,72 @@ const registerNewCard = () => {
 
 }
 
-const printForm = (enrid,data) => {
-    let name = 'LC-'+enrid+data
-    qrImageGenerator(data).then((result) => {
-        qrimage.value = result
-        pdfGenerator(name, 'a6', 'landscape', 0)
+const printForm = async (enrid, data) => {
+    const name = `LC-${enrid}-${data}`;
+
+    Swal.fire({
+        icon: "success",
+        title: "Receipt Ready",
+        text: "Click OK to generate and download the PDF.",
+        confirmButtonText: "Ok, Got it!"
+    }).then(async (result) => {
+        if (!result.isConfirmed) return;
+
         Swal.fire({
-            icon: "success",
-            title: "Download Complete",
-            text: "Check your file manager, refreshing the page",
-        }).then(()=>{
-            location.reload()
+            title: "Generating PDF...",
+            text: "Please wait while we prepare your receipt.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
-    })
-}
+
+        try {
+            // Generate QR first
+            qrimage.value = await qrImageGenerator(data);
+
+            // Generate PDF
+            await pdfGenerator(name, 'a6', 'landscape', 0);
+
+            setTimeout(() => {
+                Swal.close();
+                location.reload();
+            }, 1000);
+
+        } catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Generation Failed",
+                text: "Something went wrong while creating the PDF."
+            });
+            console.error(error);
+        }
+    });
+};
+
 </script>
 <template>
-    <div class="small-font">
+    <div class="small-font p-3">
 
         <div v-if="preLoading">
-            <Loader />
+            <NeuLoader2 />
         </div>
         <div v-else>
-            <div class="d-flex gap-2">
-                <div class="w-50">
-                    <p class="fw-bold text-white bg-secondary rounded-2 p-1">Issue New Card</p>
-                    <div class="border card">
+            <div class="d-flex gap-3">
+                <div class="w-50 neu-card p-3">
+                    <p class="fw-bold text-white neu-pastel-purple rounded-2 p-1">Issue New Card</p>
+                    <div class="border">
                         <form @submit.prevent="registerNewCard" class="p-2 d-flex flex-column gap-2">
                             <div class="form-group p-2 text-start">
                                 <label class="">Card No.</label>
                                 <input v-model="cardNo" required :disabled="hasActiveCard ? true : false"
                                     placeholder="Ex. QF-LIB-01-04-03-SEPT22" type="text"
-                                    class="form-control form-control-sm" />
+                                    class="neu-input" />
                             </div>
                             <div class="form-group p-2 text-start">
                                 <label class="">Issue Date: </label>
                                 <input v-model="cardDate" required :disabled="hasActiveCard ? true : false" type="date"
-                                    class="form-control form-control-sm" />
+                                    class="neu-input" />
                             </div>
                             <div class="form-group p-2 text-center">
                                 <button v-if="!hasActiveCard" type="submit" class="btn btn-sm btn-dark w-100">Issue New
@@ -247,7 +296,7 @@ const printForm = (enrid,data) => {
                                     any active card.
                                 </p>
                             </div>
-                            <div class="form-group p-3 text-start bg-secondary-subtle">
+                            <div class="form-group p-3 text-start">
                                 <p class="">
                                     <span class="fw-bold text-primary">Note: </span> You can release a new library card
                                     one
@@ -262,24 +311,24 @@ const printForm = (enrid,data) => {
                     </div>
 
                 </div>
-                <div class="w-50">
-                    <p class="fw-bold text-white bg-secondary rounded-2 p-1">Issued Cards</p>
+                <div class="w-50 neu-card-inner p-3">
+                    <p class="fw-bold text-white neu-pastel-blue rounded-2 p-1">Issued Cards</p>
 
                     <div v-if="!Object.keys(libraryCards).length && !verifying" class="p-2 border card">
-                        <div class="p-4 bg-white align-content-center">
+                        <div class="p-4 neu-card align-content-center">
                             No Library Card Issued
                         </div>
                     </div>
                     <div v-if="verifying" class="p-2 border card">
-                        <div class="p-4 bg-white d-flex flex-column gap-2">
-                            <Loader />
+                        <div class="p-4 neu-card d-flex flex-column gap-2">
+                            <NeuLoader2 />
                         </div>
                     </div>
-                    <div v-if="Object.keys(libraryCards).length && !verifying" class="p-2 border card">
-                        <div class="card text-start" v-for="(lc, index) in libraryCards">
+                    <div v-if="Object.keys(libraryCards).length && !verifying" class="p-2 border neu-card">
+                        <div class="p-3 text-start" v-for="(lc, index) in libraryCards">
                             <div class="card-body">
-                                <h5 class="card-title">{{ lc.lbrd_cardno }}</h5>
-                                <p class="card-text">Issued Library Card to this student with corresponding details
+                                <h5 class="card-title fw-bold mb-2">{{ lc.lbrd_cardno }}</h5>
+                                <p class="card-text mb-3">Issued Library Card to this student with corresponding details
                                     below:</p>
                             </div>
                             <ul class="list-group list-group-flush">
@@ -385,17 +434,17 @@ const printForm = (enrid,data) => {
                                     </div>
                                 </li>
                             </ul>
-                            <div class="card-body d-flex gap-1">
+                            <div class="card-body d-flex gap-1 mt-3">
                                 <button @click="printForm(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1" type="button"
-                                    class="btn btn-sm btn-primary w-100">
-                                    Download Card
+                                    class="neu-btn neu-green p-2">
+                                    <font-awesome-icon icon="fa-solid fa-download"  /> Download Card
                                 </button>
                                 <button @click="deactivateCard(lc.lbrd_id)" v-if="lc.lbrd_status == 1"
-                                    class="btn btn-sm btn-danger w-100" type="button">
-                                    Deactivate
+                                    class="neu-btn neu-red p-2" type="button">
+                                    <font-awesome-icon icon="fa-solid fa-ban"  /> Deactivate
                                 </button>
-                                <button v-else disabled class="btn btn-sm btn-danger pe-none w-100" type="button">
-                                    Deactivated
+                                <button v-else disabled class="neu-btn neu-orange p-2" type="button">
+                                    <font-awesome-icon icon="fa-solid fa-ban"  /> Deactivated
                                 </button>
                             </div>
                         </div>
@@ -407,3 +456,4 @@ const printForm = (enrid,data) => {
 
     </div>
 </template>
+

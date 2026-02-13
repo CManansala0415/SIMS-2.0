@@ -26,6 +26,15 @@ onMounted(() => {
 
 const updateMedicalInventory = () => {
     saving.value = true
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     item.value.push(medicalSupply.value)
     let x = item.value.map((e) => {
         if (e.clms_id && !e.replenish) {
@@ -52,7 +61,6 @@ const updateMedicalInventory = () => {
             }
         }
     })
-    console.log(x)
 
     updateMedicalSupply(x[0]).then((results) => {
         if (results.status == 200) {
@@ -63,6 +71,7 @@ const updateMedicalInventory = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close();
                 location.reload()
             });
         } else {
@@ -73,6 +82,7 @@ const updateMedicalInventory = () => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close();
                 location.reload()
             });
         }
@@ -82,7 +92,7 @@ const updateMedicalInventory = () => {
 </script>
 
 <template>
-    <div class="p-2">
+    <div class="p-2 neu-card small-font">
         <div class="p-2">
             <p v-if="!medicalSupply.clms_id && !medicalSupply.replenish" class="fw-bold text-success">Add New Medical
                 Supply</p>
@@ -90,17 +100,17 @@ const updateMedicalInventory = () => {
                 Medical Supply</p>
             <p v-else class="fw-bold text-success">Replenish Medical Supply</p>
         </div>
-        <div class="card p-2">
+        <div class="neu-card-inner p-4">
             <form @submit.prevent="updateMedicalInventory" class="w-100">
                 <div class="d-flex flex-column gap-1 text-start">
                     <div v-if="!medicalSupply.clms_id || !medicalSupply.replenish" class="">
-                        <label class="fw-bold">Item Description</label>
+                        <label class="">Item Description</label>
                         <input v-model="medicalSupply.clms_desc" type="text"
-                            class="form-control form-control-sm" />
+                            class="neu-input" />
                     </div>
                     <div v-if="!medicalSupply.clms_id || !medicalSupply.replenish" class="">
-                        <label class="fw-bold">Item Type</label>
-                        <select class="form-control form-select-sm" v-model="medicalSupply.clms_itemtype"
+                        <label class="">Item Type</label>
+                        <select class="neu-input neu-select" v-model="medicalSupply.clms_itemtype"
                             required>
                             <option value="1">
                                 Consumables
@@ -114,21 +124,21 @@ const updateMedicalInventory = () => {
                         </select>
                     </div>
                     <div v-if="!medicalSupply.clms_id || medicalSupply.replenish" class="">
-                        <label class="fw-bold">Stock Count</label>
+                        <label class="">Stock Count</label>
                         <input v-model="medicalSupply.clms_stocks" disabled type="number"
-                            class="form-control form-control-sm disabled:cursor-not-allowed disabled:bg-gray-200" />
+                            class="neu-input" />
                     </div>
                     <div v-if="!medicalSupply.clms_id || medicalSupply.replenish" class="">
-                        <label class="fw-bold">Stock Replenish</label>
+                        <label class="">Stock Replenish</label>
                         <input v-model="replenishItem" required min="1" type="number"
-                            class="form-control form-control-sm" />
+                            class="neu-input" />
                     </div>
                     <div class="d-flex mt-3">
                         <button v-if="!medicalSupply.clms_id" :disabled="saving ? true : false" type="submit"
-                            class="btn btn-sm btn-primary w-100">Add
+                            class="neu-btn neu-green p-2"><font-awesome-icon icon="fa-solid fa-add" /> Add
                         </button>
                         <button v-else :disabled="saving ? true : false" type="submit"
-                            class="btn btn-sm btn-primary w-100">Update
+                            class="neu-btn neu-blue p-2"><font-awesome-icon icon="fa-solid fa-wrench" /> Update
                         </button>
                     </div>
                 </div>

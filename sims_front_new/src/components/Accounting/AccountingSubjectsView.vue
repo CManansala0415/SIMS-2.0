@@ -8,7 +8,9 @@ import {
 } from "../Fetchers.js";
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+import { pesoConverter } from '../Generators.js';
 const router = useRouter();
 const subject = ref([])
 const program = ref([])
@@ -223,84 +225,89 @@ const lecRate = ref(0)
         <div class="p-3 mb-4 border-bottom">
             <h5 class=" text-uppercase fw-bold">Subject Rates</h5>
         </div>
-
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup="search()" aria-describedby="searchaddon">
-            </div>
-            <!-- <div class="d-flex flex-wrap w-50 justify-content-end">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit()" type="button"
-                    class="btn btn-sm btn-primary">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div> -->
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Code</th>
-                        <th style="background-color: #237a5b;" class="text-white">Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Details</th>
-                        <th style="background-color: #237a5b;" class="text-white w-25">Default Rate</th>
-                        <th style="background-color: #237a5b;" class="text-white">Status</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(sj, index) in filteredSubject">
-                        <td class="align-middle">
-                            {{ sj.subj_code }}
-                        </td>
-                        <td class="align-middle">
-                            {{ sj.subj_name }}
-                        </td>
-                        <td class="align-middle">
-                            <div class="d-flex flex-column">
-                                <div class="input-group input-group-sm mb-1">
-                                    <span class=" input-group-text">Lecture Units</span>
-                                    <input v-model="sj.subj_lec_units" type="text" class="form-control" disabled>
+
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup="search()" aria-describedby="searchaddon">
+                </div>
+                <!-- <div class="d-flex flex-wrap w-50 justify-content-end">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit()" type="button"
+                        class="btn btn-sm btn-primary">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                </div> -->
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Code</th>
+                            <th style="color:#555555">Name</th>
+                            <th style="color:#555555">Details</th>
+                            <th style="color:#555555">Default Rate</th>
+                            <th style="color:#555555">Status</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(sj, index) in filteredSubject">
+                            <td class="align-middle">
+                                {{ sj.subj_code }}
+                            </td>
+                            <td class="align-middle">
+                                {{ sj.subj_name }}
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex flex-column">
+                                    <div class="d-flex justify-content-between gap-1 mb-1">
+                                        <span class="">Lecture Units ({{ sj.subj_lec_units }})</span>
+                                    </div>
+                                    <div class="d-flex gap-1 mb-1">
+                                        <span class="">Laboratory Units ({{ sj.subj_lab_units }})</span>
+                                    </div>
+                                    <div class="d-flex gap-1 mb-3">
+                                        <span class="">Hours /week ({{ sj.subj_hrs_week }})</span>
+                                    </div>
                                 </div>
-                                <div class="input-group input-group-sm mb-1">
-                                    <span class=" input-group-text">Laboratory Units</span>
-                                    <input v-model="sj.subj_lab_units" type="text" class="form-control" disabled>
+                            </td>
+                            <td class="align-middle">
+                                <!-- {{ sj.subj_preq_code ? sj.subj_preq_code : 'N/A' }} -->
+                                <!-- {{ pesoConverter(sj.subj_lec_rate + sj.subj_lab_rate) }} -->
+                                {{ pesoConverter((sj.subj_lab_rate || 0) * (sj.subj_lab_units) + (sj.subj_lec_rate || 0) * (sj.subj_lec_units || 0)) }}
+                            </td>
+                            <td class="align-middle">
+                                {{ sj.subj_status == 1 ? 'Active' : 'Inactive' }}
+                            </td>
+                            <td class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center" v-if="accessData[15].useracc_modifying == 1">
+                                    <button data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit(sj)"
+                                        type="button" title="Edit Record" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-pen" /></button>
                                 </div>
-                                <div class="input-group input-group-sm mb-3">
-                                    <span class=" input-group-text">Hours /week</span>
-                                    <input :value="sj.subj_hrs_week" type="text" class="form-control" disabled>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="align-middle">
-                            <!-- {{ sj.subj_preq_code ? sj.subj_preq_code : 'N/A' }} -->
-                            {{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format( sj.subj_lec_rate + sj.subj_lab_rate ) }}
-                        </td>
-                        <td class="align-middle">
-                            {{ sj.subj_status == 1 ? 'Active' : 'Inactive' }}
-                        </td>
-                        <td class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center" v-if="accessData[15].useracc_modifying == 1">
-                                <button data-bs-toggle="modal" data-bs-target="#addnewmodal" @click="edit(sj)"
-                                    type="button" title="Edit Record" class="btn btn-secondary btn-sm">
-                                    <font-awesome-icon icon="fa-solid fa-pen" /></button>
-                            </div>
-                            <span v-else>N/A</span>
-                        </td>
-                    </tr>
-                    <tr v-if="!Object.keys(filteredSubject).length && !preLoading">
-                        <td class="p-3 text-center" colspan="8">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="!Object.keys(filteredSubject).length && preLoading">
-                        <td class="p-3 text-center" colspan="8">
-                            <Loader />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                <span v-else>N/A</span>
+                            </td>
+                        </tr>
+                        <tr v-if="!Object.keys(filteredSubject).length && !preLoading">
+                            <td class="p-3 text-center" colspan="8">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <tr v-if="!Object.keys(filteredSubject).length && preLoading">
+                            <td class="p-3 text-center" colspan="8">
+                                <Loader />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -314,7 +321,7 @@ const lecRate = ref(0)
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="editForm = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <form @submit.prevent="registerSubject()" class="d-flex flex-column p-2 gap-2">
                         <div class="d-flex flex-wrap flex-column">
                             <p class="text-success fw-bold">Rate Setup</p>
@@ -324,74 +331,76 @@ const lecRate = ref(0)
                                     correct before tagging the rates to ensure that the prices will appear correctly.
                                 </span></p>
                         </div>
-                        <table class="table table-bordered small-font">
-                            <thead>
-                                <tr>
-                                    <th colspan="3" class="text-start fw-normal">
-                                        <span>{{ editData.subj_name }}</span> (<span class="fw-bold">{{ editData.subj_code }}</span>)
-                                    </th>
-                                </tr>
-                                 <tr>
-                                    <th class="w-25">Type</th>
-                                    <th class="w-10">Units</th>
-                                    <th class="w-10">Hours</th>
-                                    <th class="w-25">Rate</th>
-                                    <th class="w-25">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="align-middle"><span class="fw-bold">Lecture</span></td>
-                                    <td class="align-middle">{{ editData.subj_lec_units }}</td>
-                                    <td class="align-middle">{{ editData.subj_lec_hrs }}</td>
-                                    <td class="align-middle">
-                                        <input  v-model.number="editData.subj_lec_units_rate"
-                                                required
-                                                step="0.01" 
-                                                min="0.00"
-                                                @input="if (editData.subj_lec_units_rate <= 0) editData.subj_lec_units_rate = 0;"
-                                                type="number"
-                                                class="form-control" placeholder="Price Per Unit"/>
-                                    </td>
-                                    <td class="align-middle">
-                                        <div class="d-flex flex-column gap-2">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lec_units_rate || 0) * (editData.subj_lec_units)) }}</span>
-                                        </div>    
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle"><span class="fw-bold">Laboratory</span></td>
-                                    <td class="align-middle">{{ editData.subj_lab_units }}</td>
-                                    <td class="align-middle">{{ editData.subj_lab_hrs }}</td>
-                                    <td class="align-middle">
-                                        <input  v-model.number="editData.subj_lab_units_rate"
-                                                required
-                                                step="0.01" 
-                                                min="0.00"
-                                                @input="if (editData.subj_lab_units_rate <= 0) editData.subj_lab_units_rate = 0;"
-                                                type="number"
-                                                :disabled="editData.subj_lab_units==0?true:false"
-                                                class="form-control" placeholder="Price Per Unit"/>
-                                    </td>
-                                    <td class="align-middle">
-                                        <div class="d-flex flex-column gap-2">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lab_units_rate || 0) * (editData.subj_lab_units)) }}</span>
-                                        </div>    
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="align-middle text-end fw-bold" colspan="4">Total</td>
-                                    <td class="align-middle">
-                                        <div class="d-flex flex-column gap-2 fw-bold">
-                                            <span>{{ new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format((editData.subj_lab_units_rate || 0) * (editData.subj_lab_units) + (editData.subj_lec_units_rate || 0) * (editData.subj_lec_units)) }}</span>
-                                        </div>    
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="p-3 neu-card">
+                            <table class="neu-table-flat small-font">
+                                <thead>
+                                    <tr>
+                                        <th colspan="3" class="text-start fw-normal">
+                                            <span>{{ editData.subj_name }}</span> (<span class="fw-bold">{{ editData.subj_code }}</span>)
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th class="w-25 text-center">Type</th>
+                                        <th class="w-10 text-center">Units</th>
+                                        <th class="w-10 text-center">Hours</th>
+                                        <th class="w-25 text-center">Rate</th>
+                                        <th class="w-25 text-center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="align-middle text-center"><span class="fw-bold">Lecture</span></td>
+                                        <td class="align-middle text-center">{{ editData.subj_lec_units }}</td>
+                                        <td class="align-middle text-center">{{ editData.subj_lec_hrs }}</td>
+                                        <td class="align-middle text-center">
+                                            <input  v-model.number="editData.subj_lec_units_rate"
+                                                    required
+                                                    step="0.01" 
+                                                    min="0.00"
+                                                    @input="if (editData.subj_lec_units_rate <= 0) editData.subj_lec_units_rate = 0;"
+                                                    type="number"
+                                                    class="neu-input" placeholder="Price Per Unit"/>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <div class="d-flex flex-column gap-2">
+                                                <span>{{ pesoConverter((editData.subj_lec_units_rate || 0) * (editData.subj_lec_units)) }}</span>
+                                            </div>    
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle text-center"><span class="fw-bold">Laboratory</span></td>
+                                        <td class="align-middle text-center">{{ editData.subj_lab_units }}</td>
+                                        <td class="align-middle text-center">{{ editData.subj_lab_hrs }}</td>
+                                        <td class="align-middle text-center">
+                                            <input  v-model.number="editData.subj_lab_units_rate"
+                                                    required
+                                                    step="0.01" 
+                                                    min="0.00"
+                                                    @input="if (editData.subj_lab_units_rate <= 0) editData.subj_lab_units_rate = 0;"
+                                                    type="number"
+                                                    :disabled="editData.subj_lab_units==0?true:false"
+                                                    class="neu-input" placeholder="Price Per Unit"/>
+                                        </td>
+                                        <td class="align-middle text-center">
+                                            <div class="d-flex flex-column gap-2">
+                                                <span>{{ pesoConverter((editData.subj_lab_units_rate || 0) * (editData.subj_lab_units)) }}</span>
+                                            </div>    
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="align-middle text-end fw-bold" colspan="4">Total</td>
+                                        <td class="align-middle text-center">
+                                            <div class="d-flex flex-column gap-2 fw-bold">
+                                                <span>{{ pesoConverter((editData.subj_lab_units_rate || 0) * (editData.subj_lab_units) + (editData.subj_lec_units_rate || 0) * (editData.subj_lec_units || 0)) }}</span>
+                                            </div>    
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="d-flex flex-column mt-3">
                             <button :disabled="saving ? true : false" type="submit"
-                                class="btn btn-sm btn-primary">Assign Rate</button>
+                                class="neu-btn neu-green p-2"><font-awesome-icon icon="fa-solid fa-floppy-disk"/> Assign Rate</button>
                         </div>
                     </form>
                 </div>

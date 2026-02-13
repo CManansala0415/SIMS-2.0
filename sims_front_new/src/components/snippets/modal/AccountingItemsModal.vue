@@ -47,11 +47,19 @@ onMounted(() => {
         itemDesc.value = ''
         itemPrice.value = 0
     }
-    console.log(item.value)
 })
 
 const save = () => {
     saving.value = true
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     let x = {
         acf_desc: itemDesc.value,
         acf_docstamp: itemDocstamp.value,
@@ -70,6 +78,7 @@ const save = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(()=>{
+                Swal.close();
                 location.reload()
             });
         } else {
@@ -80,6 +89,7 @@ const save = () => {
                 text: "Unknown error occured, try again later",
                 icon: "error"
             }).then(()=>{
+                Swal.close();
                 location.reload()
             });
         }
@@ -90,44 +100,44 @@ const save = () => {
 <template>
     <div class="p-7">
         <div class="d-flex flex-wrap flex-column">
-            <p class="text-success fw-bold">Miscellaneous Supplies</p>
-            <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+            <p class="m-0 text-success fw-bold">Miscellaneous Supplies</p>
+            <p class="mb-3 fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Ensure that the details of the item to be encoded is correct.
                 </span></p>
         </div>
         <div class="d-flex gap-2 small-font">
             <div class="w-100">
-                <form @submit.prevent="save" class="card text-start h-100">
+                <form @submit.prevent="save" class="neu-card text-start h-100">
                     <div class="d-flex flex-column gap-2 w-100 p-3">
                         <div class="form-group">
                             <label>Item Description</label>
-                            <input v-model="itemDesc" required type="text" class="form-control form-control-sm" />
+                            <input v-model="itemDesc" required type="text" class="neu-input" />
                         </div>
                         <div class="form-group">
                             <label>Item Price</label>
                             <input v-model="itemPrice" min="0" max="999999" required
                                 oninput="this.value = Math.abs(this.value)" type="number"
-                                class="form-control form-control-sm" />
+                                class="neu-input" />
                         </div>
                         <div class="form-group">
                             <label>Document Stamp</label>
-                            <select v-model="itemDocstamp" class="form-control form-select-sm" required>
-                                <option value="" disabled>-- Select Availability</option>
+                            <select v-model="itemDocstamp" class="neu-input neu-select" required>
+                                <option value="" disabled>Select Availability</option>
                                 <option value="0">No</option>
                                 <option value="1">Yes</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Receipt Type</label>
-                            <select v-model="itemReceiptType" class="form-control form-select-sm" required>
-                                <option value="" disabled>-- Select Availability</option>
+                            <select v-model="itemReceiptType" class="neu-input neu-select" required>
+                                <option value="" disabled>Select Availability</option>
                                 <option value="1">Provisional (PR)</option>
                                 <option value="2">Official (OR)</option>
                             </select>
                         </div>
                         <div class="d-flex mt-3">
                             <button :disabled="saving ? true : false" type="submit"
-                                class="btn btn-sm btn-primary w-100">Save
+                                class="neu-btn neu-green p-2"> <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save
                             </button>
                         </div>
                     </div>

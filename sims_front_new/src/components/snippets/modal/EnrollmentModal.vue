@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { enrollApplicant, getEnrollment, getCommandUpdate, getSettlementDetails } from "../../Fetchers.js";
 import { getUserID } from "../../../routes/user";
-import Loader1 from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 const userID = ref('')
 
 const props = defineProps({
@@ -243,7 +243,7 @@ const enroll = () => {
 }
 </script>
 <template>
-    <Loader1 v-if="preLoading"></Loader1>
+    <NeuLoader2 v-if="preLoading"></NeuLoader2>
     <div v-else class="d-flex flex-column p-2 gap-2">
         <div class="d-flex flex-wrap flex-column">
             <p class="text-success fw-bold">Applicant Name</p>
@@ -255,7 +255,7 @@ const enroll = () => {
         </div>
         <div class="d-flex flex-wrap form-group">
             <label for="type">Type</label>
-            <select v-model="enrollData.program" class="form-control" title="Click Edit to modify details"
+            <select v-model="enrollData.program" class="neu-input neu-select" title="Click Edit to modify details"
                 @change="filterGradelvl(), filterCourses(), enrollData.lrn = ''"
                 :disabled="enrollChecker || enrolleeData.enr_id ? true : false" id="type" aria-describedby="type">
                 <option value="" disabled>-- Select Type --</option>
@@ -264,13 +264,13 @@ const enroll = () => {
         </div>
         <!-- <div class="d-flex flex-wrap form-group">
             <label for="lrn">LRN (if applicable)</label>
-            <input v-model="enrollData.lrn" type="text" class="form-control"
+            <input v-model="enrollData.lrn" type="text" class="neu-input"
                 :disabled="enrollChecker || enrolleeData.enr_id || enrollData.program == 2 ? true : false"
                 title="Click Edit to modify details" id="lrn" aria-describedby="lrn" />
         </div> -->
         <!-- <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester / Quarter</label>
-            <select v-model="enrollData.quarter" class="form-control"
+            <select v-model="enrollData.quarter" class="neu-input neu-select"
                 :disabled="!enrollData.program || enrolleeData.enr_id || enrollData.quarter  ? true : false"
                 title="Click Edit to modify details" id="sem" aria-describedby="sem">
                 <option value="" disabled>-- Select Type --</option>
@@ -279,7 +279,7 @@ const enroll = () => {
         </div> -->
         <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester / Quarter</label>
-            <select v-model="enrollData.quarter" class="form-control"
+            <select v-model="enrollData.quarter" class="neu-input neu-select"
                 disabled
                 title="Click Edit to modify details" id="sem" aria-describedby="sem">
                 <option value="" disabled>-- Select Type --</option>
@@ -288,7 +288,7 @@ const enroll = () => {
         </div>
         <div class="d-flex flex-wrap form-group">
             <label for="prog">Program / Strand</label>
-            <select v-model="enrollData.course" class="form-control"
+            <select v-model="enrollData.course" class="neu-input neu-select"
                 :disabled="!enrollData.program || enrolleeData.enr_id ? true : false" @change="enrollData.gradelvl = ''"
                 title="Click Edit to modify details" id="prog" aria-describedby="prog">
                 <option value="" disabled>-- Select Type --</option>
@@ -298,7 +298,7 @@ const enroll = () => {
         </div>
         <div class="d-flex flex-wrap form-group">
             <label for="gradelvl">Grade / Year Level</label>
-            <select v-model="enrollData.gradelvl" class="form-control"
+            <select v-model="enrollData.gradelvl" class="neu-input neu-select"
                 :disabled="!enrollData.program || enrolleeData.enr_id ? true : false"
                 title="Click Edit to modify details" id="gradelvl" aria-describedby="gradelvl">
                 <option value="" disabled>-- Select Type --</option>
@@ -308,14 +308,14 @@ const enroll = () => {
         </div>
         <div class="d-flex flex-column mt-3">
             <button v-if="!enrolleeData.enr_id && enrollChecker == false" @click="enroll()"
-                :disabled="saving ? true : false" type="button" class="btn btn-sm btn-success w-100"
+                :disabled="saving ? true : false" type="button" class="neu-btn neu-blue w-100 p-2"
                 tabindex="-1">Enroll</button>
 
-            <button v-if="enrolleeData.enr_id" type="button" class="btn btn-sm btn-primary w-100" tabindex="-1"
+            <button v-if="enrolleeData.enr_id" type="button" class="neu-btn neu-green w-100 p-2" tabindex="-1" disabled="true"
                 aria-disabled="true">Enrolled</button>
 
             <button v-if="!enrolleeData.enr_id && enrollChecker == true" type="button"
-                class="btn btn-sm btn-warning w-100" tabindex="-1">Checking
+                class="neu-btn neu-purple w-100 p-2" tabindex="-1">Checking
                 Enrollment Status</button>
         </div>
 

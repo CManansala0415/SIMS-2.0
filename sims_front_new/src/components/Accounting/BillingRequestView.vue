@@ -14,7 +14,8 @@ import {
     getAcademicDefaults
 
 } from "../Fetchers.js";
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import { getUserID } from "../../routes/user";
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
 import { useRouter, useRoute } from 'vue-router'
@@ -283,104 +284,109 @@ const getData = (result) =>{
             <h5 class=" text-uppercase fw-bold">Billing Request</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Search
-                </button>
-                <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="btn btn-sm btn-dark text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Scan QR 
-                </button>
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#downloadmodal" @click="excelDownload()"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Download Excel
-                </button>
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover table-fixed" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Request ID</th>
-                        <th style="background-color: #237a5b;" class="text-white">Requestor</th>
-                        <th style="background-color: #237a5b;" class="text-white">Requested Item</th>
-                        <th style="background-color: #237a5b;" class="text-white">Date Requested</th>
-                        <th style="background-color: #237a5b;" class="text-white">Payment Status</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(requestedItems).length" v-for="(req, index) in requestedItems">
-                        <td class="align-middle">
-                            {{ req.acr_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ req.acr_personname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ req.acr_itemrequested }}
-                        </td>
-                        <td class="align-middle">
-                            {{ req.acr_dateadded }}
-                        </td>
-                        <td class="align-middle">
-                            <span :class="req.paystat_color">{{ req.acr_paystatusdesc }}</span>
-                        </td>
-                        <td v-if="accessData[19].useracc_modifying == 1" class="align-middle p-2">
-                            <div class="d-flex gap-2 justify-content-center align-content-center">
-                                <div v-if="req.acr_status == 0" class="text-center">
-                                    <span class="text-danger fw-bold">Cancelled</span>
-                                </div>
-                                <div v-else>
-                                    <div v-if="req.acr_paystatus == 2" class="text-center">
-                                        <button class="btn btn-sm btn-secondary" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
-                                            Completed
-                                        </button>
-                                    </div>
-                                    <div v-else class="rounded-md flex gap-1 items-center">
-                                        <button class="btn btn-sm btn-secondary" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
-                                            Payment
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle p-2">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(requestedItems).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="6">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(requestedItems).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="6">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(requestedItems).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="d-flex gap-2 justify-content-center align-content-center">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
+                    <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-id-card"/> Scan QR 
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ requestedItemsCount }})</span> items</p>
+                <!-- <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#downloadmodal" @click="excelDownload()"
+                        type="button" class="neu-btn neu-green" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-file-excel" /> Download Excel
+                    </button>
+                </div> -->
+            </div>
+
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3" style="text-transform:uppercase">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Request ID</th>
+                            <th style="color:#555555">Requestor</th>
+                            <th style="color:#555555">Requested Item</th>
+                            <th style="color:#555555">Date Requested</th>
+                            <th style="color:#555555">Payment Status</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(requestedItems).length" v-for="(req, index) in requestedItems">
+                            <td class="align-middle">
+                                {{ req.acr_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ req.acr_personname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ req.acr_itemrequested }}
+                            </td>
+                            <td class="align-middle">
+                                {{ req.acr_dateadded }}
+                            </td>
+                            <td class="align-middle">
+                                <span :class="req.paystat_color">{{ req.acr_paystatusdesc }}</span>
+                            </td>
+                            <td v-if="accessData[19].useracc_modifying == 1" class="align-middle p-2">
+                                <div class="d-flex gap-2 justify-content-center align-content-center">
+                                    <div v-if="req.acr_status == 0" class="text-center">
+                                        <span class="text-danger fw-bold">Cancelled</span>
+                                    </div>
+                                    <div v-else>
+                                        <div v-if="req.acr_paystatus == 2" class="text-center">
+                                            <button class="neu-btn-sm neu-white" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
+                                                Completed
+                                            </button>
+                                        </div>
+                                        <div v-else class="rounded-md flex gap-1 items-center">
+                                            <button class="neu-btn-sm neu-white" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
+                                                Payment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle p-2">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(requestedItems).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="6">
+                                No Records Found
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(requestedItems).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="6">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(requestedItems).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ requestedItemsCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -388,14 +394,14 @@ const getData = (result) =>{
     <!-- Settlement Modal -->
     <div class="modal fade" id="settlementmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Payment Settlement</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showPaymentModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <AccountingPaymentModal v-if="showPaymentModal" :accountData="studentsAccount" :billTypeData="2" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
@@ -425,7 +431,7 @@ const getData = (result) =>{
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showQRScanner = false" id="hideqrscanner"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                      <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="5"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

@@ -12,7 +12,7 @@ import { getCurriculumSubject,
     getArchiveMerge, 
  } 
     from "../../Fetchers.js";
-import Loader from '../loaders/Loader1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 import { useRouter, useRoute } from 'vue-router'
 
@@ -105,10 +105,10 @@ const viewType = ref(0)
 
 <template>
     <div class="d-flex flex-wrap w-100 ">
-        <div v-if="preloading" class="d-flex w-100 mt-4 justify-content-center align-content-center">
-            <Loader />
+        <div v-if="preloading" class="d-flex w-100 mt-4 justify-content-center align-content-center neu-bg">
+            <NeuLoader2 />
         </div>
-        <div v-else class="container p-3">
+        <div v-else class="container p-3 neu-bg">
             <div v-if="Object.keys(milestoneCompHeader).length" class="d-flex flex-column">
                 <div class="col-12 border-bottom">
                     <div class="p-3">
@@ -169,7 +169,7 @@ const viewType = ref(0)
                                 </div>
                             </div>
                         </div>
-                        <table class="table table-bordered">
+                        <table class="neu-table">
                             <thead>
                                 <tr>
                                     <th class="border p-2">

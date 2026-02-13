@@ -41,8 +41,17 @@ const searchStudent = () => {
     requestingStud.value = 0
     fullName.value = ''
 
+    Swal.fire({
+        title: "Searching Student",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
     getApplicant(0, 0, searchFname.value, searchMname.value, searchLname.value, 2).then((results) => {
-        console.log(results)
+        Swal.close()
         students.value = results.data
         studentCount.value = results.count
     })
@@ -63,6 +72,16 @@ const setValues = (stud) => {
 const saveRequest = () => {
     if ((requestingStud.value) && (itemRequested.value)) {
         disabler.value = true
+
+        Swal.fire({
+            title: "Rendering Request",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         let x = {
             acr_amount: itemPrice.value,
             acr_personid: requestingStud.value,
@@ -82,8 +101,10 @@ const saveRequest = () => {
                     text: "Unknown error occured, try again later",
                     icon: "error"
                 });
+                Swal.close()
                 location.reload();
             } else {
+                Swal.close()
                 const result = await Swal.fire({
                     title: "Update Successful",
                     text: "Changes applied, preparing receipt...",
@@ -94,7 +115,7 @@ const saveRequest = () => {
                 if (result.isConfirmed) {
                     // Generate QR first
                     qrimage.value = await qrImageGenerator(headers);
-
+                    
                     // 🔄 Show loading Swal
                     Swal.fire({
                         title: "Generating PDF...",
@@ -167,11 +188,11 @@ const itemCost = () => {
 
 </script>
 <template>
-  <div class="d-flex p-3 gap-3 align-items-stretch">
+  <div class="d-flex p-3 gap-3 align-items-stretch text-dim">
 
     <!-- LEFT SIDE FORM -->
     <form @submit.prevent="saveRequest"
-          class="d-flex flex-column border rounded shadow-sm p-3 flex-fill">
+          class="d-flex flex-column border rounded  p-3 flex-fill  neu-card">
 
       <p class="text-success fw-bold mb-1">Request Item</p>
       <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font">
@@ -182,9 +203,9 @@ const itemCost = () => {
       <!-- Search Student -->
       <div class="mt-3 mb-2 text-start d-flex gap-2">
         <div class="w-100">
-          <label for="searchstudent" class="form-label">Search Student</label>
+          <label for="searchstudent" class="small-font">Search Student</label>
           <input type="text"
-                 class="form-control form-control-sm"
+                 class="neu-input"
                  id="searchstudent"
                  placeholder="Enter Name Here..."
                  v-model="searchFname"
@@ -192,15 +213,15 @@ const itemCost = () => {
                  onkeydown="return /[a-z, ]/i.test(event.key)">
         </div>
         <div class="align-content-end">
-          <button class="btn btn-sm btn-primary" type="button" @click="searchStudent()">Search</button>
+          <button class="neu-btn neu-blue" type="button" @click="searchStudent()">Search</button>
         </div>
       </div>
 
       <!-- Select Item -->
       <div class="mb-2 text-start">
-        <label for="itemrequested" class="form-label">Select Item</label>
+        <label for="itemrequested" class="small-font">Select Item</label>
         <select @change="itemCost()" 
-                class="form-control form-control-sm"
+                class="neu-input neu-select"
                 v-model="itemRequested"
                 id="itemrequested" required>
           <option value="0" disabled>-- Select Item --</option>
@@ -212,9 +233,9 @@ const itemCost = () => {
 
       <!-- Doc Stamp -->
       <div v-if="hasDocStamp" class="mb-2 text-start">
-        <label for="stampno" class="form-label">Document Stamp No.</label>
+        <label for="stampno" class="small-font">Document Stamp No.</label>
         <input type="number"
-               class="form-control form-control-sm"
+               class="neu-input"
                id="stampno"
                placeholder="Enter Stamp No..."
                v-model="docStamp"
@@ -223,9 +244,9 @@ const itemCost = () => {
       </div>
 
       <!-- Student List -->
-      <div class="card mt-3 flex-fill">
-        <div class="table-responsive p-2 small-font" style="height: 200px;">
-          <table class="table table-hover text-uppercase">
+      <div class="card mt-3 flex-fill rounded-pill">
+        <div class="overflow-auto neu-card-inner p-3 small-font" style="height: 200px;">
+          <table class="neu-table text-uppercase">
             <thead>
               <tr><th>Select Student</th></tr>
             </thead>
@@ -236,7 +257,7 @@ const itemCost = () => {
                   @click="setValues(stud)">
                 <td :class="stud.per_id == requestingStud 
                            ? 'align-middle text-start bg-secondary text-white' 
-                           : 'align-middle text-start bg-white text-black'">
+                           : 'align-middle text-start'">
                   {{ stud.per_firstname }} {{ stud.per_middlename }} {{ stud.per_lastname }} {{ stud.per_suffixname }}
                 </td>
               </tr>
@@ -250,17 +271,17 @@ const itemCost = () => {
 
       <!-- Buttons -->
       <div class="d-flex flex-column gap-2 mt-3">
-        <button :disabled="disabler" type="submit" class="btn btn-sm btn-success">Save Request</button>
+        <button :disabled="disabler" type="submit" class="neu-btn neu-green p-2">Save Request</button>
         <button :disabled="disabler"
                 type="button"
                 @click="students = [], searchValue = '', itemRequested = 0, requestingStud = 0"
-                class="btn btn-sm btn-warning text-white">Clear Data</button>
+                class="neu-btn neu-orange p-2">Clear Data</button>
       </div>
     </form>
 
     <!-- RIGHT SIDE PREVIEW -->
-    <div class="bg-secondary p-3 flex-fill d-flex justify-content-center align-items-center">
-      <div class="border shadow-lg rounded bg-white w-100 d-flex justify-content-center align-items-center">
+    <div class="p-3 flex-fill d-flex justify-content-center align-items-center neu-card-inner neu-bg">
+      <div class="rounded bg-white w-100 d-flex justify-content-center align-items-center">
         
         <!-- Fixed A6 slip -->
         <div id="printform"

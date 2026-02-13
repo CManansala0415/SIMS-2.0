@@ -90,29 +90,29 @@ const formType = ref(0)
 </script>
 
 <template>
-    <div class="">
+    <div class="neu-card-inner p-3">
         <div class="d-flex flex-wrap flex-column">
             <p class="text-success fw-bold">Dewey Decimal Classification</p>
             <p class="fw-bold">{{ ddcDesc }}</p>
-            <p class=" fst-italic border p-2 rounded-3 bg-secondary-subtle small-font"><span class="fw-bold">Note:
+            <p class=" fst-italic p-2 small-font"><span class="fw-bold">Note:
                 </span><span class="italic">Check and fillout required details to complete the details and update the book's
                     DDC details.
                 </span></p>
         </div>
-        <div class="d-flex flex-wrap flex-column card p-3 small-font">
+        <div class="d-flex flex-wrap flex-column neu-card p-3 small-font">
             <form @submit.prevent="registerDdc()" class="d-flex flex-column gap-2">
                 <div class="d-flex flex-wrap form-group">
                     <label>DDC</label>
-                    <input v-model="ddcNo" required type="number" class="form-control form-control-sm" />
+                    <input v-model="ddcNo" required type="number" class="neu-input" />
                 </div>
                 <div class="d-flex flex-wrap form-group">
                     <label>Title</label>
                     <input v-model="ddcDesc" required onkeydown="return /[a-z, ]/i.test(event.key)" type="text"
-                        class="form-control form-control-sm" />
+                        class="neu-input" />
                 </div>
                 <div class="mt-2">
                     <button :disabled="saving ? true : false" type="submit"
-                        class="btn btn-sm btn-success w-100">Save Data
+                        class="neu-btn neu-green"> <font-awesome-icon icon="fa-solid fa-wrench" /> Save Data
                     </button>
                 </div>
             </form>

@@ -5,7 +5,7 @@ import {
     getOccupancyOthers,
     getScheduledFaculty
 } from "../../Fetchers.js";
-import Loader from '../loaders/Loading1.vue';
+import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 const props = defineProps({
     launchData: {
@@ -208,10 +208,10 @@ onMounted(() => {
 </script>
 <template>
     <div class="border p-3">
-        <div class="d-flex justify-content-around gap-1">
+        <div class="d-flex justify-content-around gap-1 neu-card p-3 small-font">
             <div class="w-100 d-flex gap-2 flex-column text-start">
                 <span class="">Choose Building</span>
-                <select @change="filterClassroom()" class="form-control form-select-sm" v-model="buildingId">
+                <select @change="filterClassroom()" class="neu-input neu-select" v-model="buildingId">
                     <option value="" disabled>
                         Select Here--
                     </option>
@@ -222,7 +222,7 @@ onMounted(() => {
             </div>
             <div class="w-100 d-flex gap-2 flex-column text-start">
                 <span class="">Choose Classroom</span>
-                <select class="form-control form-select-sm" v-model="classroomId" :disabled="buildingId ? false : true">
+                <select class="neu-input neu-select" v-model="classroomId" :disabled="buildingId ? false : true">
                     <option value="" disabled>
                         --Select Here--
                     </option>
@@ -233,23 +233,23 @@ onMounted(() => {
             </div>
             <!-- <div class="w-100 d-flex gap-2 flex-column text-start">
                 <span class="">Choose Classroom</span>
-                <select @change="buildingId = '', classroomId = ''" class="form-control form-select-sm"  
+                <select @change="buildingId = '', classroomId = ''" class="neu-input neu-select"  
                         v-model="othersId">
                     <option value="" disabled>Select Here--</option>
                     <option value="90">Online Class</option>
                     <option value="91">Others</option>
                 </select>
             </div> -->
-            <div class="align-content-end w-25">
-                <button @click="filterOccupancy" class="btn btn-sm btn-dark w-100">
-                    Load
+            <div class="w-50 d-flex justify-content-center align-items-end">
+                <button @click="filterOccupancy" class="neu-btn neu-dark-gray p-2">
+                    <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Load
                 </button>
             </div>
         </div>
 
         <div>
-            <div class="mt-3 overflow-auto">
-                <div class="schedule-calendar p-3 border rounded-3 bg-white shadow-sm">
+            <div class="mt-3 overflow-auto text-dim">
+                <div class="schedule-calendar p-3 border rounded-3 neu-card-inner">
 
                     <!-- Empty or Loading -->
                     <div v-if="!Object.keys(mappedSched).length && !preloading" class="text-center py-5">
@@ -258,12 +258,11 @@ onMounted(() => {
                     </div>
 
                     <div v-if="!Object.keys(mappedSched).length && preloading" class="text-center py-5">
-                        <Loader />
-                        <p class="text-muted mt-2">Loading schedules, please wait...</p>
+                        <NeuLoader2 />
                     </div>
 
                     <!-- Calendar Grid -->
-                    <div v-if="Object.keys(mappedSched).length && !preloading" class="calendar-grid">
+                    <div v-if="Object.keys(mappedSched).length && !preloading" class="calendar-grid small-font">
                         <!-- Calendar Header -->
                         <div class="calendar-header">
                             <!-- <div class="time-header"></div> -->
@@ -275,11 +274,11 @@ onMounted(() => {
                         <!-- Calendar Body -->
                         <div v-for="(tm, index) in mappedSched" :key="index" class="calendar-row align-items-stretch">
                             <!-- Time Slot Label -->
-                            <div class="time-cell text-center fw-semibold bg-light">{{ tm.timename }}</div>
+                            <div class="time-cell fw-semibold d-flex align-items-center" style="font-size: 11px;">{{ tm.timename }} {{ tm.daytime }}</div>
 
                             <!-- Monday -->
                             <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.mon_subj_code" class="sched-tile bg-primary-subtle border-primary">
+                                <div v-if="tm.mon_subj_code" class="sched-tile neu-pastel-grass">
                                     <div class="fw-bold text-primary small">{{ tm.mon_subj_code }}</div>
                                     <div class="small text-dark">{{ tm.mon_sec_name }}</div>
                                     <div class="small text-muted">{{ tm.mon_faculty }}</div>
@@ -289,7 +288,7 @@ onMounted(() => {
 
                             <!-- Tuesday -->
                             <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.tue_subj_code" class="sched-tile bg-success-subtle border-success">
+                                <div v-if="tm.tue_subj_code" class="sched-tile neu-pastel-mint">
                                     <div class="fw-bold text-success small">{{ tm.tue_subj_code }}</div>
                                     <div class="small text-dark">{{ tm.tue_sec_name }}</div>
                                     <div class="small text-muted">{{ tm.tue_faculty }}</div>
@@ -299,7 +298,7 @@ onMounted(() => {
 
                             <!-- Wednesday -->
                             <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.wed_subj_code" class="sched-tile bg-info-subtle border-info">
+                                <div v-if="tm.wed_subj_code" class="sched-tile neu-pastel-sky">
                                     <div class="fw-bold text-info small">{{ tm.wed_subj_code }}</div>
                                     <div class="small text-dark">{{ tm.wed_sec_name }}</div>
                                     <div class="small text-muted">{{ tm.wed_faculty }}</div>
@@ -309,7 +308,7 @@ onMounted(() => {
 
                             <!-- Thursday -->
                             <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.thurs_subj_code" class="sched-tile bg-warning-subtle border-warning">
+                                <div v-if="tm.thurs_subj_code" class="sched-tile neu-pastel-blue">
                                     <div class="fw-bold text-warning small">{{ tm.thurs_subj_code }}</div>
                                     <div class="small text-dark">{{ tm.thurs_sec_name }}</div>
                                     <div class="small text-muted">{{ tm.thurs_faculty }}</div>
@@ -319,7 +318,7 @@ onMounted(() => {
 
                             <!-- Friday -->
                             <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.fri_subj_code" class="sched-tile bg-danger-subtle border-danger">
+                                <div v-if="tm.fri_subj_code" class="sched-tile neu-pastel-purple">
                                     <div class="fw-bold text-danger small">{{ tm.fri_subj_code }}</div>
                                     <div class="small text-dark">{{ tm.fri_sec_name }}</div>
                                     <div class="small text-muted">{{ tm.fri_faculty }}</div>
@@ -329,7 +328,7 @@ onMounted(() => {
 
                             <!-- Saturday -->
                             <div class="day-cell" :class="tm.classname">
-                                <div v-if="tm.sat_subj_code" class="sched-tile bg-secondary-subtle border-secondary">
+                                <div v-if="tm.sat_subj_code" class="sched-tile neu-pastel-pink">
                                     <div class="fw-bold text-secondary small">{{ tm.sat_subj_code }}</div>
                                     <div class="small text-dark">{{ tm.sat_sec_name }}</div>
                                     <div class="small text-muted">{{ tm.sat_faculty }}</div>
@@ -359,7 +358,7 @@ onMounted(() => {
 }
 
 .calendar-header {
-    background: #f8f9fa;
+    /* background: #f8f9fa; */
     border-bottom: 2px solid #dee2e6;
 }
 
@@ -378,7 +377,7 @@ onMounted(() => {
     border-right: 1px solid #dee2e6;
     text-transform: uppercase;
     font-size: 0.8rem;
-    background-color: #fdfdfd;
+    /* background-color: #fdfdfd; */
 }
 
 .day-cell {
@@ -390,23 +389,26 @@ onMounted(() => {
 }
 
 .sched-tile {
-    border: 1px solid transparent;
-    border-radius: 0.5rem;
-    padding: 0.4rem 0.6rem;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    transition: all 0.15s ease;
+   border-radius: 10px;
+    padding: 10px 12px;
+    width: 95%;
+    margin: 0 auto;
+    box-shadow: 
+      2px 2px 7px rgba(119, 119, 119, 0.6),
+        -2px -2px 10px rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .sched-tile:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    transform: scale(1.02);
+    transform: translateY(-1px);
+    box-shadow: 
+      inset 2px 2px 7px rgba(119, 119, 119, 0.6),
+        inset -2px -2px 10px rgba(255, 255, 255, 0.6);
 }
 
 .empty-tile {
     text-align: center;
-    line-height: 60px;
+    /* line-height: 60px; */
 }
 </style>

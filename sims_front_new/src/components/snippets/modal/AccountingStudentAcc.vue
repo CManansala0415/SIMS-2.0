@@ -3,7 +3,7 @@ import { ref, computed, onMounted, watch } from "vue"
 import AccountingPaymentModal from "../modal/AccountingPaymentModal.vue"
 import { getStudentAccount, getPaymentDetails, getScholarshipDetails } from "../../Fetchers.js"
 import { pesoConverter,formatDateTime, pdfGenerator } from "../../Generators.js"
-import Loader1 from "../loaders/Loader1.vue"
+import NeuLoader2 from "../loaders/NeuLoader2.vue"
 
 /* ───────────── props ───────────── */
 const props = defineProps({
@@ -322,7 +322,7 @@ const printPermit = (mode) =>{
             await pdfGenerator(name, 'a6', 'portrait', 0)
             setTimeout(() => {
                     Swal.close();
-                    location.reload();
+                    // location.reload();
                 }, 1000);
         }
 
@@ -331,17 +331,17 @@ const printPermit = (mode) =>{
 </script>
 
 <template>
-    <div class="p-2 h-100">
+    <div class="p-2 h-100 small-font">
         <!-- LOADER -->
         <div v-if="preLoading" class="p-2 h-100 d-flex justify-content-center align-items-center">
-            <Loader1 />
+            <NeuLoader2 />
         </div>
 
         <div v-else>
-            <!-- ACCOUNT SELECT -->
-            <div class="w-100 p-3 border shadow-lg text-start mb-3" v-if="!showPaymentModal">
+            <!-- ACCOUNT SELECT -->  
+            <div class="w-100 neu-card p-4 text-start mb-3" v-if="!showPaymentModal">
                 <span class="fw-bold">Accounts</span>
-                <select class="form-select mt-2" v-model="selectedAcsId" @change="loadAccount()">
+                <select class="neu-input neu-select mt-2" v-model="selectedAcsId" @change="loadAccount()">
                     <option disabled value="">Select Account Set</option>
 
                     <option v-for="group in studentAccounts" :key="group.soa_acsid" :value="group.soa_acsid">
@@ -353,14 +353,14 @@ const printPermit = (mode) =>{
             </div>
 
             <!-- STATEMENT -->
-            <div v-if="selectedAccountHeader && !showPaymentModal" class="card border shadow-sm">
-                <div class="card-header bg-dark text-white text-center">
-                    <h4 class="mb-0 fw-bold">Account Breakdown</h4>
+            <div v-if="selectedAccountHeader && !showPaymentModal" class="neu-card p-4">
+                <div class="text-center">
+                    <p class="mb-0 fw-bold">Account Breakdown</p>
                 </div>
 
-                <div class="card-body">
+                <div class="mt-3 px-4">
                     <!-- ACCOUNT INFO -->
-                    <div class="row mb-4 small">
+                    <div class="row mb-4 p-3 text-dim">
                         <div class="col-6 text-start">
                             <p class="mb-1"><strong>Name:</strong>
                                 {{ `${selectedAccountHeader.per_firstname || ''} ${selectedAccountHeader.per_middlename
@@ -394,8 +394,8 @@ const printPermit = (mode) =>{
                     </div>
 
                     <!-- BREAKDOWN TABLE -->
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle soa-table">
+                    <div class="row mb-4 small neu-card-inner p-5">
+                        <table class="neu-table-flat soa-table">
 
                             <thead class="table-light">
                                 <tr>
@@ -484,10 +484,10 @@ const printPermit = (mode) =>{
                     </div>
 
                     <!-- SUMMARY -->
-                    <div class="row justify-content-center align-items-center mt-4">
+                    <div class="row mb-4 small neu-card p-3 text-dim">
                         <div :class="modeID!==2?'col-md-12 col-lg-12':'col-md-6 col-lg-8'">
-                            <div class="border rounded p-3"  style="height: 450px;">
-                               <table class="table table-bordered">
+                            <div class="p-3">
+                               <table class="neu-table-flat w-100">
                                     <thead>
                                         <tr>
                                             <th class="text-start" colspan="6">Payment Plan</th>
@@ -509,7 +509,7 @@ const printPermit = (mode) =>{
                                             <td :class="prelimBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ pesoConverter(prelimBalanceAmount) }}</td>
                                             <td :class="prelimBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ prelimBalanceAmount == 0 ? 'Paid' : 'Unpaid' }}</td>
                                             <td :class="prelimBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">
-                                                <button @click="setPermit(1)" class="btn btn-sm btn-dark w-100" type="button" v-if="modeID===2">Generate</button>
+                                                <button @click="setPermit(1)" class="neu-btn neu-purple p-2" type="button" v-if="modeID===2"> <font-awesome-icon icon="fa-solid fa-wrench"  /> Generate</button>
                                                 <span v-else>{{ studentAccount[0].soa_headerid }}</span>
                                             </td>
                                         </tr>
@@ -520,7 +520,7 @@ const printPermit = (mode) =>{
                                             <td :class="midtermBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ pesoConverter(midtermBalanceAmount) }}</td>
                                             <td :class="midtermBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ midtermBalanceAmount == 0 ? 'Paid' : 'Unpaid' }}</td>
                                             <td :class="midtermBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">
-                                                <button @click="setPermit(2)" class="btn btn-sm btn-dark w-100" type="button" v-if="modeID===2">Generate</button>
+                                                <button @click="setPermit(2)" class="neu-btn neu-purple p-2" type="button" v-if="modeID===2"> <font-awesome-icon icon="fa-solid fa-wrench"  /> Generate</button>
                                                 <span v-else>{{ studentAccount[0].soa_headerid }}</span>
                                             </td>
                                         </tr>
@@ -531,7 +531,7 @@ const printPermit = (mode) =>{
                                             <td :class="preFinalBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ pesoConverter(preFinalBalanceAmount) }}</td>
                                             <td :class="preFinalBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ preFinalBalanceAmount == 0 ? 'Paid' : 'Unpaid' }}</td>
                                             <td :class="preFinalBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">
-                                                <button @click="setPermit(3)" class="btn btn-sm btn-dark w-100" type="button" v-if="modeID===2">Generate</button>
+                                                <button @click="setPermit(3)" class="neu-btn neu-purple p-2" type="button" v-if="modeID===2"> <font-awesome-icon icon="fa-solid fa-wrench"  /> Generate</button>
                                                 <span v-else>{{ studentAccount[0].soa_headerid }}</span>
                                             </td>
                                         </tr>
@@ -542,7 +542,7 @@ const printPermit = (mode) =>{
                                             <td :class="finalBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ pesoConverter(finalBalanceAmount) }}</td>
                                             <td :class="finalBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">{{ finalBalanceAmount == 0 ? 'Paid' : 'Unpaid' }}</td>
                                             <td :class="finalBalanceAmount == 0? 'text-start bg-success-subtle text-success align-middle':'text-start align-middle'">
-                                                <button @click="setPermit(4)" class="btn btn-sm btn-dark w-100" type="button" v-if="modeID===2">Generate</button>
+                                                <button @click="setPermit(4)" class="neu-btn neu-purple p-2" type="button" v-if="modeID===2"> <font-awesome-icon icon="fa-solid fa-wrench"  /> Generate</button>
                                                 <span v-else>{{ studentAccount[0].soa_headerid }}</span>
                                             </td>
                                         </tr>
@@ -558,11 +558,11 @@ const printPermit = (mode) =>{
 
                                 <hr>
 
-                                <div class="d-flex justify-content-between fw-bold fs-6">
+                                <div class="d-flex justify-content-between fw-bold fs-6 text-dim">
                                     <span>Total Tuition</span>
                                     <span class="text-primary">{{ pesoConverter(totalTuition) }}</span>
                                 </div>
-                                <div class="d-flex justify-content-between fw-bold fs-6">
+                                <div class="d-flex justify-content-between fw-bold fs-6 text-dim">
                                     <span>Total Tuition Paid</span>
                                     <span class="text-success">{{ pesoConverter(totalPayment) }}</span>
                                 </div>
@@ -572,16 +572,16 @@ const printPermit = (mode) =>{
                         <div class="col-md-6 col-lg-4" v-if="modeID===2">
                             <div class="border rounded p-2 overflow-auto">
                                 <div class="h-100 w-100 bg-secondary rounded d-flex justify-content-center position-relative">
-                                    <div v-if="tempWaterMark" class="h-100 w-100 position-absolute overflow-hidden">
-                                        <span class="temporary-permit-watermark">Temporary</span>
-                                    </div>
+                                    
                                     <div class="h-100 w-100 d-flex p-3">
                                         <div
                                             class="h-100 w-100 bg-white"
                                             id="printform"
                                             style="font-size: 10px; line-height: 1.2;"
                                         >
-
+                                        <div v-if="tempWaterMark" class="h-100 w-100 position-absolute overflow-hidden">
+                                            <span class="temporary-permit-watermark">Temporary</span>
+                                        </div>
                                             <!-- HEADER -->
                                             <div class="text-center border-bottom p-2 fw-bold d-flex flex-column" :class="customClass">
                                                 <span>STUDENT EXAMINATION PERMIT</span>
@@ -715,7 +715,7 @@ const printPermit = (mode) =>{
                     </div>
 
                     <!-- SUMMARY -->
-                    <div class="row justify-content-end mt-4">
+                    <div class="row justify-content-end mt-4  text-dim">
                         <div class="col-md-12 col-lg-12">
                             <div class="border rounded p-3">
 
@@ -783,7 +783,7 @@ const printPermit = (mode) =>{
                                     <span class="text-success">{{ pesoConverter(grandTotal) }}</span>
                                 </div>
 
-                                <div class="d-flex flex-column justify-content-end fw-bold fs-5 mt-3 p-2" v-if="grandTotal > 0">
+                                <div class="d-flex flex-column justify-content-end fw-bold fs-5 mt-3" v-if="grandTotal > 0">
                                     <!-- Alert if the account is not settled -->
                                     <div v-if="soaStatus" class="alert alert-warning w-100" role="alert">
                                         <span class="small-font">Account Not Settled!</span><br/>
@@ -795,16 +795,16 @@ const printPermit = (mode) =>{
                                     <div class="d-flex justify-content-end">
                                         <!-- Add Payment button only in mode 2 -->
                                         <button v-if="modeID === 1 " type="button" @click="settlement(true)"
-                                            class="btn btn-sm btn-dark">
-                                            Add By Pass Payment
+                                            class="neu-btn neu-blue p-2">
+                                            <font-awesome-icon icon="fa-solid fa-cash-register"/> Add By Pass Payment
                                         </button>
                                     </div>
 
                                     <div class="d-flex justify-content-end">
                                         <!-- Add Payment button only in mode 2 -->
                                         <button v-if="modeID === 2" type="button" @click="settlement(false)"
-                                            class="btn btn-sm btn-dark">
-                                            Add Payment
+                                            class="neu-btn neu-blue p-2">
+                                            <font-awesome-icon icon="fa-solid fa-cash-register"/> Add Payment
                                         </button>
                                     </div>
                                 </div>
@@ -814,8 +814,8 @@ const printPermit = (mode) =>{
                                      <!-- Add Payment button only in mode 2 -->
                                     <div>
                                         <button type="button" @click="settlement(false)"
-                                            class="btn btn-sm btn-dark mt-2">
-                                            View Payment Details
+                                            class="neu-btn neu-blue p-2 mt-2">
+                                            <font-awesome-icon icon="fa-solid fa-eye"/> View Payment Details
                                         </button>
                                     </div>
                                 </div>
@@ -824,7 +824,7 @@ const printPermit = (mode) =>{
 
                             <!-- <div class="d-flex justify-content-end fw-bold fs-5 mt-2">
                             <button type="button" data-bs-toggle="modal" data-bs-target="#settlementmodal"
-                                @click="settlePayments()" class="btn btn-sm btn-dark">Add Payment</button>
+                                @click="settlePayments()" class="nue-btn neu-blue p-2">Add Payment</button>
                         </div> -->
                         </div>
                     </div>
@@ -837,16 +837,19 @@ const printPermit = (mode) =>{
             </div>
 
             <!-- PAYMENT -->
-            <div v-if="showPaymentModal" class="card border shadow-sm">
-                <div class="card-header bg-dark text-white text-center">
-                    <h4 class="mb-0 fw-bold">Account Settlement</h4>
+            <div v-if="showPaymentModal" class="">
+               
+                <div class="text-center">
+                    <p class="mb-0 fw-bold">Account Settlement</p>
                 </div>
 
-                <div class="card-body">
+                <div class="neu-card p-3 mt-3">
                     <div class="w-100 d-flex justify-content-end">
-                         <button class="btn btn-sm btn-primary mb-3" @click="settlement">
-                            Return to Statement
-                        </button>
+                        <div>
+                            <button class="neu-btn neu-blue p-2 mb-3" @click="settlement">
+                                <font-awesome-icon icon="fa-solid fa-rotate-left"/> Return to Statement
+                            </button>
+                        </div>
                     </div>
                     <AccountingPaymentModal :accountData="studentPayment" :billTypeData="1" />
                 </div>

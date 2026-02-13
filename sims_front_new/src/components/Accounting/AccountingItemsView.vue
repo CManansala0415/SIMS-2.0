@@ -1,7 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 // import AccItem from '../snippets/modal/AccItem.vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
 import { getFeeDetails, addAccountingItem } from '../Fetchers.js';
@@ -197,6 +198,14 @@ const itemModal = (type, data) => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 preloading.value = true
+                Swal.fire({
+                    title: "Saving Updates",
+                    text: "Please wait while we check all necessary details.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
                 let x = {
                     acf_id: data.acf_id,
                     acf_user: userID.value,
@@ -212,6 +221,7 @@ const itemModal = (type, data) => {
                         }).then(()=>{
                             preLoading.value = false
                         });
+                        Swal.close();
                         // location.reload()
                     } else {
                         // alert('Delete Successful')
@@ -220,6 +230,7 @@ const itemModal = (type, data) => {
                             text: "Successfully Deleted",
                             icon: "success"
                         }).then(()=>{
+                            Swal.close();
                             location.reload()
                         });
                     }
@@ -236,81 +247,89 @@ const itemModal = (type, data) => {
             <h5 class=" text-uppercase fw-bold">Miscellaneous Items</h5>
         </div>
 
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="itemModal(1)"
-                    type="button" class="btn btn-sm btn-primary" :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">Fee ID</th>
-                        <th style="background-color: #237a5b;" class="text-white">Item Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Price</th>
-                        <th style="background-color: #237a5b;" class="text-white">Commands</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(fee).length" v-for="(f, index) in fee">
-                        <td class="align-middle">
-                            {{ f.acf_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ f.acf_desc }}
-                        </td>
-                        <td class="align-middle">
-                            {{ f.acf_price }}
-                        </td>
-                        <td v-if="accessData[15].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#editdatamodal" title="Edit Data"
-                                    @click="itemModal(2, f)" :disabled="preloading? true:false">
-                                    <font-awesome-icon icon="fa-solid fa-pen" />
-                                </button>
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#dispensemodal" title="Delete Item"
-                                    @click="itemModal(3, f)" :disabled="preloading? true:false">
-                                    <font-awesome-icon icon="fa-solid fa-trash" />
-                                </button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(fee).length">
-                        <td class="p-3 text-center" colspan="4">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(fee).length">
-                        <td class="p-3 text-center" colspan="4">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(fee).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <div class="input-group w-50">
+                    <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
+                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ feeCount }})</span> items</p>
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="itemModal(1)"
+                        type="button" class="neu-btn neu-green" :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">Fee ID</th>
+                            <th style="color:#555555">Item Name</th>
+                            <th style="color:#555555">Price</th>
+                            <th style="color:#555555" class="text-center">Commands</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(fee).length" v-for="(f, index) in fee">
+                            <td class="align-middle">
+                                {{ f.acf_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ f.acf_desc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ f.acf_price }}
+                            </td>
+                            <td v-if="accessData[15].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                        data-bs-target="#editdatamodal" title="Edit Data"
+                                        @click="itemModal(2, f)" :disabled="preloading? true:false">
+                                        <font-awesome-icon icon="fa-solid fa-pen" />
+                                    </button>
+                                    <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                        data-bs-target="#dispensemodal" title="Delete Item"
+                                        @click="itemModal(3, f)" :disabled="preloading? true:false">
+                                        <font-awesome-icon icon="fa-solid fa-trash" />
+                                    </button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(fee).length">
+                            <td class="p-3 text-center" colspan="4">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(fee).length">
+                            <td class="p-3 text-center" colspan="4">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-dark-gray">Prev</button>
+                        <button :disabled="Object.keys(fee).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-light-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ feeCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -325,7 +344,7 @@ const itemModal = (type, data) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showAddItemModal = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <AccountingItemsModal v-if="showAddItemModal" :itemData="itemValue"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">

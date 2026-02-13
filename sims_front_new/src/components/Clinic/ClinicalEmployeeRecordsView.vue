@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import Loader from '../snippets/loaders/Loading1.vue';
+import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import ClinicMedicalForm from '../snippets/modal/ClinicEmployeeMedicalModal.vue';
 import ClinicDispenseModal from '../snippets/modal/ClinicDispenseModal.vue';
 import ClinicMedicalArchive from '../snippets/modal/ClinicMedicalArchive.vue';
@@ -198,106 +199,112 @@ const fileUpload = (id) => {
         <div class="p-3 mb-4 border-bottom">
             <h5 class=" text-uppercase fw-bold">Clinic Employee Records</h5>
         </div>
-
-        <div class="p-1 d-flex gap-2 justify-content-between mb-3">
-            <!-- <div class="input-group w-50">
-                <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
-                <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
-                    v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
-                    :disabled="preLoading ? true : false">
-            </div> -->
-            <div class="d-flex gap-2 justify-content-center align-content-center">
-                <input type="text" v-model="searchFname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="First Name"/>
-                <input type="text" v-model="searchMname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Middle Name"/>
-                <input type="text" v-model="searchLname" @keyup.enter="search()"
-                    class="form-control w-100" :disabled="preLoading?true:false" placeholder="Last Name"/>
-                <button @click="search()" type="button" class="btn btn-sm btn-info text-white w-100" tabindex="-1" :disabled="preLoading?true:false">
-                    Search
-                </button>
-            </div>
-            <div class="d-flex flex-wrap w-50 justify-content-end gap-2">
-                <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
-                    @click="editData('', [], 2)" type="button" class="btn btn-sm btn-primary"
-                    :disabled="preLoading ? true : false">
-                    <font-awesome-icon icon="fa-solid fa-add" /> Add New
-                </button>
-            </div>
+        <div v-if="preLoading">
+            <NeuLoader1/>
         </div>
-        <div class="table-responsive border p-3 small-font">
-            <table class="table table-hover" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #237a5b;" class="text-white">No</th>
-                        <th style="background-color: #237a5b;" class="text-white">First Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Middle Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Last Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Suffix Name</th>
-                        <th style="background-color: #237a5b;" class="text-white">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="!preLoading && Object.keys(employee).length" v-for="(app, index) in employee">
-                        <td class="align-middle">
-                            {{ app.emp_id }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.emp_firstname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.emp_middlename ? app.emp_middlename : 'N/A' }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.emp_lastname }}
-                        </td>
-                        <td class="align-middle">
-                            {{ app.emp_suffixname ? app.emp_suffixname : 'N/A' }}
-                        </td>
-                        <td v-if="accessData[11].useracc_modifying == 1" class="align-middle">
-                            <div class="d-flex gap-2 justify-content-center">
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#editdatamodal" title="Medical Form / Checkup"
-                                    @click="editData(app.emp_id, app)">
-                                    <font-awesome-icon icon="fa-solid fa-pen" />
-                                </button>
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#dispensemodal" title="Dispense Medical Item"
-                                    @click="dispenseData(app.emp_id)">
-                                    <font-awesome-icon icon="fa-solid fa-pills" />
-                                </button>
-                                <button class="btn btn-sm btn-secondary" data-bs-toggle="modal"
-                                    data-bs-target="#archivemodal" title="Upload Files" @click="fileUpload(app.emp_id)">
-                                    <font-awesome-icon icon="fa-solid fa-folder" />
-                                </button>
-                            </div>
-                        </td>
-                        <td v-else class="align-middle">
-                            N/A
-                        </td>
-                    </tr>
-                    <tr v-if="!preLoading && !Object.keys(employee).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            No Records Found
-                        </td>
-                    </tr>
-                    <tr v-if="preLoading && !Object.keys(employee).length" style="text-transform:none">
-                        <td class="p-3 text-center" colspan="7">
-                            <div class="m-3">
-                                <Loader />
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
-                <div class="d-flex gap-1">
-                    <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
-                        class="btn btn-sm btn-secondary">Prev</button>
-                    <button :disabled="Object.keys(employee).length < 10 ? true : false" @click="paginate('next')"
-                        class="btn btn-sm btn-secondary">Next</button>
+        <div v-else>
+            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+                <!-- <div class="input-group w-50">
+                    <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
+                    <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
+                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        :disabled="preLoading ? true : false">
+                </div> -->
+                <div class="d-flex gap-2 justify-content-center align-content-center">
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchLname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
+                    </button>
                 </div>
-                <p class="">showing total of <span class="font-semibold">({{ employeeCount }})</span> items</p>
+                <div class="d-flex flex-wrap justify-content-end gap-2">
+                    <!-- <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#editdatamodal"
+                        @click="editData('', [], 2)" type="button" class="neu-btn neu-green"
+                        :disabled="preLoading ? true : false">
+                        <font-awesome-icon icon="fa-solid fa-add" /> Add New
+                    </button> -->
+                </div>
+            </div>
+            <div class="table-responsive border p-3 small-font">
+                <table class="neu-table mb-3" style="text-transform:uppercase">
+                    <thead>
+                        <tr>
+                            <th style="color:#555555">No</th>
+                            <th style="color:#555555">First Name</th>
+                            <th style="color:#555555">Middle Name</th>
+                            <th style="color:#555555">Last Name</th>
+                            <th style="color:#555555">Suffix Name</th>
+                            <th style="color:#555555" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-if="!preLoading && Object.keys(employee).length" v-for="(app, index) in employee">
+                            <td class="align-middle">
+                                {{ app.emp_id }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.emp_firstname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.emp_middlename ? app.emp_middlename : 'N/A' }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.emp_lastname }}
+                            </td>
+                            <td class="align-middle">
+                                {{ app.emp_suffixname ? app.emp_suffixname : 'N/A' }}
+                            </td>
+                            <td v-if="accessData[11].useracc_modifying == 1" class="align-middle">
+                                <div class="d-flex gap-2 justify-content-center">
+                                    <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                        data-bs-target="#editdatamodal" title="Medical Form / Checkup"
+                                        @click="editData(app.emp_id, app)">
+                                        <font-awesome-icon icon="fa-solid fa-pen" />
+                                    </button>
+                                    <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                        data-bs-target="#dispensemodal" title="Dispense Medical Item"
+                                        @click="dispenseData(app.emp_id)">
+                                        <font-awesome-icon icon="fa-solid fa-pills" />
+                                    </button>
+                                    <button class="neu-btn-sm neu-white" data-bs-toggle="modal"
+                                        data-bs-target="#archivemodal" title="Upload Files" @click="fileUpload(app.emp_id)">
+                                        <font-awesome-icon icon="fa-solid fa-folder" />
+                                    </button>
+                                </div>
+                            </td>
+                            <td v-else class="align-middle">
+                                N/A
+                            </td>
+                        </tr>
+                        <tr v-if="!preLoading && !Object.keys(employee).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>The hamster took a break 💤 — try adding something new.</p>
+                            </td>
+                        </tr>
+                        <!-- <tr v-if="preLoading && !Object.keys(employee).length" style="text-transform:none">
+                            <td class="p-3 text-center" colspan="7">
+                                <div class="m-3">
+                                    <Loader />
+                                </div>
+                            </td>
+                        </tr> -->
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
+                    <div class="d-flex gap-1">
+                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                            class="neu-btn neu-light-gray">Prev</button>
+                        <button :disabled="Object.keys(employee).length < 10 ? true : false" @click="paginate('next')"
+                            class="neu-btn neu-dark-gray">Next</button>
+                    </div>
+                    <p class="">showing total of <span class="font-semibold">({{ employeeCount }})</span> items</p>
+                </div>
             </div>
         </div>
     </div>
@@ -312,7 +319,7 @@ const fileUpload = (id) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showForm = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <ClinicMedicalForm v-if="showForm" :genderData="gender" :civilstatusData="civilstatus"
                         :employeeData="editEmployee" :formId="editId" />
                 </div>
@@ -342,7 +349,7 @@ const fileUpload = (id) => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showDispense = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <ClinicDispenseModal v-if="showDispense" :personIdData="editId"
                         :medicicalItemsData="medicalSupplies" :userIdData="userID" :modeData="2" />
                 </div>
@@ -365,14 +372,14 @@ const fileUpload = (id) => {
     <!-- Medical Archive Modal -->
     <div class="modal fade" id="archivemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Medical Results Archive</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="showFile = false"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <ClinicMedicalArchive v-if="showFile" :personIdData="editId" :medicicalItemsData="medicalSupplies"
                         :userIdData="userID" />
                 </div>
