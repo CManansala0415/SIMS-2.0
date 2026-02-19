@@ -212,6 +212,21 @@ Route::middleware(['auth:sanctum'])->post('/update-archive-details', [CommandCon
 
 Route::middleware(['auth:sanctum'])->get('/get-person-image/{filename}/{type}', [DefaultsController::class,'getIDimage']);
 Route::middleware(['auth:sanctum'])->get('/get-qr-data/{id}/{mode}', [DefaultsController::class,'getQRData']);
+Route::middleware(['auth:sanctum'])->get('/get-announcement', [DefaultsController::class,'getAnnouncement']);
+Route::middleware(['auth:sanctum'])->post('/edit-announcement', [DefaultsController::class,'editAnnouncement']);
+
+
+Route::get('/api/holidays', function () {
+    $response = Http::get('https://holidays.abstractapi.com/v1/', [
+        'api_key' => env('ABSTRACT_HOLIDAY_KEY'),
+        'country' => 'PH',
+        'year' => request('year'),
+        'month' => request('month'),
+        'day' => request('day'),
+    ]);
+
+    return $response->json();
+});
 
 
 

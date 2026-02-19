@@ -53,6 +53,48 @@ const imageFetcher = async(data, type) =>{
 //     // html2pdf(element, opt);
 
 // }
+const pdfAutoPrint = async (name, contentWidth, orientation, margin) => {
+    const element = document.getElementById('printform');
+
+    const a4Size = [8.27, 11.7]; // A4 in inches
+
+    const opt = {
+        margin: [0.35 , margin, margin, margin],
+        filename: name + '.pdf',
+        pagebreak: { mode: 'css', before: '.pagebreak' },
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: {
+            dpi: 192,
+            scale: 4,
+            letterRendering: true,
+            useCORS: true,
+            scrollY: 0
+        },
+        jsPDF: {
+            unit: 'in',
+            format: a4Size,
+            orientation: orientation
+        }
+    };
+
+    // Temporarily wrap the content in a centered container
+    const wrapper = document.createElement('div');
+    wrapper.style.width = contentWidth + 'in';
+    wrapper.style.margin = '0 auto';
+    wrapper.style.display = 'block';
+    wrapper.appendChild(element.cloneNode(true));
+
+    const pdf = await html2pdf()
+        .set(opt)
+        .from(wrapper)
+        .outputPdf('blob');
+
+    return pdf;
+};
+
+
+
+
 
 const pdfGenerator = async (name, paper, orientation, margin) => {
     var element = document.getElementById('printform');
@@ -215,6 +257,41 @@ const handleLogin = async () => {
     return employeedata
 }
 
+
+let holidays = {}
+const getHolidays = async (year, month, day) => {
+  try {
+    await axios.get('/api/holidays', {
+      params: { year, month, day }
+    });
+
+    await axios({
+        method: "get",
+        url: '/api/holidays',
+        params: { year, month, day }
+    }).then(async (results) => {
+
+      holidays = results;
+
+    });
+
+    return holidays;
+
+  } catch (err) {
+    console.error("Holiday API error:", err.response?.data || err.message);
+    throw err;
+  }
+};
+
+let today = ''
+const getDateToday = () => {
+   today = new Date().toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+  });
+  return today;
+}
 export {
     qrImageGenerator,
     pdfGenerator,
@@ -223,5 +300,8 @@ export {
     pesoConverter,
     formatDateTime,
     getToken,
-    handleLogin
+    handleLogin,
+    getHolidays,
+    getDateToday,
+    pdfAutoPrint
 }

@@ -98,17 +98,7 @@ onMounted(async () => {
                 hasBalance.value = accounts.value.some(a => parseFloat(a.acs_balance) > 0);
                 // console.log('Has Balance:', hasBalance.value);
 
-                if(hasBalance.value){
-                    Swal.fire({
-                        title: "Enrollment Restricted",
-                        text: "This applicant has an outstanding balance. Please settle the account before proceeding with enrollment.",
-                        icon: "warning"
-                    }).then(()=>{
-                        enrollChecker.value = true
-                        preLoading.value = false
-                        close();
-                    });
-                }else{
+
                     if (results.length != 0) {
                         enrolleeData.value = results[0]
                         detectCourse(enrolleeData.value.enr_course)
@@ -123,7 +113,7 @@ onMounted(async () => {
                     }
                     enrollChecker.value = false
                     preLoading.value = false
-                }
+                
                 
                 
             })
@@ -188,57 +178,69 @@ const filterCourses = () => {
 }
 
 const enroll = () => {
-    if (
-        (enrollData.value.program) &&
-        (enrollData.value.quarter) &&
-        (enrollData.value.course) &&
-        (enrollData.value.gradelvl)
-    ) {
+    if(hasBalance.value){
         Swal.fire({
-            title: "Saving Updates",
-            text: "Please wait while we check all necessary details.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
+            title: "Enrollment Restricted",
+            text: "This applicant has an outstanding balance. Please settle the account before proceeding with enrollment.",
+            icon: "warning"
+        }).then(()=>{
+            enrollChecker.value = true
+            preLoading.value = false
+            close();
         });
-        
-        saving.value = true
-        enrollData.value.personid = personID.value
-        enrollData.value.userid = userID.value
-        enrollApplicant(enrollData.value).then((results) => {
+    } else{
+        if (
+            (enrollData.value.program) &&
+            (enrollData.value.quarter) &&
+            (enrollData.value.course) &&
+            (enrollData.value.gradelvl)
+        ) {
+            Swal.fire({
+                title: "Saving Updates",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            saving.value = true
+            enrollData.value.personid = personID.value
+            enrollData.value.userid = userID.value
+            enrollApplicant(enrollData.value).then((results) => {
 
-            if (results.data == 500) {
-                // alert('error enrolling applicant')
-                Swal.fire({
-                    title: "Update Failed",
-                    text: "Unknown error occured, try again later",
-                    icon: "error"
-                }).then(()=>{
-                    Swal.close()
+                if (results.data == 500) {
+                    // alert('error enrolling applicant')
+                    Swal.fire({
+                        title: "Update Failed",
+                        text: "Unknown error occured, try again later",
+                        icon: "error"
+                    }).then(()=>{
+                        Swal.close()
+                        // location.reload()
+                    });
+                } else {
+                    // alert('Applicant Enrolled')
                     // location.reload()
-                });
-            } else {
-                // alert('Applicant Enrolled')
-                // location.reload()
-                Swal.fire({
-                    title: "Update Successful",
-                    text: "Changes applied, refreshing the page",
-                    icon: "success"
-                }).then(()=>{
-                    Swal.close()
-                    location.reload()
-                });
-            }
-        })
+                    Swal.fire({
+                        title: "Update Successful",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        Swal.close()
+                        location.reload()
+                    });
+                }
+            })
 
-    } else {
-        // alert('Please Fillout all the Fields')
-        Swal.fire({
-            title: "Requirement",
-            text: "Please Fillout all the Fields",
-            icon: "question"
-        })
+        } else {
+            // alert('Please Fillout all the Fields')
+            Swal.fire({
+                title: "Requirement",
+                text: "Please Fillout all the Fields",
+                icon: "question"
+            })
+        }
     }
 }
 </script>
@@ -309,14 +311,9 @@ const enroll = () => {
         <div class="d-flex flex-column mt-3">
             <button v-if="!enrolleeData.enr_id && enrollChecker == false" @click="enroll()"
                 :disabled="saving ? true : false" type="button" class="neu-btn neu-blue w-100 p-2"
-                tabindex="-1">Enroll</button>
-
-            <button v-if="enrolleeData.enr_id" type="button" class="neu-btn neu-green w-100 p-2" tabindex="-1" disabled="true"
-                aria-disabled="true">Enrolled</button>
-
-            <button v-if="!enrolleeData.enr_id && enrollChecker == true" type="button"
-                class="neu-btn neu-purple w-100 p-2" tabindex="-1">Checking
-                Enrollment Status</button>
+                tabindex="-1"><font-awesome-icon icon="fa-solid fa-graduation-cap" /> Enroll</button>
+            <p v-if="enrolleeData.enr_id" class="fw-bold text-success">Student is currently Enrolled</p>
+            <p v-if="!enrolleeData.enr_id && enrollChecker == true" class="fw-bold text-success">Checking Enrollment Status</p>
         </div>
 
     </div>

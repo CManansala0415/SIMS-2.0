@@ -404,10 +404,10 @@ const getData = (result) =>{
                                         <p class="text-success fw-bold">Completed</p>
                                     </div>
                                     <div v-else class="d-flex gap-1 align-content-center justify-content-center">
-                                        <button title="Render Request" @click="settlement(req, 2)"
+                                        <!-- <button title="Render Request" @click="settlement(req, 2)"
                                             :disabled="req.acr_paystatus != 2 ? true : false" class="neu-btn-sm neu-white px-3">
                                             <font-awesome-icon icon="fa-solid fa-cash-register"/>&nbsp;Render
-                                        </button>
+                                        </button> -->
                                         <button title="Delete Request" @click="settlement(req, 3)" class="neu-btn-sm neu-white px-3">
                                             <font-awesome-icon icon="fa-solid fa-trash"/>&nbsp;Drop
                                         </button>

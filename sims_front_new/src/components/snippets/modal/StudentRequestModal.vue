@@ -35,6 +35,7 @@ const searchMname = ref('')
 const searchLname = ref('')
 const qrimage = ref('')
 const itemDesc = ref('')
+const itmQty = ref(1)
 
 const searchStudent = () => {
     itemRequested.value = 0
@@ -90,6 +91,8 @@ const saveRequest = () => {
             acr_paystatus: 0,
             acr_addedby: userID.value,
             acr_docstamp: docStamp.value,
+            acr_total: itemPrice.value * itmQty.value,
+            acr_qty: itmQty.value,
         }
 
         addItemRequest(x).then(async (results) => {
@@ -232,6 +235,18 @@ const itemCost = () => {
       </div>
 
       <!-- Doc Stamp -->
+      <div class="mb-2 text-start">
+        <label for="stampno" class="small-font">Quantity</label>
+        <input type="number"
+               class="neu-input"
+               id="stampno"
+               placeholder="Enter Quantity..."
+               v-model="itmQty"
+               required
+               min="0">
+      </div>
+
+      <!-- Doc Stamp -->
       <div v-if="hasDocStamp" class="mb-2 text-start">
         <label for="stampno" class="small-font">Document Stamp No.</label>
         <input type="number"
@@ -294,7 +309,7 @@ const itemCost = () => {
               <small class="text-muted">For Internal Use Only</small>
             </div>
             <div id="qrcode" v-html="qrimage"
-                 style="width: 80px; height: 80px; border: 1px solid #ddd; padding: 4px; border-radius: 6px;">
+                 style="width: 80px; height: 80px; border: 1px solid #ddd; border-radius: 6px;">
             </div>
           </div>
 
@@ -310,7 +325,7 @@ const itemCost = () => {
             </div>
             <div class="row mb-2">
               <div class="col-4 fw-semibold">Amount:</div>
-              <div class="col text-uppercase">₱ {{ itemPrice }}</div>
+              <div class="col text-uppercase">₱ {{ itemPrice * itmQty }}</div>
             </div>
             <div class="row mb-2">
               <div class="col-4 fw-semibold">Doc Stamp:</div>

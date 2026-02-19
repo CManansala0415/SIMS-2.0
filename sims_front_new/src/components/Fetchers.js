@@ -2913,6 +2913,44 @@ const getSectionCount = async (enr_program, enr_quarter, enr_course, enr_gradelv
     }
 }
 
+let getannouncement = {}
+const getAnnouncement = async (mode, search) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-announcement/',
+            params: {
+                mode: mode,
+                search: search
+            }
+        }).then(async (results) => {
+            // console.log(results.data)
+            getannouncement = results.data
+        })
+        return getannouncement
+    } catch (err) {
+        return err
+    }
+}
+
+let editannouncement = {}
+const editAnnouncement = async (data) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/edit-announcement/',
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)s
+            editannouncement = results.data
+        })
+        return editannouncement
+    } catch (err) {
+        return err
+    }
+}
+
+
 
 export {
 
@@ -3090,6 +3128,8 @@ export {
     getSettlementDetails,
     getScholarshipDetails,
     addScholarshipDetails,
-    getSectionCount
+    getSectionCount,
+    getAnnouncement,
+    editAnnouncement
 }
 

@@ -4,6 +4,8 @@ import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "./routes/user";
 import { useRouter, useRoute } from 'vue-router';
 import { getCommandUpdate } from './components/Fetchers.js'
+import { getHolidays } from './components/Generators.js'
+
 import loader from './components/snippets/loaders/Loading1.vue';
 const user = ref('')
 const userID = ref('')
@@ -33,6 +35,15 @@ onMounted(async () => {
     isLoading.value = false
   })
   
+  // let yearNow = new Date().getFullYear()
+  // let monthNow = new Date().getMonth() + 1
+  // let dayNow = new Date().getDate()
+
+  // getHolidays(yearNow, 12, 25).then((result) => {
+  //   console.log(result)
+  // }).catch((err) => {
+  //   console.error("Error fetching holidays:", err);
+  // });
 
 })
 

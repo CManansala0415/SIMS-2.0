@@ -803,4 +803,102 @@ class DefaultsController extends Controller
 
        return $response;
     }
+
+    public function getAnnouncement(Request $params)
+{
+    $query = DB::table('def_announcement as da')
+        ->leftJoin('def_employee as emp', 'da.dsh_addedby', '=', 'emp.emp_accid')
+        ->select(
+            'emp.*',
+            'da.*'
+        )
+        ->where('da.dsh_status', 1);
+
+    // Apply search only when mode != 1 and search has value
+    if ($params->mode != 1 && !empty($params->search)) {
+        $search = $params->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('da.dsh_header', 'like', "%{$search}%")
+              ->orWhere('da.dsh_subheader', 'like', "%{$search}%")
+              ->orWhere('da.dsh_content', 'like', "%{$search}%");
+        });
+    }
+
+    $announcement = $query
+        ->orderBy('da.dsh_dateadded', 'DESC')
+        ->get();
+
+    return response()->json([
+        'data' => $announcement,
+        'status' => 200
+    ]);
+}
+
+
+     public function editAnnouncement(Request $request){
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d H:i:s');
+
+        if($request->input('dsh_mode') == 1){
+            try{
+                $s1 = DB::table('def_announcement')
+                ->insert([
+                    'dsh_header' => $request->input('dsh_header'),
+                    'dsh_subheader' => $request->input('dsh_subheader'),
+                    'dsh_content' => $request->input('dsh_content'),
+                    'dsh_type' => $request->input('dsh_type'),
+                    'dsh_dateadded' => $date,
+                    'dsh_addedby' => $request->input('dsh_addedby'),
+                ]);
+
+                return $data = [
+                    'status' => 200,
+                ];
+            }catch(Exception $ex) {
+                return $data = [
+                    'status' => 500,
+                ];
+            }
+        }else if ($request->input('dsh_mode') == 2){
+            try{
+                $s1 = DB::table('def_announcement')
+                ->where('dsh_id','=', $request['dsh_id'])
+                ->update([
+                    'dsh_header' => $request->input('dsh_header'),
+                    'dsh_subheader' => $request->input('dsh_subheader'),
+                    'dsh_content' => $request->input('dsh_content'),
+                    'dsh_type' => $request->input('dsh_type'),
+                    'dsh_dateupdated' => $date,
+                    'dsh_updatedby' => $request->input('dsh_updatedby'),
+                ]);
+
+                return $data = [
+                    'status' => 200,
+                ];
+            }catch(Exception $ex) {
+                return $data = [
+                    'status' => 500,
+                ];
+            }
+        }else{
+            try{
+                $s1 = DB::table('def_announcement')
+                ->where('dsh_id','=', $request['dsh_id'])
+                ->update([
+                    'dsh_dateupdated' => $date,
+                    'dsh_updatedby' => $request->input('dsh_updatedby'),
+                    'dsh_status' => 0,
+                ]);
+
+                return $data = [
+                    'status' => 200,
+                ];
+            }catch(Exception $ex) {
+                return $data = [
+                    'status' => 500,
+                ];
+            }
+        }
+    }
 }

@@ -92,6 +92,7 @@ class TransactionsController extends Controller
                 $request = DB::table('def_accounts_request as dr')
                 ->leftJoin('def_accounts_fee as df', 'dr.acr_reqitem', '=', 'df.acf_id')
                 ->leftJoin('def_person as pr', 'dr.acr_personid', '=', 'pr.per_id')
+                ->leftJoin('def_student_identification as sti', 'dr.acr_personid', '=', 'sti.ident_personid')
 
                 ->leftJoin('sett_ph_country as currcountry', 'pr.per_curr_country', '=', 'currcountry.countryCode') 
                 ->leftJoin('sett_ph_province as currprovince', 'pr.per_curr_province', '=', 'currprovince.provCode') 
@@ -101,11 +102,14 @@ class TransactionsController extends Controller
                 ->select(  
                     'dr.*',
                     'df.*',
+                    'pr.per_id',
                     'pr.per_firstname',
                     'pr.per_middlename',
                     'pr.per_lastname',
                     'pr.per_suffixname',
                     'pr.per_curr_home',
+                    'sti.ident_identification',
+                    'sti.ident_lrn',
                     'currcountry.name as currcountryname',
                     'currprovince.provDesc as currprovincename',
                     'currcity.citymunDesc as currcityname',
@@ -225,6 +229,8 @@ class TransactionsController extends Controller
                 'acr_paystatus' => $request->input('acr_paystatus'),
                 'acr_addedby' => $request->input('acr_addedby'),
                 'acr_docstamp' => $request->input('acr_docstamp'),
+                'acr_total' => $request->input('acr_total'),
+                'acr_qty' => $request->input('acr_qty'),
                 'acr_dateadded' =>$date,
                 'acr_reqheader' =>$header,
             ]);

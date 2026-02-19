@@ -11,9 +11,11 @@ import {
     getCollectionStatus,
 } from "../../Fetchers.js";
 import {
+    pdfAutoPrint,
     pdfGenerator,
     numberToWords,
-    formatDateTime
+    formatDateTime,
+    getDateToday
 } from "../../Generators.js";
 import ProvisionalReceipt from '../forms/accountingforms/ProvisionalReceipt.vue';
 import OfficialReceipt from '../forms/accountingforms/OfficialReceipt.vue';
@@ -70,6 +72,7 @@ const personName = ref('')
 const receiptOrSeries = ref([])
 const receiptPrSeries = ref([])
 const receiptSeries = ref([])
+const today = ref('');
 
 onMounted(() => {
     //prevent e and negative
@@ -80,7 +83,7 @@ onMounted(() => {
         }
     });
 
-    
+    today.value = getDateToday();
 
     checking.value = true
     // amountTobePaid.value = account.value.acr_amount? account.value.acr_amount:''
@@ -119,7 +122,7 @@ onMounted(() => {
             if(billType.value == 1){ // means tuition = 1 ,  request = 2
                 balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acs_balance
             }else{
-                balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acr_amount
+                balance.value = typeof x !== 'undefined' ? x.acy_balance : account.value.acr_total
             }
 
             balance.value = Number(balance.value)
@@ -289,6 +292,8 @@ const verifyReceiptSeries = async () => {
 
 
 const checkCounterStatus = () =>{
+    disabler.value = true
+    
     Swal.fire({
         title: "Saving Updates",
         text: "Please wait while we check all transaction details.",
@@ -317,7 +322,7 @@ const checkCounterStatus = () =>{
 
 const initPayment = () => {
 
-    disabler.value = true
+    
     var balance = amountTobePaid.value - amountPaid.value
     var x = {}
 
@@ -381,9 +386,9 @@ const initPayment = () => {
 const renderPayment = (paymentdata) =>{
     if (billType.value == 1) {
         getTransactionDetails(0, 0, '', '', '', 2, accountId.value,1).then((results) => {
-            console.log(results.data[0].acs_status)
-            console.log(paymentdata.acs_status)
-            console.log(accountId.value)
+            // console.log(results.data[0].acs_status)
+            // console.log(paymentdata.acs_status)
+            // console.log(accountId.value)
             if (results.data[0].acs_status == paymentdata.acs_status) {
                 addPayment(paymentdata).then((results) => {
                     if (results.status == 204) {
@@ -450,43 +455,80 @@ const renderPayment = (paymentdata) =>{
     } else {
         getTransactionDetails(0, 0, '', '', '', 2, accountId.value,2).then((results) => {
             if (results.data[0].acr_status == 1) {
-                addPayment(paymentdata).then((results) => {
+                addPayment(paymentdata).then(async(results) => {
+                    // if (results.status == 204) {
+                    //     Swal.fire({
+                    //         title: "Update Successful",
+                    //         text: "Changes applied, preparing receipt...",
+                    //         icon: "success",
+                    //         confirmButtonText: "Ok, Got it!"
+                    //     }).then(async (result) => {
+                    //         // console.log(result)
+                    //         if (result.isConfirmed) {
+                    //             // 🔄 Show loading Swal
+                    //             Swal.fire({
+                    //                 title: "Generating PDF...",
+                    //                 text: "Please wait while we prepare your receipt.",
+                    //                 allowOutsideClick: false,
+                    //                 didOpen: () => {
+                    //                     Swal.showLoading();
+                    //                 }
+                    //             });
+
+                    //             let name = "receipt";
+                    //             let size = [6.823, 4.25];
+                    //             // let size = [8.5, 4.25];
+
+                    //             // Wait until PDF is generated
+                    //             await pdfGenerator(name, size, "landscape", 0.03);
+
+                    //             // ⏳ Keep loader for 1.5s more before closing + reloading
+                    //             setTimeout(() => {
+                    //                 Swal.close();
+                    //                 location.reload();
+                    //             }, 1000);
+                    //         }
+                    //     });
+
+
+                    // } 
                     if (results.status == 204) {
-                        Swal.fire({
-                            title: "Update Successful",
-                            text: "Changes applied, preparing receipt...",
-                            icon: "success",
-                            confirmButtonText: "Ok, Got it!"
-                        }).then(async (result) => {
-                            // console.log(result)
-                            if (result.isConfirmed) {
-                                // 🔄 Show loading Swal
-                                Swal.fire({
-                                    title: "Generating PDF...",
-                                    text: "Please wait while we prepare your receipt.",
-                                    allowOutsideClick: false,
-                                    didOpen: () => {
-                                        Swal.showLoading();
-                                    }
-                                });
+                    Swal.fire({
+                        title: "Generating PDF...",
+                        text: "Please wait while we prepare your receipt.",
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
 
-                                let name = "receipt";
-                                let size = [6.823, 4.25];
-                                // let size = [8.5, 4.25];
+                    let name = "receipt";
+                    let receiptWidth = 6.823; // in inches, your receipt width
 
-                                // Wait until PDF is generated
-                                await pdfGenerator(name, size, "landscape", 0.03);
+                    try {
+                        const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
 
-                                // ⏳ Keep loader for 1.5s more before closing + reloading
-                                setTimeout(() => {
-                                    Swal.close();
-                                    location.reload();
-                                }, 1000);
-                            }
-                        });
+                        const pdfUrl = URL.createObjectURL(pdfBlob);
+                        const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
 
+                        printWindow.onload = () => {
+                            printWindow.focus();
+                            printWindow.print();
+                        };
 
-                    } else {
+                    } catch (err) {
+                        console.error(err);
+                        Swal.fire("Error", "Failed to generate receipt.", "error");
+                        location.reload();
+                        return;
+                    }
+
+                    setTimeout(() => {
+                        Swal.close();
+                        location.reload();
+                    }, 1000);
+                }
+
+                    
+                    else {
                         Swal.fire({
                             title: "Payment Failed",
                             text: "Cannot proceed payment. Error occured, try again later",
@@ -643,8 +685,8 @@ const renderPayment = (paymentdata) =>{
                         <div class="p-3 mb-3 fw-bold">
                             Payment History
                         </div>
-                        <div class="table-responsive border d-flex flex-column justify-content-between h-100 p-2"  >
-                            <div style="height:300px; overflow: auto;" class="neu-card p-3">
+                        <div class="table-responsive border d-flex flex-column justify-content-between p-2" >
+                            <div class="neu-card p-3" style="height:390px; overflow: auto;" >
                                 <table class="neu-table-flat">
                                     <thead>
                                         <tr>
@@ -740,10 +782,10 @@ const renderPayment = (paymentdata) =>{
             <div id="printform" class="text-uppercase border"
                 style="width: 655px; height: 395px; position: relative; overflow: hidden;">
                 <div v-if="generateDefault == 1 && receiptType == 1" style="height: 100%; width: 100%;  font-weight: bold;" class="receipt-2 times ">
-                    <span style="position:absolute;top:160px; left: 280px; font-size:8.5px;">
+                    <span style="position:absolute;top:160px; left: 280px; font-size:10px;">
                         {{ personName }}
                     </span>
-                    <span style="position:absolute;top:181px; left:280px; font-size:8.5px;">
+                    <span style="position:absolute;top:181px; left:280px; font-size:10px;">
                         {{
                             [
                             account.per_curr_home,
@@ -754,21 +796,21 @@ const renderPayment = (paymentdata) =>{
                         }}
                     </span>
 
-                    <span v-if="paymentMode == 1" style="position:absolute;top:265px; left:25px; font-size:8.5px;">
+                    <span v-if="paymentMode == 1" style="position:absolute;top:265px; left:25px; font-size:10px;">
                         &#8369; &nbsp;{{ amountPaid }} 
                     </span>
-                    <span v-if="paymentMode == 1" style="position:absolute;top:225px; left:210px; font-size:8.5px;">
+                    <span v-if="paymentMode == 1" style="position:absolute;top:225px; left:210px; font-size:10px;">
                         &#8369; &nbsp;{{ numberToWords(amountPaid) }} 
                     </span>
-                    <span v-if="paymentMode == 1" style="position:absolute;top:250px; left:220px; font-size:8.5px;">
+                    <span v-if="paymentMode == 1" style="position:absolute;top:250px; left:220px; font-size:10px;">
                         &#8369; &nbsp;{{ amountPaid }} 
                     </span>
 
-                    <span v-if="paymentMode ==  2" style="position:absolute;top:300px; left:25px; font-size:8.5px;">
+                    <span v-if="paymentMode ==  2" style="position:absolute;top:300px; left:25px; font-size:10px;">
                         ({{ bankTransferName }}) - {{ bankTransferNo }}
                     </span>
 
-                    <span v-if="paymentMode == 3" style="position:absolute;top:300px; left:25px; font-size:8.5px;">
+                    <span v-if="paymentMode == 3" style="position:absolute;top:300px; left:25px; font-size:10px;">
                         ({{ chequeBankName }}) - {{ chequeNo }}
                     </span>
                 </div>
@@ -776,14 +818,38 @@ const renderPayment = (paymentdata) =>{
                     <ProvisionalReceipt :data="latestPayment" />
                 </div>
 
-                <div v-if="generateDefault == 1 && receiptType == 2" style="height: 100%; width: 100%;  font-weight: bold;" class="receipt-1 times ">
-                    <span style="position:absolute;top:100px; left: 65px; font-size:8.5px;">
+                <div v-if="generateDefault == 1 && receiptType == 2" style="height: 100%; width: 100%;  font-weight: bold;" class="times ">
+                    <span style="position:absolute;top:100px; left: 65px; font-size:10px;">
                         {{ personName }}
                     </span>
-                    <span style="position:absolute;top:115px; left: 35px; font-size:8.5px;"> 
+                     <span style="position:absolute;top:100px; left: 500px; font-size:10px;">
+                        {{ today }}
+                    </span>
+                    <span style="position:absolute;top:115px; left: 50px; font-size:10px;"> 
                         {{account.per_curr_home}}, {{account.currbarangayname}}, {{account.currcityname}}, {{account.currprovincename}}
                     </span>
-                </div>
+                    <span style="position:absolute;top:130px; left: 50px; font-size:10px;"> 
+                        {{account.per_id}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 160px; font-size:10px;"> 
+                        {{account.acf_desc}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 100px; font-size:10px;"> 
+                        {{account.acf_price}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 50px; font-size:10px;"> 
+                        {{account.acr_qty}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 590px; font-size:10px;"> 
+                        {{account.acr_total}}
+                    </span>
+                    <span style="position:absolute;top:293px; left: 590px; font-size:10px;"> 
+                        {{balance}}
+                    </span>
+                    <span style="position:absolute;top:330px; left: 440px; font-size:10px; width: 200px;"> 
+                        {{userName}}
+                    </span>
+                </div> 
                 <div v-if="generateDefault == 2 && receiptType == 2" style="height: 100%; width: 100%;  font-weight: bold;">
                     <OfficialReceipt :data="latestPayment" />
                 </div>

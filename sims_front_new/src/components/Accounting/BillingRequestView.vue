@@ -347,9 +347,7 @@ const getData = (result) =>{
                                     </div>
                                     <div v-else>
                                         <div v-if="req.acr_paystatus == 2" class="text-center">
-                                            <button class="neu-btn-sm neu-white" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">
-                                                Completed
-                                            </button>
+                                            <p class="m-0 text-success fw-bold">Completed</p>
                                         </div>
                                         <div v-else class="rounded-md flex gap-1 items-center">
                                             <button class="neu-btn-sm neu-white" title="Complete Payment" data-bs-toggle="modal" data-bs-target="#settlementmodal" @click="settlement(req, 2)">

@@ -31,6 +31,7 @@ import EnrollmentPrintModal from '../snippets/modal/EnrollmentPrintModal.vue';
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 import SearchQR from '../snippets/tech/SearchQR.vue';
 import EnrollmentReceiptModal from '../snippets/modal/EnrollmentReceiptModal.vue';
+import EnrollmentClearanceModal from '../snippets/modal/EnrollmentClearanceModal.vue';
 
 const preLoading = ref(true)
 const student = ref([])
@@ -59,6 +60,7 @@ const searchFname = ref('')
 const searchMname = ref('')
 const searchLname = ref('')
 const showLinkProfile = ref(false)
+const showClearance = ref(false)
 const showLinkSignature = ref(false)
 const linkId = ref('')
 const holdSubmit = ref(false)
@@ -797,7 +799,7 @@ const getData = (result) => {
                                 </div>
                             </div>
                             <!-- Team Details-->
-                            <div class="single_advisor_details_info border-0 border-bottom border-top">
+                            <div class="single_advisor_details_info">
                                 <h6 class="text-uppercase fw-bold" style="font-size: 13px;"> {{ stud.per_firstname }} {{
                                     stud.per_middlename }} {{
                                         stud.per_lastname }} {{
@@ -827,6 +829,21 @@ const getData = (result) => {
                                         <option v-for="(q, index) in quarter" :value="q.quar_id">{{ q.quar_desc }}
                                         </option>
                                     </select>
+                                    <!-- <span class="p-1 d-inline-block">
+                                    {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ course.find(c => c.prog_id === stud.enr_course)?.prog_code || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ gradelvl.find(g => g.grad_id === stud.enr_gradelvl)?.grad_name || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ quarter.find(q => q.quar_id === stud.enr_quarter)?.quar_desc || '—' }}
+                                    </span> -->
                                 </div>
                             </div>
                             <div class="advisor_thumb">
@@ -898,13 +915,18 @@ const getData = (result) => {
                                     class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-print" />
                                 </button>
+                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1" @click="showForm(3, stud, 3)"
+                                    data-bs-target="#printmodal" type="button" title="Print Clearance"
+                                    class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                </button>
                                 <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
                                     class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-trash" />
                                 </button>
                                 <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal"
-                                    data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="print ID"
+                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1"
+                                    data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="Print ID"
                                     class="neu-btn-sm neu-white">
                                     <font-awesome-icon icon="fa-solid fa-id-card-clip" />
                                 </button>
@@ -1005,6 +1027,8 @@ const getData = (result) => {
                         :subject="subject" :section="section" :curriculum="curriculum" />
                     <EnrollmentReceiptModal v-if="showPrintModal && printType == 2" :student="showFormData"
                         :subject="subject" :section="section" :curriculum="curriculum" />
+                    <EnrollmentClearanceModal v-if="showPrintModal && printType == 3" :student="showFormData"
+                        :subject="subject" :section="section" :curriculum="curriculum" />
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -1080,6 +1104,37 @@ const getData = (result) => {
             </div>
         </div>
     </div>
+
+    <!-- Print Clearance Modal -->
+    <div class="modal fade" id="printclearance" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Clearance</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" tabindex="-1"
+                        @click="showClearance = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body neu-bg" v-if="showClearance">
+
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" tabindex="-1"
+                            @click="showClearance = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 
     <!--  <button @click="() => $refs.focusTrap.activate()">Show the modal</button>
     <focus-trap :active="false" ref="focusTrap" :initial-focus="() => $refs.qrInput">
@@ -1228,7 +1283,7 @@ const getData = (result) => {
     width: 100%;
     bottom: 0;
     right: 30px;
-    text-align: right;
+    text-align: center;
 }
 
 .single_advisor_profile .advisor_thumb .social-info a {
@@ -1250,14 +1305,14 @@ const getData = (result) => {
     position: relative;
     z-index: 1;
     padding: 30px;
-    text-align: right;
+    text-align: center;
     -webkit-transition-duration: 500ms;
     transition-duration: 500ms;
     /* border-radius: 0 0 15px 15px; */
     background-color: #e2e2e2;
 }
 
-.single_advisor_profile .single_advisor_details_info::after {
+/* .single_advisor_profile .single_advisor_details_info::after {
     -webkit-transition-duration: 500ms;
     transition-duration: 500ms;
     position: absolute;
@@ -1268,7 +1323,7 @@ const getData = (result) => {
     content: "";
     top: 12px;
     right: 30px;
-}
+} */
 
 .single_advisor_profile .single_advisor_details_info h6 {
     margin-bottom: 0.25rem;

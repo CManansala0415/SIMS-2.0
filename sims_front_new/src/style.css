@@ -552,20 +552,20 @@ h1 {
   transition: all 0.15s ease;
 }
 
-.neu-btn-sm:hover {
+.neu-btn-sm:hover, .neu-btn-ack:hover {
   background-color: var(--neu-hover);
   box-shadow:
     1px 1px 5px var(--neu-glow),
     -1px -1px 5px rgba(255, 255, 255, 0.9);
 }
 
-.neu-btn-sm:active {
+.neu-btn-sm:active, .neu-btn-ack:active {
   box-shadow:
     inset 4px 4px 8px rgba(0, 0, 0, 0.18),
     inset -4px -4px 8px rgba(255, 255, 255, 0.9);
 }
 
-.neu-btn-sm:disabled{
+.neu-btn-sm:disabled, .neu-btn-ack:disabled{
   background: #c7c7c7;
   cursor: not-allowed;
    box-shadow:
@@ -806,4 +806,32 @@ option{
     100% 2px,
     100% 100%,
     100% 100%;
+}
+
+.neu-btn-ack{
+    background-color: #dedede;
+    color: #5f5f5f;
+    border-radius: 5px;
+    border: none;
+    padding: 0.4rem 0.4rem;
+    font-size: 0.8rem;
+    /* font-weight: 600; */
+
+    box-shadow:
+      3px 3px 5px rgba(77, 77, 77, 0.2),
+      /* dark shadow */
+      -3px -3px 5px rgba(255, 255, 255, 0.9);
+    /* light highlight */
+
+    transition: all 0.15s ease;
+}
+
+.post-img {
+  object-fit: cover;
+  width: auto;
+  height: 500px;
+}
+
+.preserve-text {
+  white-space: pre-wrap;   /* preserves line breaks & spacing */
 }

@@ -173,7 +173,7 @@ onMounted(async () => {
                                 // console.log(results1)
                                 getEnrollmentSchedule(curr, prog, grad, cour, enr_section.value, results1.ln_id).then((results2) => {
                                     scheduleData.value = results2.data
-                                    console.log(scheduleData.value)
+                                    // console.log(scheduleData.value)
                                     preloading.value = false
                                     milestoneLoading.value = false
 
