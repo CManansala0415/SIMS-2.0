@@ -103,26 +103,38 @@ const edit = (data) => {
 const registerCurriculum = () => {
     saving.value = true
     // console.log(editData.value)
-    Swal.fire({
-        title: "Saving Updates",
-        text: "Please wait while we check all necessary details.",
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-    addCurriculum(editData.value).then((results) => {
-        // alert('Successfull Registered')
-        // location.reload()
+
+    let isEmptyObject = Object.values(editData.value)
+        .every(value => value === "");
+
+    if (isEmptyObject) {
+        // console.log("Do not proceed");
+        return;
+    }else{
         Swal.fire({
-            title: "Update Success",
-            text: "Successfully registered, refreshing the page",
-            icon: "success"
-        }).then(()=>{
-            Swal.close()
-            location.reload()
+            title: "Saving Updates",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
         });
-    })
+    }
+
+    
+    
+    // addCurriculum(editData.value).then((results) => {
+    //     // alert('Successfull Registered')
+    //     // location.reload()
+    //     Swal.fire({
+    //         title: "Update Success",
+    //         text: "Successfully registered, refreshing the page",
+    //         icon: "success"
+    //     }).then(()=>{
+    //         Swal.close()
+    //         location.reload()
+    //     });
+    // })
 }
 
 const search = () => {
@@ -374,7 +386,7 @@ const saveData = () => {
                 <div class="input-group w-50">
                     <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
                     <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
-                        v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon"
+                        v-model="searchValue" aria-describedby="searchaddon"
                         :disabled="preLoading ? true : false">
                 </div>
                 <div class="d-flex w-25 justify-content-end gap-2">
@@ -534,7 +546,7 @@ const saveData = () => {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         @click="tagForm = false, reset()"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body neu-bg">
                     <form @submit.prevent="registerCurriculum()" class="d-flex flex-column p-2 gap-1">
                         <div class="d-flex flex-wrap flex-column">
                             <p class="text-success fw-bold">Tagging Settings</p>
@@ -545,7 +557,7 @@ const saveData = () => {
                                     To commit changes click the register button and wait for saving notification.
                                 </span></p>
                         </div>
-                        <div class="container mb-3 shadow-sm">
+                        <div class="neu-card mb-3 p-3">
                             <div class="row">
                                 
                                 <div class="col">
@@ -569,24 +581,24 @@ const saveData = () => {
                                 </div>
                                 <div class="col align-content-end">
                                     <button @click="showItems()" :disabled="savingTag ? true : false" type="button"
-                                        class="btn btn-sm btn-primary w-100">
+                                        class="neu-btn neu-blue">
                                         Load Data</button>
                                 </div>
                             </div>
                         </div>
 
-                        <div v-if="loadItems" class="container ">
+                        <div v-if="loadItems" class="neu-card p-3 small-font">
                             <div class="row">
                                 <div class="col">
                                     <div class="d-flex flex-column gap-2 ">
-                                        <div class="p-3 card">
-                                            <div class="border p-2 form-group">
+                                        <div class="p-2">
+                                            <div class="mb-3">
                                                 <label for="type">Search Subject</label>
                                                 <input v-model="searchValueSubject" @keyup="searchSubject" type="text"
                                                     :disabled="!loadItems ? true : false" class="neu-input" />
-                                            </div>
-                                            <div class="table-responsive border p-2 small-font" style="height: 227px;">
-                                                <table class="table table-hover">
+                                            </div> 
+                                            <div class="d-flex flex-column overflow-auto neu-card-inner p-3" style="height: 227px;">
+                                                <table class="neu-table-flat">
                                                     <thead>
                                                         <tr>
                                                             <th>Select Subjects</th>
@@ -602,7 +614,7 @@ const saveData = () => {
                                                             @click="addSubject('add', sj, index)"
                                                             :class="savingTag ? 'pe-none' : 'pe-auto'">
                                                             <td
-                                                                :class="addedSubjectId.includes(sj.subj_id) ? 'align-middle text-start bg-secondary text-white' : 'align-middle text-start bg-white text-black'">
+                                                                :class="addedSubjectId.includes(sj.subj_id) ? 'align-middle text-start neu-pastel-gray' : 'align-middle text-start'">
                                                                 <p class="fw-bold ">{{ sj.subj_code }}</p>
                                                                 <p class=" fst-italic">{{ sj.subj_name }}</p>
                                                             </td>
@@ -615,9 +627,9 @@ const saveData = () => {
                                 </div>
                                 <div class="col">
                                     <div class="d-flex flex-column gap-2 ">
-                                        <div class="p-3 card">
-                                            <div class="table-responsive border p-2 small-font" style="height: 300px;">
-                                                <table class="table table-hover">
+                                        <div class="p-3 neu-card-inner">
+                                            <div class="p-2" style="height: 300px;">
+                                                <table class="neu-table-flat">
                                                     <thead>
                                                         <tr>
                                                             <th>Select Subjects</th>
@@ -644,7 +656,7 @@ const saveData = () => {
                                                                         <button :disabled="savingTag ? true : false"
                                                                             @click="addSubject('remove',asj,index)" 
                                                                             type="button"
-                                                                            class="btn btn-sm btn-danger">&times;
+                                                                            class="neu-btn neu-red">&times;
                                                                             Remove</button>
                                                                     </div>
                                                                 </div>

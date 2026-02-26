@@ -1,0 +1,53 @@
+Swal.fire({
+    title: "Transaction Declined",
+    html: `<span class="fw-bold">${seriesNoActual.value}</span> is already existing, try to change the series set or contact the administrator for verification`,
+    icon: "warning",
+    confirmButtonText: "Ok, Got it!"
+});
+
+Swal.fire({
+    title: "Saving Updates",
+    text: "Please wait while we check all necessary details.",
+    allowOutsideClick: false,
+    didOpen: () => {
+        Swal.showLoading();
+    }
+});
+
+Swal.fire({
+    title: "Generating PDF...",
+    text: "Please wait while we prepare your receipt.",
+    allowOutsideClick: false,
+    didOpen: () => {
+        Swal.showLoading();
+    }
+});
+
+Swal.fire({
+    title: "Update Successful",
+    text: "Changes applied, refreshing the page",
+    icon: "success"
+}).then(() => {
+    location.reload()
+});
+Swal.fire({
+    title: "Update Failed",
+    text: "Unknown error occured, try again later",
+    icon: "error"
+}).then(() => {
+    // location.reload()
+});
+
+Swal.fire({
+    title: "Log Out",
+    text: "Are you sure you want to logout",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, Im Going Out!"
+}).then(async (result) => {
+    if (result.isConfirmed) {
+
+    }
+});
