@@ -698,6 +698,11 @@ option{
   width: 100%;
   overflow: auto;
   color:#555555;
+  outline:none
+}
+
+*:focus {
+    outline: none;
 }
 
 /* Dropdown (opened list) */

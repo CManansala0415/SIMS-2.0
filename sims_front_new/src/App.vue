@@ -18,6 +18,7 @@ const semInfo = ref('')
 const enrollmentInfo = ref('')
 const yrFromInfo = ref('')
 const yrFromto = ref('')
+const isLoggedIn = ref(false)
 onMounted(async () => {
 
   window.stop()
@@ -27,7 +28,9 @@ onMounted(async () => {
   getUserID().then((results) => {
     user.value = results.account.data.name
     userID.value = results.account.data.id
-    linker()
+    if(user.value){
+      linker()
+    }
     // isLoading.value = false
   }).catch((err) => {
     //alert('Unauthorized Session, Please Log In')

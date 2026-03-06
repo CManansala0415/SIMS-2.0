@@ -693,453 +693,496 @@ const refresh = () => {
         <NeuLoader2></NeuLoader2>
     </div>
     <form v-else method="post" @submit.prevent="registerApplicant()" class="d-flex flex-column gap-2 small-font p-3">
-        <div class="form-group border p-4 rounded  d-flex flex-column gap-2 neu-card ">
-            <div class="form-group border-bottom">
-                <p class="fw-bold p-1 rounded-3">Personal Information</p>
-            </div>
-            <div class="form-group d-flex flex-column gap-2">
-                <div class="row mb-2">
-                    <div class="form-group col">
-                        <label for="firstname">First Name</label>
-                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="firstname" aria-describedby="firstname"
-                            v-model="personal.per_firstname" required :disabled="saving?true:false">
+
+        <div class="row g-2">
+            <div class="col-12">
+                <div class="neu-card p-4">
+                    <div class="text-start">
+                        <p class="fw-bold p-1">Personal Information</p>
                     </div>
-                    <div class="form-group col">
-                        <label for="middlename">Middle Name</label>
-                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="middlename" aria-describedby="middlename"
-                            v-model="personal.per_middlename" :disabled="saving?true:false">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-3 text-start">
+                                    <label for="firstname">First Name</label>
+                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="firstname" aria-describedby="firstname"
+                                        v-model="personal.per_firstname" required :disabled="saving?true:false" autocomplete="off">
+                                </div>
+                                <div class="col-3 text-start">
+                                    <label for="middlename">Middle Name</label>
+                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="middlename" aria-describedby="middlename"
+                                        v-model="personal.per_middlename" :disabled="saving?true:false" autocomplete="off">
+                                </div>
+                                <div class="col-3 text-start">
+                                    <label for="lastname">Last Name</label>
+                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="lastname" aria-describedby="lastname"
+                                        v-model="personal.per_lastname" required :disabled="saving?true:false" autocomplete="off">
+                                </div>
+                                <div class="col-3 text-start">
+                                    <label for="suffixname">Suffix Name</label>
+                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="suffixname" aria-describedby="suffixname"
+                                        maxlength="3" v-model="personal.per_suffixname" :disabled="saving?true:false" autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-4 text-start">
+                                    <label for="gender">Gender</label>
+                                    <select class="neu-input neu-select" id="gender" v-model="personal.per_gender" required :disabled="saving?true:false">
+                                        <option disabled>-- Select Here --</option>
+                                        <option v-for="(gen, index) in gender" :value="gen.gen_id">{{ gen.gen_desc }}</option>
+                                    </select>
+                                </div>
+                                <div class="col-4 text-start">
+                                    <label for="civilstatus">Civil Status</label>
+                                    <select class="neu-input neu-select" id="civilstatus" v-model="personal.per_civilstatus" required :disabled="saving?true:false">
+                                        <option disabled>-- Select Here --</option>
+                                        <option v-for="(cs, index) in civilstatus" :value="cs.cv_id">
+                                            {{ cs.cv_desc }}
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-4 text-start">
+                                    <label for="nationality">Nationality</label>
+                                    <select class="neu-input neu-select" id="nationality" v-model="personal.per_nationality" required :disabled="saving?true:false">
+                                        <option disabled>-- Select Here --</option>
+                                        <option v-for="(nat, index) in nationality" :value="nat.nat_id">
+                                            {{ nat.nat_desc }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
                     </div>
-                    <div class="form-group col">
-                        <label for="lastname">Last Name</label>
-                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="lastname" aria-describedby="lastname"
-                            v-model="personal.per_lastname" required :disabled="saving?true:false">
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="form-group col">
-                        <label for="suffixname">Suffix Name</label>
-                        <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="suffixname" aria-describedby="suffixname"
-                            maxlength="3" v-model="personal.per_suffixname" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="gender">Gender</label>
-                        <select class="neu-input neu-select" id="gender" v-model="personal.per_gender" required :disabled="saving?true:false">
-                            <option v-for="(gen, index) in gender" :value="gen.gen_id">{{ gen.gen_desc }}</option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="civilstatus">Civil Status</label>
-                        <select class="neu-input neu-select" id="civilstatus" v-model="personal.per_civilstatus" required :disabled="saving?true:false">
-                            <option v-for="(cs, index) in civilstatus" :value="cs.cv_id">
-                                {{ cs.cv_desc }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="nationality">Nationality</label>
-                        <select class="neu-input neu-select" id="nationality" v-model="personal.per_nationality" required :disabled="saving?true:false">
-                            <option v-for="(nat, index) in nationality" :value="nat.nat_id">
-                                {{ nat.nat_desc }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group border p-4 rounded  d-flex flex-column gap-2 neu-card ">
-            <div class="form-group border-bottom">
-                <p class="fw-bold p-1 rounded-3">Contact Information</p>
-            </div>
-            <div class="form-group d-flex flex-column gap-2">
-                <div class="row mb-2">
-                    <!-- <div class="form-group col">
-                        <label for="exampleInputEmail1">Telephone No.</label>
-                        <input class="neu-input" type="email" name="email" id="email" placeholder="Email">
-                    </div> -->
-                    <!-- onkeydown="return /[0-9]/i.test(event.key)" -->
-                    <div class="form-group col">
-                        <label for="cellphone">Cellphone No.</label>
-                        <input class="neu-input" type="number" name="cellphone" id="cellphone"
-                            placeholder="Cellphone No." v-model="personal.per_contact"
-                            minlength="9" maxlength="9" required :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="peremail">Email</label>
-                        <input class="neu-input" type="peremail" name="peremail" id="peremail" placeholder="Email"
-                            v-model="personal.per_email" required :disabled="saving?true:false">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group border p-4 rounded  d-flex flex-column gap-2 neu-card ">
-            <div class="form-group border-bottom">
-                <p class="fw-bold p-1 rounded-3">Birth Information</p>
-            </div>
-            <div class="form-group d-flex flex-column gap-2">
-                <div class="row mb-2">
-                    <div class="form-group col">
-                        <label for="bday">Birthday</label>
-                        <input type="date" class="neu-input" id="bday" aria-describedby="emailHelp"
-                            v-model="personal.per_birthday" @focusout="getAge(personal.per_birthday)" required :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="age">Age</label>
-                        <input type="number" class="neu-input" id="age" aria-describedby="emailHelp" v-model="age"
-                            disabled>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="form-group col">
-                        <label for="birthprovince">Birth Country</label>
-                        <select class="neu-input neu-select" id="birthprovince"
-                            @change="personal.per_birth_province ='', personal.per_birth_city=''"
-                            v-model="personal.per_birth_country" required :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(country, index) in filteredBirthCountry" :value="country.countryID">{{
-                                country.name }}</option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="birthprovince">Birth Province</label>
-                        <select class="neu-input neu-select" id="birthprovince"
-                            @change="updateAddress('birth-city', personal.per_birth_province)"
-                            v-model="personal.per_birth_province" required :disabled="personal.per_birth_country != 163 || saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(prov, index) in filteredBirthProvince" :value="prov.provCode">{{
-                                prov.provDesc }}</option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="birthcity">Birth City</label>
-                        <select class="neu-input neu-select" id="birthcity" v-model="personal.per_birth_city"
-                            :disabled="((personal.per_birth_province || saving)&& personal.per_birth_country == 163) ? false : true" required>
-                            <option>- Select Here -</option>
-                            <option v-for="(ct, index) in filteredBirthCity" :value="ct.citymunCode">{{ ct.citymunDesc
-                                }}</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group border-bottom">
-                <p class="text-secondary">Present Address</p>
-            </div>
-            <div class="form-group d-flex flex-column gap-2">
-                <div class="row mb-2">
-                    <div class="form-group col">
-                        <label for="presenthome">Address</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="presenthome" aria-describedby="presenthome"
-                            v-model="personal.per_curr_home">
-                    </div>
-                    <div class="form-group col">
-                        <label for="presentregion">Region</label>
-                        <select class="neu-input neu-select" id="presentregion" v-model="personal.per_curr_region"
-                            @change="updateAddress('current-province', personal.per_curr_region)" required :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(reg, index) in filteredCurrRegion" :value="reg.regCode">
-                                {{ reg.regDesc }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="form-group col">
-                        <label for="presentprovince">Province</label>
-                        <select class="neu-input neu-select" id="presentprovince" v-model="personal.per_curr_province"
-                            @change="updateAddress('current-city', personal.per_curr_province)" required :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(prov, index) in filteredCurrProvince" :value="prov.provCode">
-                                {{ prov.provDesc }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="presentcity">City</label>
-                        <select class="neu-input neu-select" id="presentcity" v-model="personal.per_curr_city"
-                            @change="updateAddress('current-barangay', personal.per_curr_city)" required :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(ct, index) in filteredCurrCity" :value="ct.citymunCode">
-                                {{ ct.citymunDesc }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="preentbarangay">Barangay</label>
-                        <select class="neu-input neu-select" id="preentbarangay" v-model="personal.per_curr_barangay"
-                            :disabled="personal.per_curr_city || saving ? false : true" required>
-                            <option>- Select Here -</option>
-                            <option v-for="(brgy, index) in filteredCurrBarangay" :value="brgy.brgyCode">
-                               {{ brgy.brgyDesc }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="presentzipcode">Zip Code</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="presentzipcode" aria-describedby="emailHelp"
-                            v-model="personal.per_curr_zipcode" :disabled="saving?true:false">
-                    </div>
-                </div>
-            </div>
-            <div class="form-group border-bottom d-flex justify-content-center align-content-center gap-2">
-                <input @change="copyAddress()" type="checkbox" class="form-check-input" id="sameas" v-model="sameAddress" :disabled="saving?true:false">
-                <p class="text-secondary">Permanent Address</p>
-            </div>
-            <div class="form-group d-flex flex-column gap-2">
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="permanenthome">Address</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="permanenthome" aria-describedby="emailHelp"
-                            v-model="personal.per_perm_home" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="permanentregion">Region</label>
-                        <select class="neu-input neu-select" id="permanentregion" v-model="personal.per_perm_region"
-                            @change="updateAddress('permanent-province', personal.per_perm_region)" :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(reg, index) in filteredPermRegion" :value="reg.regCode">
-                               {{ reg.regDesc }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="permanentprovince">Province</label>
-                        <select class="neu-input neu-select" id="permanentprovince" v-model="personal.per_perm_province"
-                            @change="updateAddress('permanent-city', personal.per_perm_province)" :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(prov, index) in filteredPermProvince" :value="prov.provCode">
-                               {{ prov.provDesc }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="permanentcity">City</label>
-                        <select class="neu-input neu-select" id="permanentcity" v-model="personal.per_perm_city"
-                            @change="updateAddress('permanent-barangay', personal.per_perm_city)" :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(ct, index) in filteredPermCity" :value="ct.citymunCode">
-                               {{ ct.citymunDesc }}
-                            </option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="permanentbarangay">Barangay</label>
-                        <select class="neu-input neu-select" id="permanentbarangay" v-model="personal.per_perm_barangay" :disabled="saving?true:false">
-                            <option>- Select Here -</option>
-                            <option v-for="(brgy, index) in filteredPermBarangay" :value="brgy.brgyCode">
-                               {{ brgy.brgyDesc }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="form-group col">
-                        <label for="permanentzipcode">Zip Code</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="permanentzipcode" aria-describedby="permanentzipcode" :disabled="saving?true:false" v-model="personal.per_perm_zipcode">
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="form-group border p-4 rounded  d-flex flex-column gap-2 neu-card ">
-            <div class="form-group border-bottom">
-                <p class="fw-bold p-1 rounded-3">Educational Background Information</p>
-            </div>
-            <div class="form-group d-flex flex-wrap">
-                <table class="neu-table" style="text-transform:uppercase">
-                    <thead>
-                        <tr>
-                            <th scope="col">School</th>
-                            <th scope="col">From</th>
-                            <th scope="col">To</th>
-                            <th scope="col" class="w-25 text-center">Command</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(attain, index) in attainmentList">
-                            <th scope="row">{{ attain.pered_school }}</th>
-                            <td>{{ attain.pered_from }}</td>
-                            <td>{{ attain.pered_to }}</td>
-                            <td class="align-middle">
-                                <button @click="addAttainment('remove', attain, index)" type="button"
-                                    class="neu-btn neu-red" :disabled="saving?true:false">
-                                    Remove
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="!Object.keys(attainmentList).length">
-                            <td colspan="4">Empty List</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="form-group">
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="edschoolname">School</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="edschoolname" aria-describedby="emailHelp"
-                            v-model="attainmentInfo.pered_school" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="edyearfrom">Year From</label>
-                        <input type="number" class="neu-input" id="edyearfrom" aria-describedby="emailHelp"
-                            v-model="attainmentInfo.pered_from"
-                            max="9999" min="1999"  :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="edyearto">Year To</label>
-                        <input type="number" class="neu-input" id="edyearto" aria-describedby="emailHelp"
-                            v-model="attainmentInfo.pered_to" max="9999" 
-                            min="1999" :disabled="saving?true:false">
-                    </div>
-                </div>
-                <div class="form-group d-flex justify-content-center mt-3  bg-secondary-subtle p-2">
-                    <button @click="addAttainment('add', attainmentInfo)" class="neu-btn neu-blue p-2 w-25" type="button"
-                        id="submit_data" name="submit_data" :disabled="saving?true:false">Add</button>
                 </div>
             </div>
 
-        </div>
-        <div class="form-group border p-4 rounded  d-flex flex-column gap-2 neu-card ">
-            <div class="form-group border-bottom">
-                <p class="fw-bold p-1 rounded-3">Family Background Information</p>
-            </div>
-            <div class="form-group d-flex flex-wrap">
-                <table class="neu-table" style="text-transform:uppercase">
-                    <thead>
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Relationship</th>
-                            <th scope="col">Contact No.</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Guardian</th>
-                            <th scope="col" class="w-25">Command</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(fam, index) in familyMembers">
-                            <th scope="row">{{ fam.fam_firstname }} {{ fam.fam_middlename }} {{ fam.fam_lastname }} {{
-                                fam.fam_suffixname }}</th>
-                            <td>{{ fam.fam_relationship }}</td>
-                            <td>{{ fam.fam_contact }}</td>
-                            <td style="text-transform:none">{{ fam.fam_email }}</td>
-                            <td style="text-transform:none">
-                               <div class="form-check">
-                                    <input @click="guardianTick=index" class="form-check-input" type="radio" name="flexRadioDefault" :id="'fam'+index" v-model="fam.fam_guardian"
-                                    :checked="fam.fam_guardian == 1? true:false" :disabled="forUpdate? true:false">
-                                    <label class="form-check-label" for="flexRadioDefault1">
-                                        Guardian
-                                    </label>
+            <div class="col-12">
+                <div class="neu-card p-4">
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="text-start">
+                                <p class="fw-bold">Contact Information</p>
+                            </div>
+                            <div class="d-flex flex-column gap-2">
+                                <!-- <div class="form-group col">
+                                    <label for="exampleInputEmail1">Telephone No.</label>
+                                    <input class="neu-input" type="email" name="email" id="email" placeholder="Email">
+                                </div> -->
+                                <!-- onkeydown="return /[0-9]/i.test(event.key)" -->
+                                <div class="text-start">
+                                    <label for="cellphone">Cellphone No.</label>
+                                    <input class="neu-input" type="number" name="cellphone" id="cellphone" autocomplete="off"
+                                        placeholder="Cellphone No." v-model="personal.per_contact"
+                                        minlength="9" maxlength="9" required :disabled="saving?true:false">
                                 </div>
-                            </td>
-                            <td>
-                                <button @click="addFamMembers('remove', fam, index)" type="button"
-                                    class="btn btn-sm btn-danger" :disabled="saving?true:false">
-                                    Remove
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="!Object.keys(familyMembers).length">
-                            <td colspan="6">Empty List</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="form-group d-flex flex-column">
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="famfirstname">First Name</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="famfirstname" aria-describedby="famfirstname"
-                            v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                                <div class="text-start">
+                                    <label for="peremail">Email</label>
+                                    <input class="neu-input" type="peremail" name="peremail" id="peremail" placeholder="Email" autocomplete="off"
+                                        v-model="personal.per_email" required :disabled="saving?true:false">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-8">
+                            <div class="text-start">
+                                <p class="fw-bold">Birth Information</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-6 d-flex flex-column gap-2">
+                                    <div class="text-start">
+                                        <label for="bday">Birthday</label>
+                                        <input type="date" class="neu-input" id="bday" aria-describedby="emailHelp" autocomplete="off"
+                                            v-model="personal.per_birthday" @focusout="getAge(personal.per_birthday)" required :disabled="saving?true:false">
+                                    </div>
+                                    <div class="text-start">
+                                        <label for="age">Age</label>
+                                        <input type="number" class="neu-input" id="age" aria-describedby="emailHelp" v-model="age" autocomplete="off"
+                                            disabled>
+                                    </div>
+                                </div>
+                                <div class="col-6 d-flex flex-column gap-2">
+                                    <div class="text-start">
+                                        <label for="birthprovince">Birth Country</label>
+                                        <select class="neu-input neu-select" id="birthprovince"
+                                            @change="personal.per_birth_province ='', personal.per_birth_city=''"
+                                            v-model="personal.per_birth_country" required :disabled="saving?true:false">
+                                            <option disabled>-- Select Here --</option>
+                                            <option v-for="(country, index) in filteredBirthCountry" :value="country.countryID">{{
+                                                country.name }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="text-start">
+                                        <label for="birthprovince">Birth Province</label>
+                                        <select class="neu-input neu-select" id="birthprovince"
+                                            @change="updateAddress('birth-city', personal.per_birth_province)"
+                                            v-model="personal.per_birth_province" required :disabled="personal.per_birth_country != 163 || saving?true:false">
+                                            <option disabled>-- Select Here --</option>
+                                            <option v-for="(prov, index) in filteredBirthProvince" :value="prov.provCode">{{
+                                                prov.provDesc }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="text-start">
+                                        <label for="birthcity">Birth City</label>
+                                        <select class="neu-input neu-select" id="birthcity" v-model="personal.per_birth_city"
+                                            :disabled="((personal.per_birth_province || saving)&& personal.per_birth_country == 163) ? false : true" required>
+                                            <option>- Select Here -</option>
+                                            <option v-for="(ct, index) in filteredBirthCity" :value="ct.citymunCode">{{ ct.citymunDesc
+                                                }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group col">
-                        <label for="fammiddlename">Middle Name</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="fammiddlename" aria-describedby="fammiddlename"
-                            v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="famlastname">Last Name</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="famlastname" aria-describedby="famlastname"
-                            v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="famsuffixname">Suffix Name</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="famsuffixname" aria-describedby="famsuffixname"
-                            v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col">
-                        <label for="famrelationship">Relationship</label>
-                        <input type="text" style="text-transform:uppercase" class="neu-input" id="famrelationship" aria-describedby="famrelationship"
-                            v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="famcontactno">Contact No.</label>
-                        <input type="number" class="neu-input" id="famcontactno" aria-describedby="famcontactno"
-                            v-model="famMembersInfo.fam_contact"
-                            minlength="9" maxlength="9" :disabled="saving?true:false">
-                    </div>
-                    <div class="form-group col">
-                        <label for="famemail">Email</label>
-                        <input type="email" class="neu-input" id="famemail" aria-describedby="famemail"
-                            v-model="famMembersInfo.fam_email" :disabled="saving?true:false">
-                    </div>
-                </div>
-                <div class="form-group d-flex justify-content-center mt-3  bg-secondary-subtle p-2">
-                    <button @click="addFamMembers('add', famMembersInfo)" class="neu-btn neu-blue p-2 w-25" type="button"
-                        id="submit_data" name="submit_data" :disabled="saving?true:false">Add</button>
                 </div>
             </div>
         </div>
-        <div class="form-group border p-4 rounded  d-flex flex-column gap-2 neu-card ">
-            <div class="form-group border-bottom">
-                <p class="fw-bold p-1 rounded-3">School Awards Information</p>
+
+        
+        <div class="row neu-card p-4">
+            <div class="col-6">
+                <div class="text-start fw-bold">
+                    <p class="">Present Address</p>
+                </div>
+                <div class="text-start">
+                    <div class="row mb-2">
+                        <div class="form-group col">
+                            <label for="presenthome">Address</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="presenthome" aria-describedby="presenthome" autocomplete="off"
+                                v-model="personal.per_curr_home">
+                        </div>
+                        <div class="form-group col">
+                            <label for="presentregion">Region</label>
+                            <select class="neu-input neu-select" id="presentregion" v-model="personal.per_curr_region"
+                                @change="updateAddress('current-province', personal.per_curr_region)" required :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(reg, index) in filteredCurrRegion" :value="reg.regCode">
+                                    {{ reg.regDesc }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="form-group col">
+                            <label for="presentprovince">Province</label>
+                            <select class="neu-input neu-select" id="presentprovince" v-model="personal.per_curr_province"
+                                @change="updateAddress('current-city', personal.per_curr_province)" required :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(prov, index) in filteredCurrProvince" :value="prov.provCode">
+                                    {{ prov.provDesc }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group col">
+                            <label for="presentcity">City</label>
+                            <select class="neu-input neu-select" id="presentcity" v-model="personal.per_curr_city"
+                                @change="updateAddress('current-barangay', personal.per_curr_city)" required :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(ct, index) in filteredCurrCity" :value="ct.citymunCode">
+                                    {{ ct.citymunDesc }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col">
+                            <label for="preentbarangay">Barangay</label>
+                            <select class="neu-input neu-select" id="preentbarangay" v-model="personal.per_curr_barangay"
+                                :disabled="personal.per_curr_city || saving ? false : true" required>
+                                <option>- Select Here -</option>
+                                <option v-for="(brgy, index) in filteredCurrBarangay" :value="brgy.brgyCode">
+                                {{ brgy.brgyDesc }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group col">
+                            <label for="presentzipcode">Zip Code</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="presentzipcode" aria-describedby="emailHelp"
+                                v-model="personal.per_curr_zipcode" :disabled="saving?true:false">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group d-flex flex-wrap">
-                <table class="neu-table" style="text-transform:uppercase">
-                    <thead>
-                        <tr>
-                            <th scope="col">Title</th>
-                            <th scope="col">Year</th>
-                            <th scope="col" class="w-25">Command</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(award, index) in awardList">
-                            <th scope="row">{{ award.awr_desc }}</th>
-                            <td>{{ award.awr_year }}</td>
-                            <td>
-                                <button @click="addAwards('remove',award ,index)" type="button"
-                                    class="btn btn-sm btn-danger" :disabled="saving?true:false">
-                                    Remove
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="!Object.keys(awardList).length">
-                            <td colspan="3">Empty List</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col-6">
+                <div class="d-flex justify-content-start align-content-center gap-2">
+                    <p class="fw-bold ">Permanent Address</p>&nbsp;&nbsp;
+                    <input @change="copyAddress()" type="checkbox" class="form-check-input" id="sameas" v-model="sameAddress" :disabled="saving?true:false">
+                    <p><small class="fst-italic text-secondary ">Same as Current</small></p>
+                </div>
+                <div class="text-start">
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="permanenthome">Address</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="permanenthome" aria-describedby="emailHelp" autocomplete="off"
+                                v-model="personal.per_perm_home" :disabled="saving?true:false">
+                        </div>
+                        <div class="col-6">
+                            <label for="permanentregion">Region</label>
+                            <select class="neu-input neu-select" id="permanentregion" v-model="personal.per_perm_region"
+                                @change="updateAddress('permanent-province', personal.per_perm_region)" :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(reg, index) in filteredPermRegion" :value="reg.regCode">
+                                {{ reg.regDesc }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="permanentprovince">Province</label>
+                            <select class="neu-input neu-select" id="permanentprovince" v-model="personal.per_perm_province"
+                                @change="updateAddress('permanent-city', personal.per_perm_province)" :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(prov, index) in filteredPermProvince" :value="prov.provCode">
+                                {{ prov.provDesc }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="permanentcity">City</label>
+                            <select class="neu-input neu-select" id="permanentcity" v-model="personal.per_perm_city"
+                                @change="updateAddress('permanent-barangay', personal.per_perm_city)" :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(ct, index) in filteredPermCity" :value="ct.citymunCode">
+                                {{ ct.citymunDesc }}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <label for="permanentbarangay">Barangay</label>
+                            <select class="neu-input neu-select" id="permanentbarangay" v-model="personal.per_perm_barangay" :disabled="saving?true:false">
+                                <option>- Select Here -</option>
+                                <option v-for="(brgy, index) in filteredPermBarangay" :value="brgy.brgyCode">
+                                {{ brgy.brgyDesc }}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="permanentzipcode">Zip Code</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="permanentzipcode" aria-describedby="permanentzipcode" :disabled="saving?true:false" v-model="personal.per_perm_zipcode">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <div class="row w-100">
-                    <div class="form-group col">
+        </div>
+        <div class="row neu-card p-4">
+            <div class="col-12 text-start fw-bold">
+                <p class="fw-boldrounded-3">Educational Background Information</p>
+            </div>
+            <div class="col-12 row">
+                <div class="col-3">
+                    <div class="">
+                        <div class="row">
+                            <div class="col-12 text-start mb-2">
+                                <label for="edschoolname">School</label>
+                                <input type="text" style="text-transform:uppercase" class="neu-input" id="edschoolname" aria-describedby="emailHelp" autocomplete="off"
+                                    v-model="attainmentInfo.pered_school" :disabled="saving?true:false">
+                            </div>
+                            <div class="col-12 text-start mb-2">
+                                <label for="edyearfrom">Year From</label>
+                                <input type="number" class="neu-input" id="edyearfrom" aria-describedby="emailHelp" autocomplete="off"
+                                    v-model="attainmentInfo.pered_from"
+                                    max="9999" min="1999"  :disabled="saving?true:false">
+                            </div>
+                            <div class="col-12 text-start mb-2">
+                                <label for="edyearto">Year To</label>
+                                <input type="number" class="neu-input" id="edyearto" aria-describedby="emailHelp" autocomplete="off"
+                                    v-model="attainmentInfo.pered_to" max="9999" 
+                                    min="1999" :disabled="saving?true:false">
+                            </div>
+                        </div>
+                        <div class="mt-3  bg-secondary-subtle">
+                            <button @click="addAttainment('add', attainmentInfo)" class="neu-btn neu-blue p-2 " type="button"
+                                id="submit_data" name="submit_data" :disabled="saving?true:false">
+                                <font-awesome-icon icon="fa-solid fa-plus"/> Add</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="neu-card-inner p-4 overflow-auto" style=" height: 260px;">
+                        <table class="neu-table-flat text-start" style="text-transform:uppercase">
+                            <thead>
+                                <tr>
+                                    <th>School</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th style="width:100px;">Command</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(attain, index) in attainmentList">
+                                    <td>{{ attain.pered_school }}</td>
+                                    <td>{{ attain.pered_from }}</td>
+                                    <td>{{ attain.pered_to }}</td>
+                                    <td class="align-middle">
+                                        <button @click="addAttainment('remove', attain, index)" type="button"
+                                            class="neu-btn neu-red" :disabled="saving?true:false">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="!Object.keys(attainmentList).length">
+                                    <td colspan="4">Empty List</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row neu-card p-4">
+            <div class="col-12 text-start fw-bold">
+                <p class="">Family Background Information</p>
+            </div>
+            <div class="col-12 row">
+                <div class="col-3">
+                    <div class="row">
+                        <div class="col-12 text-start mb-2">
+                            <label for="famfirstname">First Name</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="famfirstname" aria-describedby="famfirstname" autocomplete="off"
+                                v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                        </div>
+                        <div class="col-12 text-start mb-2">
+                            <label for="fammiddlename">Middle Name</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="fammiddlename" aria-describedby="fammiddlename" autocomplete="off"
+                                v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                        </div>
+                        <div class="col-12 text-start mb-2">
+                            <label for="famlastname">Last Name</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="famlastname" aria-describedby="famlastname" autocomplete="off"
+                                v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                        </div>
+                        <div class="col-12 text-start mb-2">
+                            <label for="famsuffixname">Suffix Name</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="famsuffixname" aria-describedby="famsuffixname" autocomplete="off"
+                                v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 text-start mb-2">
+                            <label for="famrelationship">Relationship</label>
+                            <input type="text" style="text-transform:uppercase" class="neu-input" id="famrelationship" aria-describedby="famrelationship" autocomplete="off"
+                                v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                        </div>
+                        <div class="col-12 text-start mb-2">
+                            <label for="famcontactno">Contact No.</label>
+                            <input type="number" class="neu-input" id="famcontactno" aria-describedby="famcontactno" autocomplete="off"
+                                v-model="famMembersInfo.fam_contact"
+                                minlength="9" maxlength="9" :disabled="saving?true:false">
+                        </div>
+                        <div class="col-12 text-start mb-2">
+                            <label for="famemail">Email</label>
+                            <input type="email" class="neu-input" id="famemail" aria-describedby="famemail" autocomplete="off"
+                                v-model="famMembersInfo.fam_email" :disabled="saving?true:false">
+                        </div>
+                    </div>
+                    <div class="d-f-12lex justify-content-center mt-3  bg-secondary-subtle">
+                        <button @click="addFamMembers('add', famMembersInfo)" class="neu-btn neu-blue p-2" type="button"
+                            id="submit_data" name="submit_data" :disabled="saving?true:false">
+                            <font-awesome-icon icon="fa-solid fa-plus"/> Add</button>
+                    </div>
+                </div>
+                <div class="col-9">
+                    <div class="neu-card-inner p-4 overflow-auto" style=" height: 520px;">
+                        <table class="neu-table-flat text-start" style="text-transform:uppercase">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Relationship</th>
+                                    <th>Contact No.</th>
+                                    <th>Email</th>
+                                    <th>Guardian</th>
+                                    <th style="width:100px;">Command</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(fam, index) in familyMembers">
+                                    <td>{{ fam.fam_firstname }} {{ fam.fam_middlename }} {{ fam.fam_lastname }} {{
+                                        fam.fam_suffixname }}</td>
+                                    <td>{{ fam.fam_relationship }}</td>
+                                    <td>{{ fam.fam_contact }}</td>
+                                    <td style="text-transform:none">{{ fam.fam_email }}</td>
+                                    <td style="text-transform:none">
+                                    <div class="form-check">
+                                            <input @click="guardianTick=index" class="form-check-input" type="radio" name="flexRadioDefault" :id="'fam'+index" v-model="fam.fam_guardian"
+                                            :checked="fam.fam_guardian == 1? true:false" :disabled="forUpdate? true:false">
+                                            <label class="form-check-label" for="flexRadioDefault1">
+                                                Guardian
+                                            </label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <button @click="addFamMembers('remove', fam, index)" type="button"
+                                            class="neu-btn neu-red" :disabled="saving?true:false">
+                                            Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr v-if="!Object.keys(familyMembers).length">
+                                    <td colspan="6">Empty List</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row neu-card p-4">
+            <div class="col-12 text-start fw-bold">
+                <p class="fw-boldrounded-3">School Awards Information</p>
+            </div>
+            <div class="col-3">
+                <div class="row">
+                    <div class="col-12 text-start mb-2">
                         <label for="awardtitle">Title</label>
-                        <input type="email" class="neu-input" id="awardtitle" aria-describedby="awardtitle"
+                        <input type="email" class="neu-input text-uppercase" id="awardtitle" aria-describedby="awardtitle" autocomplete="off"
                             v-model="awardInfo.awr_desc" :disabled="saving?true:false">
                     </div>
-                    <div class="form-group col">
+                    <div class="col-12 text-start mb-2">
                         <label for="awardyear">Year Acquired</label>
-                        <input type="number" class="neu-input" id="awardyear" aria-describedby="awardyear"
+                        <input type="number" class="neu-input" id="awardyear" aria-describedby="awardyear" autocomplete="off"
                             v-model="awardInfo.awr_year" maxlength="4"
                             minlength="4" :disabled="saving?true:false">
                     </div>
                 </div>
-                <div class="form-group d-flex justify-content-center mt-3  bg-secondary-subtle p-2">
-                    <button @click="addAwards('add', awardInfo)" class="neu-btn neu-blue p-2 w-25" type="button"
-                        id="submit_data" name="submit_data" :disabled="saving?true:false">Add</button>
+                <div class="d-flex justify-content-center mt-3 bg-secondary-subtle">
+                    <button @click="addAwards('add', awardInfo)" class="neu-btn neu-blue p-2" type="button"
+                        id="submit_data" name="submit_data" :disabled="saving?true:false">
+                        <font-awesome-icon icon="fa-solid fa-plus"/> Add</button>
+                </div>
+    
+            </div>
+            <div class="col-9">
+                <div class="neu-card-inner p-4 overflow-auto" style=" height: 185px;">
+                    <table class="neu-table-flat text-start" style="text-transform:uppercase">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Year</th>
+                                <th style="width:100px;">Command</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(award, index) in awardList">
+                                <td>{{ award.awr_desc }}</td>
+                                <td>{{ award.awr_year }}</td>
+                                <td>
+                                    <button @click="addAwards('remove',award ,index)" type="button"
+                                        class="neu-btn neu-red" :disabled="saving?true:false">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="!Object.keys(awardList).length">
+                                <td colspan="3">Empty List</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -1177,14 +1220,14 @@ const refresh = () => {
                     conditions</label>
            </div>
            <div class="form-group border rounded d-flex justify-content-center gap-2" tabindex="-1" :disabled="saving?true:false">
-                <button @click="clearFields" type="button" class="neu-btn neu-light-gray w-100">
-                    <i class="mr-2 fa-solid fa-rotate-left"></i> Reset Data
+                <button @click="clearFields" type="button" class="neu-btn neu-light-gray w-100 p-2">
+                    <font-awesome-icon icon="fa-solid fa-rotate-left" /> Reset Data
                 </button>
-                <button v-if="!forUpdate" type="submit" class="neu-btn neu-green w-100" tabindex="-1" :disabled="saving?true:false">
-                    <i class="mr-2 fa-solid fa-plus"></i> Register Applicant
+                <button v-if="!forUpdate" type="submit" class="neu-btn neu-green w-100 p-2" tabindex="-1" :disabled="saving?true:false">
+                    <font-awesome-icon icon="fa-solid fa-floppy-disk" /> Register Applicant 
                 </button>
-                <button v-else type="submit" class="neu-btn neu-dark-gray w-100" tabindex="-1" :disabled="saving?true:false">
-                    <i class="mr-2 fa-solid fa-plus"></i> Update Applicant
+                <button v-else type="submit" class="neu-btn neu-dark-gray w-100 p-2" tabindex="-1" :disabled="saving?true:false">
+                    <font-awesome-icon icon="fa-solid fa-floppy-disk" /> Update Applicant
                 </button>
             </div>
         </div>

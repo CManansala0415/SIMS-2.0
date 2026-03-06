@@ -628,7 +628,7 @@ const saveData = () => {
                                 <div class="col">
                                     <div class="d-flex flex-column gap-2 ">
                                         <div class="p-3 neu-card-inner">
-                                            <div class="p-2" style="height: 300px;">
+                                            <div class="d-flex flex-column overflow-auto p-3" style="height: 278px;">
                                                 <table class="neu-table-flat">
                                                     <thead>
                                                         <tr>

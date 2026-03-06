@@ -1,18 +1,18 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import {
-    getApplicant,
-    addItemRequest
+  getApplicant,
+  addItemRequest
 } from "../../Fetchers.js";
 import { pdfGenerator, qrImageGenerator } from '../../Generators.js';
 import { getUserID } from "../../../routes/user";
 
 const props = defineProps({
-    feeData: {
-    },
+  feeData: {
+  },
 })
 const items = computed(() => {
-    return props.feeData
+  return props.feeData
 });
 
 
@@ -38,155 +38,155 @@ const itemDesc = ref('')
 const itmQty = ref(1)
 
 const searchStudent = () => {
-    itemRequested.value = 0
-    requestingStud.value = 0
-    fullName.value = ''
+  itemRequested.value = 0
+  requestingStud.value = 0
+  fullName.value = ''
 
-    Swal.fire({
-        title: "Searching Student",
-        text: "Please wait while we check all necessary details.",
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
+  Swal.fire({
+    title: "Searching Student",
+    text: "Please wait while we check all necessary details.",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
 
-    getApplicant(0, 0, searchFname.value, searchMname.value, searchLname.value, 2).then((results) => {
-        Swal.close()
-        students.value = results.data
-        studentCount.value = results.count
-    })
+  getApplicant(0, 0, searchFname.value, searchMname.value, searchLname.value, 2).then((results) => {
+    Swal.close()
+    students.value = results.data
+    studentCount.value = results.count
+  })
 }
 
 
 const setValues = (stud) => {
-    let fname = stud.per_firstname
-    let mname = stud.per_middlename ? stud.per_middlename : ''
-    let lname = stud.per_lastname
-    let sname = stud.per_suffixname ? stud.per_suffixname : ''
-    fullName.value = fname + ' ' + mname + ' ' + lname + ' ' + sname
+  let fname = stud.per_firstname
+  let mname = stud.per_middlename ? stud.per_middlename : ''
+  let lname = stud.per_lastname
+  let sname = stud.per_suffixname ? stud.per_suffixname : ''
+  fullName.value = fname + ' ' + mname + ' ' + lname + ' ' + sname
 
-    requestingStud.value = stud.per_id
-    searchValue.value = fullName.value
+  requestingStud.value = stud.per_id
+  searchValue.value = fullName.value
 }
 
 const saveRequest = () => {
-    if ((requestingStud.value) && (itemRequested.value)) {
-        disabler.value = true
+  if ((requestingStud.value) && (itemRequested.value)) {
+    disabler.value = true
 
-        Swal.fire({
-            title: "Rendering Request",
-            text: "Please wait while we check all necessary details.",
+    Swal.fire({
+      title: "Rendering Request",
+      text: "Please wait while we check all necessary details.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    let x = {
+      acr_amount: itemPrice.value,
+      acr_personid: requestingStud.value,
+      acr_personname: fullName.value,
+      acr_reqitem: itemRequested.value,
+      acr_paystatus: 0,
+      acr_addedby: userID.value,
+      acr_docstamp: docStamp.value,
+      acr_total: itemPrice.value * itmQty.value,
+      acr_qty: itmQty.value,
+    }
+
+    addItemRequest(x).then(async (results) => {
+      let headers = results.header;
+
+      if (results.status != 204) {
+        await Swal.fire({
+          title: "Update Failed",
+          text: "Unknown error occured, try again later",
+          icon: "error"
+        });
+        Swal.close()
+        location.reload();
+      } else {
+        Swal.close()
+        const result = await Swal.fire({
+          title: "Update Successful",
+          text: "Changes applied, preparing receipt...",
+          icon: "success",
+          confirmButtonText: "Ok, Got it!"
+        });
+
+        if (result.isConfirmed) {
+          // Generate QR first
+          qrimage.value = await qrImageGenerator(headers);
+
+          // 🔄 Show loading Swal
+          Swal.fire({
+            title: "Generating PDF...",
+            text: "Please wait while we prepare your receipt.",
             allowOutsideClick: false,
             didOpen: () => {
-                Swal.showLoading();
+              Swal.showLoading();
             }
-        });
+          });
 
-        let x = {
-            acr_amount: itemPrice.value,
-            acr_personid: requestingStud.value,
-            acr_personname: fullName.value,
-            acr_reqitem: itemRequested.value,
-            acr_paystatus: 0,
-            acr_addedby: userID.value,
-            acr_docstamp: docStamp.value,
-            acr_total: itemPrice.value * itmQty.value,
-            acr_qty: itmQty.value,
+          let name = "request";
+
+          // Wait until PDF is generated
+          await pdfGenerator(name, "a6", "landscape", 0.03);
+
+          // ⏳ Keep loader for 1s more before closing + reloading
+          setTimeout(() => {
+            Swal.close();
+            location.reload();
+          }, 1000);
         }
+      }
+    });
 
-        addItemRequest(x).then(async (results) => {
-            let headers = results.header;
-
-            if (results.status != 204) {
-                await Swal.fire({
-                    title: "Update Failed",
-                    text: "Unknown error occured, try again later",
-                    icon: "error"
-                });
-                Swal.close()
-                location.reload();
-            } else {
-                Swal.close()
-                const result = await Swal.fire({
-                    title: "Update Successful",
-                    text: "Changes applied, preparing receipt...",
-                    icon: "success",
-                    confirmButtonText: "Ok, Got it!"
-                });
-
-                if (result.isConfirmed) {
-                    // Generate QR first
-                    qrimage.value = await qrImageGenerator(headers);
-                    
-                    // 🔄 Show loading Swal
-                    Swal.fire({
-                        title: "Generating PDF...",
-                        text: "Please wait while we prepare your receipt.",
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    let name = "request";
-
-                    // Wait until PDF is generated
-                    await pdfGenerator(name, "a6", "landscape", 0.03);
-
-                    // ⏳ Keep loader for 1s more before closing + reloading
-                    setTimeout(() => {
-                        Swal.close();
-                        location.reload();
-                    }, 1000);
-                }
-            }
-        });
-
-    } else {
-        // alert('Please fillout all fields')
-        Swal.fire({
-            title: "Requirement",
-            text: "Please fillout all fields",
-            icon: "question"
-        })
-    }
+  } else {
+    // alert('Please fillout all fields')
+    Swal.fire({
+      title: "Requirement",
+      text: "Please fillout all fields",
+      icon: "question"
+    })
+  }
 
 }
 
 onMounted(() => {
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
+  getUserID().then((results) => {
+    userID.value = results.account.data.id
 
-        let fname = results.employee.emp_firstname ? results.employee.emp_firstname : ''
-        let mname = results.employee.emp_middlename ? results.employee.emp_middlename : ''
-        let lname = results.employee.emp_lastname ? results.employee.emp_lastname : ''
-        let sname = results.employee.emp_suffixname ? results.employee.emp_suffixname : ''
+    let fname = results.employee.emp_firstname ? results.employee.emp_firstname : ''
+    let mname = results.employee.emp_middlename ? results.employee.emp_middlename : ''
+    let lname = results.employee.emp_lastname ? results.employee.emp_lastname : ''
+    let sname = results.employee.emp_suffixname ? results.employee.emp_suffixname : ''
 
-        userName.value = fname + ' ' + mname + ' ' + lname + ' ' + sname
-    })
+    userName.value = fname + ' ' + mname + ' ' + lname + ' ' + sname
+  })
 })
 
 
 
 
 const itemCost = () => {
-    // items.value.filter((e) => {
-    //     if (itemRequested.value == e.acf_id) {
-    //         return itemPrice.value = e.acf_price
-    //     }
-    // })
-    // items.value.filter((e) => {
-    //     if (itemRequested.value == e.acf_id) {
-    //         return hasDocStamp.value = e.acf_docstamp == 1 ? true : false
-    //     }
-    // })
-    let selected = items.value.find(e => e.acf_id === itemRequested.value)
-    if (selected) {
-        itemPrice.value = selected.acf_price
-        hasDocStamp.value = selected.acf_docstamp === 1
-        itemDesc.value = selected.acf_desc   // ✅ add description here
-    }
+  // items.value.filter((e) => {
+  //     if (itemRequested.value == e.acf_id) {
+  //         return itemPrice.value = e.acf_price
+  //     }
+  // })
+  // items.value.filter((e) => {
+  //     if (itemRequested.value == e.acf_id) {
+  //         return hasDocStamp.value = e.acf_docstamp == 1 ? true : false
+  //     }
+  // })
+  let selected = items.value.find(e => e.acf_id === itemRequested.value)
+  if (selected) {
+    itemPrice.value = selected.acf_price
+    hasDocStamp.value = selected.acf_docstamp === 1
+    itemDesc.value = selected.acf_desc   // ✅ add description here
+  }
 }
 
 </script>
@@ -194,114 +194,101 @@ const itemCost = () => {
   <div class="d-flex p-3 gap-3 align-items-stretch text-dim">
 
     <!-- LEFT SIDE FORM -->
-    <form @submit.prevent="saveRequest"
-          class="d-flex flex-column border rounded  p-3 flex-fill  neu-card">
+    <form @submit.prevent="saveRequest" class="row p-4 neu-card">
 
-      <p class="text-success fw-bold mb-1">Request Item</p>
-      <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font">
-        <span class="fw-bold">Note: </span>
-        <span>Select the requesting student then tag the requested item.</span>
-      </p>
+      <div class="col-lg-12">
+        <p class="text-success fw-bold mb-1">Request Item</p>
+        <p class="fst-italic border p-2 rounded-3 bg-secondary-subtle small-font">
+          <span class="fw-bold">Note: </span>
+          <span>Select the requesting student then tag the requested item.</span>
+        </p>
+      </div>
 
-      <!-- Search Student -->
-      <div class="mt-3 mb-2 text-start d-flex gap-2">
-        <div class="w-100">
+      <div class="col-lg-12 d-flex flex-column gap-2">
+
+        <!-- Search Student -->
+        <div class="text-start">
           <label for="searchstudent" class="small-font">Search Student</label>
-          <input type="text"
-                 class="neu-input"
-                 id="searchstudent"
-                 placeholder="Enter Name Here..."
-                 v-model="searchFname"
-                 @keyup.enter="searchStudent()"
-                 onkeydown="return /[a-z, ]/i.test(event.key)">
+          <input type="text" class="neu-input" id="searchstudent" placeholder="Enter Name Here..."
+            v-model="searchFname" @keyup.enter="searchStudent()" onkeydown="return /[a-z, ]/i.test(event.key)">
         </div>
-        <div class="align-content-end">
-          <button class="neu-btn neu-blue" type="button" @click="searchStudent()">Search</button>
+        <div class="text-start">
+          <button class="neu-btn neu-blue p-2" type="button" @click="searchStudent()"><font-awesome-icon
+              icon="fa-solid fa-magnifying-glass" /> Search Student</button>
         </div>
-      </div>
 
-      <!-- Select Item -->
-      <div class="mb-2 text-start">
-        <label for="itemrequested" class="small-font">Select Item</label>
-        <select @change="itemCost()" 
-                class="neu-input neu-select"
-                v-model="itemRequested"
-                id="itemrequested" required>
-          <option value="0" disabled>-- Select Item --</option>
-          <option v-for="(itm, index) in items" :key="itm.acf_id" :value="itm.acf_id">
-            {{ itm.acf_desc }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Doc Stamp -->
-      <div class="mb-2 text-start">
-        <label for="stampno" class="small-font">Quantity</label>
-        <input type="number"
-               class="neu-input"
-               id="stampno"
-               placeholder="Enter Quantity..."
-               v-model="itmQty"
-               required
-               min="0">
-      </div>
-
-      <!-- Doc Stamp -->
-      <div v-if="hasDocStamp" class="mb-2 text-start">
-        <label for="stampno" class="small-font">Document Stamp No.</label>
-        <input type="number"
-               class="neu-input"
-               id="stampno"
-               placeholder="Enter Stamp No..."
-               v-model="docStamp"
-               required
-               min="0">
-      </div>
-
-      <!-- Student List -->
-      <div class="card mt-3 flex-fill rounded-pill">
-        <div class="overflow-auto neu-card-inner p-3 small-font" style="height: 200px;">
-          <table class="neu-table text-uppercase">
-            <thead>
-              <tr><th>Select Student</th></tr>
-            </thead>
-            <tbody>
-              <tr v-if="Object.keys(students).length"
-                  v-for="(stud, index) in students"
-                  :key="stud.per_id"
+        <!-- Student List -->
+        <div class="">
+          <div class="overflow-auto neu-card-inner p-3 small-font" style="height: 200px;">
+            <table class="neu-table text-uppercase">
+              <thead>
+                <tr>
+                  <th>Select Student</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="Object.keys(students).length" v-for="(stud, index) in students" :key="stud.per_id"
                   @click="setValues(stud)">
-                <td :class="stud.per_id == requestingStud 
-                           ? 'align-middle text-start bg-secondary text-white' 
-                           : 'align-middle text-start'">
-                  {{ stud.per_firstname }} {{ stud.per_middlename }} {{ stud.per_lastname }} {{ stud.per_suffixname }}
-                </td>
-              </tr>
-              <tr v-else>
-                <td class="align-middle text-start">No Student Found</td>
-              </tr>
-            </tbody>
-          </table>
+                  <td :class="stud.per_id == requestingStud
+                    ? 'align-middle text-start bg-secondary text-white'
+                    : 'align-middle text-start'">
+                    {{ stud.per_firstname }} {{ stud.per_middlename }} {{ stud.per_lastname }} {{ stud.per_suffixname }}
+                  </td>
+                </tr>
+                <tr v-else>
+                  <td class="align-middle text-start">No Student Found</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Select Item -->
+        <div class="text-start">
+          <label for="itemrequested" class="small-font">Select Item</label>
+          <select @change="itemCost()" class="neu-input neu-select" v-model="itemRequested" id="itemrequested" required>
+            <option value="0" disabled>-- Select Item --</option>
+            <option v-for="(itm, index) in items" :key="itm.acf_id" :value="itm.acf_id">
+              {{ itm.acf_desc }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Doc Stamp -->
+        <div class="text-start">
+          <label for="stampno" class="small-font">Quantity <small>(20 Max)</small></label>
+          <input type="number" class="neu-input" id="stampno" placeholder="Enter Quantity..." v-model="itmQty" required
+            min="0" max="10" @keyup="itmQty > 20 ? itmQty = 1 : itmQty = itmQty">
+        </div>
+
+        <!-- Doc Stamp -->
+        <div v-if="hasDocStamp" class="text-start">
+          <label for="stampno" class="small-font">Document Stamp No.</label>
+          <input type="number" class="neu-input" id="stampno" placeholder="Enter Stamp No..." v-model="docStamp"
+            required min="0">
+        </div>
+
+        
+
+        <!-- Buttons -->
+        <div class="d-flex flex-column gap-2 mt-3">
+          <button :disabled="disabler" type="submit" class="neu-btn neu-green p-2"><font-awesome-icon icon="fa-solid fa-floppy-disk" /> Save Request</button>
+          <button :disabled="disabler" type="button"
+            @click="students = [], searchValue = '', itemRequested = 0, requestingStud = 0"
+            class="neu-btn neu-orange p-2"><font-awesome-icon icon="fa-solid fa-rotate-left" /> Clear Data</button>
         </div>
       </div>
 
-      <!-- Buttons -->
-      <div class="d-flex flex-column gap-2 mt-3">
-        <button :disabled="disabler" type="submit" class="neu-btn neu-green p-2">Save Request</button>
-        <button :disabled="disabler"
-                type="button"
-                @click="students = [], searchValue = '', itemRequested = 0, requestingStud = 0"
-                class="neu-btn neu-orange p-2">Clear Data</button>
-      </div>
     </form>
 
     <!-- RIGHT SIDE PREVIEW -->
     <div class="p-3 flex-fill d-flex justify-content-center align-items-center neu-card-inner neu-bg">
       <div class="rounded bg-white w-100 d-flex justify-content-center align-items-center">
-        
+
         <!-- Fixed A6 slip -->
         <div id="printform"
-             style="width: 148mm; height: 103mm; font-family: 'Segoe UI', sans-serif; position: relative; box-sizing: border-box; border: 1px solid #ddd; padding: 12px;">
-          
+          style="width: 148mm; height: 103mm; font-family: 'Segoe UI', sans-serif; position: relative; box-sizing: border-box; border: 1px solid #ddd; padding: 12px;">
+
           <!-- Header -->
           <div class="d-flex justify-content-between align-items-start mb-3">
             <div>
@@ -309,7 +296,7 @@ const itemCost = () => {
               <small class="text-muted">For Internal Use Only</small>
             </div>
             <div id="qrcode" v-html="qrimage"
-                 style="width: 80px; height: 80px; border: 1px solid #ddd; border-radius: 6px;">
+              style="width: 80px; height: 80px; border: 1px solid #ddd; border-radius: 6px;">
             </div>
           </div>
 
@@ -340,7 +327,8 @@ const itemCost = () => {
           </div>
 
           <!-- Footer -->
-          <div class="position-absolute bottom-0 start-0 end-0 p-2 border-top d-flex justify-content-between align-items-center">
+          <div
+            class="position-absolute bottom-0 start-0 end-0 p-2 border-top d-flex justify-content-between align-items-center">
             <small class="text-muted">Prepared by: <strong>{{ userName }}</strong></small>
             <small class="text-muted">Generated on: {{ new Date().toLocaleDateString() }}</small>
           </div>

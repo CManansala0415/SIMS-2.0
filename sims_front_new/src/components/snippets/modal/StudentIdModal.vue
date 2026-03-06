@@ -50,6 +50,16 @@ const save = () => {
     //  && studentLrn.value
     if(customNumber.value){
         saving.value = true
+
+        Swal.fire({
+            title: "Saving Updates",
+            text: "Please wait while we check all necessary details.",
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         let x = {
             ident_idno: identity.value.ident_idno,
             ident_identification: customNumber.value,
@@ -67,6 +77,7 @@ const save = () => {
                     text: "Unknown error occured, try again later",
                     icon: "error"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
                 
@@ -78,6 +89,7 @@ const save = () => {
                     text: "Changes applied, refreshing the page",
                     icon: "success"
                 }).then(()=>{
+                    Swal.close()
                     location.reload()
                 });
             }
@@ -94,7 +106,7 @@ const save = () => {
 </script>
 
 <template>
-    <div class="d-flex flex-column p-2 gap-2">
+    <div class="d-flex flex-column p-2 gap-2 small-font">
         <NeuLoader2 v-if="preloading"/>
         
         <form v-else @submit.prevent="save" class="flex flex-col gap-2 overflow-auto">
@@ -132,7 +144,7 @@ const save = () => {
                             it cannot be modified and it is for one time generation only.
                         </span></p>
                     <button v-if="!identity.ident_identification" type="submit" :disabled="saving ? true : false"
-                        class="neu-btn neu-blue w-100">Save
+                        class="neu-btn neu-blue w-100 p-2"> <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save
                         Identification</button>
                 </div>
             </div>

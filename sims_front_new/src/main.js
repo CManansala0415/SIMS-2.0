@@ -76,15 +76,15 @@ app.config.errorHandler = (err, instance, info) => {
       icon: "error"
     }).then(() => {
       nextTick(() => {
-        router.replace({ name: "home" }).then(() => {
-          location.reload() // 🔄 always force fresh load of /home
+        router.replace({ name: "login" }).then(() => {
+          location.reload() // 🔄 always force fresh load of /login
         })
       })
     })
   } else {
     alert("Unauthorized operation detected")
     nextTick(() => {
-      router.replace({ name: "home" }).then(() => {
+      router.replace({ name: "login" }).then(() => {
         location.reload() // 🔄 fallback reload
       })
     })

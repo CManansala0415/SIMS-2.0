@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000', 'http://sims.clcst.com:3000')],
+    'allowed_origins' => [env('FRONTEND_URL', 'http://localhost:3000', 'http://sims.local:3000')],
 
     'allowed_origins_patterns' => [],
 

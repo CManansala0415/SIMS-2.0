@@ -834,7 +834,7 @@ class DefaultsController extends Controller
         'status' => 200
     ]);
 }
-
+ 
 
      public function editAnnouncement(Request $request){
         date_default_timezone_set('Asia/Manila');

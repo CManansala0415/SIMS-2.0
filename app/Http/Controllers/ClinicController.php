@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 Use DateTime;
-
+ 
 class ClinicController extends Controller
 {
     public function addStudentClinicalRecord(Request $request){

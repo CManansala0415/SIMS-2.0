@@ -846,9 +846,9 @@ const validateData = (type, value) => {
                                                         <span>{{ emp.emp_firstname }} {{ emp.emp_lastname }}</span>
                                                     </td>
                                                     <td>
-                                                        <span v-if="!counterStatus" class="btn btn-sm btn-success"
+                                                        <button v-if="!counterStatus" class="neu-btn neu-green"
                                                             @click="getSeries(emp)" data-bs-toggle="modal"
-                                                            data-bs-target="#seriesmodal">Edit Series</span>
+                                                            data-bs-target="#seriesmodal">Edit Series</button>
                                                         <span v-else class="fw-bold text-success"
                                                             title="to edit series, deactivate all counters first">Active</span>
                                                     </td>
@@ -1064,7 +1064,7 @@ const validateData = (type, value) => {
                                             </div>
                                             <div class="mt-3">
                                                 <button v-show="!savingSeries" type="submit"
-                                                    class="btn btn-sm btn-success w-100">Save Official Receipt
+                                                    class="neu-btn neu-green p-2"><font-awesome-icon icon="fa-solid fa-floppy-disk" /> Save Official Receipt
                                                     Series</button>
                                             </div>
                                         </form>
@@ -1151,7 +1151,7 @@ const validateData = (type, value) => {
                                             </div>
                                             <div class="mt-3">
                                                 <button v-show="!savingSeries" type="submit"
-                                                    class="btn btn-sm btn-success w-100">Save Provisional Receipt
+                                                    class="neu-btn neu-green p-2"><font-awesome-icon icon="fa-solid fa-floppy-disk" /> Save Provisional Receipt
                                                     Series</button>
                                             </div>
                                         </form>
