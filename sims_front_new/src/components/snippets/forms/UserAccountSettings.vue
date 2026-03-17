@@ -9,7 +9,8 @@ import {
     updateCommandUsers,
     addCommandUsers,
     saveCommandAccess,
-    getCommandAccess
+    getCommandAccess,
+    resetPassword
 
 } from "../../Fetchers.js";
 
@@ -126,6 +127,7 @@ const handleAccount = async () => {
     saving.value = true
     if (addNew.value) {
         let x = {
+            mode:1,
             name: name.value,
             email: email.value,
             password: password.value,
@@ -166,9 +168,11 @@ const handleAccount = async () => {
         })
     } else {
         let x = {
+            mode:2,
             id: id.value,
             name: name.value,
             email: email.value,
+            password: password.value,
             mode: 1,
             updated_by: userID.value
         }
@@ -216,6 +220,15 @@ const accessData = async (data) => {
     accessModuleData.value = data
 }
  
+const passwordReset = () =>{
+    let x = {
+        email:'devclcst@gmail.com'
+    }
+
+   resetPassword(x).then((res)=>{
+    console.log(res)
+   })
+}
 
 </script>
 <template>
@@ -334,7 +347,7 @@ const accessData = async (data) => {
                             <input type="email" class="neu-input" id="email" aria-describedby="email" v-model="email"
                                 required>
                         </div>
-                        <div v-if="addNew" class="w-100">
+                        <div class="w-100">
                             <div class="mb-3 d-flex flex-column align-items-start w-100">
                                 <label for="password" class="form-label">Password</label>
                                 <input type="password" class="neu-input" id="password" aria-describedby="password"
@@ -346,7 +359,7 @@ const accessData = async (data) => {
                                     v-model="confirmpassword" required>
                             </div>
                         </div>
-                        <div class="w-100" v-if="addNew">
+                        <div class="w-100">
                             <div class="alert alert-danger" role="alert"
                                 v-if="password != confirmpassword || !password || !confirmpassword">
                                 Password does not match
@@ -360,6 +373,9 @@ const accessData = async (data) => {
                             <font-awesome-icon icon="fa-solid fa-gear"/> Register
                         </button>
                     </form>
+                    <div class="mb-3 d-flex flex-column align-items-start w-100">
+                        <button class="neu-btn neu-green p-2" @click="passwordReset()">Password Reset</button>
+                    </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

@@ -188,6 +188,7 @@ class CommandController extends Controller
                 ->where('id','=', $req['id'])
                 ->update([
                     'name' => $req->input('name'),
+                    'password' => Hash::make($req->input('password')),
                     'email' => $req->input('email'),
                     'updated_at' => $date,
                     'updated_by' => $req->input('updated_by'),
