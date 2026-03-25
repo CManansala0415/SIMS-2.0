@@ -12,7 +12,8 @@ import {
     updateMilestone, 
     getCommandUpdateCurriculum, 
     getAcademicStatus, 
-    getArchiveMerge } from "../../Fetchers.js";
+    getArchiveMerge,
+    getChargesTemplateHeader } from "../../Fetchers.js";
 import NeuLoader2 from '../loaders/NeuLoader2.vue';
 
 import { useRouter, useRoute } from 'vue-router'
@@ -142,6 +143,8 @@ onMounted(async () => {
                     }
                     
                     getSectionSlot(enr_section.value)
+                    console.log(e)
+
                 })
                 
                 
@@ -356,38 +359,63 @@ const saveData = async () => {
             user_id: userID.value
         }
 
-        for await (const e of addedSubject.value) {
-            counter += 1
-            addMilestone(e).then((results) => { })
-        }
-        if (counter == Object.keys(addedSubject.value).length) {
-            updateEnrollment(x).then((results) => {
-                // alert('Tagging Successful')
-                // //router.replace({ name: 'Academics', params: { id: 2}});
-                // location.reload()
-                // saving.value = false
-                Swal.close()
-                // console.log(results)
-                if(results.status == 200){
-                    Swal.fire({
-                        title: "Tagging Successful",
-                        text: "Changes applied, refreshing the page",
-                        icon: "success"
-                    }).then(()=>{
-                        location.reload()
-                    });
-                }else{
-                    Swal.fire({
-                        title: "Cannot Alter Records",
-                        text: "Unable to save changes, due to the account is already forwarded to accounting. Please contact the system administrator for assistance.",
-                        icon: "error"
-                    }).then(()=>{
-                        saving.value = false
-                    });
-                }
-                
-            })
-        }
+        // for await (const e of addedSubject.value) {
+        //     counter += 1
+        //     addMilestone(e).then((results) => { })
+        // }
+        getChargesTemplateHeader(
+            x.enr_curriculum ?? 0,
+            x.enr_quarter ?? 0,
+            x.enr_program ?? 0,
+            x.enr_course ?? 0,
+            x.enr_gradelvl ?? 0,
+            x.enr_section ?? 0
+        ).then((res) => {
+            
+            if(Object.keys(res.template).length > 0){ 
+                addMilestone(addedSubject.value).then((results) => { 
+                    updateEnrollment(x).then((results) => {
+                        // alert('Tagging Successful')
+                        // //router.replace({ name: 'Academics', params: { id: 2}});
+                        // location.reload()
+                        // saving.value = false
+                        // console.log(results)
+                        if(results.status == 200){
+                            Swal.fire({
+                                title: "Tagging Successful",
+                                text: "Changes applied, refreshing the page",
+                                icon: "success"
+                            }).then(()=>{
+                                Swal.close()
+                                location.reload()
+                            });
+                        }else{
+                            Swal.fire({
+                                title: "Cannot Alter Records",
+                                text: "Unable to save changes, due to the account is already forwarded to accounting. Please contact the system administrator for assistance.",
+                                icon: "error"
+                            }).then(()=>{
+                                Swal.close()
+                                saving.value = false
+                            });
+                        }
+                        
+                    })
+                })
+            }else{ //means walang template sa accounting walang charges so di dapat ma tag yung subjects
+                Swal.fire({
+                    title: "Cannot Proceed Taggings",
+                    text: "Unable to save changes, due to the course charges has not yet initialized.",
+                    icon: "error"
+                }).then(()=>{
+                    Swal.close()
+                    saving.value = false
+                });
+            }
+        })
+        
+        
+        
     }
 }
 

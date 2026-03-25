@@ -960,54 +960,48 @@ class RegistrarController extends Controller
         ];
     }
 
-    public function addMilestone(Request $request)
+    public function addMilestone(Request $req)
     {
-        
-        // date_default_timezone_set('Asia/Manila');
-        // $date = date('Y-m-d H:i:s');
-        // $primary = DB::table('def_milestone')->insert([
-        //     'mi_enrid' =>  $request->input('enr_id'),
-        //     'mi_subjid' =>  $request->input('subj_id'),
-        //     'mi_completed' =>  0,
-        //     'mi_date' =>  $date,
-        //     'mi_addby' => $request->input('user_id')
-        // ]);
-        $milestone = DB::table('def_milestone')
-            ->select('mi_id')
-            ->where('mi_enrid', '=' , $request->input('enr_id'))
-            ->where('mi_subjid', '=' , $request->input('subj_id'))
-            ->first();
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d H:i:s');
+        $request = $req->all();
 
-        if($milestone){
-            $milestoneid = $milestone->mi_id;
+        foreach ($request as $ms) {
+            $milestone = DB::table('def_milestone')
+                ->select('mi_id')
+                ->where('mi_enrid', '=' , $ms['enr_id'])
+                ->where('mi_subjid', '=' , $ms['subj_id'])
+                ->first();
 
-            date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d H:i:s');
-            $primary = DB::table('def_milestone')
-            ->where('mi_id','=', $milestoneid)
-            ->update([
-                'mi_updatedby' => $request->input('user_id'),
-                'mi_crossenr' => $request->input('mi_crossenr'),
-                'mi_tag' => $request->input('mi_tag'),
-                'mi_status' => 1,
-                'mi_dateupdated' => $date,
-            ]);
+                if($milestone){
+                    $milestoneid = $milestone->mi_id;
 
-        }else{
-            date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d H:i:s');
-            $primary = DB::table('def_milestone')->insert([
-                'mi_enrid' =>  $request->input('enr_id'),
-                'mi_subjid' =>  $request->input('subj_id'),
-                'mi_crossenr' =>  $request->input('crossenr'),
-                'mi_tag' =>  $request->input('mi_tag'),
-                'mi_completed' =>  0,
-                'mi_date' =>  $date,
-                'mi_addby' => $request->input('user_id')
-            ]);
+                    $primary = DB::table('def_milestone')
+                    ->where('mi_id','=', $milestoneid)
+                    ->update([
+                        'mi_updatedby' => $ms['user_id'],
+                        'mi_crossenr' => $ms['mi_crossenr'],
+                        'mi_tag' => $ms['mi_tag'],
+                        'mi_status' => 1,
+                        'mi_dateupdated' => $date,
+                    ]);
+
+                }else{
+                
+                    $primary = DB::table('def_milestone')->insert([
+                        'mi_enrid' =>  $ms['enr_id'],
+                        'mi_subjid' =>  $ms['subj_id'],
+                        'mi_crossenr' =>  $ms['mi_crossenr'],
+                        'mi_tag' =>  $ms['mi_tag'],
+                        'mi_completed' =>  0,
+                        'mi_date' =>  $date,
+                        'mi_addby' => $ms['user_id']
+                    ]);
+                }
         }
+        
         return 200; 
-       
+
     }
 
     public function getMilestone($id)
@@ -1341,15 +1335,17 @@ class RegistrarController extends Controller
          * 1️⃣ Get launch (DO NOT filter by section)
          */
         $launch = DB::table('def_launch')
-            ->where('ln_status', 1)
-            ->where('ln_dtype', $params->enr_program)
-            ->where('ln_quarter', $params->enr_quarter)
-            ->where('ln_course', $params->enr_course)
-            ->where('ln_gradelvl', $params->enr_gradelvl)
-            ->when($params->filled('enr_curriculum'), function ($query) use ($params) {
-                $query->where('ln_curriculum', $params->enr_curriculum);
-            })
-            ->first();
+        ->where('ln_status', 1)
+        ->where('ln_dtype', $params->enr_program)
+        ->where('ln_quarter', $params->enr_quarter)
+        ->where('ln_course', $params->enr_course)
+        ->where('ln_gradelvl', $params->enr_gradelvl)
+        ->when($params->enr_curriculum != 0, function ($query) use ($params) {
+            $query->where('ln_curriculum', $params->enr_curriculum);
+        })
+        ->get()
+        ->keyBy('ln_section');
+        // ->first();
 
         /**
          * 2️⃣ Get all active sections
@@ -1360,6 +1356,7 @@ class RegistrarController extends Controller
         /**
          * 3️⃣ Count enrollments per section
          */
+      
         $enrollmentCounts = DB::table('def_enrollment')
             ->select('enr_section', DB::raw('COUNT(*) as total'))
             ->where('enr_status', 1)
@@ -1367,8 +1364,8 @@ class RegistrarController extends Controller
             ->where('enr_quarter', $params->enr_quarter)
             ->where('enr_course', $params->enr_course)
             ->where('enr_gradelvl', $params->enr_gradelvl)
-            ->when($params->filled('enr_curriculum'), function ($q) use ($params) {
-                $q->where('enr_curriculum', $params->enr_curriculum);
+           ->when((int)$params->enr_curriculum !== 0, function ($q) use ($params) {
+                $q->where('enr_curriculum', (int)$params->enr_curriculum);
             })
             ->groupBy('enr_section')
             ->pluck('total', 'enr_section');
@@ -1376,24 +1373,29 @@ class RegistrarController extends Controller
         /**
          * 4️⃣ Slot limit (from launch)
          */
-        $slotLimit = $launch?->ln_slots ?? 0;
+        // $slotLimit = $launch?->ln_slots ?? 0;
 
         /**
          * 5️⃣ Build per-section status
          */
-        $sectionStatus = $sections->map(function ($section) use ($enrollmentCounts, $slotLimit) {
-            $current = $enrollmentCounts[$section->sec_id] ?? 0;
+        $sectionStatus = $sections->map(function ($section) use ($enrollmentCounts, $launch) {
+        $current = $enrollmentCounts[$section->sec_id] ?? 0;
 
-            return [
-                'sec_id'            => $section->sec_id,
-                'sec_name'          => $section->sec_name,
-                'sec_code'          => $section->sec_code,
-                'slots'             => $slotLimit,
-                'current_enrolled'  => $current,
-                'available_slots'   => max(0, $slotLimit - $current),
-                'is_full'           => $slotLimit > 0 && $current >= $slotLimit,
-            ];
-        });
+        // ✅ Get launch for THIS section
+        $launches = $launch[$section->sec_id] ?? null;
+
+        $slots = $launches?->ln_slots ?? 0;
+
+        return [
+            'sec_id'            => $section->sec_id,
+            'sec_name'          => $section->sec_name,
+            'sec_code'          => $section->sec_code,
+            'slots'             => $slots,
+            'current_enrolled'  => $current,
+            'available_slots'   => max(0, $slots - $current),
+            'is_full'           => $slots > 0 && $current >= $slots,
+        ];
+    });
 
         /**
          * 6️⃣ Response

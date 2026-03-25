@@ -205,7 +205,7 @@ const saveLaunch = async () => {
     // } else {
     //     return false;
     // }
-
+ 
     Swal.fire({
         title: "Initialize Launch",
         text: "Are you sure you want to create a launch? this is ireversible?",
@@ -217,6 +217,14 @@ const saveLaunch = async () => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             saving.value = true
+            Swal.fire({
+                title: "Saving Changes",
+                text: "Please wait while we check all necessary details.",
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             getLaunchChecker(
                 launch.value.ln_dtype,
                 launch.value.ln_quarter,
@@ -242,6 +250,7 @@ const saveLaunch = async () => {
                         text: "Already existing",
                         icon: "question"
                     }).then(()=>{
+                        Swal.close()
                         saving.value = false
                     })
                 } else {
@@ -257,6 +266,7 @@ const saveLaunch = async () => {
                             text: "Changes applied, refreshing the page",
                             icon: "success"
                         }).then(()=>{
+                            Swal.close()
                             location.reload()
                         });
                     })

@@ -71,10 +71,11 @@ onMounted(async () => {
         sch_total: e.sch_type == 1 ? e.sch_value / 100 : e.sch_value
     }))
     
-    
-    studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
-    studentSettlements.value = accountRes.student_settlement || []
-    selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
+    console.log(accountRes)
+    console.log(scholarshipRes)
+    // studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
+    // studentSettlements.value = accountRes.student_settlement || []
+    // selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
 
     loadAccount()
     preLoading.value = false
