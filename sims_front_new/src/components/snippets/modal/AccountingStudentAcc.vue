@@ -73,9 +73,11 @@ onMounted(async () => {
     
     console.log(accountRes)
     console.log(scholarshipRes)
-    // studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
-    // studentSettlements.value = accountRes.student_settlement || []
-    // selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
+    
+
+    studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
+    studentSettlements.value = accountRes.student_settlement || []
+    selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
 
     loadAccount()
     preLoading.value = false
@@ -99,7 +101,6 @@ const groupByAcsIdArray = (rows) => {
 
 const loadAccount = async () =>{
     preLoading.value = true
-
     let data1 = studentSettlements.value.filter((e)=>{
         if(e.acs_id == selectedAcsId.value){
             return e
@@ -113,6 +114,7 @@ const loadAccount = async () =>{
             return e
         }
     })
+
 
     filteredStudentAccount.value = data2[0].items
 

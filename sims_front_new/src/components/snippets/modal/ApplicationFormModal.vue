@@ -331,7 +331,7 @@ const downloadPdf = (filetype) => {
                             <p class="m-0 fw-normal small-font">Founded 1959</p>
                         </div>
                         <div class="w-25">
-                            <img src="/img/clcst_logo.png" height="70px" width="70px" alt="...">
+                            <img src="/img/sims_logo.png" height="70px" width="70px" alt="...">
                         </div>
                     </div>
                     <div class="p-2 fw-bold">
