@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, watch } from "vue"
 import AccountingPaymentModal from "../modal/AccountingPaymentModal.vue"
 import { getStudentAccount, getPaymentDetails, getScholarshipDetails } from "../../Fetchers.js"
-import { pesoConverter,formatDateTime, pdfGenerator } from "../../Generators.js"
+import { pesoConverter,formatDateTime, pdfGenerator, pdfAutoPrint } from "../../Generators.js"
 import NeuLoader2 from "../loaders/NeuLoader2.vue"
 
 /* ───────────── props ───────────── */
@@ -71,13 +71,18 @@ onMounted(async () => {
         sch_total: e.sch_type == 1 ? e.sch_value / 100 : e.sch_value
     }))
     
-    console.log(accountRes)
-    console.log(scholarshipRes)
+    // console.log(accountRes)
+    // console.log(scholarshipRes)
     
 
     studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
     studentSettlements.value = accountRes.student_settlement || []
     selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
+    studentAccountSubjects.value = accountRes.student_account.filter((e)=>{
+        if(e.soa_subjid != null){
+            return e
+        }
+    })
 
     loadAccount()
     preLoading.value = false
@@ -304,7 +309,8 @@ const setPermit = (mode) => {
 
 
 const printPermit = (mode) =>{
-    let name = 'test'
+    // let name = 'permit'
+    let name = studentAccount.value[0].fullname +"-"+ studentAccount.value[0].prog_name +"-"+ "permit"
     // let name = personID.value + '_' + studentSem.value + '_' + studentDateEnr.value.split(" ")[0]
     Swal.fire({
         icon: "success",
@@ -322,11 +328,36 @@ const printPermit = (mode) =>{
                 }
             });
 
-            await pdfGenerator(name, 'a6', 'portrait', 0)
+            // await pdfGenerator(name, 'a6', 'portrait', 0)
+            // setTimeout(() => {
+            //         Swal.close();
+            //         // location.reload();
+            //     }, 1000);
+            let name = "permit";
+            let receiptWidth = 4.13; // in inches, your receipt width
+
+            try {
+                const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
+
+                const pdfUrl = URL.createObjectURL(pdfBlob);
+                const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+
+                printWindow.onload = () => {
+                    printWindow.focus();
+                    printWindow.print();
+                };
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire("Error", "Failed to generate receipt.", "error");
+                location.reload();
+                return;
+            }
+
             setTimeout(() => {
-                    Swal.close();
-                    // location.reload();
-                }, 1000);
+                Swal.close();
+                // location.reload();
+            }, 1000);
         }
 
     });
@@ -686,9 +717,9 @@ const printPermit = (mode) =>{
                                                     </div>
                                                 </div>
 
-                                                <div class="mt-2">
+                                                <!-- <div class="mt-2">
                                                     Official Seal / Stamp
-                                                </div>
+                                                </div> -->
 
                                                 <div class="mt-1 fst-italic">
                                                     This document is system-generated and valid without signature if electronically issued.
@@ -706,7 +737,7 @@ const printPermit = (mode) =>{
                                             type="button"
                                             :disabled="!examType"
                                         >
-                                            Download Permit
+                                            Print Permit
                                         </button>
                                         <small v-else class="text-white">-- Please Select Term First -- </small>
                                     </div>

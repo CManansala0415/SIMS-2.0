@@ -394,38 +394,81 @@ const renderPayment = (paymentdata) =>{
                     if (results.status == 204) {
                         Swal.close();
                         Swal.fire({
-                            title: "Update Successful",
+                            title: "Update Successfuls",
                             text: "Changes applied, preparing receipt...",
                             icon: "success",
                             confirmButtonText: "Ok, Got it!"
                         }).then(async (result) => {
                             // console.log(result)
-                            if (result.isConfirmed) {
+                            // if (result.isConfirmed) {
                                 // 🔄 Show loading Swal
+                                // Swal.fire({
+                                //     title: "Generating PDF...",
+                                //     text: "Please wait while we prepare your receipt.",
+                                //     allowOutsideClick: false,
+                                //     didOpen: () => {
+                                //         Swal.showLoading();
+                                //     }
+                                // });
+
+                                // let name = "receipt" + '-' + accountId.value;
+                                // let size = [6.823, 4.25];
+                                // // let size = [8.5, 4.25];
+
+                                // // Wait until PDF is generated
+                                // await pdfGenerator(name, size, "landscape", 0.03);
+
+                                // // ⏳ Keep loader for 1.5s more before closing + reloading
+                                // setTimeout(() => {
+                                //     Swal.close();
+                                //     // location.reload();
+                                // }, 1000);
+                            // }    
+                            if (results.status == 204) {
                                 Swal.fire({
                                     title: "Generating PDF...",
                                     text: "Please wait while we prepare your receipt.",
                                     allowOutsideClick: false,
-                                    didOpen: () => {
-                                        Swal.showLoading();
-                                    }
+                                    didOpen: () => Swal.showLoading()
                                 });
 
-                                let name = "receipt" + '-' + accountId.value;
-                                let size = [6.823, 4.25];
-                                // let size = [8.5, 4.25];
+                                let name = "receipt";
+                                let receiptWidth = 6.823; // in inches, your receipt width
 
-                                // Wait until PDF is generated
-                                await pdfGenerator(name, size, "landscape", 0.03);
+                                try {
+                                    const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
 
-                                // ⏳ Keep loader for 1.5s more before closing + reloading
+                                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                                    const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+
+                                    printWindow.onload = () => {
+                                        printWindow.focus();
+                                        printWindow.print();
+                                    };
+
+                                } catch (err) {
+                                    console.error(err);
+                                    Swal.fire("Error", "Failed to generate receipt.", "error");
+                                    location.reload();
+                                    return;
+                                }
+
                                 setTimeout(() => {
                                     Swal.close();
                                     location.reload();
                                 }, 1000);
                             }
+                            else {
+                                Swal.fire({
+                                    title: "Payment Failed",
+                                    text: "Cannot proceed payment. Error occured, try again later",
+                                    icon: "question"
+                                }).then(() => {
+                                    location.reload()
+                                });
+                            }
+                            
                         });
-
 
                     } else {
 
@@ -493,41 +536,39 @@ const renderPayment = (paymentdata) =>{
 
                     // } 
                     if (results.status == 204) {
-                    Swal.fire({
-                        title: "Generating PDF...",
-                        text: "Please wait while we prepare your receipt.",
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading()
-                    });
+                        Swal.fire({
+                            title: "Generating PDF...",
+                            text: "Please wait while we prepare your receipt.",
+                            allowOutsideClick: false,
+                            didOpen: () => Swal.showLoading()
+                        });
 
-                    let name = "receipt";
-                    let receiptWidth = 6.823; // in inches, your receipt width
+                        let name = "receipt";
+                        let receiptWidth = 6.823; // in inches, your receipt width
 
-                    try {
-                        const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
+                        try {
+                            const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
 
-                        const pdfUrl = URL.createObjectURL(pdfBlob);
-                        const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+                            const pdfUrl = URL.createObjectURL(pdfBlob);
+                            const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
 
-                        printWindow.onload = () => {
-                            printWindow.focus();
-                            printWindow.print();
-                        };
+                            printWindow.onload = () => {
+                                printWindow.focus();
+                                printWindow.print();
+                            };
 
-                    } catch (err) {
-                        console.error(err);
-                        Swal.fire("Error", "Failed to generate receipt.", "error");
-                        location.reload();
-                        return;
+                        } catch (err) {
+                            console.error(err);
+                            Swal.fire("Error", "Failed to generate receipt.", "error");
+                            location.reload();
+                            return;
+                        }
+
+                        setTimeout(() => {
+                            Swal.close();
+                            location.reload();
+                        }, 1000);
                     }
-
-                    setTimeout(() => {
-                        Swal.close();
-                        location.reload();
-                    }, 1000);
-                }
-
-                    
                     else {
                         Swal.fire({
                             title: "Payment Failed",

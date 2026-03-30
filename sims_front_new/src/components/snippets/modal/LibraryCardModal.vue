@@ -10,7 +10,8 @@ import {
 
 import {
     qrImageGenerator,
-    pdfGenerator
+    pdfGenerator,
+    pdfAutoPrint
 } from "../../Generators.js";
 
 
@@ -217,6 +218,35 @@ const registerNewCard = () => {
         }
     })
 
+}
+
+
+const printCard = async (enrid, data) =>{
+    let name = `LC-${enrid}-${data}`;
+    let receiptWidth = 5.83; // in inches, your receipt width
+
+    try {
+        const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
+
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+
+        printWindow.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+        };
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Failed to generate receipt.", "error");
+        location.reload();
+        return;
+    }
+
+    setTimeout(() => {
+        Swal.close();
+        // location.reload();
+    }, 1000);
 }
 
 const printForm = async (enrid, data) => {
@@ -435,6 +465,10 @@ const printForm = async (enrid, data) => {
                                 </li>
                             </ul>
                             <div class="card-body d-flex gap-1 mt-3">
+                                <button @click="printCard(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1" type="button"
+                                    class="neu-btn neu-blue p-2">
+                                    <font-awesome-icon icon="fa-solid fa-print"  /> Print Card
+                                </button>
                                 <button @click="printForm(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1" type="button"
                                     class="neu-btn neu-green p-2">
                                     <font-awesome-icon icon="fa-solid fa-download"  /> Download Card

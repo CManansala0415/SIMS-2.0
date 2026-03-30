@@ -77,7 +77,7 @@ onMounted(async () => {
                 break;
             }
         }
-
+        
         preLoading.value = false
     })
 })
