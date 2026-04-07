@@ -175,7 +175,11 @@ onMounted(async () => {
                         countersData.value = cashierTotals
 
                         // get lahat ng total collections amount ng counters
-                        totalCountersAmount.value = countersData.value.reduce((sum, item) => sum + item.amount, 0);
+                        // totalCountersAmount.value = countersData.value.reduce((sum, item) => sum + item.amount, 0);
+                        totalCountersAmount.value = countersData.value.reduce(
+                            (sum, item) => sum + (parseFloat(item.amount) || 0),
+                            0
+                        );
 
                         let cashcollection = Array(7).fill(0);
 
@@ -212,6 +216,10 @@ onMounted(async () => {
                         emit('doneLoading', false)
                         preLoading.value = false
                         fetchingCollection.value = false
+                        // console.log(totalCountersAmount.value)
+                        // console.log(countersData.value)
+
+                        
                     })
 
 
