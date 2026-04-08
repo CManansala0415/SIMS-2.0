@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue"
 import AccountingPaymentModal from "../modal/AccountingPaymentModal.vue"
-import { getStudentAccount, getPaymentDetails, getScholarshipDetails } from "../../Fetchers.js"
+import { getStudentAccount, getPaymentDetails, getScholarshipDetails, getDemograph } from "../../Fetchers.js"
 import { pesoConverter,formatDateTime, pdfGenerator, pdfAutoPrint } from "../../Generators.js"
 import NeuLoader2 from "../loaders/NeuLoader2.vue"
 
@@ -9,10 +9,12 @@ import NeuLoader2 from "../loaders/NeuLoader2.vue"
 const props = defineProps({
     personId: {},
     userId: {},
-    modeId: {}
+    modeId: {},
+    personData: {},
 })
 
 const personID = computed(() => props.personId)
+const personDetails = computed(() => props.personData)
 const modeID = computed(() => props.modeId)
 
 /* ───────────── state ───────────── */
@@ -56,10 +58,16 @@ const studentAccounts = ref([])
 const selectedAccountHeader = ref('')
 const filteredStudentAccount = ref([])
 const filteredStudentSettlement = ref([])
-
+const demograph = ref([])
 /* ───────────── lifecycle ───────────── */
 onMounted(async () => {
     preLoading.value = true
+
+    getDemograph().then((res)=>{ // load the address first to maintain time
+        demograph.value = res
+
+       
+    })
 
     const [accountRes, scholarshipRes] = await Promise.all([
         getStudentAccount(personID.value),
@@ -86,6 +94,8 @@ onMounted(async () => {
 
     loadAccount()
     preLoading.value = false
+
+    
 })
 
 const groupByAcsIdArray = (rows) => {
@@ -254,11 +264,13 @@ const settlement = (mode) => {
         per_suffixname: selectedAccountHeader.value.per_suffixname,
         acs_balance: grandTotal.value,
         acs_status:filteredStudentSettlement.value.acs_status,
-        by_pass: mode
+        by_pass: mode,
+        ...personDetails.value
     }
 
-    console.log(selectedAccountHeader.value)
     studentPayment.value = x
+    console.log(selectedAccountHeader.value)
+    console.log(studentPayment.value)
 
     showPaymentModal.value = !showPaymentModal.value
     if (!showPaymentModal.value) window.stop()
@@ -885,7 +897,7 @@ const printPermit = (mode) =>{
                             </button>
                         </div>
                     </div>
-                    <AccountingPaymentModal :accountData="studentPayment" :billTypeData="1" />
+                    <AccountingPaymentModal :accountData="studentPayment" :demoData="demograph" :billTypeData="1" />
                 </div>
             </div>
         </div>

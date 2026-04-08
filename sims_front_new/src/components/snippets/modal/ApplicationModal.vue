@@ -109,13 +109,16 @@ const personal = ref({
     per_civilstatus:'',
     per_nationality:'',
 
+    
     per_curr_home:'',
+    per_curr_country:163,
     per_curr_region:'',
     per_curr_province:'',
     per_curr_city:'',
     per_curr_barangay:'',
     per_curr_zipcode:'',
     per_perm_home:'',
+    per_perm_country:163,
     per_perm_region:'',
     per_perm_province:'',
     per_perm_city:'',
@@ -219,6 +222,7 @@ const copyAddress = () =>{
         updateAddress('permanent-barangay', personal.value.per_curr_city)
 
         personal.value.per_perm_home = personal.value.per_curr_home
+        personal.value.per_perm_region = personal.value.per_perm_country
         personal.value.per_perm_region = personal.value.per_curr_region
         personal.value.per_perm_province = personal.value.per_curr_province
         personal.value.per_perm_city = personal.value.per_curr_city

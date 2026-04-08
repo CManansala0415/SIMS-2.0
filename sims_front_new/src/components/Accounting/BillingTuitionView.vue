@@ -83,6 +83,7 @@ const dtype = ref([])
 const semester = ref([])
 const section = ref([])
 const editId = ref('')
+const personEditData = ref([])
 const fullName = ref('')
 const booting = ref('')
 const bootingCount = ref(0)
@@ -382,9 +383,10 @@ const goTo = () => {
 }
 
 const formMode = ref('')
-const editData = (id) => {
+const editData = (data, id) => {
     editId.value = id
     formMode.value = id
+    personEditData.value = data
     showFormModal.value = !showFormModal.value
 }
 const enrollApplicant = (data) => {
@@ -517,7 +519,7 @@ const viewApplicationFormModal = (data) => {
                             </td>
                             <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
                                 <div class="d-flex gap-2 justify-content-center">
-                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app.per_id)"
+                                    <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app, app.per_id)"
                                         type="button" title="Edit Record" class="neu-btn-sm neu-white">
                                         <font-awesome-icon icon="fa-solid fa-gear"/></button>
                                 </div>
@@ -566,7 +568,7 @@ const viewApplicationFormModal = (data) => {
                         @click="showFormModal = false"></button>
                 </div>
                 <div class="modal-body neu-bg">
-                        <AccountingStudentAcc v-if="showFormModal" :personId="editId" :userId="userID" :modeId="2"/>
+                        <AccountingStudentAcc v-if="showFormModal" :personData="personEditData" :personId="editId" :userId="userID" :modeId="2"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -577,6 +579,35 @@ const viewApplicationFormModal = (data) => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showFormModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="scanqrmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">QR Scanner</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showQRScanner = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body neu-bg">
+                     <SearchQR v-if="showQRScanner" @fetchData="getData" modeData="5"/>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showQRScanner = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

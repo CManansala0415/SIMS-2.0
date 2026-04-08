@@ -292,6 +292,38 @@ const getDateToday = () => {
   });
   return today;
 }
+
+const getAddress = (account, demograph) => {
+    const barangay = demograph.barangay.find(
+        b => b.brgyCode == account.per_curr_barangay
+    )?.brgyDesc?.trim();
+
+    const city = demograph.city.find(
+        c => c.citymunCode == account.per_curr_city
+    )?.citymunDesc;
+
+    const province = demograph.province.find(
+        p => p.provCode == account.per_curr_province
+    )?.provDesc;
+
+    const region = demograph.region.find(
+        r => r.regCode == account.per_curr_region
+    )?.regDesc;
+
+    const country = demograph.country.find(
+        r => r.countryID == account.per_curr_country
+    )?.name;
+
+    return [
+        account.per_curr_home,
+        barangay,
+        city,
+        province,
+        region,
+        country
+    ].filter(e => e && e !== ' ').join(', ');
+};
+
 export {
     qrImageGenerator,
     pdfGenerator,
@@ -303,5 +335,6 @@ export {
     handleLogin,
     getHolidays,
     getDateToday,
-    pdfAutoPrint
+    pdfAutoPrint,
+    getAddress
 }

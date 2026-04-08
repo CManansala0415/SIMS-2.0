@@ -128,24 +128,44 @@ onMounted(async () => {
 
 
                     getAllPayments(transactionType.value, formattedWeekStart.value, formattedWeekEnd.value, userID.value).then((results) => {
-                        let cashcollection = Array(7).fill(0);
+                        // let cashcollection = Array(7).fill(0);
 
-                        // Loop through each data item
+                        // // Loop through each data item
+                        // results.data.forEach(item => {
+                        //     const datePaid = new Date(item.acy_datepaid);
+
+                        //     // Only include dates within the range
+                        //     if (datePaid >= new Date(results.datefrom) && datePaid <= new Date(results.dateto)) {
+                        //         // Calculate day index (0 = Monday, 6 = Sunday)
+                        //         const dayIndex = (datePaid.getDay() + 6) % 7; 
+                        //         // Add payment to the corresponding day
+                        //         cashcollection[dayIndex] += item.acy_payment;
+                        //     }
+                        // });
+
+                        // console.log(cashcollection);
+                        // collections = cashcollection
+                        // weekCollection.value = collections
+
+                        let cashcollection = Array(7).fill(0);
+                        // Pre-convert date range once (better performance too)
+                        const dateFrom = new Date(results.datefrom);
+                        const dateTo = new Date(results.dateto);
+
                         results.data.forEach(item => {
                             const datePaid = new Date(item.acy_datepaid);
 
-                            // Only include dates within the range
-                            if (datePaid >= new Date(results.datefrom) && datePaid <= new Date(results.dateto)) {
-                                // Calculate day index (0 = Monday, 6 = Sunday)
-                                const dayIndex = (datePaid.getDay() + 6) % 7; 
-                                // Add payment to the corresponding day
-                                cashcollection[dayIndex] += item.acy_payment;
+                            if (datePaid >= dateFrom && datePaid <= dateTo) {
+                                const dayIndex = (datePaid.getDay() + 6) % 7;
+
+                                // ✅ Force number
+                                cashcollection[dayIndex] += parseFloat(item.acy_payment) || 0;
                             }
                         });
 
                         // console.log(cashcollection);
-                        collections = cashcollection
-                        weekCollection.value = collections
+                        collections = cashcollection;
+                        weekCollection.value = collections;
 
                         getBarHeights(collections).then((bardata) => {
                             barHeights.value = bardata.barHeights

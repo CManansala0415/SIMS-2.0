@@ -15,7 +15,9 @@ import {
     pdfGenerator,
     numberToWords,
     formatDateTime,
-    getDateToday
+    getDateToday,
+    pesoConverter,
+    getAddress
 } from "../../Generators.js";
 import ProvisionalReceipt from '../forms/accountingforms/ProvisionalReceipt.vue';
 import OfficialReceipt from '../forms/accountingforms/OfficialReceipt.vue';
@@ -26,12 +28,18 @@ const props = defineProps({
     },
     billTypeData: {
     },
+    demoData: {
+    },
+    
 })
 const account = computed(() => {
     return props.accountData
 });
 const billType = computed(() => {
     return props.billTypeData
+});
+const demographData = computed(() => {
+    return props.demoData
 });
 
 const generateDefault = ref(1)
@@ -76,6 +84,8 @@ const today = ref('');
 
 onMounted(() => {
     //prevent e and negative
+    console.log(demographData.value)
+    console.log(account.value)
     document.querySelector(".amount-text").addEventListener("keypress", function (evt) {
         if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57)
         {
@@ -394,7 +404,7 @@ const renderPayment = (paymentdata) =>{
                     if (results.status == 204) {
                         Swal.close();
                         Swal.fire({
-                            title: "Update Successfuls",
+                            title: "Payment Successful",
                             text: "Changes applied, preparing receipt...",
                             icon: "success",
                             confirmButtonText: "Ok, Got it!"
@@ -423,23 +433,98 @@ const renderPayment = (paymentdata) =>{
                                 //     Swal.close();
                                 //     // location.reload();
                                 // }, 1000);
-                            // }    
+                            // }  
+                            
+                            // old html2pdf
+                            // if (results.status == 204) {
+                            //     Swal.fire({
+                            //         title: "Generating PDF...",
+                            //         text: "Please wait while we prepare your receipt.",
+                            //         allowOutsideClick: false,
+                            //         didOpen: () => Swal.showLoading()
+                            //     });
+
+                            //     let name = "receipt";
+                            //     let receiptWidth = 6.823; // in inches, your receipt width
+
+                            //     try {
+                            //         const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
+
+                            //         const pdfUrl = URL.createObjectURL(pdfBlob);
+                            //         const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+
+                            //         printWindow.onload = () => {
+                            //             printWindow.focus();
+                            //             printWindow.print();
+                            //         };
+
+                            //     } catch (err) {
+                            //         console.error(err);
+                            //         Swal.fire("Error", "Failed to generate receipt.", "error");
+                            //         location.reload();
+                            //         return;
+                            //     }
+
+                            //     setTimeout(() => {
+                            //         Swal.close();
+                            //         location.reload();
+                            //     }, 1000);
+                            // }
+                            // else {
+                            //     Swal.fire({
+                            //         title: "Payment Failed",
+                            //         text: "Cannot proceed payment. Error occured, try again later",
+                            //         icon: "question"
+                            //     }).then(() => {
+                            //         location.reload()
+                            //     });
+                            // }
+
                             if (results.status == 204) {
                                 Swal.fire({
-                                    title: "Generating PDF...",
-                                    text: "Please wait while we prepare your receipt.",
+                                    title: "Preparing Print...",
+                                    text: "Opening receipt...",
                                     allowOutsideClick: false,
                                     didOpen: () => Swal.showLoading()
                                 });
 
-                                let name = "receipt";
-                                let receiptWidth = 6.823; // in inches, your receipt width
-
                                 try {
-                                    const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.5);
+                                    const content = document.getElementById('printform').outerHTML;
 
-                                    const pdfUrl = URL.createObjectURL(pdfBlob);
-                                    const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+                                    const printWindow = window.open('', 'PrintWindow', 'width=900,height=700');
+
+                                    printWindow.document.write(`
+                                        <html>
+                                        <head>
+                                            <title>Receipt</title>
+                                            <style>
+                                                body {
+                                                    margin: 0;
+                                                    padding: 0;
+                                                }
+
+                                                #printform {
+                                                    width: 655px;
+                                                    height: 395px;
+                                                    position: relative;
+                                                    font-weight: bold;
+                                                    text-transform: uppercase;
+                                                }
+
+                                                span {
+                                                    position: absolute;
+                                                    font-size: 10px;
+                                                    font-family: "Courier New", monospace;
+                                                }
+                                            </style>
+                                        </head>
+                                        <body>
+                                            ${content}
+                                        </body>
+                                        </html>
+                                    `);
+
+                                    printWindow.document.close();
 
                                     printWindow.onload = () => {
                                         printWindow.focus();
@@ -448,8 +533,7 @@ const renderPayment = (paymentdata) =>{
 
                                 } catch (err) {
                                     console.error(err);
-                                    Swal.fire("Error", "Failed to generate receipt.", "error");
-                                    location.reload();
+                                    Swal.fire("Error", "Failed to open receipt.", "error");
                                     return;
                                 }
 
@@ -457,15 +541,6 @@ const renderPayment = (paymentdata) =>{
                                     Swal.close();
                                     location.reload();
                                 }, 1000);
-                            }
-                            else {
-                                Swal.fire({
-                                    title: "Payment Failed",
-                                    text: "Cannot proceed payment. Error occured, try again later",
-                                    icon: "question"
-                                }).then(() => {
-                                    location.reload()
-                                });
                             }
                             
                         });
@@ -693,7 +768,7 @@ const renderPayment = (paymentdata) =>{
 
                         <div class="form-group p-1">
                             <label class="text-xs">Amount to be paid</label>
-                            <input v-model="amountTobePaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text""
+                            <input v-model="amountTobePaid" onkeydown="return /[a-z, ]/i.test(event.key)" type="text"
                                 class="neu-input" disabled />
                         </div>
                         <div class="form-group p-1">
@@ -822,7 +897,59 @@ const renderPayment = (paymentdata) =>{
 
             <div id="printform" class="text-uppercase border"
                 style="width: 655px; height: 395px; position: relative; overflow: hidden;">
-                <div v-if="generateDefault == 1 && receiptType == 1" style="height: 100%; width: 100%;  font-weight: bold;" class="receipt-2 times ">
+
+                <div v-if="generateDefault == 2 && receiptType == 1" style="height: 100%; width: 100%;  font-weight: bold;">
+                    <OfficialReceipt :data="latestPayment" />
+                </div>
+                
+                <div v-if="generateDefault == 1 && receiptType == 1" style="height: 100%; width: 100%;  font-weight: bold;" class="times ">
+                    <span style="position:absolute;top:100px; left: 65px; font-size:10px;">
+                        {{ personName }}
+                    </span>
+                     <span style="position:absolute;top:100px; left: 500px; font-size:10px;">
+                        {{ today }}
+                    </span>
+                    <span style="position:absolute;top:115px; left: 50px; font-size:10px;"> 
+                        <!-- {{
+                            [
+                            account.per_curr_home,
+                            account.currbarangayname,
+                            account.currcityname,
+                            account.currprovincename
+                            ].filter(Boolean).join(', ')
+                        }} -->
+                        {{ getAddress(account, demographData) }}
+                    </span>
+                    <span style="position:absolute;top:130px; left: 50px; font-size:10px;"> 
+                        {{account.per_id}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 160px; font-size:10px;"> 
+                        {{account.acf_desc}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 100px; font-size:10px;"> 
+                        {{account.acf_price}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 50px; font-size:10px;"> 
+                        {{account.acr_qty}}
+                    </span>
+                    <span style="position:absolute;top:170px; left: 590px; font-size:10px;"> 
+                        {{account.acr_total}}
+                    </span>
+                    <span style="position:absolute;top:280px; left: 590px; font-size:10px;"> 
+                        {{pesoConverter(amountPaid)}}
+                    </span>
+                    <span style="position:absolute;top:313px; left: 590px; font-size:10px;"> 
+                        {{pesoConverter(balance)}}
+                    </span>
+                    <span style="position:absolute;top:337px; left: 440px; font-size:10px; width: 200px;"> 
+                        {{userName}}
+                    </span>
+                </div> 
+                <div v-if="generateDefault == 2 && receiptType == 2" style="height: 100%; width: 100%;">
+                    <ProvisionalReceipt :data="latestPayment" />
+                </div>
+
+                <div v-if="generateDefault == 1 && receiptType == 2" style="height: 100%; width: 100%;  font-weight: bold;" class="times ">
                     <span style="position:absolute;top:160px; left: 280px; font-size:10px;">
                         {{ personName }}
                     </span>
@@ -855,45 +982,7 @@ const renderPayment = (paymentdata) =>{
                         ({{ chequeBankName }}) - {{ chequeNo }}
                     </span>
                 </div>
-                <div v-if="generateDefault == 2 && receiptType == 1" style="height: 100%; width: 100%;">
-                    <ProvisionalReceipt :data="latestPayment" />
-                </div>
-
-                <div v-if="generateDefault == 1 && receiptType == 2" style="height: 100%; width: 100%;  font-weight: bold;" class="times ">
-                    <span style="position:absolute;top:100px; left: 65px; font-size:10px;">
-                        {{ personName }}
-                    </span>
-                     <span style="position:absolute;top:100px; left: 500px; font-size:10px;">
-                        {{ today }}
-                    </span>
-                    <span style="position:absolute;top:115px; left: 50px; font-size:10px;"> 
-                        {{account.per_curr_home}}, {{account.currbarangayname}}, {{account.currcityname}}, {{account.currprovincename}}
-                    </span>
-                    <span style="position:absolute;top:130px; left: 50px; font-size:10px;"> 
-                        {{account.per_id}}
-                    </span>
-                    <span style="position:absolute;top:170px; left: 160px; font-size:10px;"> 
-                        {{account.acf_desc}}
-                    </span>
-                    <span style="position:absolute;top:170px; left: 100px; font-size:10px;"> 
-                        {{account.acf_price}}
-                    </span>
-                    <span style="position:absolute;top:170px; left: 50px; font-size:10px;"> 
-                        {{account.acr_qty}}
-                    </span>
-                    <span style="position:absolute;top:170px; left: 590px; font-size:10px;"> 
-                        {{account.acr_total}}
-                    </span>
-                    <span style="position:absolute;top:293px; left: 590px; font-size:10px;"> 
-                        {{balance}}
-                    </span>
-                    <span style="position:absolute;top:330px; left: 440px; font-size:10px; width: 200px;"> 
-                        {{userName}}
-                    </span>
-                </div> 
-                <div v-if="generateDefault == 2 && receiptType == 2" style="height: 100%; width: 100%;  font-weight: bold;">
-                    <OfficialReceipt :data="latestPayment" />
-                </div>
+                
 
             </div>
             <!-- <div class="p-2">

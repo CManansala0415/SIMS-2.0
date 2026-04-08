@@ -150,18 +150,37 @@ onMounted(async () => {
 
                     getAllPayments(transactionType.value, formattedWeekStart.value, formattedWeekEnd.value, userID.value, 1).then((results) => {
 
-                        // group counters per cashier para makuha yung collections per counter
+                        // // group counters per cashier para makuha yung collections per counter
+                        // let raw = results.data;
+                        // let counters = Object.groupBy(raw, r => r.acy_cashier);
+
+                        // // Build summarized totals
+                        // let cashierTotals = Object.keys(counters).map(cashierId => {
+                        //     const group = counters[cashierId];
+
+                        //     // Sum all payments for this cashier
+                        //     const totalAmount = group.reduce((sum, item) => sum + item.acy_payment, 0);
+
+                        //     // Get cashier name (from emp_* fields)
+                        //     const cashierName = `${group[0].emp_firstname} ${group[0].emp_lastname}`;
+
+                        //     return {
+                        //         cashier: cashierName,
+                        //         cashierId: cashierId,
+                        //         amount: totalAmount,
+                        //     };
+                        // });
                         let raw = results.data;
                         let counters = Object.groupBy(raw, r => r.acy_cashier);
 
-                        // Build summarized totals
                         let cashierTotals = Object.keys(counters).map(cashierId => {
                             const group = counters[cashierId];
 
-                            // Sum all payments for this cashier
-                            const totalAmount = group.reduce((sum, item) => sum + item.acy_payment, 0);
+                            const totalAmount = group.reduce((sum, item) => {
+                                const amount = parseFloat(String(item.acy_payment).replace(/,/g, '')) || 0;
+                                return sum + amount;
+                            }, 0);
 
-                            // Get cashier name (from emp_* fields)
                             const cashierName = `${group[0].emp_firstname} ${group[0].emp_lastname}`;
 
                             return {
@@ -173,6 +192,7 @@ onMounted(async () => {
 
 
                         countersData.value = cashierTotals
+                        console.log(countersData.value)
 
                         // get lahat ng total collections amount ng counters
                         // totalCountersAmount.value = countersData.value.reduce((sum, item) => sum + item.amount, 0);
@@ -181,24 +201,44 @@ onMounted(async () => {
                             0
                         );
 
-                        let cashcollection = Array(7).fill(0);
+                        // let cashcollection = Array(7).fill(0);
 
-                        // Loop through each data item
+                        // // Loop through each data item
+                        // results.data.forEach(item => {
+                        //     const datePaid = new Date(item.acy_datepaid);
+
+                        //     // Only include dates within the range
+                        //     if (datePaid >= new Date(results.datefrom) && datePaid <= new Date(results.dateto)) {
+                        //         // Calculate day index (0 = Monday, 6 = Sunday)
+                        //         const dayIndex = (datePaid.getDay() + 6) % 7;
+                        //         // Add payment to the corresponding day
+                        //         cashcollection[dayIndex] += item.acy_payment;
+                        //     }
+                        // });
+
+                        // // console.log(cashcollection);
+                        // collections = cashcollection
+                        // weekCollection.value = parseFloat(collections)
+
+                        let cashcollection = Array(7).fill(0);
+                        // Pre-convert date range once (better performance too)
+                        const dateFrom = new Date(results.datefrom);
+                        const dateTo = new Date(results.dateto);
+
                         results.data.forEach(item => {
                             const datePaid = new Date(item.acy_datepaid);
 
-                            // Only include dates within the range
-                            if (datePaid >= new Date(results.datefrom) && datePaid <= new Date(results.dateto)) {
-                                // Calculate day index (0 = Monday, 6 = Sunday)
+                            if (datePaid >= dateFrom && datePaid <= dateTo) {
                                 const dayIndex = (datePaid.getDay() + 6) % 7;
-                                // Add payment to the corresponding day
-                                cashcollection[dayIndex] += item.acy_payment;
+
+                                // ✅ Force number
+                                cashcollection[dayIndex] += parseFloat(item.acy_payment) || 0;
                             }
                         });
 
                         // console.log(cashcollection);
-                        collections = cashcollection
-                        weekCollection.value = collections
+                        collections = cashcollection;
+                        weekCollection.value = collections;
 
 
                         getBarHeights(collections).then((bardata) => {
