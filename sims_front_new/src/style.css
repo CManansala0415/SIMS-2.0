@@ -23,12 +23,21 @@ a:hover {
   color: #535bf2;
 }
 
-body {
+/* body {
   margin: 0;
   display: flex;
   place-items: start;
   min-width: 320px;
   min-height: 100vh;
+} */
+
+html, body {
+  min-width: 1010px;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1610px !important;
 }
 
 .text-dim{
@@ -55,7 +64,7 @@ h1 {
   /* overflow: auto; */
   width: 100%;
   color: #737373;
-
+  min-width: 1010px;
 }
 
 .glass-green {
@@ -78,7 +87,7 @@ h1 {
 }
 
 .bg-fallback{
-  background-color: #e2e2e2;
+  background-color: #e5edf5; /*e2e2e2*/
 }
 
 /* .bg-opaque{
@@ -414,14 +423,14 @@ h1 {
 }
 
 .neu-bg{
-  background: #dedede;
+  background: #e5edf5;
 }
 .neu-bg-dark{
   background: #3f3f3f;
 }
 /* edeef7 */
 .neu-card {
-  background: #dedede;
+  background: #e5edf5;
   border-radius: 16px;
   box-shadow:
     4px 4px 6px rgba(122, 122, 122, 0.5),
@@ -429,7 +438,7 @@ h1 {
 }
 
 .neu-card-inner {
-  background: #dedede;
+  background: #e5edf5;
   border-radius: 16px;
   box-shadow:
     inset 4px 4px 6px rgba(122, 122, 122, 0.5),
@@ -437,7 +446,7 @@ h1 {
 }
 
 .neu-card-inner-dark {
-  /* background: #dedede; */
+  /* background: #e5edf5; */
   border-radius: 16px;
   box-shadow:
     inset 12px 12px 15px rgba(31, 31, 31, 0.9),
@@ -538,7 +547,7 @@ h1 {
 }
 
 .neu-btn-sm {
-  background-color: #dedede;
+  background-color: #e5edf5;
   color: #5f5f5f;
   border-radius: 5px;
   border: none;
@@ -579,7 +588,7 @@ h1 {
 
 
 .neu-input {
-  background: #dedede;
+  background: #e5edf5;
   color: #2e2e2e;
   border: none;
   border-radius: 5px;
@@ -629,7 +638,7 @@ h1 {
 
 .neu-table tbody tr {
   border: 1px solid #dddddd;
-  background: #dedede;
+  background: #e5edf5;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -662,7 +671,7 @@ h1 {
 
 .neu-table-flat tbody tr {
   border: 1px solid #dddddd;
-  background: #dedede;
+  background: #e5edf5;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -715,7 +724,7 @@ option{
   border: 0;
   margin: .4rem 0;
   border-radius: 6px;
-  background: #dedede;
+  background: #e5edf5;
 
   /* 🔑 THIS IS THE FIX */
   inline-size: anchor-size(width);
@@ -730,7 +739,7 @@ option{
 .neu-select option {
   font-size: 14px;
   padding: 12px;
-  background: #dedede;
+  background: #e5edf5;
   color: #2e2e2e;
 }
 
@@ -818,7 +827,7 @@ option{
 }
 
 .neu-btn-ack{
-    background-color: #dedede;
+    background-color: #e5edf5;
     color: #5f5f5f;
     border-radius: 5px;
     border: none;

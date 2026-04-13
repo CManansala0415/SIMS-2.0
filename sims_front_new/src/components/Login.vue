@@ -105,14 +105,36 @@ const handleLogin = async () => {
             </div>
             <div class="col-7">
                 <div class="d-flex flex-column overflow-auto p-2 h-100 d-flex align-content-center justify-content-center">
+                    <!-- <div class="p-2 d-flex gap-1">
+                        <div class="w-50">
+                            <img src="/img/clcst_logo.png" height="100px" width="100px" alt="...">
+                        </div>
+                        <div class="w-100 fw-bold text-center">
+                            <p class="m-0">CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.</p>
+                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San Fernando,
+                                Pampanga, Philippines, 2000</p>
+                            <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                            <p class="m-0 fw-normal small-font">Founded 1959</p>
+                        </div>
+                        <div class="w-50">
+                            <img src="/img/sims_logo.png" height="100px" width="100px" alt="...">
+                        </div>
+                    </div> -->
                     <div class="mb-2">
                         <p class=" fs-3 fw-bold">Welcome to SIMS</p>
                         <small class="form-text text-muted">School Information and Management System</small>
                     </div>
+                    
                     <div class="d-flex flex-column justify-content-center align-items-center">
-                        <NeuLoader3/>
+                        <div class="w-100" style="height:300px;   
+                                                            background-image: url('/img/students.png');
+                                                            background-position: bottom;
+                                                            background-repeat: no-repeat;
+                                                            background-size: cover;">
+
+                        </div>
                     </div>
-                    <div class="mt-4 mb-4 justify-text p-5">
+                    <div class="justify-text p-5">
                         <p >
                         CELTECH COLLEGE adheres to the philosophy of transformative education for personal integrity, professionalism, 
                         social responsibility, productive citizenship, enlightened nationalism and global competitiveness.

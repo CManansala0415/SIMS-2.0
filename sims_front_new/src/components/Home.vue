@@ -3,8 +3,8 @@ import axios from 'axios';
 import { ref, onMounted, computed } from 'vue';
 import { getUserID } from "../routes/user";
 import { useRouter, useRoute } from 'vue-router'
-import { formatDateTime, getHolidays } from './Generators.js'
-import { getAnnouncement, editAnnouncement } from './Fetchers.js'
+import { formatDateTime, getHolidays, getDateToday } from './Generators.js'
+import { getAnnouncement, editAnnouncement, getEmployee } from './Fetchers.js'
 import NeuLoader1 from './snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from './snippets/loaders/NeuLoader4.vue';
 
@@ -15,6 +15,8 @@ const route = useRoute();
 const path = computed(() => route.path)
 const preLoading = ref(false)
 const announcementData = ref([])
+const birthdaysData = ref([])
+const dateToday = ref('')
 const searchAnnouncement = ref('')
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 
@@ -32,8 +34,21 @@ onMounted(async () => {
 
     getAnnouncement(1).then((results) => {
       announcementData.value = results.data
-      preLoading.value = false
 
+      getEmployee(0,0,404,404,404).then((results) => {
+        birthdaysData.value = results.data
+        dateToday.value = getDateToday()
+
+        let today = new Date().toLocaleDateString('en-CA');
+        birthdaysData.value = birthdaysData.value.filter((emp) => {
+          return emp.emp_birthday === today
+        })
+
+        preLoading.value = false
+
+        // console.log(birthdaysData.value)
+        // console.log(dateToday.value)
+      })
     })
   }).catch((err) => {
     // alert('Unauthorized Session, Please Log In')
@@ -181,6 +196,16 @@ const executeAnnouncement = (msg_title, msg_content) =>{
   });
 }
 
+const upvotePost = (id) =>{
+  // let x = {
+  //   dsh_id:id,
+  //   dsh_upvote:1,
+  // }
+  // upvoteAnnouncement(id).then((results) => {
+  //   console.log(results)      
+  // })
+}
+
 
 
 
@@ -213,6 +238,34 @@ const executeAnnouncement = (msg_title, msg_content) =>{
       </div>
       <div class="small-font">
         <div class="row g-3">
+          <div class="col-12">
+            <div class="neu-card p-3" style="
+                                            background-image: linear-gradient(rgba(229, 237, 245, 0.9)), url('/img/bday.png');
+                                            background-size: cover;
+                                            background-position: center;">
+              <div class="d-flex flex-column gap-3 px-5 py-3">
+                <h5 class="fw-bold">
+                  <font-awesome-icon icon="fa-solid fa-cake-candles" /> 
+                  &nbsp;Happy Birthday!!!&nbsp;
+                  <font-awesome-icon icon="fa-solid fa-cake-candles" /> 
+                </h5>
+                <p class="m-0">
+                  Wishing you a wonderful birthday filled with happiness, good health, 
+                  and continued success. <br/>May your day be as remarkable as you are, and may the year ahead bring even greater opportunities 
+                  and joy. 
+                </p>
+                <p class="fw-bold m-0">{{ dateToday }}</p>
+                <div class="d-flex gap-3 text-center justify-content-center align-items-center">
+                  <div v-for="(dsh, index) in birthdaysData">
+                    <!-- <font-awesome-icon icon="fa-solid fa-gift" />  -->
+                    <p class="m-0">{{ dsh.emp_firstname }} {{ dsh.emp_lastname
+                      }} {{ dsh.emp_suffixname || '' }}</p>
+                  </div>
+                      
+                </div>
+              </div>
+            </div>
+          </div>
           <div v-for="(dsh, index) in announcementData" class="col-12">
             <div class="neu-card p-3">
               <div class="d-flex flex-column gap-3 px-5 py-3">
@@ -244,20 +297,20 @@ const executeAnnouncement = (msg_title, msg_content) =>{
                 <div class="text-start mt-3">
                   <div class="d-flex gap-3 justify-content-between align-items-center">
                     <div class="d-flex gap-2 align-items-center justify-content-start">
-                      <button class="neu-btn-ack neu-white px-3"><font-awesome-icon
+                      <!-- <button class="neu-btn-ack neu-white px-3" @click="upvotePost(dsh.dsh_id)"><font-awesome-icon
                           icon="fa-solid fa-thumbs-up" /></button>
-                      <button class="neu-btn-ack neu-white px-3"><font-awesome-icon
-                          icon="fa-solid fa-thumbs-down" /></button>
+                      <button class="neu-btn-ack neu-white px-3" @click="upvotePost(dsh.dsh_id)"><font-awesome-icon
+                          icon="fa-solid fa-thumbs-down" /></button> -->
                       <button v-if="dsh.dsh_addedby == userID" class="neu-btn-ack neu-white px-3"
                         @click="editData('update', dsh)" data-bs-toggle="modal"
                         data-bs-target="#editmodal"><font-awesome-icon icon="fa-solid fa-pen" /></button>
                       <button v-if="dsh.dsh_addedby == userID" class="neu-btn-ack neu-white px-3"
                         @click="editData('delete', dsh)"><font-awesome-icon icon="fa-solid fa-trash" /></button>
                     </div>
-                    <div class="d-flex gap-2 align-items-center justify-content-start">
+                    <!-- <div class="d-flex gap-2 align-items-center justify-content-start">
                       <p class="m-0">Acknowledges: <span class="fw-bold">{{ dsh.dsh_total_ack }}</span></p>
                       <p class="m-0">Renounced: <span class="fw-bold">{{ dsh.dsh_total_ren }}</span></p>
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>

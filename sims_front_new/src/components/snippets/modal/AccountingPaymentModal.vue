@@ -84,8 +84,8 @@ const today = ref('');
 
 onMounted(() => {
     //prevent e and negative
-    console.log(demographData.value)
-    console.log(account.value)
+    // console.log(demographData.value)
+    // console.log(account.value)
     document.querySelector(".amount-text").addEventListener("keypress", function (evt) {
         if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57)
         {

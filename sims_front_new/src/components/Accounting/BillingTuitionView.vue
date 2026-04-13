@@ -388,6 +388,7 @@ const editData = (data, id) => {
     formMode.value = id
     personEditData.value = data
     showFormModal.value = !showFormModal.value
+
 }
 const enrollApplicant = (data) => {
     getAcademicStatus(1,'cs_05').then((results) => {
@@ -520,7 +521,7 @@ const viewApplicationFormModal = (data) => {
                             <td v-if="accessData[0].useracc_modifying == 1" class="align-middle">
                                 <div class="d-flex gap-2 justify-content-center">
                                     <button data-bs-toggle="modal" data-bs-target="#editdatamodal" @click="editData(app, app.per_id)"
-                                        type="button" title="Edit Record" class="neu-btn-sm neu-white">
+                                        type="button" title="Edit Record" class="neu-btn-sm neu-white" :id="app.per_id">
                                         <font-awesome-icon icon="fa-solid fa-gear"/></button>
                                 </div>
                             </td> 

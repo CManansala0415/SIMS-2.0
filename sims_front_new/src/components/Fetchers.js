@@ -2967,6 +2967,23 @@ const resetPassword = async (data) => {
     }
 }
 
+// let upvoteannouncement = {}
+// const upvoteAnnouncement = async (data) => {
+//     try {
+//         await axios({
+//             method: "POST",
+//             url: 'http://sims.clcst.edu/forgot-password',
+//             data:data
+//         }).then(async (results) => {
+//             // console.log(results.data)s
+//             resetpassword = results.data
+//         })
+//         return resetpassword
+//     } catch (err) {
+//         return err
+//     }
+// }
+
 export {
 
     getApplicant,

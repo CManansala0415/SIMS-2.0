@@ -6,6 +6,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { getCommandUpdate } from './components/Fetchers.js'
 import { getHolidays } from './components/Generators.js'
 
+
 import loader from './components/snippets/loaders/Loading1.vue';
 const user = ref('')
 const userID = ref('')
@@ -318,7 +319,7 @@ const handleLogout = async () => {
   }).then(async(result) => {
     if (result.isConfirmed) {
       Swal.fire({
-          title: "Loging Out",
+          title: "Logging Out",
           text: "Please wait while we clean your trace",
           allowOutsideClick: false,
           didOpen: () => {
@@ -443,32 +444,29 @@ const active_class = ref("nav-static border p-2 active");
 </script>
 <template>
   <div class="container border rounded-3 shadow p-5 flex-column neu-card">
-
     <nav class="navbar mb-5">
-      <div class="container-fluid">
+      <div class="d-flex justify-content-between w-100">
 
-        <div class="flex-column mb-2">
+        <div class="mb-2 w-75">
           <div class="row">
-            <div class="col d-flex justify-content-start">
-              <h3 class="fw-bold text-green">SIMS</h3>
+            <div class="col-2">
+              <img src="/img/sims_logo.png" height="75px" width="75px" alt="..." v-once>
             </div>
-          </div>
-          <div class="row">
-            <div class="col d-flex justify-content-start">
-              <small id="emailHelp" class="form-text text-muted">School Information & Management System</small>
+            <div class="col-10 text-start d-flex flex-column justify-content-center">
+                <h5 class="fw-bold text-green">SIMS</h5>
+                <small id="emailHelp" class="form-text text-muted">School Information & Management System</small>
             </div>
           </div>
         </div>
 
-        <div class="flex-column mb-2">
+        <div class="mb-2 w-75">
           <div class="row">
-            <div class="col d-flex justify-content-end">
-              <h6 class="fw-bold">CLCST</h6>
+            <div class="col-10 text-end d-flex flex-column justify-content-center">
+                <h5 class="fw-bold ">CLCST</h5>
+                <small id="emailHelp" class="form-text text-muted">City of San Fernando, Pampanga</small>
             </div>
-          </div>
-          <div class="row">
-            <div class="col d-flex justify-content-end">
-              <small id="emailHelp" class="form-text text-muted">City of San Fernando, Pampanga</small>
+            <div class="col-2">
+              <img src="/img/clcst_logo.png" height="75px" width="75px" alt="..." v-once>
             </div>
           </div>
         </div>
@@ -478,7 +476,6 @@ const active_class = ref("nav-static border p-2 active");
 
     <div>
       <div v-if="path != '/'" class="d-flex align-content-center justify-content-between flex-wrap small-font">
-        
         <div>
           <span v-if="fetchingUserAccess"class="fw-regular">Identifying Academic Calendar...</span>
           <div class="dropdown" v-else>
@@ -498,7 +495,7 @@ const active_class = ref("nav-static border p-2 active");
           <span v-else class="fw-regular">Welcome <span class="fw-bold text-uppercase">{{ userName }}</span></span>
         </div>
       </div>
-      <div v-if="path != '/'" class="container neu-card w-100 m-0 border p-2 mb-4 mt-2">
+      <div v-if="path != '/'" class="neu-card w-100 m-0 border p-2 mb-4 mt-2">
         <div class="row g-2">
           <div class="col-12 d-flex justify-content-between">
             <div v-if="fetchingUserAccess" class="d-flex gap-2 align-content-center flex-wrap">
@@ -812,7 +809,7 @@ const active_class = ref("nav-static border p-2 active");
         </div>
       </div>
 
-      <div class="container w-100 m-0 p-0">
+      <div class="w-100 m-0 p-0">
         <div class="row g-2">
           <div v-if="path != '/'" class="col-3">
             <div class="rounded-0 text-start d-flex flex-column nav-static">
