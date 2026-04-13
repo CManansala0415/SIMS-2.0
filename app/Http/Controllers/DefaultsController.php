@@ -804,8 +804,11 @@ class DefaultsController extends Controller
        return $response;
     }
 
-    public function getAnnouncement(Request $params)
-{
+public function getAnnouncement(Request $params)
+{   
+    date_default_timezone_set('Asia/Manila');
+    $date = date('Y-m-d H:i:s');
+
     $query = DB::table('def_announcement as da')
         ->leftJoin('def_employee as emp', 'da.dsh_addedby', '=', 'emp.emp_accid')
         ->select(
@@ -813,6 +816,7 @@ class DefaultsController extends Controller
             'da.*'
         )
         ->where('da.dsh_status', 1);
+        
 
     // Apply search only when mode != 1 and search has value
     if ($params->mode != 1 && !empty($params->search)) {

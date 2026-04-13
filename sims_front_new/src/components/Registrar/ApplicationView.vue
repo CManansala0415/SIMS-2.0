@@ -223,11 +223,11 @@ onMounted(async () => {
         // console.log(accessData.value)
         emit('fetchUser', results)
         try {
-            await booter().then((results) => {
+            await booter().then(async(results) => {
                 booting.value = 'Loading Applicants...'
                 bootingCount.value += 1
             
-                getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results) => {
+                await getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     
