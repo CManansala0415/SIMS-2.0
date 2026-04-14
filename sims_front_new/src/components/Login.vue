@@ -127,11 +127,18 @@ const handleLogin = async () => {
                     
                     <div class="d-flex flex-column justify-content-center align-items-center">
                         <div class="w-100" style="height:300px;   
-                                                            background-image: url('/img/students.png');
-                                                            background-position: bottom;
+                                                            background-image: url('/img/clcst.jpg');
+                                                            background-position: center;
                                                             background-repeat: no-repeat;
-                                                            background-size: cover;">
-
+                                                            background-size: cover;
+                                                            position: relative;">
+                            <div class="w-100 position-absolute" style="  height:300px; 
+                                                                background-image: url('/img/students_cropped_removebg.png');
+                                                                background-position: bottom;
+                                                                background-repeat: no-repeat;
+                                                                background-size: contain;">
+        
+                            </div>    
                         </div>
                     </div>
                     <div class="justify-text p-5">

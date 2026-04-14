@@ -20,9 +20,12 @@ import {
     getStudentFiltering,
     getAcademicDefaults,
     getPaymentDetails
-} from "../Fetchers.js";
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+} from "../Fetchers.js"; 
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
+import SkeletonCardLoader from '../snippets/loaders/SkeletonCardLoader.vue';
 // import PrintForm from '../snippets/modal/PrintForms.vue';
 import Taggings from '../snippets/modal/EnrollmentTagging.vue';
 import { getUserID } from "../../routes/user.js";
@@ -664,17 +667,18 @@ const getData = (result) => {
             <h5 class=" text-uppercase fw-bold">Enrolled Students</h5>
         </div>
 
-        <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
+        <!-- <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
             <div class="col-12 col-sm-8 col-lg-6">
                 <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
                     style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
                     <NeuLoader1 />
                 </div>
             </div>
-        </div>
+        </div> -->
 
-        <div v-else>
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+        <div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div  v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-center align-content-center">
                     <input type="text" v-model="searchFname" @keyup.enter="search()" class="neu-input"
                         :disabled="preLoading ? true : false" placeholder="First Name" />
@@ -740,19 +744,25 @@ const getData = (result) => {
                             style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
                             <NeuLoader4 />
                             <p class="fw-bold m-0">Nothing here yet!</p>
-                            <p>The hamster took a break 💤 — try adding something new.</p>
+                            <p>try adding something new.</p>
                         </div>
                     </div>
                 </div>
                 <!-- <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
-                        <div class="col-12 col-sm-8 col-lg-6">
-                            <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
-                                style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
-                                <NeuLoader1 />
-                            </div>
+                    <div class="col-12 col-sm-8 col-lg-6">
+                        <div class="section_heading text-center wow fadeInUp" data-wow-delay="0.2s"
+                            style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                            <NeuLoader1 />
                         </div>
-                    </div> -->
-                <div class="row" v-if="!preLoading && Object.keys(student).length">
+                    </div>
+                </div> -->
+                <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
+                    <div class="col-12 col-sm-8 col-lg-6 w-100">
+                        <SkeletonCardLoader :elementcount="3"/>
+                    </div>
+                </div>
+                      
+                <div v-else class="row" v-if="!preLoading && Object.keys(student).length">
                     <!-- Single Advisor-->
                     <div class="col-12 col-md-6 col-lg-4" v-for="(stud, index) in student">
                         <div class="single_advisor_profile wow fadeInUp rounded-4" data-wow-delay="0.2s"
@@ -1173,7 +1183,7 @@ const getData = (result) => {
     position: relative;
     display: block;
     cursor: pointer;
-    background-color: #e2e2e2;
+    background-color: #e5edf5;
 }
 
 .text_guide img {
@@ -1309,7 +1319,7 @@ const getData = (result) => {
     -webkit-transition-duration: 500ms;
     transition-duration: 500ms;
     /* border-radius: 0 0 15px 15px; */
-    background-color: #e2e2e2;
+    background-color: #e5edf5;
 }
 
 /* .single_advisor_profile .single_advisor_details_info::after {
@@ -1388,7 +1398,7 @@ const getData = (result) => {
 } */
 
 .upload-section {
-    background: #e2e2e2;
+    background: #e5edf5;
     border-radius: 12px;
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.08),
         -4px -4px 8px rgba(255, 255, 255, 0.9);

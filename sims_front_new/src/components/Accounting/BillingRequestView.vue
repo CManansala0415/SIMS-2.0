@@ -14,7 +14,9 @@ import {
     getAcademicDefaults
 
 } from "../Fetchers.js";
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import { getUserID } from "../../routes/user";
 import AccountingPaymentModal from '../snippets/modal/AccountingPaymentModal.vue';
@@ -284,11 +286,12 @@ const getData = (result) =>{
             <h5 class=" text-uppercase fw-bold">Billing Request</h5>
         </div>
 
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1/>
-        </div>
-        <div v-else>
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+        </div> -->
+        <div >
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-center align-content-center">
                     <input type="text" v-model="searchFname" @keyup.enter="search()"
                         class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
@@ -363,8 +366,13 @@ const getData = (result) =>{
                         </tr>
                         <tr v-if="!preLoading && !Object.keys(requestedItems).length" style="text-transform:none">
                             <td class="p-3 text-center" colspan="6">
-                                No Records Found
+                                <NeuLoader4/>
+                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                <p>try adding something new.</p>
                             </td>
+                        </tr>
+                        <tr v-if="preLoading && !Object.keys(requestedItems).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="6" />
                         </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(requestedItems).length" style="text-transform:none">
                             <td class="p-3 text-center" colspan="6">

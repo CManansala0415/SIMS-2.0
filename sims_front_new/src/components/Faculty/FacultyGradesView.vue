@@ -1,8 +1,11 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
-import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
+import SkeletonCardLoader from '../snippets/loaders/SkeletonCardLoader.vue';
+// import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import ExcelDownloaderGrades from '../snippets/modal/ExcelDownloaderGrades.vue';
 // import TipForm from '../snippets/modal/TipForm.vue';
 // import ApplicationForm from './ApplicationForm.vue';
@@ -524,12 +527,16 @@ const openTip = () => {
             <h5 class=" text-uppercase fw-bold">Grading Sheet</h5>
         </div>
     </div>
-     <div v-if="preLoading">
+     <!-- <div v-if="preLoading">
         <NeuLoader1/>
-    </div>
+    </div> -->
 
-    <div v-else class="">
-        <div v-if="!showForm" class="table-responsive border p-3 small-font">
+    <div class="">
+        <div v-if="preLoading">
+            <SkeletonHeaderLoader :elementcount="2"/>
+            <SkeletonCardLoader :elementcount="3"/>
+        </div>
+        <div v-else v-if="!showForm" class="table-responsive border p-3 small-font">
             <div v-if="switcher == 0">
                 <div class="row neu-card p-3 d-flex g-1">
                     <div class="col-md-12 col-lg-5">
@@ -883,10 +890,13 @@ const openTip = () => {
                                 No Grading Sheet Found
                             </td>
                         </tr>
-                        <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)">
+                        <!-- <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)">
                             <td class="p-3 text-center border border-mid-gray" colspan="10">
                                 Loading Please Wait...
                             </td>
+                        </tr> -->
+                        <tr v-if="(!Object.keys(finalStudentList).length) && (filteringData)"  v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="10" />
                         </tr>
                         <tr>
                             <td colspan="10">

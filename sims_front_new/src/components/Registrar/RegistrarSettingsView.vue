@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonCardLoader from '../snippets/loaders/SkeletonCardLoader.vue';
 import ProgramForms from '../snippets/forms/ProgramSettingsForm.vue';
 import SectionForms from '../snippets/forms/SectionSettingsForm.vue';
 import SubjectForms from '../snippets/forms/SubjectSettingsForm.vue';
@@ -244,7 +245,8 @@ const mode = (type) => {
         <h5 class=" text-uppercase fw-bold">Registrar Settings</h5>
     </div>
 
-    <NeuLoader1 v-if="preLoading" />
+    <!-- <NeuLoader1 v-if="preLoading" /> -->
+    <SkeletonCardLoader :elementcount="3" v-if="preLoading"/>
     <div v-else>
         <div v-if="accessData == 1">
             <div v-if="form == 1">

@@ -9,8 +9,10 @@ import {
     getSubject
 } from "../Fetchers.js";
 import { getUserID } from "../../routes/user";
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 
 // import EmployeeForm from './EmployeeForm.vue'
 import EmployeeAccountTagging from '../snippets/modal/EmployeeAccountTagging.vue';
@@ -248,12 +250,13 @@ onMounted(async () => {
             <h5 class=" text-uppercase fw-bold">Employee Management</h5>
         </div>
 
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1/>
-        </div>
+        </div> -->
 
-        <div v-else >
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+        <div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <!-- <div class="input-group w-50">
                     <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
                             /></span>
@@ -340,8 +343,11 @@ onMounted(async () => {
                             <td class="p-3 text-center" colspan="7">
                                 <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
+                        </tr>
+                        <tr  v-if="preLoading && !Object.keys(employee).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="7" />
                         </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(employee).length" style="text-transform:none">
                             <td class="p-3 text-center" colspan="7">

@@ -16,7 +16,9 @@ import {
     pesoConverter
 } from "../Generators.js";
 
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
+import SkeletonCardLoader from '../snippets/loaders/SkeletonCardLoader.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import LineChart from '../snippets/tech/LineChart.vue';
 import { getUserID } from "../../routes/user.js";
@@ -631,14 +633,15 @@ const validateData = (type, value) => {
             <h5 class="text-uppercase fw-bold">Counters Daily Collection</h5>
         </div>
 
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1 />
-        </div>
+        </div> -->
 
-        <div v-else>
+        <div>
             <div class="table-responsive small-font text-dim">
                 <div class="p-3">
-                    <div class="row neu-card py-4 px-2 mb-3">
+                    <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+                    <div v-else class="row neu-card py-4 px-2 mb-3">
                         <div class="col-md-12 col-lg-8 ">
                             <div class="row">
                                 <div class="col-md-12 col-lg-4 text-start">
@@ -669,328 +672,332 @@ const validateData = (type, value) => {
                         </div>
                     </div>
 
-                    <div class="row neu-card py-4 px-2 mb-3">
-                        <!-- Bar Chart Imitation -->
-                            <!-- <div class="col-lg-6 d-flex align-content-center justify-content-center">
-                            <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
-                                <div class="card-body d-flex flex-column align-content-center justify-content-center">
-                                    <h6 class="fw-semibold mb-3">Total Collections (Week)</h6>
+                    <SkeletonCardLoader :elementcount="3" v-if="preLoading"/>
+                    <div v-else >
+                        <div class="row neu-card py-4 px-2 mb-3">
+                            <!-- Bar Chart Imitation -->
+                                <!-- <div class="col-lg-6 d-flex align-content-center justify-content-center">
+                                <div class="card shadow-sm border-0 rounded-4 bg-body-secondary w-100">
+                                    <div class="card-body d-flex flex-column align-content-center justify-content-center">
+                                        <h6 class="fw-semibold mb-3">Total Collections (Week)</h6>
 
-                                    <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
-                                        <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:60%;"></div>
-                                        <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
-                                        <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:80%;"></div>
-                                        <div class="bg-primary rounded-2" style="width:10%;height:100%;"></div>
-                                        <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:85%;"></div>
-                                        <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
-                                        <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:50%;"></div>
+                                        <div class="d-flex align-items-end justify-content-between" style="height: 160px;">
+                                            <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:60%;"></div>
+                                            <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
+                                            <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:80%;"></div>
+                                            <div class="bg-primary rounded-2" style="width:10%;height:100%;"></div>
+                                            <div class="bg-primary bg-opacity-75 rounded-2" style="width:10%;height:85%;"></div>
+                                            <div class="bg-primary bg-opacity-50 rounded-2" style="width:10%;height:70%;"></div>
+                                            <div class="bg-primary bg-opacity-25 rounded-2" style="width:10%;height:50%;"></div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between text-muted small mt-2">
+                                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                        </div>
                                     </div>
+                                </div>
+                            </div> -->
+                            <div class="col-md-12 col-lg-7 d-flex flex-column align-content-center justify-content-start text-dim">
 
-                                    <div class="d-flex justify-content-between text-muted small mt-2">
-                                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                                <div class="row g-3 mt-4 mb-3">
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <button
+                                                    :class="counterStatus == true ? 'neu-btn neu-green' : 'neu-btn neu-red'"
+                                                    @click="turnOffCounters()">
+                                                    <font-awesome-icon icon="fa-solid fa-power-off" />
+                                                </button>
+                                                <p
+                                                    :class="counterStatus == true ? 'small mb-1 mt-2 fw-bold enabled-text' : 'small mb-1 mt-2 fw-bold text-danger'">
+                                                    {{ counterStatus == true ? 'ACTIVATED' : 'DEACTIVATED' }}</p>
+                                                <small class="text-dim">{{ counterStatus == true ? 'Counters are Active': 'Counters are Inactive' }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Total Counters</p>
+                                                <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
+                                                    Object.keys(countersData).length }}</h2>
+                                                <small class="text-dim">
+                                                    {{ counterStatus == true ? 'actively working' : 'are inactive' }}
+                                                </small>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Total Payment collected</p>
+                                                <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
+                                                    pesoConverter(totalCountersAmount) }}</h2>
+                                                <small class="text-dim">All Counters this week</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="neu-card p-3">
+                                    <div class="card-body d-flex flex-column align-content-center justify-content-center">
+                                        <p class="fw-semibold mb-3">
+                                            Total Collection (all counters week collection)
+                                        </p>
+                                        <p class="text-muted small mt-2">
+                                            [{{ formattedWeekStart }} → {{ formattedWeekEnd }}]
+                                        </p>
+
+                                        <!-- Bars -->
+                                        <div class="d-flex align-items-end justify-content-between" style="height: 191px;">
+                                            <div v-for="(height, index) in barHeights" :key="index"
+                                                class="rounded-2 transition-all" :class="[
+                                                    graphColor,
+                                                    days[index] === currentDay ? 'opacity-100' : 'bg-opacity-50'
+                                                ]" :style="{ width: '10%', height: height + '%' }">
+                                            </div>
+                                        </div>
+
+                                        <!-- Day labels -->
+                                        <div class="d-flex justify-content-between text-muted small mt-2">
+
+                                            <span v-for="(day, index) in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
+                                                :key="day" style="width: 10%">
+                                                <span class="text-primary fw-bold">{{ pesoConverter(weekCollection[index])
+                                                    }}</span>
+                                                <br />
+                                                {{ day }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div> -->
-                        <div class="col-md-12 col-lg-7 d-flex flex-column align-content-center justify-content-start text-dim">
-
-                            <div class="row g-3 mt-4 mb-3">
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <button
-                                                :class="counterStatus == true ? 'neu-btn neu-green' : 'neu-btn neu-red'"
-                                                @click="turnOffCounters()">
-                                                <font-awesome-icon icon="fa-solid fa-power-off" />
-                                            </button>
-                                            <p
-                                                :class="counterStatus == true ? 'small mb-1 mt-2 fw-bold enabled-text' : 'small mb-1 mt-2 fw-bold text-danger'">
-                                                {{ counterStatus == true ? 'ACTIVATED' : 'DEACTIVATED' }}</p>
-                                            <small class="text-dim">{{ counterStatus == true ? 'Counters are Active': 'Counters are Inactive' }}</small>
+                            <div class="col-lg-5 col-sm-12">
+                                <div class="row g-3 mt-4 mb-4">
+                                    <div class="col-md-12 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Total Earnings</p>
+                                                <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
+                                                    pesoConverter(totalDailyPayment) }}</h2>
+                                                <small class="text-secondary">as of the date</small>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-3 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Total Counters</p>
-                                            <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
-                                                Object.keys(countersData).length }}</h2>
-                                            <small class="text-dim">
-                                                {{ counterStatus == true ? 'actively working' : 'are inactive' }}
-                                            </small>
-
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Total Collections</p>
+                                                <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
+                                                    Object.keys(payment).length }}</h2>
+                                                <small class="text-secondary">transactions</small>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Total Payment collected</p>
-                                            <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
-                                                pesoConverter(totalCountersAmount) }}</h2>
-                                            <small class="text-dim">All Counters this week</small>
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Tuition Payment</p>
+                                                <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ totalTuitionPayment }}
+                                                </h2>
+                                                <small class="text-secondary">transactions</small>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="neu-card p-3">
-                                <div class="card-body d-flex flex-column align-content-center justify-content-center">
-                                    <p class="fw-semibold mb-3">
-                                        Total Collection (all counters week collection)
-                                    </p>
-                                    <p class="text-muted small mt-2">
-                                        [{{ formattedWeekStart }} → {{ formattedWeekEnd }}]
-                                    </p>
-
-                                    <!-- Bars -->
-                                    <div class="d-flex align-items-end justify-content-between" style="height: 191px;">
-                                        <div v-for="(height, index) in barHeights" :key="index"
-                                            class="rounded-2 transition-all" :class="[
-                                                graphColor,
-                                                days[index] === currentDay ? 'opacity-100' : 'bg-opacity-50'
-                                            ]" :style="{ width: '10%', height: height + '%' }">
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Misc Payment</p>
+                                                <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ totalMiscPayment }}</h2>
+                                                <small class="text-secondary">transactions</small>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <!-- Day labels -->
-                                    <div class="d-flex justify-content-between text-muted small mt-2">
-
-                                        <span v-for="(day, index) in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
-                                            :key="day" style="width: 10%">
-                                            <span class="text-primary fw-bold">{{ pesoConverter(weekCollection[index])
-                                                }}</span>
-                                            <br />
-                                            {{ day }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-5 col-sm-12">
-                            <div class="row g-3 mt-4 mb-4">
-                                <div class="col-md-12 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Total Earnings</p>
-                                            <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
-                                                pesoConverter(totalDailyPayment) }}</h2>
-                                            <small class="text-secondary">as of the date</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Total Collections</p>
-                                            <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{
-                                                Object.keys(payment).length }}</h2>
-                                            <small class="text-secondary">transactions</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Tuition Payment</p>
-                                            <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ totalTuitionPayment }}
-                                            </h2>
-                                            <small class="text-secondary">transactions</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Misc Payment</p>
-                                            <h2 :class="['fw-bold', 'mb-0', textColorHead]">{{ totalMiscPayment }}</h2>
-                                            <small class="text-secondary">transactions</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 col-sm-6">
-                                    <div class="neu-card p-3">
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-1">Active Cashiers</p>
-                                            <div style="height:160px; overflow: auto;" class="p-2">
-                                                <ul class="list-group text-uppercase">
-                                                    <li class="list-group-item bg-transparent">
-                                                        <div class="d-flex justify-content-between fw-bold">
-                                                            <small>Name</small> <small>This Week Collection</small>
-                                                        </div>
-                                                    </li>
-                                                    <li v-if="Object.keys(countersData).length == 0" class="list-group-item bg-transparent">
-                                                        <div class="text-center">
-                                                            <small>No Data Available</small>
-                                                        </div>
-                                                    </li>
-                                                    <li class="list-group-item bg-transparent" v-for="(cd, index) in countersData">
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <span>{{ cd.cashier }}</span> →
-                                                            <span class="fw-bold text-primary">{{
-                                                                pesoConverter(cd.amount) }}</span>
-                                                            <!-- <button @click="getSeries(cd)" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#seriesmodal">Edit Series</button> -->
-                                                        </div>
-                                                    </li>
-                                                </ul>
+                                    <div class="col-md-12 col-sm-6">
+                                        <div class="neu-card p-3">
+                                            <div class="card-body">
+                                                <p class="text-muted small mb-1">Active Cashiers</p>
+                                                <div style="height:160px; overflow: auto;" class="p-2">
+                                                    <ul class="list-group text-uppercase">
+                                                        <li class="list-group-item bg-transparent">
+                                                            <div class="d-flex justify-content-between fw-bold">
+                                                                <small>Name</small> <small>This Week Collection</small>
+                                                            </div>
+                                                        </li>
+                                                        <li v-if="Object.keys(countersData).length == 0" class="list-group-item bg-transparent">
+                                                            <div class="text-center">
+                                                                <small>No Data Available</small>
+                                                            </div>
+                                                        </li>
+                                                        <li class="list-group-item bg-transparent" v-for="(cd, index) in countersData">
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span>{{ cd.cashier }}</span> →
+                                                                <span class="fw-bold text-primary">{{
+                                                                    pesoConverter(cd.amount) }}</span>
+                                                                <!-- <button @click="getSeries(cd)" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#seriesmodal">Edit Series</button> -->
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row neu-card py-4 px-2 mb-3">
-                        <div class="col-md-12 col-lg-8 mt-2 mb-2">
-                            <div class="neu-card p-3">
-                                <div class="card-body">
-                                    <p class="text-muted small mb-1">Counters w/ Corresponding Receipt Series</p>
-                                    <div class="p-2">
-                                        <table class="neu-table-flat">
-                                            <thead>
-                                                <tr>
-                                                    <th>Cashier</th>
-                                                    <th>Start Series</th>
-                                                    <th>End Series</th>
-                                                    <th>Receipt Type</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(rs, index) in receiptSeries">
-                                                    <td class="text-uppercase">{{ rs.fullname }}</td>
-                                                    <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_start }}</td>
-                                                    <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_end }}</td>
-                                                    <td>
-                                                        <span v-if="rs.sr_receipt == 1">Official Receipt</span>
-                                                        <span v-if="rs.sr_receipt == 2">Provisional Receipt</span>
-                                                    </td>
-                                                </tr>
-                                                <tr v-if="!Object.keys(receiptSeries).length">
-                                                    <td colspan="4">
-                                                        Active Counters does not have updated series
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                        <div class="row neu-card py-4 px-2 mb-3">
+                            <div class="col-md-12 col-lg-8 mt-2 mb-2">
+                                <div class="neu-card p-3">
+                                    <div class="card-body">
+                                        <p class="text-muted small mb-1">Counters w/ Corresponding Receipt Series</p>
+                                        <div class="p-2">
+                                            <table class="neu-table-flat">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Cashier</th>
+                                                        <th>Start Series</th>
+                                                        <th>End Series</th>
+                                                        <th>Receipt Type</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(rs, index) in receiptSeries">
+                                                        <td class="text-uppercase">{{ rs.fullname }}</td>
+                                                        <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_start }}</td>
+                                                        <td>{{ rs.sr_prefix }}-{{ rs.sr_year }}-{{ rs.sr_end }}</td>
+                                                        <td>
+                                                            <span v-if="rs.sr_receipt == 1">Official Receipt</span>
+                                                            <span v-if="rs.sr_receipt == 2">Provisional Receipt</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="!Object.keys(receiptSeries).length">
+                                                        <td colspan="4">
+                                                            Active Counters does not have updated series
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-lg-4 mt-2 mb-2">
+                                <div class="neu-card p-3">
+                                    <div class="card-body">
+                                        <p class="text-muted small mb-1">Cashiers</p>
+                                        <div class="p-2">
+                                            <table class="neu-table-flat">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Cashier</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(emp, index) in employeeCashier">
+                                                        <td class="text-uppercase align-middle">
+                                                            <span>{{ emp.emp_firstname }} {{ emp.emp_lastname }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <button v-if="!counterStatus" class="neu-btn neu-green"
+                                                                @click="getSeries(emp)" data-bs-toggle="modal"
+                                                                data-bs-target="#seriesmodal">Edit Series</button>
+                                                            <span v-else class="fw-bold text-success"
+                                                                title="to edit series, deactivate all counters first">Active</span>
+                                                        </td>
+                                                    </tr>
+                                                    <tr v-if="!Object.keys(employeeCashier).length">
+                                                        <td colspan="4">
+                                                            No Active Counters
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 col-lg-4 mt-2 mb-2">
-                            <div class="neu-card p-3">
-                                <div class="card-body">
-                                    <p class="text-muted small mb-1">Cashiers</p>
-                                    <div class="p-2">
-                                        <table class="neu-table-flat">
-                                            <thead>
-                                                <tr>
-                                                    <th>Cashier</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="(emp, index) in employeeCashier">
-                                                    <td class="text-uppercase align-middle">
-                                                        <span>{{ emp.emp_firstname }} {{ emp.emp_lastname }}</span>
-                                                    </td>
-                                                    <td>
-                                                        <button v-if="!counterStatus" class="neu-btn neu-green"
-                                                            @click="getSeries(emp)" data-bs-toggle="modal"
-                                                            data-bs-target="#seriesmodal">Edit Series</button>
-                                                        <span v-else class="fw-bold text-success"
-                                                            title="to edit series, deactivate all counters first">Active</span>
-                                                    </td>
-                                                </tr>
-                                                <tr v-if="!Object.keys(employeeCashier).length">
-                                                    <td colspan="4">
-                                                        No Active Counters
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+
+
+                        <div class="row neu-card py-4 px-2 mb-3">
+                            <h6 class="fw-semibold mb-3">Transactions</h6>
+                            <div class="p-3">
+                                <table class="neu-table" style="text-transform:uppercase">
+                                    <thead>
+                                        <tr>
+                                            <th style="color:#555555">Payment ID</th>
+                                            <th style="color:#555555">Full Name</th>
+                                            <th style="color:#555555">Mode of Payment</th>
+                                            <th style="color:#555555">Date of Payment</th>
+                                            <th style="color:#555555">Transaction Type</th>
+                                            <th style="color:#555555">Detail</th>
+                                            <th style="color:#555555">Amount Paid</th>
+                                            <th style="color:#555555" class="text-center">Cashier</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-if="!fetchingCollection && Object.keys(payment).length"
+                                            v-for="(pay, index) in payment">
+                                            <td class="align-middle p-2">
+                                                {{ pay.acy_id }}
+                                            </td>
+                                            <td class="align-middle p-2">
+                                                <span v-if="pay.acy_billtype == 1">
+                                                    {{ pay.per_firstname }} {{ pay.per_middlename ? pay.per_middlename : ' ' }} {{
+                                                    pay.per_lastname }} {{ pay.per_suffixname ? pay.per_suffixname : ' ' }}
+                                                </span>
+                                                <span v-if="pay.acy_billtype == 2">
+                                                    {{ pay.acr_personname }}
+                                                </span>
+                                            </td>
+                                            <td class="align-middle p-2">
+                                                <span v-if="pay.acy_mode == 1"> Cash</span>
+                                                <span v-if="pay.acy_mode == 2"> Bank</span>
+                                                <span v-if="pay.acy_mode == 3"> Cheque</span>
+                                            </td>
+                                            <td class="align-middle p-2">
+                                                {{ pay.acy_datepaid.split('T')[0] }}
+                                            </td>
+                                            <td class="align-middle p-2">
+                                                <span v-if="pay.acy_billtype == 1"> Tuition</span>
+                                                <span v-if="pay.acy_billtype == 2"> Misc / Item</span>
+                                            </td>
+                                            <td class="align-middle p-2">
+                                                <span v-if="pay.acy_billtype == 1">N/A</span>
+                                                <span v-if="pay.acy_billtype == 2">{{ pay.acf_desc }}</span>
+                                            </td>
+                                            <td class="align-middle p-2 text-primary fw-bold">
+                                                {{ new Intl.NumberFormat('en-PH', {
+                                                    style: 'currency', currency: 'PHP'
+                                                }).format(pay.acy_payment) }}
+                                            </td>
+                                            <td class="align-middle p-2 ">
+                                                {{ pay.emp_firstname }} {{ pay.emp_lastname }}
+                                            </td>
+                                        </tr>
+                                        <tr v-if="!fetchingCollection && !Object.keys(payment).length"
+                                            style="text-transform:none">
+                                            <td class="p-3 text-center" colspan="8">
+                                                <NeuLoader4/>
+                                                <p class="fw-bold m-0">Nothing here yet!</p>
+                                                <p>try adding something new.</p>
+                                            </td>
+                                        </tr>
+                                        <tr v-if="fetchingCollection && !Object.keys(payment).length"
+                                            style="text-transform:none">
+                                            <td class="p-3 text-center" colspan="8">
+                                                <div class="m-3">
+                                                    <NeuLoader2 />
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </div>
 
-
-                    <div class="row neu-card py-4 px-2 mb-3">
-                        <h6 class="fw-semibold mb-3">Transactions</h6>
-                        <div class="p-3">
-                            <table class="neu-table" style="text-transform:uppercase">
-                                <thead>
-                                    <tr>
-                                        <th style="color:#555555">Payment ID</th>
-                                        <th style="color:#555555">Full Name</th>
-                                        <th style="color:#555555">Mode of Payment</th>
-                                        <th style="color:#555555">Date of Payment</th>
-                                        <th style="color:#555555">Transaction Type</th>
-                                        <th style="color:#555555">Detail</th>
-                                        <th style="color:#555555">Amount Paid</th>
-                                        <th style="color:#555555" class="text-center">Cashier</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-if="!fetchingCollection && Object.keys(payment).length"
-                                        v-for="(pay, index) in payment">
-                                        <td class="align-middle p-2">
-                                            {{ pay.acy_id }}
-                                        </td>
-                                        <td class="align-middle p-2">
-                                            <span v-if="pay.acy_billtype == 1">
-                                                {{ pay.per_firstname }} {{ pay.per_middlename ? pay.per_middlename : ' ' }} {{
-                                                pay.per_lastname }} {{ pay.per_suffixname ? pay.per_suffixname : ' ' }}
-                                            </span>
-                                            <span v-if="pay.acy_billtype == 2">
-                                                {{ pay.acr_personname }}
-                                            </span>
-                                        </td>
-                                        <td class="align-middle p-2">
-                                            <span v-if="pay.acy_mode == 1"> Cash</span>
-                                            <span v-if="pay.acy_mode == 2"> Bank</span>
-                                            <span v-if="pay.acy_mode == 3"> Cheque</span>
-                                        </td>
-                                        <td class="align-middle p-2">
-                                            {{ pay.acy_datepaid.split('T')[0] }}
-                                        </td>
-                                        <td class="align-middle p-2">
-                                            <span v-if="pay.acy_billtype == 1"> Tuition</span>
-                                            <span v-if="pay.acy_billtype == 2"> Misc / Item</span>
-                                        </td>
-                                        <td class="align-middle p-2">
-                                            <span v-if="pay.acy_billtype == 1">N/A</span>
-                                            <span v-if="pay.acy_billtype == 2">{{ pay.acf_desc }}</span>
-                                        </td>
-                                        <td class="align-middle p-2 text-primary fw-bold">
-                                            {{ new Intl.NumberFormat('en-PH', {
-                                                style: 'currency', currency: 'PHP'
-                                            }).format(pay.acy_payment) }}
-                                        </td>
-                                        <td class="align-middle p-2 ">
-                                            {{ pay.emp_firstname }} {{ pay.emp_lastname }}
-                                        </td>
-                                    </tr>
-                                    <tr v-if="!fetchingCollection && !Object.keys(payment).length"
-                                        style="text-transform:none">
-                                        <td class="p-3 text-center" colspan="8">
-                                            <NeuLoader4/>
-                                            <p class="fw-bold m-0">Nothing here yet!</p>
-                                            <p>The hamster took a break 💤 — try adding something new.</p>
-                                        </td>
-                                    </tr>
-                                    <tr v-if="fetchingCollection && !Object.keys(payment).length"
-                                        style="text-transform:none">
-                                        <td class="p-3 text-center" colspan="8">
-                                            <div class="m-3">
-                                                <NeuLoader2 />
-                                            </div>
-                                        </td>
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
                     </div>
 
                 </div>

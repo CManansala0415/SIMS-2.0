@@ -1,7 +1,9 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import Loader from '../snippets/loaders/Loading1.vue';
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 
 // import Enroll from '../snippets/modal/Enrollment.vue';
@@ -178,12 +180,13 @@ const downloadExcel = () => {
             <h5 class=" text-uppercase fw-bold">Faculty Loads</h5>
         </div>
 
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1/>
-        </div>
+        </div> -->
 
-        <div v-else>
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+        <div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <!-- <div class="input-group w-50">
                     <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span>
                     <input type="text" class="form-control" placeholder="Search Here..." aria-label="search"
@@ -254,8 +257,11 @@ const downloadExcel = () => {
                             <td class="align-middle text-center" colspan="5">
                                 <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
+                        </tr>
+                        <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="5" />
                         </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
                             <td class="align-middle" colspan="5">

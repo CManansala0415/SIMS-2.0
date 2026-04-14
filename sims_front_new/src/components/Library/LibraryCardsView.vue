@@ -14,7 +14,9 @@ import { getStudent,
          deleteEnrollment,
          getAcademicDefaults,
         getStudentFiltering } from "../Fetchers.js";
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 import NeuLoader2 from '../snippets/loaders/NeuLoader2.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 import LibraryCard from '../snippets/modal/LibraryCardModal.vue';
@@ -316,12 +318,13 @@ const getData = (result) =>{
             <h5 class=" text-uppercase fw-bold">Library Cards</h5>
         </div>
         
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1/>
-        </div>
+        </div> -->
 
-        <div v-else>
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+        <div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div  v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-between align-content-center w-75">
                     <input type="text" v-model="searchFname" @keyup.enter="search()"
                         class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
@@ -439,14 +442,17 @@ const getData = (result) =>{
                             </td>
                         </tr>
                         <tr v-if="!preLoading && !Object.keys(student).length">
-                            <td class="p-3 text-center" colspan="7">
+                            <td class="p-3 text-center" colspan="5">
                                 <NeuLoader4/>
                                     <p class="fw-bold m-0">Nothing here yet!</p>
-                                    <p>The hamster took a break 💤 — try adding something new.</p>
+                                    <p>try adding something new.</p>
                             </td>
                         </tr>
+                        <tr v-if="preLoading && !Object.keys(student).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="5" />
+                        </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(student).length"  style="text-transform:none">
-                            <td class="p-3 text-center" colspan="7">
+                            <td class="p-3 text-center" colspan="5">
                                 <div class="m-3">
                                     <Loader />
                                 </div>

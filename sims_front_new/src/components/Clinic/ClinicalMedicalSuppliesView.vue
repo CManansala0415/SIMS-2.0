@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
 // import MedicalSupplies from '../snippets/modal/MedicalSupplies.vue';
 import { getUserID } from "../../routes/user.js";
@@ -237,11 +239,12 @@ const editData = (mode, data) => {
             <h5 class=" text-uppercase fw-bold">Clinic Medical Supplies</h5>
         </div>
 
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1/>
-        </div>
-        <div v-else>
-            <div class="p-1 d-flex gap-2 justify-content-between mb-3">
+        </div> -->
+        <div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div v-else class="p-1 d-flex gap-2 justify-content-between mb-3">
                 <div class="input-group w-50">
                     <!-- <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search" /></span> -->
                     <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
@@ -300,14 +303,17 @@ const editData = (mode, data) => {
                             </td>
                         </tr>
                         <tr v-if="!preLoading && !Object.keys(medicalSupplies).length" style="text-transform:none">
-                            <td class="p-3 text-center" colspan="7">
+                            <td class="p-3 text-center" colspan="5">
                                 <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
                         </tr>
+                        <tr v-if="preLoading && !Object.keys(medicalSupplies).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="5" />
+                        </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(medicalSupplies).length" style="text-transform:none">
-                            <td class="p-3 text-center" colspan="7">
+                            <td class="p-3 text-center" colspan="5">
                                 <div class="m-3">
                                     <Loader />
                                 </div>

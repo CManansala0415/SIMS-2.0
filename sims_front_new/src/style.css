@@ -604,7 +604,7 @@ h1 {
 }
 
 .neu-input:disabled{
-  background: #d8d8d8;
+  background: #d9e0e7;
   cursor: not-allowed;
 }
 
@@ -758,7 +758,7 @@ option{
 }
 
 .neu-select:disabled {
-  background: #d8d8d8;
+  background: #e5edf5;
 }
 
 .neu-nav-btn{

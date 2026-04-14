@@ -7,9 +7,11 @@ import { ref, onMounted, computed } from 'vue';
 // import MiniYellowBtn from '../snippets/buttons/MiniYellowBtn.vue';
 // import MiniTealBtn from '../snippets/buttons/MiniTealBtn.vue';
 // import RedBtn from '../snippets/buttons/RedBtn.vue';
-import Loader from '../snippets/loaders/Loading1.vue';
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import Loader from '../snippets/loaders/Loading1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 // import Enroll from '../snippets/modal/Enrollment.vue';
 import ApplicationModal from '../snippets/modal/ApplicationModal.vue';
 import ApplicationFormModal from '../snippets/modal/ApplicationFormModal.vue';
@@ -45,6 +47,7 @@ import {
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 import SearchQR from '../snippets/tech/SearchQR.vue';
 import ApplicationMilestoneModal from '../snippets/modal/ApplicationMilestoneModal.vue';
+
 
 const limit = ref(10)
 const offset = ref(0)
@@ -448,12 +451,13 @@ const hideModal = () => {
             <h5 class=" text-uppercase fw-bold">Student Admission</h5>
         </div>
 
-        <div v-if="preLoading">
+        <!-- <div v-if="preLoading">
             <NeuLoader1/>
-        </div>
+        </div> -->
 
-        <div v-else>
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+        <div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <!-- <div class="input-group w-50">
                     <span class="input-group-text" id="searchaddon"><font-awesome-icon icon="fa-solid fa-search"
                             /></span>
@@ -549,16 +553,12 @@ const hideModal = () => {
                             <td class="p-3 text-center" colspan="7">
                                <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
                         </tr>
-                        <!-- <tr v-if="preLoading && !Object.keys(applicant).length" style="text-transform:none">
-                            <td class="p-3 text-center" colspan="7">
-                                <div class="m-3">
-                                    <NeuLoader1 />
-                                </div>
-                            </td>
-                        </tr> -->
+                        <tr v-if="preLoading && !Object.keys(applicant).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="7" />
+                        </tr>
                     </tbody>
                 </table>
                 <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">

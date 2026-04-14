@@ -15,8 +15,10 @@ import {
     getCurriculumSubject,
     getAcademicDefaults
 } from "../Fetchers.js";
-import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
+// import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 
 import LaunchSemesterModal from '../snippets/modal/LaunchSemesterModal.vue';
 import LaunchScheduleModal from '../snippets/modal/LaunchScheduleModal.vue';
@@ -228,15 +230,17 @@ onMounted(async () => {
         <h5 class=" text-uppercase fw-bold">Semester Launch</h5>
     </div>
 
-    <div v-if="preLoading">
+    <!-- <div v-if="preLoading">
         <NeuLoader1 />
-    </div>
-    <div v-else>
+    </div> -->
+    
+    <div>
         <div v-if="sched">
             <LaunchScheduleModal  :launchData="launchData" :buildingData="building" :classroomData="classroom" @close-sched="showSched()"/>
         </div>
         <div v-else>
-            <div class="p-3 d-flex gap-2 justify-content-between mb-3">
+            <SkeletonHeaderLoader :elementcount="2" v-if="preLoading"/>
+            <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 w-50">
                     <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
                         v-model="searchValue" aria-describedby="searchaddon"
@@ -309,8 +313,11 @@ onMounted(async () => {
                             <td class="p-3 text-center" colspan="8">
                                 <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
+                        </tr>
+                        <tr v-if="preLoading && !Object.keys(launch).length" v-for="a in 5">
+                            <SkeletonTableLoader :tdcount="8" />
                         </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(launch).length">
                             <td class="p-3 text-center" colspan="8">

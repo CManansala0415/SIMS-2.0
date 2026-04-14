@@ -1,0 +1,65 @@
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  tdcount: Number
+});
+
+const tdNum = computed(() => props.tdcount);
+</script>
+
+<template>
+  <td v-for="n in tdNum" :key="n" class="skeleton-td">
+    <div class="skeleton shimmer"></div>
+  </td>
+</template>
+
+<style scoped>
+.skeleton-td {
+  padding: 12px;
+}
+
+/* Base skeleton */
+.skeleton {
+  height: 23px;
+  width: 100%;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  background-color: #e5e7eb;
+}
+
+/* Shimmer effect */
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  height: 100%;
+  width: 150%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #d8e0e7,
+    transparent
+  );
+  animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    left: 150%;
+  }
+}
+
+/* Optional: variation per column for realism */
+.skeleton-td:nth-child(1) .skeleton {
+  width: 80%;
+}
+.skeleton-td:nth-child(2) .skeleton {
+  width: 60%;
+}
+.skeleton-td:nth-child(3) .skeleton {
+  width: 40%;
+}
+</style>

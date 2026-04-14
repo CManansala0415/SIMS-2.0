@@ -4,7 +4,7 @@ import { ref, onMounted, computed } from 'vue';
 //           getAllPayments
 //        } from "../../Fetchers.js";
 import Loader from '../loaders/Loading1.vue';
-
+import NeuLoader4 from '../loaders/NeuLoader4.vue';
 const props = defineProps({
   gradingsheetdata: {
   },

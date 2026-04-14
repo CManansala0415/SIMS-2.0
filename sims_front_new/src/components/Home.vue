@@ -7,7 +7,8 @@ import { formatDateTime, getHolidays, getDateToday } from './Generators.js'
 import { getAnnouncement, editAnnouncement, getEmployee } from './Fetchers.js'
 import NeuLoader1 from './snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from './snippets/loaders/NeuLoader4.vue';
-
+import SkeletonPostLoader from './snippets/loaders/SkeletonPostLoader.vue';
+import SkeletonHeaderLoader from './snippets/loaders/SkeletonHeaderLoader.vue';
 const user = ref('')
 const userID = ref('')
 const router = useRouter();
@@ -30,7 +31,7 @@ onMounted(async () => {
     user.value = results.account.data.name
     userID.value = results.account.data.id
     emit('fetchUser', results)
-    emit('doneLoading', false)
+    // emit('doneLoading', false)
 
     getAnnouncement(1).then((results) => {
       announcementData.value = results.data
@@ -45,7 +46,7 @@ onMounted(async () => {
         })
 
         preLoading.value = false
-
+        emit('doneLoading', false)
         // console.log(birthdaysData.value)
         // console.log(dateToday.value)
       })
@@ -216,8 +217,9 @@ const upvotePost = (id) =>{
       <h5 class=" text-uppercase fw-bold">Dashboard</h5>
     </div>
 
-    <div v-if="preLoading">
-      <NeuLoader1 />
+    <div v-if="preLoading" class="mb-3">
+      <SkeletonHeaderLoader :elementcount="4"/>
+      <SkeletonPostLoader :elementcount="4"/>
     </div>
     <div v-else>
       <div class="d-flex gap-2 justify-content-between mb-3">
