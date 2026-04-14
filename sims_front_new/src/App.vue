@@ -496,372 +496,374 @@ const bgGradient = ref(`
           </div>
         </nav>
 
-        <div v-if="fetchingUserAccess">
-          <div class="d-flex w-100 justify-content-between">
-            <SkeletonHeaderLoader :elementcount="2"/>
+        <div v-if="path != '/'">
+          <div v-if="fetchingUserAccess">
+            <div class="d-flex w-100 justify-content-between">
+              <SkeletonHeaderLoader :elementcount="2"/>
+            </div>
+            <div class="neu-card w-100 m-0 border p-2 mb-4 mt-2">
+              <SkeletonHeaderLoader :elementcount="5"/>
+            </div>
           </div>
-          <div class="neu-card w-100 m-0 border p-2 mb-4 mt-2">
-            <SkeletonHeaderLoader :elementcount="5"/>
-          </div>
-        </div>
-        <div v-else>
-          <div v-if="path != '/'" class="d-flex align-content-center justify-content-between flex-wrap small-font">
-            <div>
-              <span v-if="fetchingUserAccess" class="fw-regular">Identifying Academic Calendar...</span>
-              <div class="dropdown" v-else>
-                <button class="btn btn-sm dropdown-toggle" type="button" id="notifications" data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  Academic Status
-                </button>
-                <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="notifications">
-                  <li class="dropdown-item">SY {{ yrFromto }}-{{ yrFromInfo }}</li>
-                  <li class="dropdown-item">{{ semInfo }} Semester</li>
-                  <li class="dropdown-item">Enrollment is {{ enrollmentInfo }}</li>
-                </ul>
+          <div v-else>
+            <div class="d-flex align-content-center justify-content-between flex-wrap small-font">
+              <div>
+                <span v-if="fetchingUserAccess" class="fw-regular">Identifying Academic Calendar...</span>
+                <div class="dropdown" v-else>
+                  <button class="btn btn-sm dropdown-toggle" type="button" id="notifications" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                    Academic Status
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="notifications">
+                    <li class="dropdown-item">SY {{ yrFromto }}-{{ yrFromInfo }}</li>
+                    <li class="dropdown-item">{{ semInfo }} Semester</li>
+                    <li class="dropdown-item">Enrollment is {{ enrollmentInfo }}</li>
+                  </ul>
+                </div>
+              </div>
+              <div>
+                <span v-if="fetchingUserAccess" class="fw-regular">Identifying User...</span>
+                <span v-else class="fw-regular">Welcome <span class="fw-bold text-uppercase">{{ userName }}</span></span>
               </div>
             </div>
-            <div>
-              <span v-if="fetchingUserAccess" class="fw-regular">Identifying User...</span>
-              <span v-else class="fw-regular">Welcome <span class="fw-bold text-uppercase">{{ userName }}</span></span>
-            </div>
-          </div>
-          <div v-if="path != '/'" class="neu-card w-100 m-0 border p-2 mb-4 mt-2">
-            <div class="row g-2">
-              <div class="col-12 d-flex justify-content-between">
-                <div v-if="fetchingUserAccess" class="d-flex gap-2 align-content-center flex-wrap">
-                  <nav class="nav gap-2 p-2">
-                    <div class="dropdown">
-                      <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Loading Please Wait...
-                      </button>
-                    </div>
-                  </nav>
-                </div>
-                <div v-else class="d-flex gap-2 align-content-center flex-wrap">
-                  <!-- <div class="form-group col">
-                      <select class="neu-nav-btn neu-select">
-                          <option v-for="(admin, index) in administrativeAccess">
-                            <router-link :to="admin.link" @click="switchItem(admin.useracc_category,admin.useracc_modulecode) " class="dropdown-item">
+            <div v-if="path != '/'" class="neu-card w-100 m-0 border p-2 mb-4 mt-2">
+              <div class="row g-2">
+                <div class="col-12 d-flex justify-content-between">
+                  <div v-if="fetchingUserAccess" class="d-flex gap-2 align-content-center flex-wrap">
+                    <nav class="nav gap-2 p-2">
+                      <div class="dropdown">
+                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Loading Please Wait...
+                        </button>
+                      </div>
+                    </nav>
+                  </div>
+                  <div v-else class="d-flex gap-2 align-content-center flex-wrap">
+                    <!-- <div class="form-group col">
+                        <select class="neu-nav-btn neu-select">
+                            <option v-for="(admin, index) in administrativeAccess">
+                              <router-link :to="admin.link" @click="switchItem(admin.useracc_category,admin.useracc_modulecode) " class="dropdown-item">
+                                {{ admin.description }}
+                              </router-link>
+                            </option>
+                        </select>
+                    </div> -->
+                    <nav class="nav gap-2 p-2">
+                      <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                          General
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                          <li><router-link to="/home" class="dropdown-item" href="#">Announcement</router-link></li>
+                        </ul>
+                      </div>
+                      <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                          v-if="administrative > 0" data-bs-toggle="dropdown" aria-expanded="false">
+                          Administrative
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                          <li v-for="(admin, index) in administrativeAccess">
+                            <router-link :to="admin.link"
+                              @click="switchItem(admin.useracc_category, admin.useracc_modulecode)" class="dropdown-item">
                               {{ admin.description }}
                             </router-link>
-                          </option>
-                      </select>
-                  </div> -->
-                  <nav class="nav gap-2 p-2">
-                    <div class="dropdown">
-                      <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        General
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                        <li><router-link to="/home" class="dropdown-item" href="#">Announcement</router-link></li>
-                      </ul>
-                    </div>
-                    <div class="dropdown">
-                      <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                        v-if="administrative > 0" data-bs-toggle="dropdown" aria-expanded="false">
-                        Administrative
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                        <li v-for="(admin, index) in administrativeAccess">
-                          <router-link :to="admin.link"
-                            @click="switchItem(admin.useracc_category, admin.useracc_modulecode)" class="dropdown-item">
-                            {{ admin.description }}
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                          v-if="transactions > 0" data-bs-toggle="dropdown" aria-expanded="false">
+                          Transactions
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                          <li v-for="(transac, index) in transactionsAccess">
+                            <router-link :to="transac.link"
+                              @click="switchItem(transac.useracc_category, transac.useracc_modulecode)" class="dropdown-item"
+                              href="#">{{ transac.description }}</router-link>
+                          </li>
+                        </ul>
+                      </div>
+                      <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2" v-if="academics > 0"
+                          data-bs-toggle="dropdown" aria-expanded="false">
+                          Academics
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                          <li v-for="(academe, index) in academicsAccess">
+                            <router-link :to="academe.link"
+                              @click="switchItem(academe.useracc_category, academe.useracc_modulecode)" class="dropdown-item"
+                              href="#">{{ academe.description }}</router-link>
+                          </li>
+                        </ul>
+                      </div>
+                    </nav>
+                  </div>
+
+                  <div class="d-flex align-content-center flex-wrap gap-2">
+                    <div v-if="!fetchingUserAccess" class="d-flex align-content-center flex-wrap">
+                      <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 1 && itemSelected == 1">
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Menu
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                            <li>
+                              <router-link @click="checkPath('/registrar-application')"
+                                v-if="accessData[0].useracc_grant == 1" to="/registrar-application" class="dropdown-item"
+                                title="Student Application" tabindex="-1">
+                                <p class="m-2">Student Admission</p>
+                              </router-link>
+                            </li>
+
+                            <li>
+                              <router-link @click="checkPath('/registrar-enrollment')" v-if="accessData[1].useracc_grant == 1"
+                                to="/registrar-enrollment" class="dropdown-item" title="Student Enrollment" tabindex="-1">
+                                <p class="m-2">Enrolled Students</p>
+                              </router-link>
+                            </li>
+
+                            <li>
+                              <router-link @click="checkPath('/registrar-request')" v-if="accessData[2].useracc_grant == 1"
+                                to="/registrar-request" class="dropdown-item" title="Student Request" tabindex="-1">
+                                <p class="m-2">Student Requests</p>
+                              </router-link>
+                            </li>
+
+                            <li>
+                              <router-link @click="checkPath('/registrar-launch')" v-if="accessData[3].useracc_grant == 1"
+                                to="/registrar-launch" class="dropdown-item" title="Student Schedules" tabindex="-1">
+                                <p class="m-2">Semester Launch</p>
+                              </router-link>
+                            </li>
+
+                            <li>
+                              <router-link @click="checkPath('/registrar-personnel')" v-if="accessData[4].useracc_grant == 1"
+                                to="/registrar-personnel" class="dropdown-item" title="Personnel Management" tabindex="-1">
+                                <p class="m-2">Employee Management</p>
+                              </router-link>
+                            </li>
+
+                            <li>
+                              <router-link @click="checkPath('/registrar-settings')" v-if="accessData[5].useracc_grant == 1"
+                                to="/registrar-settings" class="dropdown-item" title="Registrar Settings" tabindex="-1">
+                                <p class="m-2">Registrar Settings</p>
+                              </router-link>
+                            </li>
+
+                            <li>
+                              <router-link @click="checkPath('/registrar-alumni')" v-if="accessData[6].useracc_grant == 1"
+                                to="/registrar-alumni" class="dropdown-item" title="Alumni Association" tabindex="-1">
+                                <p class="m-2">Alumni Tracker</p>
+                              </router-link>
+                            </li>
+
+                          </ul>
+                        </div>
+                      </nav>
+
+                      <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 1 && itemSelected == 2">
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Menu
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                            <li>
+                              <router-link @click="checkPath('/registrar-library-books')"
+                                v-if="accessData[7].useracc_grant == 1" to="/registrar-library-books" class="dropdown-item"
+                                title="Book Inventory" tabindex="-1">
+                                <p class="m-2">Book Supplies</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/registrar-library-books-borrowers')"
+                                v-if="accessData[8].useracc_grant == 1" to="/registrar-library-books-borrowers"
+                                class="dropdown-item" title="Book Borrowers" tabindex="-1">
+                                <p class="m-2">Book Borrowers</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/registrar-library-books-ddc')"
+                                v-if="accessData[9].useracc_grant == 1" to="/registrar-library-books-ddc"
+                                class="dropdown-item" title="Book DDC" tabindex="-1">
+                                <p class="m-2">Book DDC</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/registrar-library-cards')"
+                                v-if="accessData[10].useracc_grant == 1" to="/registrar-library-cards" class="dropdown-item"
+                                title="Library Cards" tabindex="-1">
+                                <p class="m-2">Library Cards</p>
+                              </router-link>
+                            </li>
+                          </ul>
+                        </div>
+                      </nav>
+
+                      <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 1 && itemSelected == 3">
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Menu
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                            <li>
+                              <router-link @click="checkPath('/registrar-clinical-students')"
+                                v-if="accessData[11].useracc_grant == 1" to="/registrar-clinical-students"
+                                class="dropdown-item" title="Clinical Records" tabindex="-1">
+                                <p class="m-2">Student Records</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/registrar-clinical-employee')"
+                                v-if="accessData[12].useracc_grant == 1" to="/registrar-clinical-employee"
+                                class="dropdown-item" title="Clinical Records" tabindex="-1">
+                                <p class="m-2">Employee Records</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/registrar-clinical-medical-supplies')"
+                                v-if="accessData[13].useracc_grant == 1" to="/registrar-clinical-medical-supplies"
+                                class="dropdown-item" title="Clinical Records" tabindex="-1">
+                                <p class="m-2">Medical Supplies</p>
+                              </router-link>
+                            </li>
+                          </ul>
+                        </div>
+                      </nav>
+
+                      <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 2 && itemSelected == 1">
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Menu
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                            <li>
+                              <router-link @click="checkPath('/daily-collections-accounting')"
+                                v-if="accessData[14].useracc_grant == 1" to="/daily-collections-accounting"
+                                class="dropdown-item" title="items" tabindex="-1">
+                                <p class="m-2">Daily Collections</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/accounting-items')" v-if="accessData[15].useracc_grant == 1"
+                                to="/accounting-items" class="dropdown-item" title="items" tabindex="-1">
+                                <p class="m-2">Miscellaneuos / Items</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/accounting-tuition')" v-if="accessData[16].useracc_grant == 1"
+                                to="/accounting-tuition" class="dropdown-item" title="items" tabindex="-1">
+                                <p class="m-2">Tuition / Charges</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/accounting-subjects')" v-if="accessData[17].useracc_grant == 1"
+                                to="/accounting-subjects" class="dropdown-item" title="items" tabindex="-1">
+                                <p class="m-2">Subject Rates</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/accounting-student-accounts')"
+                                v-if="accessData[18].useracc_grant == 1" to="/accounting-student-accounts"
+                                class="dropdown-item" title="items" tabindex="-1">
+                                <p class="m-2">Student Accounts</p>
+                              </router-link>
+                            </li>
+                            <!-- <li>
+                          <router-link to="/accounting-package" class="dropdown-item" tabindex="-1">
+                            <i class="m-2 fa-solid fa-paper-plane"></i>
+                            <p class="m-2">Packages</p>
                           </router-link>
-                        </li>
-                      </ul>
+                        </li> -->
+                          </ul>
+                        </div>
+                      </nav>
+
+                      <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 2 && itemSelected == 2">
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Menu
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                            <li>
+                              <router-link @click="checkPath('/daily-collections-cashier')"
+                                v-if="accessData[19].useracc_grant == 1" to="/daily-collections-cashier" class="dropdown-item"
+                                title="request" tabindex="-1">
+                                <p class="m-2">Daily Collections</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/accounting-billing')" v-if="accessData[20].useracc_grant == 1"
+                                to="/accounting-billing" class="dropdown-item" title="Billing" tabindex="-1">
+                                <p class="m-2">Tuition Payment</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/accounting-request')" v-if="accessData[21].useracc_grant == 1"
+                                to="/accounting-request" class="dropdown-item" title="request" tabindex="-1">
+                                <p class="m-2">Request Payment</p>
+                              </router-link>
+                            </li>
+                          </ul>
+                        </div>
+                      </nav>
+
+
+                      <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 3 && itemSelected == 1">
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Menu
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
+                            <!-- <li>
+                              <router-link to="/faculty-classes" class="dropdown-item" tabindex="-1">
+                                <p class="m-2">Faculty Loadings</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link to="/faculty-assignment" class="dropdown-item" tabindex="-1">
+                                <p class="m-2">Faculty Assignments</p>
+                              </router-link>
+                            </li> -->
+                            <li>
+                              <router-link @click="checkPath('/faculty-classes')" v-if="accessData[22].useracc_grant == 1"
+                                to="/faculty-classes" class="dropdown-item" tabindex="-1">
+                                <p class="m-2">Faculty Loadings</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/faculty-student')" v-if="accessData[23].useracc_grant == 1"
+                                to="/faculty-student" class="dropdown-item" tabindex="-1">
+                                <p class="m-2">Faculty Students</p>
+                              </router-link>
+                            </li>
+                            <li>
+                              <router-link @click="checkPath('/faculty-grading-sheet')"
+                                v-if="accessData[24].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item"
+                                title="items" tabindex="-1">
+                                <p class="m-2">Grading Sheet</p>
+                              </router-link>
+                            </li>
+                          </ul>
+                        </div>
+                      </nav>
                     </div>
-                    <div class="dropdown">
-                      <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                        v-if="transactions > 0" data-bs-toggle="dropdown" aria-expanded="false">
-                        Transactions
+                    <div class="d-flex align-content-center flex-wrap">
+                      <button type="button" @click="handleLogout()" class="neu-btn neu-red p-2 z-1" title="items"
+                        :disabled="isLoading ? true : false" tabindex="-1"><font-awesome-icon icon="fa-solid fa-power-off" />
+                        Logout
                       </button>
-                      <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                        <li v-for="(transac, index) in transactionsAccess">
-                          <router-link :to="transac.link"
-                            @click="switchItem(transac.useracc_category, transac.useracc_modulecode)" class="dropdown-item"
-                            href="#">{{ transac.description }}</router-link>
-                        </li>
-                      </ul>
                     </div>
-                    <div class="dropdown">
-                      <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2" v-if="academics > 0"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Academics
-                      </button>
-                      <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                        <li v-for="(academe, index) in academicsAccess">
-                          <router-link :to="academe.link"
-                            @click="switchItem(academe.useracc_category, academe.useracc_modulecode)" class="dropdown-item"
-                            href="#">{{ academe.description }}</router-link>
-                        </li>
-                      </ul>
-                    </div>
-                  </nav>
-                </div>
-
-                <div class="d-flex align-content-center flex-wrap gap-2">
-                  <div v-if="!fetchingUserAccess" class="d-flex align-content-center flex-wrap">
-                    <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 1 && itemSelected == 1">
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                          data-bs-toggle="dropdown" aria-expanded="false">
-                          Menu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                          <li>
-                            <router-link @click="checkPath('/registrar-application')"
-                              v-if="accessData[0].useracc_grant == 1" to="/registrar-application" class="dropdown-item"
-                              title="Student Application" tabindex="-1">
-                              <p class="m-2">Student Admission</p>
-                            </router-link>
-                          </li>
-
-                          <li>
-                            <router-link @click="checkPath('/registrar-enrollment')" v-if="accessData[1].useracc_grant == 1"
-                              to="/registrar-enrollment" class="dropdown-item" title="Student Enrollment" tabindex="-1">
-                              <p class="m-2">Enrolled Students</p>
-                            </router-link>
-                          </li>
-
-                          <li>
-                            <router-link @click="checkPath('/registrar-request')" v-if="accessData[2].useracc_grant == 1"
-                              to="/registrar-request" class="dropdown-item" title="Student Request" tabindex="-1">
-                              <p class="m-2">Student Requests</p>
-                            </router-link>
-                          </li>
-
-                          <li>
-                            <router-link @click="checkPath('/registrar-launch')" v-if="accessData[3].useracc_grant == 1"
-                              to="/registrar-launch" class="dropdown-item" title="Student Schedules" tabindex="-1">
-                              <p class="m-2">Semester Launch</p>
-                            </router-link>
-                          </li>
-
-                          <li>
-                            <router-link @click="checkPath('/registrar-personnel')" v-if="accessData[4].useracc_grant == 1"
-                              to="/registrar-personnel" class="dropdown-item" title="Personnel Management" tabindex="-1">
-                              <p class="m-2">Employee Management</p>
-                            </router-link>
-                          </li>
-
-                          <li>
-                            <router-link @click="checkPath('/registrar-settings')" v-if="accessData[5].useracc_grant == 1"
-                              to="/registrar-settings" class="dropdown-item" title="Registrar Settings" tabindex="-1">
-                              <p class="m-2">Registrar Settings</p>
-                            </router-link>
-                          </li>
-
-                          <li>
-                            <router-link @click="checkPath('/registrar-alumni')" v-if="accessData[6].useracc_grant == 1"
-                              to="/registrar-alumni" class="dropdown-item" title="Alumni Association" tabindex="-1">
-                              <p class="m-2">Alumni Tracker</p>
-                            </router-link>
-                          </li>
-
-                        </ul>
-                      </div>
-                    </nav>
-
-                    <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 1 && itemSelected == 2">
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                          data-bs-toggle="dropdown" aria-expanded="false">
-                          Menu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                          <li>
-                            <router-link @click="checkPath('/registrar-library-books')"
-                              v-if="accessData[7].useracc_grant == 1" to="/registrar-library-books" class="dropdown-item"
-                              title="Book Inventory" tabindex="-1">
-                              <p class="m-2">Book Supplies</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/registrar-library-books-borrowers')"
-                              v-if="accessData[8].useracc_grant == 1" to="/registrar-library-books-borrowers"
-                              class="dropdown-item" title="Book Borrowers" tabindex="-1">
-                              <p class="m-2">Book Borrowers</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/registrar-library-books-ddc')"
-                              v-if="accessData[9].useracc_grant == 1" to="/registrar-library-books-ddc"
-                              class="dropdown-item" title="Book DDC" tabindex="-1">
-                              <p class="m-2">Book DDC</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/registrar-library-cards')"
-                              v-if="accessData[10].useracc_grant == 1" to="/registrar-library-cards" class="dropdown-item"
-                              title="Library Cards" tabindex="-1">
-                              <p class="m-2">Library Cards</p>
-                            </router-link>
-                          </li>
-                        </ul>
-                      </div>
-                    </nav>
-
-                    <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 1 && itemSelected == 3">
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                          data-bs-toggle="dropdown" aria-expanded="false">
-                          Menu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                          <li>
-                            <router-link @click="checkPath('/registrar-clinical-students')"
-                              v-if="accessData[11].useracc_grant == 1" to="/registrar-clinical-students"
-                              class="dropdown-item" title="Clinical Records" tabindex="-1">
-                              <p class="m-2">Student Records</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/registrar-clinical-employee')"
-                              v-if="accessData[12].useracc_grant == 1" to="/registrar-clinical-employee"
-                              class="dropdown-item" title="Clinical Records" tabindex="-1">
-                              <p class="m-2">Employee Records</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/registrar-clinical-medical-supplies')"
-                              v-if="accessData[13].useracc_grant == 1" to="/registrar-clinical-medical-supplies"
-                              class="dropdown-item" title="Clinical Records" tabindex="-1">
-                              <p class="m-2">Medical Supplies</p>
-                            </router-link>
-                          </li>
-                        </ul>
-                      </div>
-                    </nav>
-
-                    <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 2 && itemSelected == 1">
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                          data-bs-toggle="dropdown" aria-expanded="false">
-                          Menu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                          <li>
-                            <router-link @click="checkPath('/daily-collections-accounting')"
-                              v-if="accessData[14].useracc_grant == 1" to="/daily-collections-accounting"
-                              class="dropdown-item" title="items" tabindex="-1">
-                              <p class="m-2">Daily Collections</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/accounting-items')" v-if="accessData[15].useracc_grant == 1"
-                              to="/accounting-items" class="dropdown-item" title="items" tabindex="-1">
-                              <p class="m-2">Miscellaneuos / Items</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/accounting-tuition')" v-if="accessData[16].useracc_grant == 1"
-                              to="/accounting-tuition" class="dropdown-item" title="items" tabindex="-1">
-                              <p class="m-2">Tuition / Charges</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/accounting-subjects')" v-if="accessData[17].useracc_grant == 1"
-                              to="/accounting-subjects" class="dropdown-item" title="items" tabindex="-1">
-                              <p class="m-2">Subject Rates</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/accounting-student-accounts')"
-                              v-if="accessData[18].useracc_grant == 1" to="/accounting-student-accounts"
-                              class="dropdown-item" title="items" tabindex="-1">
-                              <p class="m-2">Student Accounts</p>
-                            </router-link>
-                          </li>
-                          <!-- <li>
-                        <router-link to="/accounting-package" class="dropdown-item" tabindex="-1">
-                          <i class="m-2 fa-solid fa-paper-plane"></i>
-                          <p class="m-2">Packages</p>
-                        </router-link>
-                      </li> -->
-                        </ul>
-                      </div>
-                    </nav>
-
-                    <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 2 && itemSelected == 2">
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                          data-bs-toggle="dropdown" aria-expanded="false">
-                          Menu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                          <li>
-                            <router-link @click="checkPath('/daily-collections-cashier')"
-                              v-if="accessData[19].useracc_grant == 1" to="/daily-collections-cashier" class="dropdown-item"
-                              title="request" tabindex="-1">
-                              <p class="m-2">Daily Collections</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/accounting-billing')" v-if="accessData[20].useracc_grant == 1"
-                              to="/accounting-billing" class="dropdown-item" title="Billing" tabindex="-1">
-                              <p class="m-2">Tuition Payment</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/accounting-request')" v-if="accessData[21].useracc_grant == 1"
-                              to="/accounting-request" class="dropdown-item" title="request" tabindex="-1">
-                              <p class="m-2">Request Payment</p>
-                            </router-link>
-                          </li>
-                        </ul>
-                      </div>
-                    </nav>
-
-
-                    <nav class="nav gap-2 mb-2 mt-2" v-if="accessSelected == 3 && itemSelected == 1">
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle" type="button" id="dropdownMenuButton2"
-                          data-bs-toggle="dropdown" aria-expanded="false">
-                          Menu
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-light" aria-labelledby="dropdownMenuButton2">
-                          <!-- <li>
-                            <router-link to="/faculty-classes" class="dropdown-item" tabindex="-1">
-                              <p class="m-2">Faculty Loadings</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link to="/faculty-assignment" class="dropdown-item" tabindex="-1">
-                              <p class="m-2">Faculty Assignments</p>
-                            </router-link>
-                          </li> -->
-                          <li>
-                            <router-link @click="checkPath('/faculty-classes')" v-if="accessData[22].useracc_grant == 1"
-                              to="/faculty-classes" class="dropdown-item" tabindex="-1">
-                              <p class="m-2">Faculty Loadings</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/faculty-student')" v-if="accessData[23].useracc_grant == 1"
-                              to="/faculty-student" class="dropdown-item" tabindex="-1">
-                              <p class="m-2">Faculty Students</p>
-                            </router-link>
-                          </li>
-                          <li>
-                            <router-link @click="checkPath('/faculty-grading-sheet')"
-                              v-if="accessData[24].useracc_grant == 1" to="/faculty-grading-sheet" class="dropdown-item"
-                              title="items" tabindex="-1">
-                              <p class="m-2">Grading Sheet</p>
-                            </router-link>
-                          </li>
-                        </ul>
-                      </div>
-                    </nav>
                   </div>
-                  <div class="d-flex align-content-center flex-wrap">
-                    <button type="button" @click="handleLogout()" class="neu-btn neu-red p-2 z-1" title="items"
-                      :disabled="isLoading ? true : false" tabindex="-1"><font-awesome-icon icon="fa-solid fa-power-off" />
-                      Logout
-                    </button>
-                  </div>
-                </div>
 
+                </div>
               </div>
             </div>
           </div>
