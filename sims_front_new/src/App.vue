@@ -870,7 +870,7 @@ const bgGradient = ref(`
         </div>
       </div>
     </div>
-    <div class="px-5">
+    <div class="px-5 mb-3">
        <div class="w-100 m-0 p-0">
         <div class="row g-2">
           <div v-if="path != '/'" class="col-3">

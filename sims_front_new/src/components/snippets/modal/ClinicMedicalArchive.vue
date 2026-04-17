@@ -296,7 +296,7 @@ const downloadImage = (folder, file) => {
                     class="border p-2 align-content-center p-3">
                     <NeuLoader4/>
                     <p class="fw-bold m-0">Nothing here yet!</p>
-                    <p>The hamster took a break 💤 — try adding something new.</p>
+                    <p>try adding something new.</p>
                 </div>
                 <div v-if="preLoading && !Object.keys(filteredMedicalFilesHeaders).length"
                     class="border p-2 align-content-center">
@@ -409,7 +409,7 @@ const downloadImage = (folder, file) => {
                         <div class="h-100 neu-card p-4 mt-3">
                             <NeuLoader4/>
                             <p class="fw-bold m-0">Nothing here yet!</p>
-                            <p>The hamster took a break 💤 — try adding something new.</p>
+                            <p>try adding something new.</p>
                         </div>
 
                     </div>

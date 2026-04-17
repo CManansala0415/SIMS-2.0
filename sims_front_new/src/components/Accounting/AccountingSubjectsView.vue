@@ -207,14 +207,14 @@ onMounted(async () => {
             });
         }
     }).catch((err) => {
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Session expired, log in again",
-        }).then(()=>{
-            router.push("/");
-            window.stop()
-        });
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Oops...",
+        //     text: "Session expired, log in again",
+        // }).then(()=>{
+        //     router.push("/");
+        //     window.stop()
+        // });
     })
 
 })

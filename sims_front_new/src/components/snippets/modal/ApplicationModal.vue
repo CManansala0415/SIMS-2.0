@@ -27,6 +27,8 @@ const props = defineProps({
     formId: {
     },
     formMode:{
+    },
+    userdata:{
     }
 })
 
@@ -60,8 +62,10 @@ const personID = computed(() => {
 const registrationMode = computed(() => {
   return props.formMode
 });
+const userData = computed(() => {
+  return props.userdata
+});
 const router = useRouter();
-
 // for select box div absolute
 
 const userID = ref('');
@@ -192,10 +196,13 @@ onMounted(async () => {
     filteredCurrRegion.value = region.value
     filteredPermRegion.value = region.value
 
-    getUserID().then((results) => {
-        userID.value = results.account.data.id
-    })
-    
+    // getUserID().then((results) => {
+    //     userID.value = results.account.data.id
+    // })
+
+    userID.value = userData.value.account.data.id
+    // console.log(userID.value)
+
     checking.value = true
     if(personID.value){
         await booter().then((results)=>{

@@ -97,14 +97,14 @@ onMounted(async () => {
             });
         }
     }).catch((err) => {
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Session expired, log in again",
-        }).then(()=>{
-            router.push("/");
-            window.stop()
-        });
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Oops...",
+        //     text: "Session expired, log in again",
+        // }).then(()=>{
+        //     router.push("/");
+        //     window.stop()
+        // });
     })
 })
 
@@ -395,7 +395,7 @@ const deactivateCharge = (data) =>{
                             <td class="p-3 text-center" colspan="7">
                                 <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
                         </tr>
                         <tr v-if="preLoading && !Object.keys(tuitionInfo).length" v-for="a in 5">

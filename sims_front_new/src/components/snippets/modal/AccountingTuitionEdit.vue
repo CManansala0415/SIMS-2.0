@@ -193,15 +193,15 @@ onMounted(async () => {
             preLoading.value = false
 
         }).catch((err) => {
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Session expired, log in again",
-            }).then(() => {
-                router.push("/");
-                location.reload()
-                window.stop()
-            });
+            // Swal.fire({
+            //     icon: "error",
+            //     title: "Oops...",
+            //     text: "Session expired, log in again",
+            // }).then(() => {
+            //     router.push("/");
+            //     location.reload()
+            //     window.stop()
+            // });
         })
 
         if (Object.keys(item.value).length) {

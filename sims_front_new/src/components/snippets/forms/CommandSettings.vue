@@ -4,7 +4,7 @@ import {
     addCurriculum, addCurriculumTagging, getCurriculumSubject, setAcademicStatus, getAcademicStatus, setCommandUpdate
 } from "../../Fetchers.js";
 import NeuLoader1 from '../loaders/NeuLoader1.vue';
-import Loader1 from '../loaders/Loader1.vue';
+// import Loader1 from '../loaders/Loader1.vue';
 import CommandCenterModal from '../modal/CommandCenterModal.vue';
 import AcademicYear from './commandcenterforms/AcademicYear.vue';
 import AcademicSemester from './commandcenterforms/AcademicSemester.vue';
@@ -384,7 +384,7 @@ const stopStopwatch = () => {
 }
 
 const resetStopwatch = () => {
-    clearInterval(timerInterval.value);
+    clearInterval(timerInterval.value); 
     seconds.value = 0;
     // console.log(seconds.value); // Or update an HTML element
 }

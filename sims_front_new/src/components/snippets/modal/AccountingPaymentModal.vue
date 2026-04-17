@@ -855,7 +855,7 @@ const renderPayment = (paymentdata) =>{
                                             <td class="p-3 text-center" colspan="8">
                                                 <NeuLoader4/>
                                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                                <p>The hamster took a break 💤 — No payment has been recorded</p>
+                                                <p>No payment has been recorded</p>
                                             </td>
                                         </tr>
                                         <tr v-if="checking && !Object.keys(payment).length">

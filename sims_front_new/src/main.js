@@ -75,7 +75,7 @@ app.config.errorHandler = (err, instance, info) => {
   if (typeof Swal !== "undefined") {
     Swal.fire({
       title: "Error",
-      text: "Unauthorized operation detected",
+      text: "Something went wrong in the application",
       icon: "error"
     }).then(() => {
       nextTick(() => {
@@ -85,7 +85,7 @@ app.config.errorHandler = (err, instance, info) => {
       })
     })
   } else {
-    alert("Unauthorized operation detected")
+    alert("Something went wrong in the application")
     nextTick(() => {
       router.replace({ name: "login" }).then(() => {
         location.reload() // 🔄 fallback reload

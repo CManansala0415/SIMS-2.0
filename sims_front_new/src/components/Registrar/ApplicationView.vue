@@ -218,11 +218,13 @@ const booter = async () => {
     // })
 }
 
+const userData = ref([])
 onMounted(async () => {
     window.stop()
     getUserID().then(async(results) => {
         userID.value = results.account.data.id
         accessData.value = results.access
+        userData.value = results
         // console.log(accessData.value)
         emit('fetchUser', results)
         try {
@@ -257,14 +259,14 @@ onMounted(async () => {
         }
     }).catch((err) => {
         // alert('Unauthorized Session, Please Log In')
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Session expired, log in again",
-        }).then(()=>{
-            router.push("/");
-            window.stop()
-        });
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Oops...",
+        //     text: "Session expired, log in again",
+        // }).then(()=>{
+        //     router.push("/");
+        //     window.stop()
+        // });
     })
 })
 const deletePerson = (id) => {
@@ -588,7 +590,7 @@ const hideModal = () => {
                 <div class="modal-body neu-bg">
                     <ApplicationModal v-if="showFormModal" :genderData="gender" :civilstatusData="civilstatus"
                         :nationalityData="nationality" :regionData="region" :provinceData="province" :cityData="city"
-                        :barangayData="barangay" :formId="editId" :formMode="formMode" :countryData="country"/>
+                        :barangayData="barangay" :formId="editId" :formMode="formMode" :countryData="country" :userdata="userData"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

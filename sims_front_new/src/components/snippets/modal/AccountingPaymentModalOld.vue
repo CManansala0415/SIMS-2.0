@@ -188,14 +188,14 @@ onMounted(async () => {
         // alert('Unauthorized Session, Please Log In')
         // router.push("/");
         // window.stop()
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Session expired, log in again",
-        }).then(() => {
-            router.push("/");
-            window.stop()
-        });
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Oops...",
+        //     text: "Session expired, log in again",
+        // }).then(() => {
+        //     router.push("/");
+        //     window.stop()
+        // });
     })
 })
 

@@ -2,6 +2,8 @@
 import { ref, onMounted, computed } from 'vue';
 // import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import SkeletonCardLoader from '../snippets/loaders/SkeletonCardLoader.vue';
+import SkeletonTableLoader from '../snippets/loaders/SkeletonTableLoader.vue';
+import SkeletonHeaderLoader from '../snippets/loaders/SkeletonHeaderLoader.vue';
 import ProgramForms from '../snippets/forms/ProgramSettingsForm.vue';
 import SectionForms from '../snippets/forms/SectionSettingsForm.vue';
 import SubjectForms from '../snippets/forms/SubjectSettingsForm.vue';
@@ -87,14 +89,14 @@ onMounted(async () => {
                 emit('doneLoading', false)
 
             }).catch((err) => {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Session expired, log in again",
-                }).then(()=>{
-                    router.push("/");
-                    window.stop()
-                });
+                // Swal.fire({
+                //     icon: "error",
+                //     title: "Oops...",
+                //     text: "Session expired, log in again",
+                // }).then(()=>{
+                //     router.push("/");
+                //     window.stop()
+                // });
             })
         })
 
@@ -348,7 +350,11 @@ const mode = (type) => {
             </div>
 
             <div v-if="form == 2">
-                <NeuLoader1 v-if="preLoading" />
+                <!-- <NeuLoader1 v-if="preLoading" /> -->
+                <div v-if="preLoading">
+                    <SkeletonHeaderLoader :elementcount="4"/>
+                    <SkeletonTableLoader :tdcount="8"/>
+                </div>
                 <div v-else>
                     <!-- <div class="d-flex w-100 justify-content-end mb-3">
                         <div class="d-flex">
@@ -364,7 +370,10 @@ const mode = (type) => {
             </div>
             <div v-if="form == 3">
 
-                <NeuLoader1 v-if="preLoading" />
+                <div v-if="preLoading">
+                    <SkeletonHeaderLoader :elementcount="4"/>
+                    <SkeletonTableLoader :tdcount="8"/>
+                </div>
                 <div v-else>
                     <!-- <div class="d-flex w-100 justify-content-end mb-3">
                         <div class="d-flex">
@@ -378,7 +387,10 @@ const mode = (type) => {
                 </div>
             </div>
             <div v-if="form == 4">
-                <NeuLoader1 v-if="preLoading" />
+                <div v-if="preLoading">
+                    <SkeletonHeaderLoader :elementcount="4"/>
+                    <SkeletonTableLoader :tdcount="8"/>
+                </div>
                 <div v-else>
                     <!-- <div class="d-flex w-100 justify-content-end mb-3">
                         <div class="d-flex">
@@ -393,7 +405,10 @@ const mode = (type) => {
                 </div>
             </div>
             <div v-if="form == 5">
-                <NeuLoader1 v-if="preLoading" />
+                <div v-if="preLoading">
+                    <SkeletonHeaderLoader :elementcount="4"/>
+                    <SkeletonTableLoader :tdcount="8"/>
+                </div>
                 <div v-else>
                     <!-- <div class="d-flex w-100 justify-content-end mb-3">
                         <div class="d-flex">
@@ -409,7 +424,10 @@ const mode = (type) => {
                 </div>
             </div>
             <div v-if="form == 6">
-                <NeuLoader1 v-if="preLoading" />
+                <div v-if="preLoading">
+                    <SkeletonHeaderLoader :elementcount="4"/>
+                    <SkeletonTableLoader :tdcount="8"/>
+                </div>
                 <div v-else>
                     <!-- <div class="d-flex justify-content-end mb-3">
                 <button class="neu-btn" @click="form = 1"><font-awesome-icon
@@ -421,7 +439,10 @@ const mode = (type) => {
                 </div>
             </div>
             <div v-if="form == 7">
-                <NeuLoader1 v-if="preLoading" />
+                <div v-if="preLoading">
+                    <SkeletonHeaderLoader :elementcount="4"/>
+                    <SkeletonTableLoader :tdcount="8"/>
+                </div>
                 <div v-else>
                     <!-- <div class="d-flex w-100 justify-content-end mb-3">
                         <div class="d-flex">

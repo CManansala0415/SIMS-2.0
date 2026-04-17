@@ -144,14 +144,14 @@ onMounted(async () => {
         }
     }).catch((err) => {
         // alert('Unauthorized Session, Please Log In')
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Session expired, log in again",
-        }).then(()=>{
-            router.push("/");
-            window.stop()
-        });
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Oops...",
+        //     text: "Session expired, log in again",
+        // }).then(()=>{
+        //     router.push("/");
+        //     window.stop()
+        // });
     })
 })
 
@@ -428,7 +428,7 @@ function getScheduleGroupsForSubject(subjId) {
                             <td class="align-middle text-center" colspan="5">
                                 <NeuLoader4/>
                                 <p class="fw-bold m-0">Nothing here yet!</p>
-                                <p>The hamster took a break 💤 — try adding something new.</p>
+                                <p>try adding something new.</p>
                             </td>
                         </tr>
                         <!-- <tr v-if="preLoading && !Object.keys(groupedAssignmentSection).length">
@@ -540,7 +540,7 @@ function getScheduleGroupsForSubject(subjId) {
                                         <td class="align-middle" colspan="7">
                                             <NeuLoader4/>
                                             <p class="fw-bold m-0">Nothing here yet!</p>
-                                            <p>The hamster took a break 💤 — try adding something new.</p>
+                                            <p>try adding something new.</p>
                                         </td>
                                     </tr>
                                     <tr v-if="loadingSchedule && !Object.keys(scheduleData).length">

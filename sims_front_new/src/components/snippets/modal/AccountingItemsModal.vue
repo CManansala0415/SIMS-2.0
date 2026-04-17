@@ -28,14 +28,14 @@ onMounted(() => {
     }).catch((err) => {
         // alert('Unauthorized Session, Please Log In')
         // router.push("/");
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Session expired, log in again",
-        }).then(()=>{
-            router.push("/");
-            window.stop()
-        });
+        // Swal.fire({
+        //     icon: "error",
+        //     title: "Oops...",
+        //     text: "Session expired, log in again",
+        // }).then(()=>{
+        //     router.push("/");
+        //     window.stop()
+        // });
     })
 
     if (Object.keys(item.value).length) {

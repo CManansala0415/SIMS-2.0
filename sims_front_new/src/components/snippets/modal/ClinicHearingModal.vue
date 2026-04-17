@@ -358,7 +358,7 @@ const examinationMode = (mode) => {
                                 <td class="p-3 text-center" colspan="4">
                                     <NeuLoader4 />
                                     <p class="fw-bold m-0">Nothing here yet!</p>
-                                    <p>The hamster took a break 💤 — try adding something new.</p>
+                                    <p>try adding something new.</p>
                                 </td>
                             </tr>
                         </tbody>
