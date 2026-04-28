@@ -119,7 +119,7 @@ const save = () => {
                                 oninput="this.value = Math.abs(this.value)" type="number"
                                 class="neu-input" /> -->
                             <input v-model="itemPrice" required
-                                type="number"
+                                type="number" placeholder="0.00" min="0" value="0" step="0.01"
                                 class="neu-input" />
                         </div>
                         <div class="form-group">
