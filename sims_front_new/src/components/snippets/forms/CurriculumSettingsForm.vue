@@ -123,18 +123,18 @@ const registerCurriculum = () => {
 
     
     
-    // addCurriculum(editData.value).then((results) => {
-    //     // alert('Successfull Registered')
-    //     // location.reload()
-    //     Swal.fire({
-    //         title: "Update Success",
-    //         text: "Successfully registered, refreshing the page",
-    //         icon: "success"
-    //     }).then(()=>{
-    //         Swal.close()
-    //         location.reload()
-    //     });
-    // })
+    addCurriculum(editData.value).then((results) => {
+        // alert('Successfull Registered')
+        // location.reload()
+        Swal.fire({
+            title: "Update Success",
+            text: "Successfully registered, refreshing the page",
+            icon: "success"
+        }).then(()=>{
+            Swal.close()
+            location.reload()
+        });
+    })
 }
 
 const search = () => {
