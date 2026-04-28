@@ -118,7 +118,7 @@ const save = () => {
                             <!-- <input v-model="itemPrice" min="0" max="999999" required
                                 oninput="this.value = Math.abs(this.value)" type="number"
                                 class="neu-input" /> -->
-                            <input v-model="itemPrice" min="0" max="999999" required
+                            <input v-model="itemPrice" required
                                 type="number"
                                 class="neu-input" />
                         </div>
