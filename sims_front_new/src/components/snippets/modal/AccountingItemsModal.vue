@@ -74,9 +74,9 @@ const save = () => {
             // alert('Saving Failed')
             // location.reload()
             Swal.fire({
-                title: "Update Successful",
-                text: "Changes applied, refreshing the page",
-                icon: "success"
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
             }).then(()=>{
                 Swal.close();
                 location.reload()
@@ -85,9 +85,9 @@ const save = () => {
             // alert('Saving Successful')
             // location.reload()
             Swal.fire({
-                title: "Update Failed",
-                text: "Unknown error occured, try again later",
-                icon: "error"
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
             }).then(()=>{
                 Swal.close();
                 location.reload()
@@ -115,8 +115,11 @@ const save = () => {
                         </div>
                         <div class="form-group">
                             <label>Item Price</label>
-                            <input v-model="itemPrice" min="0" max="999999" required
+                            <!-- <input v-model="itemPrice" min="0" max="999999" required
                                 oninput="this.value = Math.abs(this.value)" type="number"
+                                class="neu-input" /> -->
+                            <input v-model="itemPrice" min="0" max="999999" required
+                                type="number"
                                 class="neu-input" />
                         </div>
                         <div class="form-group">

@@ -257,8 +257,8 @@ const upvotePost = (id) =>{
                   and joy. 
                 </p>
                 <p class="fw-bold m-0">{{ dateToday }}</p>
-                <div v-if="birthdaysData.length > 0" class="d-flex gap-3 text-center justify-content-center align-items-center">
-                  <div v-for="(dsh, index) in birthdaysData">
+                <div v-if="birthdaysData.length > 0" class="row gap-3 text-center justify-content-center align-items-center">
+                  <div v-for="(dsh, index) in birthdaysData" class="col-6">
                     <!-- <font-awesome-icon icon="fa-solid fa-gift" />  -->
                     <p class="m-0">{{ dsh.emp_firstname }} {{ dsh.emp_lastname
                       }} {{ dsh.emp_suffixname || '' }}</p>
