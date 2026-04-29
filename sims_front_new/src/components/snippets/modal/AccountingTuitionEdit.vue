@@ -767,16 +767,25 @@ const resolveGroupLabel = (groupKey) => {
                                 @keyup="searchItem(1)" type="text" class="neu-input mb-3"
                                 placeholder="Search Item Here..." />
                             <div class="neu-card-inner p-3 overflow-auto py-2" style="height: 320px;">
-                                <ul class="list-group">
-                                    <li class="list-group-item bg-transparent" v-for="(misc, index) in miscFeesMainFiltered"
-                                        @click="addMiscFee(misc, 1), clickSubmit('assess')">
+                                <ul class="list-unstyled">
+                                    <li
+                                        class="p-2 border" style="cursor: pointer;"
+                                        :class="{ 'bg-secondary': miscFees.some(f => f.tuitemp_itemid === misc.acf_id) }"
+                                        v-for="(misc, index) in miscFeesMainFiltered"
+                                        @click="addMiscFee(misc, 1), clickSubmit('assess')"
+                                        >
                                         <div class="d-flex justify-content-between">
                                             <span>{{ misc.acf_desc }}</span>
-                                            <span>{{ new Intl.NumberFormat('en-PH', {
-                                                style: 'currency', currency: 'PHP'
-                                                }).format(misc.acf_price) }}</span>
+                                            <span>
+                                            {{
+                                                new Intl.NumberFormat('en-PH', {
+                                                style: 'currency',
+                                                currency: 'PHP'
+                                                }).format(misc.acf_price)
+                                            }}
+                                            </span>
                                         </div>
-                                    </li>
+                                        </li>
                                     <li class="list-group-item bg-transparent"
                                         v-if="!Object.keys(miscFeesMainFiltered).length && !preLoading">No Record Found
                                     </li>
@@ -946,7 +955,7 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="col-md-12 text-start mb-2">
                             <span class="fst-italic fw-bold text-success">Additional Items</span>
                             <div class="neu-card-inner p-3 mt-3">
-                                <ul class="list-group mt-2">
+                                <ul class="list-group mt-2" style="height:300px; overflow:auto;">
                                     <li class="list-group-item bg-transparent" v-for="(mf, index) in miscFees">
                                         <div class="d-flex justify-content-between align-items-center neu-card p-3">
                                             <div class="w-50 d-flex justify-content-start align-items-center">
@@ -1047,7 +1056,7 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="col-md-12 text-start mb-2" v-if="chargeType == 1">
                             <span class="fst-italic fw-bold text-primary">Subjects Prices</span>
                             <div class="neu-card-inner p-3 mt-3">
-                                <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey">
+                                <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey"  style="height:300px; overflow:auto;">
                                     <li class="list-group-item bg-transparent">
                                         <p class="fw-bold p-3 mt-2 neu-card">{{ resolveGroupLabel(groupKey)}}</p>
                                     </li>
@@ -1139,7 +1148,7 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="col-md-12 text-start mb-2">
                             <span class="fst-italic fw-bold text-info">Additional Charges</span>
                             <div class="neu-card-inner p-3 mt-3">
-                                <ul class="list-group mt-2">
+                                <ul class="list-group mt-2" style="height:300px; overflow:auto;">
                                     <li class="list-group-item bg-transparent" v-for="(cq, index) in customFees">
                                         <div class="d-flex justify-content-between align-items-center gap-1 neu-card p-3">
                                             <div class="w-50 d-flex justify-content-start align-items-center">
