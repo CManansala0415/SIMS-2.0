@@ -444,7 +444,8 @@ class FinanceController extends Controller
                             'tuitemp_gradelvl'      => $item['tuitemp_gradelvl'] ?? null,
                             'tuitemp_updatedby'    => $item['tuitemp_user'] ?? null,
                             'tuitemp_dateupdated'  => $date,
-                            'tuitemp_subjcode' => $item['tuitemp_subjcode'] ?? null
+                            'tuitemp_subjcode' => $item['tuitemp_subjcode'] ?? null,
+                            'tuitemp_extra' => $item['tuitemp_extra'] ?? null,
                         ]);
 
                     }else {
@@ -468,7 +469,8 @@ class FinanceController extends Controller
                             'tuitemp_gradelvl'      => $item['tuitemp_gradelvl'] ?? null,
                             'tuitemp_addedby'    => $item['tuitemp_user'] ?? null,
                             'tuitemp_dateadded'  => $date,
-                            'tuitemp_subjcode' => $item['tuitemp_subjcode'] ?? null
+                            'tuitemp_subjcode' => $item['tuitemp_subjcode'] ?? null,
+                            'tuitemp_extra' => $item['tuitemp_extra'] ?? null
                         ]);
                     }
 
