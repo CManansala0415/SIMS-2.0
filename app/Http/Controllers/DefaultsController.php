@@ -488,6 +488,12 @@ class DefaultsController extends Controller
                     ];
                 }
             }
+
+            if($request->input('subj_extra') == 1 || $request->input('subj_extra') == 2){
+                $labmult = $request->input('subj_lab_units') * 1;
+            }else{
+                $labmult = $request->input('subj_lab_units') * 3;
+            }
     
             if($request->input('subj_id') == ''){
                 try{
@@ -498,12 +504,13 @@ class DefaultsController extends Controller
                         'subj_lec_units' => $request->input('subj_lec_units'),
                         'subj_lab_units' => $request->input('subj_lab_units'),
                         'subj_lec_hrs' => $request->input('subj_lec_units') * 1,
-                        'subj_lab_hrs' => $request->input('subj_lab_units') * 3,
-                        'subj_hrs_week' => $request->input('subj_lec_units') + ($request->input('subj_lab_units') * 3),
+                        'subj_lab_hrs' => $request->input('subj_lab_units') * $labmult,
+                        'subj_hrs_week' => $request->input('subj_lec_units') + ($request->input('subj_lab_units') * $labmult),
                         'subj_preq' => $request->input('subj_preq'),
                         'subj_dtypeid' => $request->input('subj_dtypeid'),
                         'subj_specid' => $request->input('subj_specid'),
                         'subj_schedpass' => $request->input('subj_schedpass'),
+                        'subj_extra' => $request->input('subj_extra'),
                         'subj_addedby' => $request->input('subj_addedby'),
                         'subj_updatedby' => null,
                         'subj_dateadded' => $date,
@@ -539,12 +546,13 @@ class DefaultsController extends Controller
                             'subj_lec_units' => $request->input('subj_lec_units'),
                             'subj_lab_units' => $request->input('subj_lab_units'),
                             'subj_lec_hrs' => $request->input('subj_lec_units') * 1,
-                            'subj_lab_hrs' => $request->input('subj_lab_units') * 3,
-                            'subj_hrs_week' => $request->input('subj_lec_units') + ($request->input('subj_lab_units') * 3),
+                            'subj_lab_hrs' => $request->input('subj_lab_units') * $labmult,
+                            'subj_hrs_week' => $request->input('subj_lec_units') + ($request->input('subj_lab_units') * $labmult),
                             'subj_preq' => $request->input('subj_preq'),
                             'subj_dtypeid' => $request->input('subj_dtypeid'),
                             'subj_specid' => $request->input('subj_specid'),
                             'subj_schedpass' => $request->input('subj_schedpass'),
+                            'subj_extra' => $request->input('subj_extra'),
                             'subj_updatedby' => $request->input('subj_updatedby'),
                             'subj_dateupdated' => $date,
                         ]);

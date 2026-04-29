@@ -616,7 +616,11 @@ const detectMode = (index, id, obj) => {
 const saveMode = ref('')
 const clickSubmit = (mode) => {
     saveMode.value = mode
-    document.getElementById('submitDetails').click();
+    if(mode == 'assess') {
+        manageDetails()
+    }else{
+        document.getElementById('submitDetails').click();
+    }
 };
 
 // const gradeMap = {
@@ -1064,7 +1068,9 @@ const resolveGroupLabel = (groupKey) => {
                                         <div class=" neu-card p-3 d-flex justify-content-between align-items-center">
 
                                             <div class="w-50 d-flex justify-content-start align-items-center">
-                                                <span class="w-50">{{ sj.tuitemp_desc }}</span>
+                                                <span class="w-50">
+                                                    <span class="badge bg-secondary">{{ sj.tuitemp_subjcode }}</span><br/>
+                                                    {{ sj.tuitemp_desc }} </span>
                                             </div>
                                             <div class="w-25 d-flex justify-content-start align-items-center">
                                                 <div class="d-flex flex-column gap-1">

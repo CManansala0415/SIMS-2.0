@@ -251,11 +251,11 @@ onMounted(async () => {
                             <td class="align-middle">
                                 <div class="d-flex flex-column w-100 gap-1">
                                     <div class="d-flex justify-content-center align-items-center w-75">
-                                        <span class="w-50">Lecture Units</span>
+                                        <span class="w-50">Lec Units</span>
                                         <input :value="sj.subj_lec_units" type="text" class="neu-input" disabled>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center w-75">
-                                        <span class="w-50">Laboratory Units</span>
+                                        <span class="w-50">Lab Units</span>
                                         <input :value="sj.subj_lab_units" type="text" class="neu-input" disabled>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center w-75">
