@@ -909,7 +909,7 @@ const resolveGroupLabel = (groupKey) => {
                                         class="neu-input" placeholder="Description" />
                                 </div>
                                 <div class="col-md-12 col-lg-3">
-                                    <input v-model.number="customPrice" required step="0.01" min="0.00"
+                                    <input v-model.number="customPrice" required step="0.01" min="0.00" onwheel="this.blur()"
                                         :disabled="preLoading ? true : false" @input="
                                         if (customPrice <= 0) customPrice = 0;" type="number"
                                         class="neu-input amount-text" placeholder="Price" />
@@ -993,6 +993,7 @@ const resolveGroupLabel = (groupKey) => {
                                                         min="1"
                                                         required
                                                         class="neu-input"
+                                                        onwheel="this.blur()"
                                                         :value="mf.tuitemp_quantity"
                                                         @focus="oldQty = mf.tuitemp_quantity"
                                                         @focusout="($event.target.value != oldQty) && (mf.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
@@ -1094,6 +1095,7 @@ const resolveGroupLabel = (groupKey) => {
                                                             min="0"
                                                             required
                                                             class="neu-input"
+                                                            onwheel="this.blur()"
                                                             placeholder="Price Per Unit"
                                                             :value="sj.tuitemp_lec_price"
                                                             @focus="oldLecPrice = sj.tuitemp_lec_price"
@@ -1113,6 +1115,7 @@ const resolveGroupLabel = (groupKey) => {
                                                             min="0"
                                                             required
                                                             class="neu-input"
+                                                            onwheel="this.blur()"
                                                             placeholder="Price Per Unit"
                                                             :disabled="sj.tuitemp_lab == 0"
                                                             :value="sj.tuitemp_lab_price"
@@ -1191,6 +1194,7 @@ const resolveGroupLabel = (groupKey) => {
                                                     min="1"
                                                     required
                                                     class="neu-input"
+                                                    onwheel="this.blur()"
                                                     :value="cq.tuitemp_quantity"
                                                     @focus="oldQty = cq.tuitemp_quantity"
                                                     @focusout="($event.target.value != oldQty) && (cq.tuitemp_quantity = $event.target.value, clickSubmit('assess'))"
