@@ -314,6 +314,11 @@ const saveCharges = () => {
     })
 }
 
+const addAllMiscFees = () => {
+    miscFeesMain.value.forEach((e) => {
+        addMiscFee(e, 1)
+    })
+}
 const addMiscFee = (data, type) => {
 
     if (type == 1) {
@@ -438,7 +443,7 @@ const manageDetails = () => {
 
         subjFees.value.forEach((price) => {
             subjFeesTotal.value += parseFloat((price.tuitemp_lec_price || 0) * price.tuitemp_lec)
-            subjFeesTotal.value += parseFloat((price.tuitemp_lab_price || 0) * price.tuitemp_lab)
+            subjFeesTotal.value += parseFloat((price.tuitemp_lab_price || 0) * (price.tuitemp_lab * 3))
         })
 
         customFees.value.forEach((price) => {
@@ -767,9 +772,16 @@ const resolveGroupLabel = (groupKey) => {
                     <div class="row g-2 w-100 p-2">
                         <div class="col-md-12 neu-card p-3">
                             <p class="mb-2 fw-bold">Additional Items</p>
-                            <input :disabled="preLoading ? true : false" v-model="miscFeesMainSearch"
-                                @keyup="searchItem(1)" type="text" class="neu-input mb-3"
-                                placeholder="Search Item Here..." />
+                            <div class="row g-1 mb-2">
+                                <div class="col-md-12 col-lg-9">
+                                    <input :disabled="preLoading ? true : false" v-model="miscFeesMainSearch"
+                                    @keyup="searchItem(1)" type="text" class="neu-input"
+                                    placeholder="Search Item Here..." />
+                                </div>
+                                <div class="col-md-12 col-lg-3 d-flex gap-1">
+                                    <button type="button" @click="addAllMiscFees()" class="neu-btn-sm neu-white">Add All</button>
+                                </div>
+                            </div>
                             <div class="neu-card-inner p-3 overflow-auto py-2" style="height: 320px;">
                                 <ul class="list-unstyled">
                                     <li
@@ -896,7 +908,7 @@ const resolveGroupLabel = (groupKey) => {
                                     <input v-model="customDescription" :disabled="preLoading ? true : false" type="text"
                                         class="neu-input" placeholder="Description" />
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-12 col-lg-3">
                                     <input v-model.number="customPrice" required step="0.01" min="0.00"
                                         :disabled="preLoading ? true : false" @input="
                                         if (customPrice <= 0) customPrice = 0;" type="number"
@@ -905,7 +917,7 @@ const resolveGroupLabel = (groupKey) => {
                                 <!-- <div class="col-md-2">
                                     <input :disabled="preLoading? true:false" type="text" class="neu-input" placeholder=""/>
                                 </div> -->
-                                <div class="col-md-9 d-flex gap-1">
+                                <div class="col-md-12 col-lg-9 d-flex gap-1">
                                     <button @click="addMiscFee([], 3), clickSubmit('assess')"
                                         class="neu-btn-sm neu-white">Add as Item</button>
                                     <button @click="addMiscFee([], 4), clickSubmit('assess')"
@@ -1060,7 +1072,7 @@ const resolveGroupLabel = (groupKey) => {
                         <div class="col-md-12 text-start mb-2" v-if="chargeType == 1">
                             <span class="fst-italic fw-bold text-primary">Subjects Prices</span>
                             <div class="neu-card-inner p-3 mt-3">
-                                <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey"  style="height:300px; overflow:auto;">
+                                <ul class="list-group mt-2" v-for="(items, groupKey) in groupedSubjects" :key="groupKey"  style="height:500px; overflow:auto;">
                                     <li class="list-group-item bg-transparent">
                                         <p class="fw-bold p-3 mt-2 neu-card">{{ resolveGroupLabel(groupKey)}}</p>
                                     </li>
@@ -1068,14 +1080,14 @@ const resolveGroupLabel = (groupKey) => {
                                         <div class=" neu-card p-3 d-flex justify-content-between align-items-center">
 
                                             <div class="w-50 d-flex justify-content-start align-items-center">
-                                                <span class="w-50">
+                                                <span class="w-75">
                                                     <span class="badge bg-secondary">{{ sj.tuitemp_subjcode }}</span><br/>
                                                     {{ sj.tuitemp_desc }} </span>
                                             </div>
-                                            <div class="w-25 d-flex justify-content-start align-items-center">
+                                            <div class="w-50 d-flex justify-content-start align-items-center">
                                                 <div class="d-flex flex-column gap-1">
-                                                    <div class="d-flex gap-2 align-items-center">
-                                                        <span class="">Lec ({{ sj.tuitemp_lec }})</span>
+                                                    <div class="d-flex gap-2 align-items-start">
+                                                        <span class="">Lec ({{ sj.tuitemp_lec }}) </span>
                                                         <input
                                                             type="number"
                                                             step="0.01"
@@ -1091,10 +1103,10 @@ const resolveGroupLabel = (groupKey) => {
                                                                     ? (sj.tuitemp_lec_price = $event.target.value, clickSubmit('assess'))
                                                                     : null
                                                             "
-                                                        />
+                                                        /> <span>x 1hr</span>
                                                     </div>
-                                                    <div class="d-flex gap-2 align-items-center">
-                                                        <span class="">Lab ({{ sj.tuitemp_lab }})</span>
+                                                    <div class="d-flex gap-2 align-items-start">
+                                                        <span class="">Lab ({{ sj.tuitemp_lab }}) </span>
                                                         <input
                                                             type="number"
                                                             step="0.01"
@@ -1111,7 +1123,7 @@ const resolveGroupLabel = (groupKey) => {
                                                                     ? (sj.tuitemp_lab_price = $event.target.value, clickSubmit('assess'))
                                                                     : null
                                                             "
-                                                        />
+                                                        /> <span>x 3hrs</span>
                                                     </div>
 
                                                 </div>
@@ -1119,7 +1131,7 @@ const resolveGroupLabel = (groupKey) => {
                                             <div class="w-25 d-flex justify-content-center align-items-center">
                                                 <div class="d-flex flex-column gap-2 text-start">
                                                     <span>{{ pesoConverter((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
-                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * sj.tuitemp_lab) }}</span>
+                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * (sj.tuitemp_lab * 3)) }}</span>
                                                 </div>
                                             </div>
                                             <!-- <div class="d-flex justify-content-center align-items-center">
