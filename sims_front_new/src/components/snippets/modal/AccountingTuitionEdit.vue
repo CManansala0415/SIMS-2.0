@@ -1132,6 +1132,7 @@ const resolveGroupLabel = (groupKey) => {
                                                 <div class="d-flex flex-column gap-2 text-start">
                                                     <span>{{ pesoConverter((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
                                                     <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * (sj.tuitemp_lab * 3)) }}</span>
+                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * (sj.tuitemp_lab * 3) + (sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
                                                 </div>
                                             </div>
                                             <!-- <div class="d-flex justify-content-center align-items-center">
