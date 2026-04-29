@@ -371,7 +371,8 @@ const addMiscFee = (data, type) => {
             tuitemp_price: parseFloat(data.subj_lec_units_rate) + parseFloat(data.subj_lab_units_rate),
             tuitemp_type: type, // means misc item, 2 for subject and 3 for custom
             tuitemp_user: userID.value,
-            tuitemp_subjcode: data.subj_code
+            tuitemp_subjcode: data.subj_code,
+            tuitemp_extra: data.subj_extra,
         }
 
         let check = subjFees.value.filter((e) => {
@@ -443,7 +444,7 @@ const manageDetails = () => {
 
         subjFees.value.forEach((price) => {
             subjFeesTotal.value += parseFloat((price.tuitemp_lec_price || 0) * price.tuitemp_lec)
-            subjFeesTotal.value += parseFloat((price.tuitemp_lab_price || 0) * (price.tuitemp_lab * 3))
+            subjFeesTotal.value += parseFloat((price.tuitemp_lab_price || 0) * isExtra(price.tuitemp_lab, price.tuitemp_extra))
         })
 
         customFees.value.forEach((price) => {
@@ -654,6 +655,16 @@ const resolveGroupLabel = (groupKey) => {
     return `${grade} – ${period}`
 }
 
+const isExtra = (data, extra) =>{
+    // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
+    let mult = 0
+    if(extra == 1 || extra == 2){
+        mult = data * 1
+    } else {
+        mult = data * 3
+    }
+    return mult;
+}
 
 </script>
 
@@ -1134,8 +1145,10 @@ const resolveGroupLabel = (groupKey) => {
                                             <div class="w-25 d-flex justify-content-center align-items-center">
                                                 <div class="d-flex flex-column gap-2 text-start">
                                                     <span>{{ pesoConverter((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
-                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * (sj.tuitemp_lab * 3)) }}</span>
-                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * (sj.tuitemp_lab * 3) + (sj.tuitemp_lec_price || 0) * sj.tuitemp_lec) }}</span>
+                                                    <span>{{ pesoConverter((sj.tuitemp_lab_price || 0) * isExtra(sj.tuitemp_lab, sj.tuitemp_extra)) }}</span>
+                                                    <span>{{ pesoConverter(
+                                                        ((sj.tuitemp_lab_price || 0) * isExtra(sj.tuitemp_lab, sj.tuitemp_extra)) + 
+                                                        ((sj.tuitemp_lec_price || 0) * sj.tuitemp_lec)) }}</span>
                                                 </div>
                                             </div>
                                             <!-- <div class="d-flex justify-content-center align-items-center">
