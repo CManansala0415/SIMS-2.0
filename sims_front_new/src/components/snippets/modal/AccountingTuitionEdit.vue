@@ -431,7 +431,7 @@ const manageDetails = () => {
         miscFees.value = []
         subjFees.value = []
         customFees.value = []
-    } else if (saveMode.value == 'assess') {
+    } else {
         miscFeesTotal.value = 0
         subjFeesTotal.value = 0
         customFeesTotal.value = 0
@@ -464,75 +464,78 @@ const manageDetails = () => {
             - (parseFloat(customDeductionsExact.value) + ((parseFloat(miscFeesTotal.value) + parseFloat(subjFeesTotal.value) + parseFloat(customFeesTotal.value)) * parseFloat(customDeductionsPercent.value) / 100))
         // console.log(customDeductionsPercent.value)
 
-    } else {
-        Swal.fire({
-            title: "Saving Updates",
-            text: "Please wait while we check all necessary details.",
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        let x = [
-            ...(miscFees.value || []),// handles the empty
-            ...(subjFees.value || []),// handles the empty
-            ...(customFees.value || [])// handles the empty
-        ];
-
-        let y = []
-
-        x.forEach((e) => {
-            // console.log(e)
-            if (e.tuitemp_subjid) {
-                let data = tuitionTemplateHolder.value.findIndex((f) => {
-                    return f.tuitemp_subjid === e.tuitemp_subjid
-                })
-                // console.log(data)
-                let response = detectMode(data, e.tuitemp_id, e)
-                y.push(response)
-            }
-            else if (e.tuitemp_itemid) {
-                let data = tuitionTemplateHolder.value.findIndex((f) => {
-                    return f.tuitemp_itemid === e.tuitemp_itemid
-                })
-                // console.log(data)
-                let response = detectMode(data, e.tuitemp_id, e)
-                y.push(response)
-            }
-            else {
-                let data = tuitionTemplateHolder.value.findIndex((f) => {
-                    return f.tuitemp_custid === e.tuitemp_custid
-                })
-                // console.log(data)
-                let response = detectMode(data, e.tuitemp_id, e)
-                y.push(response)
-            }
-        })
-
-        saveTuitionTemplate(y, 1).then((results) => {
-            Swal.close()
-            if (results.status == 200) {
-                Swal.fire({
-                    title: "Update Successful",
-                    text: "Changes applied, refreshing the page",
-                    icon: "success"
-                }).then(() => {
-                    location.reload()
-                });
-            } else {
-                Swal.fire({
-                    title: "Update Failed",
-                    text: "Unknown error occured, try again later",
-                    icon: "error"
-                }).then(() => {
-                    // location.reload()
-                });
-            }
-        })
+        console.log(subjFees.value)
 
     }
 
+}
+
+const saveTemplate = () =>{
+    Swal.fire({
+        title: "Saving Updates",
+        text: "Please wait while we check all necessary details.",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    let x = [
+        ...(miscFees.value || []),// handles the empty
+        ...(subjFees.value || []),// handles the empty
+        ...(customFees.value || [])// handles the empty
+    ];
+
+    let y = []
+
+    x.forEach((e) => {
+        // console.log(e)
+        if (e.tuitemp_subjid) {
+            let data = tuitionTemplateHolder.value.findIndex((f) => {
+                return f.tuitemp_subjid === e.tuitemp_subjid
+            })
+            // console.log(data)
+            let response = detectMode(data, e.tuitemp_id, e)
+            y.push(response)
+        }
+        else if (e.tuitemp_itemid) {
+            let data = tuitionTemplateHolder.value.findIndex((f) => {
+                return f.tuitemp_itemid === e.tuitemp_itemid
+            })
+            // console.log(data)
+            let response = detectMode(data, e.tuitemp_id, e)
+            y.push(response)
+        }
+        else {
+            let data = tuitionTemplateHolder.value.findIndex((f) => {
+                return f.tuitemp_custid === e.tuitemp_custid
+            })
+            // console.log(data)
+            let response = detectMode(data, e.tuitemp_id, e)
+            y.push(response)
+        }
+    })
+
+    saveTuitionTemplate(y, 1).then((results) => {
+        Swal.close()
+        if (results.status == 200) {
+            Swal.fire({
+                title: "Update Successful",
+                text: "Changes applied, refreshing the page",
+                icon: "success"
+            }).then(() => {
+                location.reload()
+            });
+        } else {
+            Swal.fire({
+                title: "Update Failed",
+                text: "Unknown error occured, try again later",
+                icon: "error"
+            }).then(() => {
+                // location.reload()
+            });
+        }
+    })
 }
 
 const deleteMiscData = (mode, data, index) => {
@@ -976,7 +979,7 @@ const isExtra = (data, extra) =>{
                     <div class="w-100 p-4 mb-2">
                         <span class="mb-2 fw-bold">Payment Breakdown</span>
                     </div>
-                    <form @submit.prevent="manageDetails"
+                    <form @submit.prevent="saveTemplate"
                         class="row g-1 p-2 d-flex flex-column justify-content-start h-100">
                         <button type="submit" id="submitDetails" hidden></button>
                         <div class="col-md-12 text-start mb-2">
