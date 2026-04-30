@@ -470,7 +470,9 @@ const manageDetails = () => {
 
 }
 
+const savingData = ref(false)
 const saveTemplate = () =>{
+    savingData.value = true
     Swal.fire({
         title: "Saving Updates",
         text: "Please wait while we check all necessary details.",
@@ -981,7 +983,7 @@ const isExtra = (data, extra) =>{
                     </div>
                     <form @submit.prevent="saveTemplate"
                         class="row g-1 p-2 d-flex flex-column justify-content-start h-100">
-                        <button type="submit" id="submitDetails" hidden></button>
+                        <button type="submit" id="submitDetails" hidden v-show="!savingData" :disabled="savingData"></button>
                         <div class="col-md-12 text-start mb-2">
                             <span class="fst-italic fw-bold text-success">Additional Items</span>
                             <div class="neu-card-inner p-3 mt-3">
@@ -1312,7 +1314,7 @@ const isExtra = (data, extra) =>{
 
                     <div class="w-100 mb-2 d-flex justify-content-end gap-2" v-if="!activeEnrollment">
                         <!-- <button type="button" class="btn btn-sm btn-warning" @click="clickSubmit('clear')">Reset Details</button> -->
-                        <button type="button" class="neu-btn neu-green p-2" @click="clickSubmit('save')"> <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save
+                        <button type="button" class="neu-btn neu-green p-2" @click="clickSubmit('save')" v-show="!savingData" :disabled="savingData"> <font-awesome-icon icon="fa-solid fa-floppy-disk"/> Save
                             Details</button>
                     </div>
                 </div>
