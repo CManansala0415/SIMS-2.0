@@ -5,6 +5,7 @@ import {
 } from "../../Fetchers.js";
 import NeuLoader4 from '../loaders/NeuLoader4.vue'
 import NeuLoader1 from '../loaders/NeuLoader1.vue'
+import SkeletonCardLoader from '../loaders/SkeletonCardLoader.vue';
 
 const props = defineProps({
     degreeData: {
@@ -198,7 +199,7 @@ onMounted(async () => {
             </div>
         </div> -->
         <div v-if="preLoading">
-            <NeuLoader1/>
+            <SkeletonCardLoader/>
         </div>
 
         <div v-else>

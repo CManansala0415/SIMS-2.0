@@ -11,6 +11,7 @@ import {
 
 } from "../../Fetchers.js";
 import NeuLoader1 from '../loaders/NeuLoader1.vue';
+import SkeletonCardLoader from '../loaders/SkeletonCardLoader.vue';
 import LaunchSchedulerModal from './LaunchSchedulerModal.vue';
 import LaunchOccupancyModal from './LaunchOccupancyModal.vue';
 import LaunchFacultyModal from './LaunchFacultyModal.vue';
@@ -1149,7 +1150,7 @@ const loadSched = () => {
 }
 
 const loadOccupancy = () => {
-    showOccupancy.value = !showOccupancy.value
+    showOccupancy.value = !showOccupancy.value 
 }
 
 const loadFaculty = () => {
@@ -1373,13 +1374,13 @@ const loadFaculty = () => {
 
             <div v-if="preLoading" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
-                    <NeuLoader1 />
-                    <p class=" mt-3">This may take a while, the wheels are bit heavier</p>
+                    <SkeletonCardLoader />
+                    <p class=" mt-3">This may take a while, please wait</p>
                 </div>
             </div>
             <div v-if="saving" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
-                    <NeuLoader1 />
+                    <!-- <SkeletonCardLoader /> -->
                     <p class=" mt-3">{{ savingCount }} out of {{ Object.keys(scheduleList).length }}</p>
                     <p class=" mt-3">Saving Items Please Wait...</p>
                 </div>

@@ -396,7 +396,7 @@ const resetStopwatch = () => {
             <p class="text-uppercase fw-bold">{{ title }}</p>
         </div>
         <div v-if="preLoading">
-            <NeuLoader1/>
+            <!-- <NeuLoader1/> -->
         </div>
         <div v-else>
             <div class="p-3 d-flex gap-1 justify-content-end">

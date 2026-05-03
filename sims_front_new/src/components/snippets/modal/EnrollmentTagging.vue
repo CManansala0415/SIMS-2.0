@@ -219,9 +219,9 @@ const monitorCurriculum = (data) => {
     addedSubjectId.value = []
     loadCurrItems.value = true
     getCurriculumSubject(data, 0, 0).then(async (results) => {
-        if(results.length){
+        if(Object.keys(results).length){
             currSubject.value = results
-            currSubject.value = currSubject.value.filter(e => {
+            currSubject.value = results.filter(e => {
                 if (
                     (e.currtag_gradelvl == studentData.value.enr_gradelvl) &&
                     (e.currtag_sem == studentData.value.enr_quarter)
@@ -233,9 +233,14 @@ const monitorCurriculum = (data) => {
             for await (const e of currSubject.value) {
                 addedSubject.value.push(e)
             };
+            console.log('test')
         }
 
         loadCurrItems.value = false
+        console.log(studentData.value.enr_gradelvl)
+        console.log(studentData.value.enr_quarter)
+        console.log(currSubject.value)
+        console.log(addedSubject.value)
     })
 }
 
@@ -282,6 +287,7 @@ const setData = (type, data) => {
         case 'curriculum':
             monitorCurriculum(data)
             enr_curriculum.value = data
+            
             break;
         case 'section':
             enr_section.value = data

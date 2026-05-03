@@ -13,6 +13,7 @@ import {
     resetPassword
 
 } from "../../Fetchers.js";
+import SkeletonCardLoader from '../loaders/SkeletonCardLoader.vue';
 
 const props = defineProps({
     userIdData: {
@@ -237,7 +238,7 @@ const passwordReset = () =>{
             <p class="text-uppercase fw-bold">User Account Settings</p>
         </div>
         <div v-if="preLoading">
-            <NeuLoader1/>
+            <SkeletonCardLoader/>
         </div>
         <div v-else>
             <div class="p-3 d-flex gap-1 justify-content-between">
