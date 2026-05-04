@@ -716,22 +716,22 @@ const refresh = () => {
                             <div class="row">
                                 <div class="col-3 text-start">
                                     <label for="firstname">First Name</label>
-                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="firstname" aria-describedby="firstname"
+                                    <input type="text" onkeydown="return /[-a-z', ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="firstname" aria-describedby="firstname"
                                         v-model="personal.per_firstname" required :disabled="saving?true:false" autocomplete="off">
                                 </div>
                                 <div class="col-3 text-start">
                                     <label for="middlename">Middle Name</label>
-                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="middlename" aria-describedby="middlename"
+                                    <input type="text" onkeydown="return /[-a-z', ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="middlename" aria-describedby="middlename"
                                         v-model="personal.per_middlename" :disabled="saving?true:false" autocomplete="off">
                                 </div>
                                 <div class="col-3 text-start">
                                     <label for="lastname">Last Name</label>
-                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="lastname" aria-describedby="lastname"
+                                    <input type="text" onkeydown="return /[-a-z', ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="lastname" aria-describedby="lastname"
                                         v-model="personal.per_lastname" required :disabled="saving?true:false" autocomplete="off">
                                 </div>
                                 <div class="col-3 text-start">
                                     <label for="suffixname">Suffix Name</label>
-                                    <input type="text" onkeydown="return /[a-z'-, ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="suffixname" aria-describedby="suffixname"
+                                    <input type="text" onkeydown="return /[-a-z', ]/i.test(event.key)" style="text-transform:uppercase" class="neu-input" id="suffixname" aria-describedby="suffixname"
                                         maxlength="3" v-model="personal.per_suffixname" :disabled="saving?true:false" autocomplete="off">
                                 </div>
                             </div>
@@ -1056,29 +1056,29 @@ const refresh = () => {
                         <div class="col-12 text-start mb-2">
                             <label for="famfirstname">First Name</label>
                             <input type="text" style="text-transform:uppercase" class="neu-input" id="famfirstname" aria-describedby="famfirstname" autocomplete="off"
-                                v-model="famMembersInfo.fam_firstname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                                v-model="famMembersInfo.fam_firstname" onkeydown="return /[-a-z', ]/i.test(event.key)" :disabled="saving?true:false">
                         </div>
                         <div class="col-12 text-start mb-2">
                             <label for="fammiddlename">Middle Name</label>
                             <input type="text" style="text-transform:uppercase" class="neu-input" id="fammiddlename" aria-describedby="fammiddlename" autocomplete="off"
-                                v-model="famMembersInfo.fam_middlename" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                                v-model="famMembersInfo.fam_middlename" onkeydown="return /[-a-z', ]/i.test(event.key)" :disabled="saving?true:false">
                         </div>
                         <div class="col-12 text-start mb-2">
                             <label for="famlastname">Last Name</label>
                             <input type="text" style="text-transform:uppercase" class="neu-input" id="famlastname" aria-describedby="famlastname" autocomplete="off"
-                                v-model="famMembersInfo.fam_lastname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                                v-model="famMembersInfo.fam_lastname" onkeydown="return /[-a-z', ]/i.test(event.key)" :disabled="saving?true:false">
                         </div>
                         <div class="col-12 text-start mb-2">
                             <label for="famsuffixname">Suffix Name</label>
                             <input type="text" style="text-transform:uppercase" class="neu-input" id="famsuffixname" aria-describedby="famsuffixname" autocomplete="off"
-                                v-model="famMembersInfo.fam_suffixname" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                                v-model="famMembersInfo.fam_suffixname" onkeydown="return /[-a-z', ]/i.test(event.key)" :disabled="saving?true:false">
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-12 text-start mb-2">
                             <label for="famrelationship">Relationship</label>
                             <input type="text" style="text-transform:uppercase" class="neu-input" id="famrelationship" aria-describedby="famrelationship" autocomplete="off"
-                                v-model="famMembersInfo.fam_relationship" onkeydown="return /[a-z'-, ]/i.test(event.key)" :disabled="saving?true:false">
+                                v-model="famMembersInfo.fam_relationship" onkeydown="return /[-a-z', ]/i.test(event.key)" :disabled="saving?true:false">
                         </div>
                         <div class="col-12 text-start mb-2">
                             <label for="famcontactno">Contact No.</label>

@@ -19,6 +19,7 @@ import {
 import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     pdfGenerator,
+    pdfGeneratorEnrollment,
     pesoConverter,
     pdfAutoPrint
 } from "../../Generators.js";
@@ -406,7 +407,7 @@ const downloadPdf = () => {
     // var element = document.getElementById('printform');
     // html2pdf(element);
     let name = studentID.value + '_' + studentSem.value + '_' + studentDateEnr.value.split(" ")[0]
-    pdfGenerator(name, 'a4', 'portrait', 0.1)
+    pdfGeneratorEnrollment(name, 'a4', 'portrait', 0.1)
     Swal.fire({
         icon: "success",
         title: "Download Complete",
@@ -569,17 +570,19 @@ function getScheduleGroupsForSubject(subjId) {
 </script>
 
 <template>
-    <div class="col-12 border-bottom" v-if="!milestoneLoading && Object.keys(milestone).length">
+    <!-- <div class="col-12 border-bottom" v-if="!milestoneLoading && Object.keys(milestone).length">
         <div class="p-3 w-100 d-flex justify-content-center">
             <select v-model="formType" class="neu-input neu-select w-50">
                 <option value="1">Registrar</option>
                 <option value="2">Cashier</option>
+                <option value="3">Student</option>
+                <option value="0">All</option>
             </select>
         </div>
-    </div>
-    <div id="printform" v-if="!milestoneLoading && Object.keys(milestone).length" class="d-flex justify-content-center">
+    </div> -->
+    <div id="printform" v-if="!milestoneLoading && Object.keys(milestone).length" class="d-flex flex-column justify-content-center w-100 align-items-center">
         <div class="border small-font bg-opaque h-100"
-            style="width: 770px; height: 1105px; border:2px solid black; font-size: 8.8px;">
+            id="form">
             <table class="table table-fixed" style="text-transform:uppercase">
                 <thead>
                     <tr>
@@ -595,7 +598,7 @@ function getScheduleGroupsForSubject(subjId) {
                             <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
                             <p class="m-0 fw-normal small-font">Founded 1959</p>
                         </th>
-                        <th class="align-middle"><img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
+                        <th class="align-middle"><img src="/img/sims_logo.png" height="60px" width="60px" alt="...">
                         </th>
                     </tr>
                 </thead>
@@ -604,8 +607,7 @@ function getScheduleGroupsForSubject(subjId) {
                         <td colspan="3">
                             <div class="d-flex flex-column text-center w-100">
                                 <span class="fw-bold">CERTIFICATE OF REGISTRATION</span>
-                                <span v-if="formType == 1" class="fw-bold">REGISTRAR'S COPY</span>
-                                <span v-if="formType == 2" class="fw-bold">CASHIER'S COPY</span>
+                                <span class="fw-bold">REGISTRAR'S COPY</span>
                                 <span>No. SF-12606</span>
                             </div>
                         </td>
@@ -615,7 +617,7 @@ function getScheduleGroupsForSubject(subjId) {
                             <table class="table" v-for="(e, index) in enrolleeData">
                                 <tbody>
                                     <tr class="text-start">
-                                        <td class="p-2 border" colspan="2">
+                                        <td class="" colspan="2">
                                             <span style="text-transform:none">Name: </span>
                                             <span class="fw-semibold">
                                                 {{ studentData.per_firstname }} 
@@ -624,13 +626,13 @@ function getScheduleGroupsForSubject(subjId) {
                                                 {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
                                             </span>
                                         </td>
-                                        <td class="p-2 border">
+                                        <td class="">
                                             <span style="text-transform:none">Student ID: </span>
                                             <span class="fw-semibold">
                                                 {{ e.ident_identification }}
                                             </span>
                                         </td>
-                                        <td class="p-2 border">
+                                        <td class="">
                                             <span style="text-transform:none">Date: </span>
                                             <span class="fw-semibold">
                                                 {{ e.enr_dateenrolled }}
@@ -638,25 +640,25 @@ function getScheduleGroupsForSubject(subjId) {
                                         </td>
                                     </tr>
                                     <tr class="text-start">
-                                        <td class="p-2 border">
+                                        <td class="">
                                             <span style="text-transform:none">Course: </span>
                                             <span class="fw-semibold">
                                                 {{ e.prog_name }}
                                             </span>
                                         </td>
-                                        <td class="p-2 border">
+                                        <td class="">
                                             <span style="text-transform:none">Grade/Year: </span>
                                             <span class="fw-semibold">
                                                 {{ e.grad_name }}
                                             </span>
                                         </td>
-                                        <td class="p-2 border">
+                                        <td class="">
                                             <span style="text-transform:none">Section: </span>
                                             <span class="fw-semibold">
                                                 {{ e.sec_name ? e.sec_name : 'N/A' }}
                                             </span>
                                         </td>
-                                        <td class="p-2 border">
+                                        <td class="">
                                             <span style="text-transform:none">Semester: </span>
                                             <span class="fw-semibold">
                                                 {{ e.quar_desc }}
@@ -669,18 +671,15 @@ function getScheduleGroupsForSubject(subjId) {
                     </tr>
                 </tbody>
             </table>
-            <div class="text-center w-100">
-                <p class="fw-bold">Subjects Enrolled</p>
-            </div>
             <table class="table table-fixed" style="text-transform:uppercase">
                 <thead>
                     <tr>
-                        <th style="background-color: #000000;" class="text-white">Code</th>
-                        <th style="background-color: #000000; width: 120px;" class="text-white">Subject</th>
-                        <th style="background-color: #000000;" class="text-white">Units</th>
-                        <th style="background-color: #000000;" class="text-white">Days</th>
-                        <th style="background-color: #000000;" class="text-white">Time</th>
-                        <th style="background-color: #000000;" class="text-white">Room</th>
+                        <th style="background-color: #000000; width: 50px;" class="text-white">Code</th>
+                        <th style="background-color: #000000; width: 180px;" class="text-white">Subject</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Units</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Days</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Time</th>
+                        <th style="background-color: #000000; width: 100px;" class="text-white">Room</th>
                         <th style="background-color: #000000; width: 120px;" class="text-white">Faculty</th>
                     </tr>
                 </thead>
@@ -698,7 +697,7 @@ function getScheduleGroupsForSubject(subjId) {
 
                         <!-- Units -->
                         <td class="align-middle p-2">
-                            Lec: {{ c.subj_lec_units }} | Lab: {{ c.subj_lab_units }} | Total: {{ c.subj_lec_units + c.subj_lab_units }}
+                            Lec: {{ c.subj_lec_units }} | Lab: {{ c.subj_lab_units }}
                         </td>
 
                         <!-- Days -->
@@ -744,7 +743,7 @@ function getScheduleGroupsForSubject(subjId) {
                 </tbody>
             </table>
             <div class="d-flex flex-column justify-content-center align-items-center" style="font-size:8px">
-                <div class="w-75 p-1 ">
+                <div class="w-75">
                     <span class="fst-italic">
                         I shall abide by all the rules and regulations now enforced or may be promulgated by Central
                         Luzon
@@ -806,16 +805,15 @@ function getScheduleGroupsForSubject(subjId) {
                     </div>
                 </div>
             </div>
-            <div class="d-flex flex-column justify-content-center align-items-center mt-3" style="font-size:8px"
-                v-if="formType == 1">
+            <div class="d-flex flex-column justify-content-center align-items-center mt-1" style="font-size:8px">
                 <div class="d-flex flex-column gap-1 justify-content-center align-content-center align-items-center">
-                    <span class="fw-bold mt-1">
+                    <span class="fw-bold">
                         STUDENT AFFAIRS OFFICE
                     </span>
-                    <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
+                    <span class="fw-bold fa-underline  border-0 border-bottom border-dark-subtle">
                         UNDERTAKING
                     </span>
-                    <span class="w-75 p-1 fst-italic" style="text-align: justify;">
+                    <span class="w-100 p-3 fst-italic" style="text-align: justify;">
                         I, <span class="fw-semibold text-uppercase">
                             {{ studentData.per_firstname }}
                             {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
@@ -865,7 +863,234 @@ function getScheduleGroupsForSubject(subjId) {
 
                 </div>
             </div>
-            <div class="w-100 p-2 d-flex gap-2 justify-content-around" v-if="formType == 2" style="height: 180px;">
+        </div>
+        <div class="pagebreak"></div>
+        
+        <div class="border small-font bg-opaque h-100 mt-3"
+            id="form">
+            <table class="table table-fixed" style="text-transform:uppercase">
+                <thead>
+                    <tr>
+                        <th class="align-middle">
+                            <img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
+                        </th>
+                        <th class="align-middle text-center">
+                            <p class="m-0">CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.
+                                CELTECH COLLEGE</p>
+                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San
+                                Fernando,
+                                Pampanga, Philippines, 2000</p>
+                            <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                            <p class="m-0 fw-normal small-font">Founded 1959</p>
+                        </th>
+                        <th class="align-middle"><img src="/img/sims_logo.png" height="60px" width="60px" alt="...">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">
+                            <div class="d-flex flex-column text-center w-100">
+                                <span class="fw-bold">CERTIFICATE OF REGISTRATION</span>
+                                <span class="fw-bold">CASHIER'S COPY</span>
+                                <span>No. SF-12606</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="align-middle" colspan="3">
+                            <table class="table" v-for="(e, index) in enrolleeData">
+                                <tbody>
+                                    <tr class="text-start">
+                                        <td class="" colspan="2">
+                                            <span style="text-transform:none">Name: </span>
+                                            <span class="fw-semibold">
+                                                {{ studentData.per_firstname }} 
+                                                {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
+                                                {{ studentData.per_lastname }}
+                                                {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Student ID: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.ident_identification }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Date: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.enr_dateenrolled }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr class="text-start">
+                                        <td class="">
+                                            <span style="text-transform:none">Course: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.prog_name }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Grade/Year: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.grad_name }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Section: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.sec_name ? e.sec_name : 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Semester: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.quar_desc }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-fixed" style="text-transform:uppercase">
+                <thead>
+                    <tr>
+                        <th style="background-color: #000000; width: 50px;" class="text-white">Code</th>
+                        <th style="background-color: #000000; width: 180px;" class="text-white">Subject</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Units</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Days</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Time</th>
+                        <th style="background-color: #000000; width: 100px;" class="text-white">Room</th>
+                        <th style="background-color: #000000; width: 120px;" class="text-white">Faculty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(c, index) in milestone" :key="index">
+                        <!-- Code -->
+                        <td class="align-middle p-2">
+                            {{ c.subj_code }}
+                        </td>
+
+                        <!-- Subject -->
+                        <td class="align-middle p-2">
+                            {{ c.subj_name }}
+                        </td>
+
+                        <!-- Units -->
+                        <td class="align-middle p-2">
+                            Lec: {{ c.subj_lec_units }} | Lab: {{ c.subj_lab_units }}
+                        </td>
+
+                        <!-- Days -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.day }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+
+                        <!-- Time -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.start }} - {{ g.end }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+
+                        <!-- Room -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.room }} <span v-if="g.building">- {{ g.building }}</span>
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+
+                        <!-- Faculty -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.faculty }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="d-flex flex-column justify-content-center align-items-center" style="font-size:8px">
+                <div class="w-75">
+                    <span class="fst-italic">
+                        I shall abide by all the rules and regulations now enforced or may be promulgated by Central
+                        Luzon
+                        College of Science and Technology, Inc. from time to time
+                        Likewise, I agree to the cancellation of the credits I have earned in subjects I have enrolled
+                        under
+                        false pretenses.
+                    </span>
+                </div>
+                <div
+                    class="p-1 d-flex flex-column gap-1 justify-content-center align-content-center align-items-center border border-dark-subtle rounded bg-body-tertiary shadow-sm">
+                    <span class="text-danger fw-bold mt-1"> IMPORTANT </span>
+                    <span class="fw-bold mt-1">
+                        CERTIFICATE OF REGISTRATION - means officially enrolled subjects and it will serve as an admission slip
+                        to the
+                        classroom.
+                    </span>
+                    <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
+                        * CHARGES TO STUDENTS WITHDRAWING/ DROPPING *
+                    </span>
+                    <ul class="text-start">
+                        <li>
+                            <strong>Before the start of classes:</strong> charged the full amount of the registration
+                            fee, School ID, report cards, etc., <em>plus</em> <strong>10% of the total tuition
+                                fees</strong>.
+                        </li>
+                        <li>
+                            <strong>Within the first week of classes:</strong> charged an amount equal to <strong>30% of
+                                the total charges for the whole semester</strong>, regardless of whether or not he has
+                            actually attended classes.
+                        </li>
+                        <li>
+                            <strong>Within the second week of classes:</strong> charged an amount equal to <strong>80%
+                                of the total charges for the whole semester</strong>, regardless of whether or not he
+                            has actually attended classes.
+                        </li>
+                        <li>
+                            <strong>After the second week of classes:</strong> charged the <strong>full amount due for
+                                the whole semester</strong>, regardless of whether or not he has actually attended
+                            classes.
+                        </li>
+                    </ul>
+                    <small>
+                        Note: This statement serves as the official policy regarding
+                        withdrawal/drop charges. For questions, contact the Registrar's Office.
+                    </small>
+
+                    <div class="d-flex gap-2 w-75 justify-content-between mt-3">
+                        <div class="w-100 text-center">
+                            <div style="height:1px; background:#808080;"></div>
+                            <p style="font-size:8px; color:#374151;">Student Signature over
+                                Printed Name</p>
+                        </div>
+                        <div class="w-100 text-center">
+                            <div style="height:1px; background:#808080;"></div>
+                            <p style="font-size:8px; color:#374151;">Registrar / Authorized
+                                Signature</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-100 p-2 d-flex gap-2 justify-content-around" style="height: 150px;">
                 <div class="w-100 border bg-body-secondary">
                     <span class="fw-bold">Payments (5 latest Transaction)</span>
                     <table class="table table-bordered">
@@ -909,12 +1134,12 @@ function getScheduleGroupsForSubject(subjId) {
                         <span>Total Other Charges</span>
                         <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.misc_amount) : 0.00 }}</span>
                     </div>
-                   
+                
                     <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
                         <span>Total Tuition</span>
                         <span class="fw-bold">{{ enrolleeData[0].acs_amount?  pesoConverter(enrolleeData[0].acs_amount) : 0.00 }}</span>
                     </div>
-                     <div class="d-flex gap-1 justify-content-between">
+                    <div class="d-flex gap-1 justify-content-between">
                         <span>Total Deductions</span>
                         <span class="fw-bold"> - {{ pesoConverter(chargeBreakdown.deductions) }}</span>
                     </div>
@@ -952,6 +1177,319 @@ function getScheduleGroupsForSubject(subjId) {
                 </div>
             </div>
         </div>
+
+        <div class="border small-font bg-opaque h-100 mt-3"
+            id="form">
+            <table class="table table-fixed" style="text-transform:uppercase">
+                <thead>
+                    <tr>
+                        <th class="align-middle">
+                            <img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
+                        </th>
+                        <th class="align-middle text-center">
+                            <p class="m-0">CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.
+                                CELTECH COLLEGE</p>
+                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San
+                                Fernando,
+                                Pampanga, Philippines, 2000</p>
+                            <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
+                            <p class="m-0 fw-normal small-font">Founded 1959</p>
+                        </th>
+                        <th class="align-middle"><img src="/img/sims_logo.png" height="60px" width="60px" alt="...">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="3">
+                            <div class="d-flex flex-column text-center w-100">
+                                <span class="fw-bold">CERTIFICATE OF REGISTRATION</span>
+                                <span class="fw-bold">STUDENT'S COPY</span>
+                                <span>No. SF-12606</span>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="align-middle" colspan="3">
+                            <table class="table" v-for="(e, index) in enrolleeData">
+                                <tbody>
+                                    <tr class="text-start">
+                                        <td class="" colspan="2">
+                                            <span style="text-transform:none">Name: </span>
+                                            <span class="fw-semibold">
+                                                {{ studentData.per_firstname }} 
+                                                {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
+                                                {{ studentData.per_lastname }}
+                                                {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Student ID: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.ident_identification }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Date: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.enr_dateenrolled }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr class="text-start">
+                                        <td class="">
+                                            <span style="text-transform:none">Course: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.prog_name }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Grade/Year: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.grad_name }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Section: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.sec_name ? e.sec_name : 'N/A' }}
+                                            </span>
+                                        </td>
+                                        <td class="">
+                                            <span style="text-transform:none">Semester: </span>
+                                            <span class="fw-semibold">
+                                                {{ e.quar_desc }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table table-fixed" style="text-transform:uppercase">
+                <thead>
+                    <tr>
+                        <th style="background-color: #000000; width: 50px;" class="text-white">Code</th>
+                        <th style="background-color: #000000; width: 180px;" class="text-white">Subject</th>
+                        <th style="background-color: #000000; width: 80px;" class="text-white">Units</th>
+                        <th style="background-color: #000000;" class="text-white">Days</th>
+                        <th style="background-color: #000000;" class="text-white">Time</th>
+                        <th style="background-color: #000000;" class="text-white">Room</th>
+                        <th style="background-color: #000000; width: 120px;" class="text-white">Faculty</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(c, index) in milestone" :key="index">
+                        <!-- Code -->
+                        <td class="align-middle p-2">
+                            {{ c.subj_code }}
+                        </td>
+
+                        <!-- Subject -->
+                        <td class="align-middle p-2">
+                            {{ c.subj_name }}
+                        </td>
+
+                        <!-- Units -->
+                        <td class="align-middle p-2">
+                            Lec: {{ c.subj_lec_units }} | Lab: {{ c.subj_lab_units }}
+                        </td>
+
+                        <!-- Days -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.day }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+
+                        <!-- Time -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.start }} - {{ g.end }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+
+                        <!-- Room -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.room }} <span v-if="g.building">- {{ g.building }}</span>
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+
+                        <!-- Faculty -->
+                        <td class="align-middle p-2">
+                            <template v-if="getScheduleGroupsForSubject(c.subj_id).length">
+                                <div v-for="(g, i) in getScheduleGroupsForSubject(c.subj_id)" :key="i">
+                                    {{ g.faculty }}
+                                </div>
+                            </template>
+                            <span v-else>TBA</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="d-flex flex-column justify-content-center align-items-center" style="font-size:8px">
+                <div class="w-75">
+                    <span class="fst-italic">
+                        I shall abide by all the rules and regulations now enforced or may be promulgated by Central
+                        Luzon
+                        College of Science and Technology, Inc. from time to time
+                        Likewise, I agree to the cancellation of the credits I have earned in subjects I have enrolled
+                        under
+                        false pretenses.
+                    </span>
+                </div>
+                <div
+                    class="p-1 d-flex flex-column gap-1 justify-content-center align-content-center align-items-center border border-dark-subtle rounded bg-body-tertiary shadow-sm">
+                    <span class="text-danger fw-bold mt-1"> IMPORTANT </span>
+                    <span class="fw-bold mt-1">
+                        CERTIFICATE OF REGISTRATION - means officially enrolled subjects and it will serve as an admission slip
+                        to the
+                        classroom.
+                    </span>
+                    <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
+                        * CHARGES TO STUDENTS WITHDRAWING/ DROPPING *
+                    </span>
+                    <ul class="text-start">
+                        <li>
+                            <strong>Before the start of classes:</strong> charged the full amount of the registration
+                            fee, School ID, report cards, etc., <em>plus</em> <strong>10% of the total tuition
+                                fees</strong>.
+                        </li>
+                        <li>
+                            <strong>Within the first week of classes:</strong> charged an amount equal to <strong>30% of
+                                the total charges for the whole semester</strong>, regardless of whether or not he has
+                            actually attended classes.
+                        </li>
+                        <li>
+                            <strong>Within the second week of classes:</strong> charged an amount equal to <strong>80%
+                                of the total charges for the whole semester</strong>, regardless of whether or not he
+                            has actually attended classes.
+                        </li>
+                        <li>
+                            <strong>After the second week of classes:</strong> charged the <strong>full amount due for
+                                the whole semester</strong>, regardless of whether or not he has actually attended
+                            classes.
+                        </li>
+                    </ul>
+                    <small>
+                        Note: This statement serves as the official policy regarding
+                        withdrawal/drop charges. For questions, contact the Registrar's Office.
+                    </small>
+
+                    <div class="d-flex gap-2 w-75 justify-content-between mt-3">
+                        <div class="w-100 text-center">
+                            <div style="height:1px; background:#808080;"></div>
+                            <p style="font-size:8px; color:#374151;">Student Signature over
+                                Printed Name</p>
+                        </div>
+                        <div class="w-100 text-center">
+                            <div style="height:1px; background:#808080;"></div>
+                            <p style="font-size:8px; color:#374151;">Registrar / Authorized
+                                Signature</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-100 p-2 d-flex gap-2 justify-content-around" style="height: 120px;">
+                <div class="w-100 border bg-body-secondary">
+                    <span class="fw-bold">Payments (5 latest Transaction)</span>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <td class="p-1">Date</td>
+                                <td class="p-1">OR No.</td>
+                                <td class="p-1">Amount</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(pay, index) in paymentDetails.slice(-5)" :key="index">
+                                <td class="p-1">{{ pay.acy_datepaid }}</td>
+                                <td class="p-1">
+                                    {{ pay.acy_series_prefix }}-{{ pay.acy_series_year }}-{{ pay.acy_series_pattern }}
+                                </td>
+                                <td class="p-1">{{ pesoConverter(pay.acy_payment) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="w-100 p-2">
+                    
+                    <!-- <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Subject Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.subjects_amount?  pesoConverter(chargeBreakdown.subjects_amount) : 0.00 }}</span>
+                    </div> -->
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total lecture Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.lec_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Laboratory Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.lab_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total  Item/Miscellaneous Fees</span>
+                        <span class="fw-bold">{{ chargeBreakdown.item_amount?  pesoConverter(chargeBreakdown.item_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Other Charges</span>
+                        <span class="fw-bold">{{ chargeBreakdown.misc_amount?  pesoConverter(chargeBreakdown.misc_amount) : 0.00 }}</span>
+                    </div>
+                
+                    <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
+                        <span>Total Tuition</span>
+                        <span class="fw-bold">{{ enrolleeData[0].acs_amount?  pesoConverter(enrolleeData[0].acs_amount) : 0.00 }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Total Deductions</span>
+                        <span class="fw-bold"> - {{ pesoConverter(chargeBreakdown.deductions) }}</span>
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between mt-2 border-top pt-2">
+                        <span>Remaining Balance</span>
+                        <span class="fw-bold">{{  chargeBreakdown.overall_amount ? pesoConverter(chargeBreakdown.overall_amount - totalPayment) :enrolleeData[0].acs_amount }}</span>
+                    </div>
+                    <!-- <div class="d-flex gap-1 justify-content-between">
+                        <span>Mode of Payment</span>
+                        <span class="fw-bold">INSTALLMENT</span>
+                    </div> -->
+                    <!-- <div class="d-flex gap-1 justify-content-between">
+                        <span>Prelim</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Midterm</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Pre-Final</span>
+                        <span class="fw-bold">0.00</span>
+
+                    </div>
+                    <div class="d-flex gap-1 justify-content-between">
+                        <span>Final</span>
+                        <span class="fw-bold">0.00</span>
+                    </div> -->
+                    <div class="text-center mt-1 fst-italic">
+                        <span class="fw-bold">Note: </span>
+                        <span>Above fees exclude other applicable charges to be paid at cashiers office.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pagebreak"></div>
     </div>
 
     <div v-if="!milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
@@ -976,3 +1514,15 @@ function getScheduleGroupsForSubject(subjId) {
         v-show="!milestoneLoading && Object.keys(milestone).length">Print Form</button>
 
 </template>
+<style scope>
+#form {
+  width: 210mm;
+  min-height: 290mm;
+  border: 2px solid black;
+  font-size: 9px;
+}
+.pagebreak {
+  page-break-before: always;
+}
+
+</style>

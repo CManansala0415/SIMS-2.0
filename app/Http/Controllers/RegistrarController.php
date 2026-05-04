@@ -1100,7 +1100,7 @@ class RegistrarController extends Controller
                         break;
                     }
                 }
-
+ 
                 $total_price = 0;
                 $mergedItem  = clone $ms; // copy object safely
 
@@ -1110,18 +1110,33 @@ class RegistrarController extends Controller
                         $mergedItem->$key = $value;
                     }
 
+                    // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
+                    $computedLab = 0;
+                    if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2){
+                        $computedLab = $template->tuitemp_lab * 1;
+                    } else {
+                        $computedLab = $template->tuitemp_lab * 3;
+                    }
+
                     // Compute from template
                     $total_price =
                         ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
-                        ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($template->tuitemp_lab ?? 0));
+                        ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($computedLab ?? 0));
 
                     // Ensures template exists in UI
                     $mergedItem->tuitemp_id = $template->tuitemp_id;
 
                 } else {
+                    $computedLab = 0;
+                    if($ms->subj_extra == 1 || $ms->subj_extra == 2){
+                        $computedLab = $ms->tuitemp_lab * 1;
+                    } else {
+                        $computedLab = $ms->tuitemp_lab * 3;
+                    }
+
                     // Fallback to milestone rates
                     $total_price =
-                        ((float) ($ms->subj_lec_rate ?? 0) * (float) (($ms->subj_lec_units) ?? 0)) +
+                        ((float) ($ms->subj_lec_rate ?? 0) * (float) (($computedLab) ?? 0)) +
                         ((float) ($ms->subj_lab_rate ?? 0) * (float) (($ms->subj_lab_units) ?? 0));
                 }
 

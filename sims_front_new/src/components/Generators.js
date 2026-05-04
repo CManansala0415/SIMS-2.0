@@ -93,7 +93,28 @@ const pdfAutoPrint = async (name, contentWidth, orientation, margin) => {
 };
 
 
+const pdfGeneratorEnrollment = async (name, paper, orientation, margin) => {
+    var element = document.getElementById('printform');
+    var opt = {
+      margin: margin,
+      filename: name + '.pdf',
+      pagebreak: { mode: 'css', before: '.pagebreak' },
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollY: 0
+      },
+      jsPDF: { 
+          unit: 'mm',
+          format: 'a4',
+          orientation: orientation
+      },
+  };
 
+    // ✅ Return the promise so callers can await it
+    return html2pdf().set(opt).from(element).save();
+};
 
 
 const pdfGenerator = async (name, paper, orientation, margin) => {
@@ -336,5 +357,6 @@ export {
     getHolidays,
     getDateToday,
     pdfAutoPrint,
-    getAddress
+    getAddress,
+    pdfGeneratorEnrollment
 }

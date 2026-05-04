@@ -55,7 +55,7 @@ const showFilterModal = ref(false)
 const showPrintID = ref(false)
 const showFormData = ref([])
 const activeForm = ref(1)
-const limit = ref(3000)
+const limit = ref(10)
 const offset = ref(0)
 const studentCount = ref(0)
 const searchValue = ref([])
@@ -74,8 +74,6 @@ const printType = ref('')
 const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const paymentDetails = ref([])
-const inQueue = ref([])
-
 const booter = async () => {
     getAcademicDefaults().then((results) => {
         // console.log(results)
@@ -206,7 +204,7 @@ onMounted(async () => {
                     })
 
                     student.value = x
-                    // getNoPrint(student.value)
+
 
                     preLoading.value = false
                     emit('doneLoading', false)
@@ -662,18 +660,6 @@ const getData = (result) => {
     document.getElementById('hideqrscanner').click();
 }
 
-const getNoPrint = (data) =>{
-    inQueue.value = data.filter((e)=>{
-        if(e.enr_inqueue == 1){
-            return e
-        }
-    })
-
-    console.log(inQueue.value)
-    console.log(student.value)
-
-}
-
 </script>
 <template>
     <div>
@@ -772,205 +758,194 @@ const getNoPrint = (data) =>{
                 </div> -->
                 <div class="row justify-content-center" v-if="preLoading && !Object.keys(student).length">
                     <div class="col-12 col-sm-8 col-lg-6 w-100">
-                        <SkeletonCardLoader :elementcount="2"/>
+                        <SkeletonCardLoader :elementcount="3"/>
                     </div>
                 </div>
                       
-                <div v-else class="row mb-3" v-if="!preLoading && Object.keys(student).length">
-                    <div class="col-12 col-lg-8">
-                        <div class="p-4 neu-card">
-                            <div v-for="(stud, index) in student">
-                                <div class="row border">
-                                    <div class="col-12 col-lg-4 border-0 border-end">
-                                        <div class="d-flex p-2">
-                                            <div class="w-100">
-                                                <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
-                                                    class="text_guide img_hover p-1 d-flex justify-content-center align-items-center">
-                                                    <!-- stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
-                                                    <img class=" img-size-card img_profile" :src="stud.profile_picture" alt="">
-                                                </div>
-                                                <div v-if="showLinkProfile && index === linkId"
-                                                    class="upload-section d-flex flex-column align-items-center justify-content-center p-1 rounded-4 shadow-sm w-100">
-                                                    <form @submit.prevent="upload(stud.per_id, 1, stud.per_profile)"
-                                                        enctype="multipart/form-data" class="w-100 text-center">
-                                                        <!-- Hidden File Input -->
-                                                        <input type="file" :id="'fileInput-' + index" class="d-none"
-                                                            @change="handleImage" />
+                <div v-else class="row" v-if="!preLoading && Object.keys(student).length">
+                    <!-- Single Advisor-->
+                    <div class="col-12 col-md-6 col-lg-4" v-for="(stud, index) in student">
+                        <div class="single_advisor_profile wow fadeInUp rounded-4" data-wow-delay="0.2s"
+                            style="visibility: visible; animation-delay: 0.2s; animation-name: fadeInUp;">
+                            <!-- Team Thumb-->
+                            <div class="advisor_thumb rounded-top-4">
+                                <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
+                                    class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
+                                    <!-- stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
+                                    <img class=" img-size-card img_profile" :src="stud.profile_picture" alt="">
+                                </div>
+                                <div v-if="showLinkProfile && index === linkId"
+                                    class="upload-section d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm w-100">
+                                    <form @submit.prevent="upload(stud.per_id, 1, stud.per_profile)"
+                                        enctype="multipart/form-data" class="w-100 text-center">
+                                        <!-- Hidden File Input -->
+                                        <input type="file" :id="'fileInput-' + index" class="d-none"
+                                            @change="handleImage" />
 
-                                                        <!-- Custom Upload Button -->
-                                                        <label :for="'fileInput-' + index"
-                                                            class="btn btn-outline-info btn-sm px-3 py-1 m-1">
-                                                            <i class="fa fa-upload me-2"></i> Choose Photo
-                                                        </label>
+                                        <!-- Custom Upload Button -->
+                                        <label :for="'fileInput-' + index"
+                                            class="btn btn-outline-info btn-sm px-3 py-1 m-1">
+                                            <i class="fa fa-upload me-2"></i> Choose Photo
+                                        </label>
 
-                                                        <!-- Submit & Cancel Buttons -->
-                                                        <div class="mt-2">
-                                                            <button type="submit" class="neu-btn neu-green px-4 py-2 m-1"
-                                                                :disabled="holdSubmit">
-                                                                <i class="fa fa-cloud-upload-alt me-2"></i> Upload
-                                                            </button>
+                                        <!-- Submit & Cancel Buttons -->
+                                        <div class="mt-2">
+                                            <button type="submit" class="neu-btn neu-green px-4 py-2 m-1"
+                                                :disabled="holdSubmit">
+                                                <i class="fa fa-cloud-upload-alt me-2"></i> Upload
+                                            </button>
 
-                                                            <button type="button" class="neu-btn neu-red px-4 py-2 m-1"
-                                                                @click="showLinkProfile = false">
-                                                                <i class="fa fa-times me-2"></i> Cancel
-                                                            </button>
-                                                        </div>
-
-                                                        <!-- Filename Display -->
-                                                        <p v-if="image?.name" class="mt-2 text-muted small fst-italic">
-                                                            Selected: {{ image.name }}
-                                                        </p>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex justify-content-between align-items-center w-100">
-                                                <div v-if="stud.per_signature"
-                                                    @click="showLinkSignature = !showLinkSignature, linkId = index"
-                                                    class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
-                                                    <img class="signature-size-card"
-                                                        :src="'http://localhost:8000/storage/signatures/' + stud.per_signature" alt="">
-                                                </div>
-                                                <div v-else class="text_guide img_hover p-3"
-                                                    @click="showLinkSignature = !showLinkSignature, linkId = index">
-                                                    <div
-                                                        class="signature-size-card-none d-flex justify-content-center align-items-center">
-                                                        <span class="text-muted">No Signature Uploaded</span>
-                                                    </div>
-                                                </div>
-
-                                                <div v-if="showLinkSignature && index == linkId"
-                                                    class="upload-section d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm w-100">
-                                                    <form @submit.prevent="upload(stud.per_id, 2, stud.per_signature)"
-                                                        enctype="multipart/form-data" class="w-100 text-center">
-                                                        <!-- Hidden File Input -->
-                                                        <input type="file" :id="'fileInput-' + index" class="d-none"
-                                                            @change="handleImage" />
-
-                                                        <!-- Custom Upload Button -->
-                                                        <label :for="'fileInput-' + index"
-                                                            class="upload-label btn btn-outline-success btn-sm px-3 py-1 m-1">
-                                                            <i class="fa fa-upload me-2"></i> Choose Photo
-                                                        </label>
-
-                                                        <!-- Submit & Cancel Buttons -->
-                                                        <div class="mt-2">
-                                                            <button type="submit" class="neu-btn neu-green px-4 py-2 m-1"
-                                                                :disabled="holdSubmit">
-                                                                <i class="fa fa-cloud-upload-alt me-2"></i> Upload
-                                                            </button>
-
-                                                            <button type="button" class="neu-btn neu-red btn-sm px-4 py-2 m-1"
-                                                                @click="showLinkSignature = false">
-                                                                <i class="fa fa-times me-2"></i> Cancel
-                                                            </button>
-                                                        </div>
-
-                                                        <!-- Filename Display -->
-                                                        <p v-if="image?.name" class="mt-2 text-muted small fst-italic">
-                                                            Selected: {{ image.name }}
-                                                        </p>
-                                                    </form>
-                                                </div>
-                                            </div>
+                                            <button type="button" class="neu-btn neu-red px-4 py-2 m-1"
+                                                @click="showLinkProfile = false">
+                                                <i class="fa fa-times me-2"></i> Cancel
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div class="col-12 col-lg-8">
-                                        <div class="d-flex flex-column justify-content-around h-100">
-                                            <div class="d-flex flex-column gap-2 p-2">
-                                                <div class="text-start">
-                                                    <span class="text-uppercase fw-bold" style="font-size: 13px;"> {{ stud.per_firstname }} {{
-                                                    stud.per_middlename }} {{
-                                                        stud.per_lastname }} {{
-                                                        stud.per_suffixname }}</span>
-                                                </div>
-                                                <div class="text-center d-flex justify-content-between">
-                                                    <div>
-                                                        <span class="d-inline-block">
-                                                        {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
-                                                        </span>
-                                                        |
-                                                        <span class="d-inline-block">
-                                                        {{ course.find(c => c.prog_id === stud.enr_course)?.prog_code || '—' }}
-                                                        </span>
-                                                        |
-                                                        <span class="d-inline-block">
-                                                        {{ gradelvl.find(g => g.grad_id === stud.enr_gradelvl)?.grad_name || '—' }}
-                                                        </span>
-                                                        |
-                                                        <span class="d-inline-block">
-                                                        {{ quarter.find(q => q.quar_id === stud.enr_quarter)?.quar_desc || '—' }}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span v-if="stud.is_paid" class="text-success fw-bold d-inline-block" style="font-size: 10px;">Officially
-                                                            Enrolled</span>
-                                                        <span v-else class="text-danger fw-bold d-inline-block" style="font-size: 10px;">Not Officially Enrolled
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="text-center">
-                                                <div v-if="accessData[1].useracc_modifying == 1"
-                                                    class="d-flex gap-2 justify-content-center p-1 w-100">
-                                                    <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
-                                                        data-bs-toggle="modal" data-bs-target="#taggingmodal" class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-pen" />
-                                                    </button>
-                                                    <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                                    <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Grades"
-                                                        data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-print" />
-                                                    </button>
-                                                    <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                                    <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt"
-                                                        data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-print" />
-                                                    </button>
-                                                    <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1" @click="showForm(3, stud, 3)"
-                                                        data-bs-target="#printmodal" type="button" title="Print Clearance"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-print" />
-                                                    </button>
-                                                    <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-trash" />
-                                                    </button>
-                                                    <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                                    <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1"
-                                                        data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="Print ID"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-id-card-clip" />
-                                                    </button>
-                                                </div>
-                                                <div v-else class="d-flex gap-2 justify-content-center p-3 bg-secondary-subtle">
-                                                    No access to modify student records.
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+
+                                        <!-- Filename Display -->
+                                        <p v-if="image?.name" class="mt-2 text-muted small fst-italic">
+                                            Selected: {{ image.name }}
+                                        </p>
+                                    </form>
                                 </div>
                             </div>
-                        </div>    
-                    </div>
-                    <div class="col-12 col-lg-4">
-                        <div class="p-2 neu-card">
-                            <p class="fw-bold mt-2">In Queue for Printing</p>
-                            <div v-if="Object.keys(inQueue).length" class="text-start p-2">
-                                <ul class="list-group">
-                                    <li v-for="(q, index) in inQueue" class="bg-transparent list-group-item text-uppercase">
-                                        {{ q.per_firstname }} {{ q.per_middlename }} {{ q.per_lastname }} {{ q.per_suffixname }}
-                                    </li>
-                                </ul>
+                            <!-- Team Details-->
+                            <div class="single_advisor_details_info">
+                                <h6 class="text-uppercase fw-bold" style="font-size: 13px;"> {{ stud.per_firstname }} {{
+                                    stud.per_middlename }} {{
+                                        stud.per_lastname }} {{
+                                        stud.per_suffixname }}</h6>
+                                <p v-if="stud.is_paid" class="text-success fw-bold" style="font-size: 10px;">Officially
+                                    Enrolled</p>
+                                <p v-else class="text-danger fw-bold" style="font-size: 10px;">Not Officially Enrolled
+                                </p>
+                                <div class="d-flex flex-column gap-1 mt-3">
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_program" :id="index + 'program'">
+                                        <option v-for="(p, index) in program" :value="p.dtype_id">{{ p.dtype_desc }}
+                                        </option>
+                                    </select>
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_course" :id="index + 'course'">
+                                        <option v-for="(c, index) in course" :value="c.prog_id">{{ c.prog_code }}
+                                        </option>
+                                    </select>
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_gradelvl" :id="index + 'gradelvl'">
+                                        <option v-for="(g, index) in gradelvl" :value="g.grad_id">{{ g.grad_name }}
+                                        </option>
+                                    </select>
+                                    <select class="neu-input neu-select text-small" disabled tabindex="-1"
+                                        v-model="stud.enr_quarter" :id="index + 'quarter'">
+                                        <option v-for="(q, index) in quarter" :value="q.quar_id">{{ q.quar_desc }}
+                                        </option>
+                                    </select>
+                                    <!-- <span class="p-1 d-inline-block">
+                                    {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ course.find(c => c.prog_id === stud.enr_course)?.prog_code || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ gradelvl.find(g => g.grad_id === stud.enr_gradelvl)?.grad_name || '—' }}
+                                    </span>
+
+                                    <span class="p-1 d-inline-block">
+                                    {{ quarter.find(q => q.quar_id === stud.enr_quarter)?.quar_desc || '—' }}
+                                    </span> -->
+                                </div>
                             </div>
-                            <div v-else class="text-start p-2">
-                                <ul class="list-group">
-                                    <li class="bg-transparent list-group-item">No students in queue for printing.</li>
-                                </ul>
+                            <div class="advisor_thumb">
+                                <div v-if="stud.per_signature"
+                                    @click="showLinkSignature = !showLinkSignature, linkId = index"
+                                    class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
+                                    <img class="signature-size-card"
+                                        :src="'http://localhost:8000/storage/signatures/' + stud.per_signature" alt="">
+                                </div>
+                                <div v-else class="text_guide img_hover p-3"
+                                    @click="showLinkSignature = !showLinkSignature, linkId = index">
+                                    <div
+                                        class="signature-size-card-none d-flex justify-content-center align-items-center">
+                                        <span class="text-muted">No Signature Uploaded</span>
+                                    </div>
+                                </div>
+
+                                <div v-if="showLinkSignature && index == linkId"
+                                    class="upload-section d-flex flex-column align-items-center justify-content-center p-3 rounded-4 shadow-sm w-100">
+                                    <form @submit.prevent="upload(stud.per_id, 2, stud.per_signature)"
+                                        enctype="multipart/form-data" class="w-100 text-center">
+                                        <!-- Hidden File Input -->
+                                        <input type="file" :id="'fileInput-' + index" class="d-none"
+                                            @change="handleImage" />
+
+                                        <!-- Custom Upload Button -->
+                                        <label :for="'fileInput-' + index"
+                                            class="upload-label btn btn-outline-success btn-sm px-3 py-1 m-1">
+                                            <i class="fa fa-upload me-2"></i> Choose Photo
+                                        </label>
+
+                                        <!-- Submit & Cancel Buttons -->
+                                        <div class="mt-2">
+                                            <button type="submit" class="neu-btn neu-green px-4 py-2 m-1"
+                                                :disabled="holdSubmit">
+                                                <i class="fa fa-cloud-upload-alt me-2"></i> Upload
+                                            </button>
+
+                                            <button type="button" class="neu-btn neu-red btn-sm px-4 py-2 m-1"
+                                                @click="showLinkSignature = false">
+                                                <i class="fa fa-times me-2"></i> Cancel
+                                            </button>
+                                        </div>
+
+                                        <!-- Filename Display -->
+                                        <p v-if="image?.name" class="mt-2 text-muted small fst-italic">
+                                            Selected: {{ image.name }}
+                                        </p>
+                                    </form>
+                                </div>
+
                             </div>
-                        </div>    
+
+                            <div v-if="accessData[1].useracc_modifying == 1"
+                                class="d-flex gap-2 justify-content-center p-3 bg-transparent  rounded-bottom-4">
+                                <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
+                                    data-bs-toggle="modal" data-bs-target="#taggingmodal" class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-pen" />
+                                </button>
+                                <!-- v-if="Number(stud.acs_amount) > 0" -->
+                                <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Grades"
+                                    data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
+                                    class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                </button>
+                                <!-- v-if="Number(stud.acs_amount) > 0" -->
+                                <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt"
+                                    data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
+                                    class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                </button>
+                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1" @click="showForm(3, stud, 3)"
+                                    data-bs-target="#printmodal" type="button" title="Print Clearance"
+                                    class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                </button>
+                                <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
+                                    class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-trash" />
+                                </button>
+                                <!-- v-if="Number(stud.acs_amount) > 0" -->
+                                <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1"
+                                    data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="Print ID"
+                                    class="neu-btn-sm neu-white">
+                                    <font-awesome-icon icon="fa-solid fa-id-card-clip" />
+                                </button>
+                            </div>
+                            <div v-else class="d-flex gap-2 justify-content-center border p-3 bg-secondary-subtle">
+                                No access to modify student records.
+                            </div>
+
+                        </div>
                     </div>
                 </div>
                 <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
@@ -1186,8 +1161,8 @@ const getNoPrint = (data) =>{
 .img_profile {
     /* border: 1px solid #ddd; */
     border-radius: 100%;
-    height: 100px;
-    width: 100px;
+    height: 150px;
+    width: 150px;
     padding: 10px;
     box-shadow:
         3px 3px 5px rgba(122, 122, 122, 0.8),
@@ -1195,12 +1170,12 @@ const getNoPrint = (data) =>{
 }
 
 .signature-size-card {
-    height: 75px;
-    width: 75px;
+    height: 50px;
+    width: 50px;
 }
 
 .signature-size-card-none {
-    height: 75px;
+    height: 50px;
     width: 100%;
 }
 
