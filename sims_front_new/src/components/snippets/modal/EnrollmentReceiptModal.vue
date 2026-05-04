@@ -4,7 +4,7 @@ import { getUserID } from "../../../routes/user.js";
 import {
     getCurriculumSubject,
     getEnrollment,
-    getMilestone,
+    getMilestone, 
     addMilestone,
     updateEnrollment,
     updateMilestone,
@@ -19,7 +19,8 @@ import {
 import NeuLoader2 from '../loaders/NeuLoader2.vue';
 import {
     pdfGenerator,
-    pesoConverter
+    pesoConverter,
+    pdfAutoPrint
 } from "../../Generators.js";
 import { useRouter, useRoute } from 'vue-router'
 
@@ -414,6 +415,41 @@ const downloadPdf = () => {
         location.reload()
     });
 
+}
+
+const printSheet = async () =>{
+    Swal.fire({
+        title: "Generating File...",
+        text: "Please wait while we prepare your receipt.",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    let name = "cor";
+    let receiptWidth = 8.27; // in inches, your receipt width
+
+    try {
+        const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.1);
+
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');
+
+        printWindow.onload = () => {
+            printWindow.focus();
+            printWindow.print();
+        };
+
+    } catch (err) {
+        console.error(err);
+        Swal.fire("Error", "Failed to generate receipt.", "error");
+        location.reload();
+        return;
+    }
+
+    setTimeout(() => {
+        Swal.close();
+        location.reload();
+    }, 1000);
 }
 
 const formType = ref(1)
@@ -935,5 +971,8 @@ function getScheduleGroupsForSubject(subjId) {
     <button class="neu-btn neu-green p-2 mt-3" @click="downloadPdf()"
         v-if="!milestoneLoading && Object.keys(milestone).length"
         v-show="!milestoneLoading && Object.keys(milestone).length">Download Form</button>
+    <button class="neu-btn neu-blue p-2 mt-3" @click="printSheet()"
+        v-if="!milestoneLoading && Object.keys(milestone).length"
+        v-show="!milestoneLoading && Object.keys(milestone).length">Print Form</button>
 
 </template>
