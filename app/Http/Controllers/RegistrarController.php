@@ -678,7 +678,7 @@ class RegistrarController extends Controller
                 ->get();
 
         return $student;
-    }
+    } 
 
     public function getStudentFiltering($limit, $offset, $fname, $mname, $lname, $program, $gradelvl, $course, $mode)
     {   
@@ -687,12 +687,31 @@ class RegistrarController extends Controller
 
             if($limit == 0 && $offset == 0){
                 $student = DB::table('def_enrollment')
-                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
+                ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+                ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+                ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+                ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+
+                ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+                ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+                ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+                ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
+
                 ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                 ->select(  
                     'def_enrollment.*',
                     'def_person.*',
                     'def_student_identification.ident_identification as studentid',
+                    'currcountry.name as currcountryname',
+                    'currprovince.provDesc as currprovincename',
+                    'currcity.citymunDesc as currcityname',
+                    'currbarangay.brgyDesc as currbarangayname',
+
+                    'permcountry.name as permcountryname',
+                    'permprovince.provDesc as permprovincename',
+                    'permcity.citymunDesc as permcityname',
+                    'permbarangay.brgyDesc as permbarangayname',
                 )
                 ->orderBy('def_enrollment.enr_course')
                 ->orderByDesc('def_enrollment.enr_dateenrolled')
@@ -701,11 +720,29 @@ class RegistrarController extends Controller
             }else{
                 $student = DB::table('def_enrollment')
                 ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+                ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+                ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+                ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+
+                ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+                ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+                ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+                ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode')
                 ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                 ->select(  
                     'def_enrollment.*',
                     'def_person.*',
                     'def_student_identification.ident_identification as studentid',
+                    'currcountry.name as currcountryname',
+                    'currprovince.provDesc as currprovincename',
+                    'currcity.citymunDesc as currcityname',
+                    'currbarangay.brgyDesc as currbarangayname',
+
+                    'permcountry.name as permcountryname',
+                    'permprovince.provDesc as permprovincename',
+                    'permcity.citymunDesc as permcityname',
+                    'permbarangay.brgyDesc as permbarangayname',
                 )
                 ->orderBy('def_enrollment.enr_dateenrolled')
                 ->orderByDesc('def_enrollment.enr_dateenrolled')
@@ -730,12 +767,30 @@ class RegistrarController extends Controller
         // ($fname != 404)||($mname != 404)||($lname != 404) && ($limit == 1 && $offset == 1)
         else if (($fname == 404)&&($mname == 404)&&($lname == 404)&&($mode==1)){
             $student = DB::table('def_enrollment')
-                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
+                        ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+                        ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+                        ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+                        ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+
+                        ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+                        ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+                        ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+                        ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
                         ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                         ->select(  
                             'def_enrollment.*',
                             'def_person.*',
                             'def_student_identification.ident_identification as studentid',
+                            'currcountry.name as currcountryname',
+                            'currprovince.provDesc as currprovincename',
+                            'currcity.citymunDesc as currcityname',
+                            'currbarangay.brgyDesc as currbarangayname',
+
+                            'permcountry.name as permcountryname',
+                            'permprovince.provDesc as permprovincename',
+                            'permcity.citymunDesc as permcityname',
+                            'permbarangay.brgyDesc as permbarangayname',
                         )
                         ->orderBy('def_enrollment.enr_course')
                         ->orderByDesc('def_enrollment.enr_dateenrolled')

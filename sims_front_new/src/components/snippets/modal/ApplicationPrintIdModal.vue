@@ -97,7 +97,7 @@ onMounted(() => {
             // let decrypted = lvl2Decrypt('OG4wOjB9aWdxZHdjbnxzY2RtcTg=', 'CLCST_SECRET');
             // let obj = JSON.parse(decrypted);
             // console.log(obj.sid);
-           
+            // console.log(studentData.value)
         })
     })
     
@@ -241,12 +241,11 @@ const printForm = (studentid) => {
                                 studentData.per_curr_home&&
                                 studentData.brgyDesc&&
                                 studentData.citymunDesc&&
-                                studentData.provDesc&&
-                                studentData.countryName
+                                studentData.provDesc
                             " style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_curr_home }}, 
                                 <br/>{{ studentData.brgyDesc }}, {{ studentData.citymunDesc }}, 
-                                <br/>{{ studentData.provDesc }}, {{ studentData.countryName }}
+                                <br/>{{ studentData.provDesc }}
                             </span>
                             <span v-else style="font-size: 7px; font-weight: bold; text-transform: uppercase;">N/A</span>
                             <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Address</span>
