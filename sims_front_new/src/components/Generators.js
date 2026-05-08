@@ -345,6 +345,38 @@ const getAddress = (account, demograph) => {
     ].filter(e => e && e !== ' ').join(', ');
 };
 
+
+const lvl1Encrypt = (text)=>{
+  return btoa(text);
+}
+const lvl1Decrypt = (text)=>{
+  return atob(text);
+}
+
+const lvl2Encrypt = (text, key)=>{
+  let result = '';
+
+  for (let i = 0; i < text.length; i++) {
+      result += String.fromCharCode(
+          text.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+      );
+  }
+
+  return btoa(result);
+}
+const lvl2Decrypt = (encoded, key)=>{
+  const text = atob(encoded);
+    let result = '';
+
+    for (let i = 0; i < text.length; i++) {
+        result += String.fromCharCode(
+            text.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+        );
+    }
+
+    return result;
+}
+
 export {
     qrImageGenerator,
     pdfGenerator,
@@ -358,5 +390,9 @@ export {
     getDateToday,
     pdfAutoPrint,
     getAddress,
-    pdfGeneratorEnrollment
+    pdfGeneratorEnrollment,
+    lvl1Encrypt,
+    lvl1Decrypt,
+    lvl2Encrypt,
+    lvl2Decrypt,
 }

@@ -9,7 +9,9 @@ import {
 import {
     qrImageGenerator,
     pdfGenerator,
-    imageFetcher
+    imageFetcher,
+    lvl2Encrypt,
+    lvl2Decrypt,
 } from "../../Generators.js";
 
 
@@ -38,6 +40,7 @@ const preLoading = ref(true)
 const studentData = ref([])
 
 onMounted(() => {
+
     getStudentIdDetails(student.value.enr_id).then((result1)=>{
         studentData.value = result1[0]
         getFamily(student.value.per_famid,2).then((result2)=>{
@@ -90,6 +93,11 @@ onMounted(() => {
             // console.log( signatureId.value)
             // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
             preLoading.value = false
+
+            // let decrypted = lvl2Decrypt('OG4wOjB9aWdxZHdjbnxzY2RtcTg=', 'CLCST_SECRET');
+            // let obj = JSON.parse(decrypted);
+            // console.log(obj.sid);
+           
         })
     })
     
@@ -98,7 +106,19 @@ onMounted(() => {
 
 const printForm = (studentid) => {
     let name = 'LC-'+studentid
-    qrImageGenerator(studentid).then((result) => {
+
+    let key = "SIMS_CLCST_@2026!--*";
+    let original = JSON.stringify({
+        sid: studentid
+    });
+
+    const encrypted = lvl2Encrypt(original, key);
+    // console.log("QR DATA:", encrypted);
+
+    const decrypted = lvl2Decrypt(encrypted, key);
+    // console.log("BACK:", JSON.parse(decrypted));
+
+    qrImageGenerator(encrypted).then((result) => {
         qrimage.value = result
         let size = [2.125,3.375]
         pdfGenerator(name, size, 'portrait', 0.03)
@@ -111,6 +131,8 @@ const printForm = (studentid) => {
         });
     })
 }
+
+
 </script>
 <template>
     <!-- CR80 cards are 3.375" x 2.125" (the same size as a credit card) and are the standard, most commonly used size of PVC card. -->
