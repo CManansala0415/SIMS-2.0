@@ -232,7 +232,7 @@ onMounted(async () => {
                 booting.value = 'Loading Applicants...'
                 bootingCount.value += 1
             
-                await getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then((results) => {
+                await getApplicant(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value,1).then(async(results) => {
                     applicant.value = results.data
                     applicantCount.value = results.count
                     

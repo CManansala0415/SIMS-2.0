@@ -133,7 +133,7 @@ const printForm = (studentid) => {
                     </div>
                     <div style="height: 235px; width:100%;" class="idbg">
                         <div style="margin-top: 75px; width:100%; line-height: 0.1;text-align: center; padding: 1px;">
-                            <span style="font-size: 8px; font-weight: bold; text-transform: uppercase;">
+                            <span style="font-size: 9px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_firstname }}
                                 {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
                                 {{ studentData.per_lastname }}
@@ -141,12 +141,6 @@ const printForm = (studentid) => {
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Student Name</span> -->
                             </span>
                         </div>  
-                        <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px;">
-                            <span style="font-size: 5px; font-weight: bold;">
-                                {{ studentData.course }}<br/>
-                                <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
-                            </span>
-                        </div>
                          <!-- display: flex; justify-content: center; align-items: center; align-content: center; -->
                         <div style="width:100%; margin-top: 5px;">
                             <span class="px-5 py-1" 
@@ -158,7 +152,13 @@ const printForm = (studentid) => {
                                     {{ studentData.studentid? studentData.studentid: '000000' }}
                             </span>
                         </div>
-                        <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px;">
+                        <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px; margin-top:2px">
+                            <span style="font-size: 7px; font-weight: bold;">
+                                {{ studentData.course }}<br/>
+                                <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
+                            </span>
+                        </div>
+                        <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px; margin-top:1px">
                             <span style="font-size: 5px; font-weight: bold;">
                                 {{ studentData.program }} Department<br/>
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
@@ -173,7 +173,7 @@ const printForm = (studentid) => {
                         <!-- b8048e -->
                     
                         <div style="margin-top:1px; width:100%; line-height: 0.1;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
-                            <img :src="signatureId" height="45px" width="45px"/>
+                            <img :src="signatureId" height="43px" width="43px" style="opacity: 0;"/>
                             <p style="font-size: 4px; font-weight: bold;">
                                 Student's Signature
                             </p>

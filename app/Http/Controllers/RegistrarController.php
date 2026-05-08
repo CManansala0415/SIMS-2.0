@@ -1037,13 +1037,79 @@ class RegistrarController extends Controller
         return $milestone; 
        
     }
+
+    public function generateStudentIDAuto($data)
+    {   
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d H:i:s');
+
+        $studiddata = $this->getStudentIdentification(
+            $data['enr_personid']
+        );
+
+        if ($studiddata) {
+            return null;        
+        }else{
+            $yearShort = date('y');
+            $nextYearShort = str_pad(((int)$yearShort + 1) % 100, 2, '0', STR_PAD_LEFT);
+            $prefix = $yearShort . $nextYearShort;
+
+            DB::beginTransaction();
+
+            try {
+                $latestStudID = DB::table('def_student_identification')
+                    ->where('ident_identification', 'like', $prefix . '-%')
+                    ->orderBy('ident_idno', 'DESC')
+                    ->lockForUpdate()
+                    ->first();
+
+                if ($latestStudID) {
+                    $parts = explode('-', $latestStudID->ident_identification);
+
+                    $number = (int) $parts[1];
+                    $newNumber = str_pad($number + 1, 5, '0', STR_PAD_LEFT);
+                } else {
+                    $newNumber = '00001';
+                }
+
+                $newStudID = $prefix . '-' . $newNumber;
+
+                DB::table('def_student_identification')->insert([
+                    'ident_personid' => $data['enr_personid'],
+                    'ident_identification' => $newStudID,
+                    'ident_addedby' => 0,
+                    'ident_dateadded' => $date,
+                ]);
+
+                DB::commit();
+            } 
+            
+            catch (\Exception $e) {
+                DB::rollBack();
+                throw $e;
+            }       
+        }
+
+        // return [
+        //     'studentid' => $newStudID,
+        //     'studiddata' => $studiddata,
+        // ];
+        return $newStudID;
+       
+    }
     
     public function updateEnrollment(Request $request){
         try{
             
             date_default_timezone_set('Asia/Manila');
             $date = date('Y-m-d H:i:s');
-           
+                
+            $par = [
+                'enr_personid' => $request->input('enr_personid'),
+            ];
+
+            $studentid = $this->generateStudentIDAuto($par);
+            
 
             $finance = new FinanceController();
             $financedata = $finance->getChargesTemplateHeader(
@@ -1247,6 +1313,7 @@ class RegistrarController extends Controller
                 'message' => $msg,
                 'status' => $status,
                 'totalCost' => $totalCost,
+                'studentid' => $studentid,
             ];
 
             // return 204;
@@ -2912,7 +2979,6 @@ class RegistrarController extends Controller
     
     public function getStudentIdentification($id)
     {
-
         $identification = DB::table('def_student_identification')
         ->where('ident_personid','=',$id)
         ->first();
