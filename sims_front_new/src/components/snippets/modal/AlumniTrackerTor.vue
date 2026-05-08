@@ -159,7 +159,7 @@ onMounted(async () => {
             // console.log(milestoneCompData.value )
             // console.log(milestoneCompHeader.value )
 
-            profileId.value = milestoneCompHeader.value[0].arc_profile ? 'http://localhost:8000/api/get-person-image/' + milestoneCompHeader.value[0].arc_profile + '/2' : '/img/profile_default.png'
+            profileId.value = milestoneCompHeader.value[0].arc_profile ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + milestoneCompHeader.value[0].arc_profile + '/2' : '/img/profile_default.png'
             
 
             // pagesContent

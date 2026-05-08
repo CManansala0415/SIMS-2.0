@@ -264,7 +264,7 @@ const handleImage = (e) => {
 // image uploading
 
 const downloadImage = (folder, file) => {
-    let link = "http://localhost:8000/storage/clinic/" + folder + "/" + file
+    let link = "http://sims.clcst.edu.local:8000/storage/clinic/" + folder + "/" + file
     window.open(link)
 }
 
@@ -391,7 +391,7 @@ const downloadImage = (folder, file) => {
                     class=" w-100 d-flex flex-column justify-content-center align-content-center p-3">
                     <div v-if="fileName" class="flex flex-col justify-center items-center overflow-auto">
                        <div class="neu-card-inner-dark neu-bg-dark p-3">
-                         <img :src="fileName ? 'http://localhost:8000/storage/clinic/' + folderName + '/' + fileName : '/img/profile_default.png'"
+                         <img :src="fileName ? 'http://sims.clcst.edu.local:8000/storage/clinic/' + folderName + '/' + fileName : '/img/profile_default.png'"
                             class="h-100 object-contain border-2 border-gray-300" />
                        </div>
 

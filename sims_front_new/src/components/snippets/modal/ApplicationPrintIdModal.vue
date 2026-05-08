@@ -85,8 +85,8 @@ onMounted(() => {
             //         // console.log(response)
             // });
 
-            profileId.value = student.value.per_profile ? 'http://localhost:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
-            signatureId.value = student.value.per_signature ? 'http://localhost:8000/api/get-person-image/' + student.value.per_signature+'/3' : '/img/sig1.png'
+            profileId.value = student.value.per_profile ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
+            signatureId.value = student.value.per_signature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + student.value.per_signature+'/3' : '/img/sig1.png'
             // console.log( signatureId.value)
             // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
             preLoading.value = false
@@ -142,7 +142,7 @@ const printForm = (studentid) => {
                             </span>
                         </div>  
                          <!-- display: flex; justify-content: center; align-items: center; align-content: center; -->
-                        <div style="width:100%; margin-top: 5px;">
+                        <div style="width:100%; margin-top: 5px; text-align: center;">
                             <span class="px-5 py-1" 
                                     :style="`color:#FFFFFF;
                                     background-color: `+indicator+`; 

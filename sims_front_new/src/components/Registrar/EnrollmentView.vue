@@ -183,11 +183,11 @@ onMounted(async () => {
                             paid = true
                         }
 
-                        // stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
                         let z = ''
                         if (e.per_profile) {
-                            z = 'http://localhost:8000/storage/profiles/' + e.per_profile
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
                         } else {
                             if (e.per_gender == 2) {
                                 z = '/img/woman.png'
@@ -263,11 +263,11 @@ const paginate = (mode) => {
                             return f.acs_enrid === e.enr_id
                         })
 
-                        // stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
                         let z = ''
                         if (e.per_profile) {
-                            z = 'http://localhost:8000/storage/profiles/' + e.per_profile
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
                         } else {
                             if (e.per_gender == 2) {
                                 z = '/img/woman.png'
@@ -307,11 +307,11 @@ const paginate = (mode) => {
                             return f.acs_enrid === e.enr_id
                         })
 
-                        // stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
                         let z = ''
                         if (e.per_profile) {
-                            z = 'http://localhost:8000/storage/profiles/' + e.per_profile
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
                         } else {
                             if (e.per_gender == 2) {
                                 z = '/img/woman.png'
@@ -349,11 +349,11 @@ const paginate = (mode) => {
                             return f.acs_enrid === e.enr_id
                         })
 
-                        // stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
                         let z = ''
                         if (e.per_profile) {
-                            z = 'http://localhost:8000/storage/profiles/' + e.per_profile
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
                         } else {
                             if (e.per_gender == 2) {
                                 z = '/img/woman.png'
@@ -786,7 +786,7 @@ const getNoPrint = (data) =>{
                                             <div class="w-100">
                                                 <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
                                                     class="text_guide img_hover p-1 d-flex justify-content-center align-items-center">
-                                                    <!-- stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
+                                                    <!-- stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
                                                     <img class=" img-size-card img_profile" :src="stud.profile_picture" alt="">
                                                 </div>
                                                 <div v-if="showLinkProfile && index === linkId"
@@ -828,7 +828,7 @@ const getNoPrint = (data) =>{
                                                     @click="showLinkSignature = !showLinkSignature, linkId = index"
                                                     class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
                                                     <img class="signature-size-card"
-                                                        :src="'http://localhost:8000/storage/signatures/' + stud.per_signature" alt="">
+                                                        :src="'http://sims.clcst.edu.local:8000/storage/signatures/' + stud.per_signature" alt="">
                                                 </div>
                                                 <div v-else class="text_guide img_hover p-3"
                                                     @click="showLinkSignature = !showLinkSignature, linkId = index">

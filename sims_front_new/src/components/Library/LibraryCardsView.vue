@@ -358,7 +358,7 @@ const getData = (result) =>{
                                 <div class="d-flex flex-column justify-content-center align-content-center pe-none">
                                     <div class="d-flex justify-content-center align-content-center w-100">
                                         <label @click="showLink = !showLink, linkId = index" :for="index" class="m-2">
-                                            <img :src="stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
+                                            <img :src="stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
                                                 class="img-size neu-card p-2" />
                                         </label>
                                     </div>

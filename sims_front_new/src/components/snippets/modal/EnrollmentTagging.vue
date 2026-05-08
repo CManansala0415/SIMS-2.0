@@ -518,7 +518,7 @@ const filterCurriculum = () => {
                                     </div>
                                 </div>  -->
                                 <div class="col-12 border-bottom mb-3">
-                                    <div class="p-3 neu-card p-2 rounded-3 neu-pastel-purple text-white">
+                                    <div class="p-3 neu-card rounded-3 neu-pastel-purple text-white">
                                          <span class="fw-bold">{{ e.prog_name }}</span>
                                     </div>
                                 </div>
@@ -689,7 +689,7 @@ const filterCurriculum = () => {
                     <div class="container overflow-hidden p-3">
                         <div v-for="(e, index) in enrolleeData" class="row gy-2 gx-2 ">
                             <div class="col-12 border-bottom mb-3">
-                                <div class="p-3 neu-card p-2 rounded-3 neu-pastel-purple text-white">
+                                <div class="p-3 neu-card rounded-3 neu-pastel-purple text-white">
                                     <span class="fw-bold">Subjects Enrolled</span>
                                 </div>
                             </div>
@@ -837,7 +837,7 @@ const filterCurriculum = () => {
                     <div class="container overflow-hidden p-3">
                         <div v-if="Object.keys(milestoneCompHeader).length" class="row gy-2 gx-2">
                             <div class="col-12 border-bottom mb-3">
-                                <div class="p-3 neu-card p-2 rounded-3 neu-pastel-purple text-white">
+                                <div class="p-3 neu-card rounded-3 neu-pastel-purple text-white">
                                     <span class="fw-bold">MILESTONE</span>
                                 </div>
                             </div>

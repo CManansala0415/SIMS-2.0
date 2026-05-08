@@ -326,7 +326,7 @@ const downloadExcel = () => {
                                     <td class="align-middle text-center">
                                         <div class="flex items-center w-full justify-center">
                                             <label class="cursor-pointer border hover:border-teal-500">
-                                                <img :src="app.per_profile ? 'http://localhost:8000/storage/profiles/' + app.per_profile : '/img/profile_default.png'"
+                                                <img :src="app.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + app.per_profile : '/img/profile_default.png'"
                                                     class="object-fit border-2 border-gray-300 neu-card  p-2" height="100px" width="100px" />
                                             </label>
                                         </div>

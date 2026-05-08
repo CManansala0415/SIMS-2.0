@@ -489,7 +489,7 @@ const handleImage = (e) => {
                                 <div class="d-flex flex-column justify-content-center align-content-center">
                                     <div class="d-flex justify-content-center align-content-center w-100" title="Click to Upload Profile Picture">
                                         <label @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index" class="m-2" style="cursor: pointer;">
-                                            <img :src="app.arc_profile ? 'http://localhost:8000/storage/alumni/' + app.arc_profile : '/img/profile_default.png'"
+                                            <img :src="app.arc_profile ? 'http://sims.clcst.edu.local:8000/storage/alumni/' + app.arc_profile : '/img/profile_default.png'"
                                                 class="img-size" />
                                         </label>
                                     </div>

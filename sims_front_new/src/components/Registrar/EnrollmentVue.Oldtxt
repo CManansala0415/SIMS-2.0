@@ -562,7 +562,7 @@ const getData = (result) =>{
                             <div class="d-flex flex-column justify-content-center align-content-center">
                                 <div class="d-flex justify-content-center align-content-center w-100" @click="showLinkSignature = false" title="Click to Upload Profile Picture">
                                     <label @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index" class="m-2" style="cursor: pointer;">
-                                        <img :src="stud.per_profile ? 'http://localhost:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
+                                        <img :src="stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/profile_default.png'"
                                             class="img-size" />
                                     </label>
                                 </div>
@@ -583,7 +583,7 @@ const getData = (result) =>{
                             <div class="d-flex flex-column justify-content-center align-content-center">
                                 <div class="d-flex justify-content-center align-content-center w-100"  @click="showLinkProfile = false" title="Click to Upload Signature">
                                     <label @click="showLinkSignature = !showLinkSignature, linkId = index" :for="index" class="m-2" style="cursor: pointer;">
-                                        <img :src="stud.per_signature ? 'http://localhost:8000/storage/signatures/' + stud.per_signature : '/img/404.png'"
+                                        <img :src="stud.per_signature ? 'http://sims.clcst.edu.local:8000/storage/signatures/' + stud.per_signature : '/img/404.png'"
                                             class="img-size" />
                                     </label>
                                 </div>
