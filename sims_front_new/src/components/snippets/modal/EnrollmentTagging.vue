@@ -176,6 +176,7 @@ onMounted(async () => {
                                 addedSubject.value.push(e)
                                 addedSubjectId.value.push(e.subj_id)
                             })
+                            
                         }else{
                             milestone.value = results
                             milestone.value.forEach((e) => {

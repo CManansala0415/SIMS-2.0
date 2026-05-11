@@ -119,7 +119,16 @@ onMounted(async () => {
                     })
 
                     getMilestone(studentData.value.enr_id).then((results2) => {
-                        milestone.value = results2
+                        // milestone.value = results2
+                        // milestone.value.forEach((e) => {
+                        //     addedSubject.value.push(e)
+                        //     addedSubjectId.value.push(e.subj_id)
+                        // })
+
+                        milestone.value = results.sort((a, b) => {
+                            return (a.subj_extra ?? -1) - (b.subj_extra ?? -1)
+                        })
+
                         milestone.value.forEach((e) => {
                             addedSubject.value.push(e)
                             addedSubjectId.value.push(e.subj_id)
