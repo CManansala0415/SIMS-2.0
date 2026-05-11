@@ -505,6 +505,7 @@ class LibraryController extends Controller
                 ->leftJoin('users as user', 'lbd.lbrd_issuedby', '=', 'user.id')
                 ->leftJoin('def_employee as emp', 'user.id', '=', 'emp.emp_accid')
                 ->leftJoin('def_person as per', 'lbd.lbrd_personid', '=', 'per.per_id')
+                ->leftJoin('def_student_identification as des', 'per.per_id', '=', 'des.ident_personid') 
                 ->select(  
                     'lbd.*',
                     'emp.*',
@@ -512,6 +513,8 @@ class LibraryController extends Controller
                     'per.per_middlename',
                     'per.per_lastname',
                     'per.per_suffixname',
+                    'per.per_profile',
+                    'des.ident_identification as studentid',
                 )
                 ->where('lbd.lbrd_personid','=', $personid)
                 ->where('lbd.lbrd_enrid','=', $enrid)
@@ -522,6 +525,7 @@ class LibraryController extends Controller
             ->leftJoin('users as user', 'lbd.lbrd_issuedby', '=', 'user.id')
             ->leftJoin('def_employee as emp', 'user.id', '=', 'emp.emp_accid')
             ->leftJoin('def_person as per', 'lbd.lbrd_personid', '=', 'per.per_id')
+            ->leftJoin('def_student_identification as des', 'per.per_id', '=', 'des.ident_personid') 
             ->select(  
                 'lbd.*',
                 'emp.*',
@@ -529,16 +533,25 @@ class LibraryController extends Controller
                 'per.per_middlename',
                 'per.per_lastname',
                 'per.per_suffixname',
+                'per.per_profile',
+                'per.per_contact',
+                'per.per_email',
+                'des.ident_identification as studentid',
             )
             ->where('lbd.lbrd_personid','=', $personid)
             ->where('lbd.lbrd_enrid','=', $enrid)
             ->where('lbd.lbrd_status','=', 1)
             ->get();
         }
-       
 
+        $academicyear = new CommandController();
+        $year = $academicyear->getCommandUpdate();
 
-        return $cards; 
+        return $primary = [
+            'cards' => $cards,
+            'year' => $year,
+            'status' => 200,
+        ];
     }
 
     public function deactivateLibraryCard(Request $request){

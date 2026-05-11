@@ -23,7 +23,7 @@ const yrFromto = ref('')
 const isLoggedIn = ref(false)
 onMounted(async () => {
 
-  window.stop()
+  // window.stop()
   //get user here
   isLoading.value = true
   await router.isReady()

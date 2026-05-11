@@ -153,9 +153,9 @@ const setBorrower = (perid, enrid, fname, lname) => {
 
     checkingLibraryCard.value = true
     getLibraryCardIssue(perid, enrid, 1).then((results) => {
-        if (Object.keys(results).length) {
-            cardId.value = results[0].lbrd_id
-            cardIdNo.value = results[0].lbrd_cardno
+        if (Object.keys(results.cards).length) {
+            cardId.value = results.cards[0].lbrd_id
+            cardIdNo.value = results.cards[0].lbrd_cardno
         } else {
             cardId.value = ''
             cardIdNo.value = ''

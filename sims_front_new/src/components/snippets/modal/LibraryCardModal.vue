@@ -5,13 +5,17 @@ import {
     getLibraryCardIssue,
     getBorrowedBooksBy,
     deactivateLibraryCard,
-    addLibraryCard
+    addLibraryCard,
+    getProgramList, 
+    getGradelvl, 
 } from "../../Fetchers.js";
 
 import {
     qrImageGenerator,
     pdfGenerator,
-    pdfAutoPrint
+    pdfAutoPrint,
+    lvl2Encrypt,
+    lvl2Decrypt
 } from "../../Generators.js";
 
 
@@ -38,20 +42,85 @@ const cardDate = ref('')
 const hasActiveCard = ref(false)
 const verifying = ref(false)
 const qrimage = ref('')
+const year = ref('')
+const gradelvl = ref([])
+const course = ref([])
 
-onMounted(() => {
-    preLoading.value = true
-    getLibraryCardIssue(student.value.per_id, student.value.enr_id, 0).then((results) => {
-        libraryCards.value = results
-        let x = libraryCards.value.findIndex((e) => {
-            return e.lbrd_status === 1
-        })
-
-        if (x !== -1) {
-            hasActiveCard.value = true
-        }
-        preLoading.value = false
+const booter = async () => {
+    getProgramList().then((results) => {
+        course.value = results
     })
+    getGradelvl().then((results) => {
+        gradelvl.value = results
+    })
+}
+
+const cardCurrentColor = ref('')
+const cardColor = ref([
+    { id: 1, bgcolor: '#f01f1f', desc: 'BSCRIM', deg: 1 },
+    { id: 2, bgcolor: '#1f34f0', desc: 'BSIT', deg: 1 },
+    { id: 3, bgcolor: '#951ff0', desc: 'HUMSS', deg: 2 },
+    { id: 4, bgcolor: '#951ff0', desc: 'STEM', deg: 2 },
+    { id: 5, bgcolor: '#f0aa1f', desc: 'TVL', deg: 1 },
+    { id: 6, bgcolor: '#951ff0', desc: 'PRE-BACC', deg: 2 },
+    { id: 7, bgcolor: '#f01fd4', desc: 'BSHM', deg: 1 },
+    { id: 8, bgcolor: '#f0f01f', desc: 'BSMT', deg: 1 },
+    { id: 10, bgcolor: '#951ff0', desc: 'ABM', deg: 2 },
+]);
+
+onMounted(async() => {
+     try {
+        cardCurrentColor.value = cardColor.value.find(c => c.id === student.value.enr_course)?.bgcolor || '#ffffff';
+        console.log(cardCurrentColor.value)
+        
+        preLoading.value = true
+        await booter().then(() => {
+            getLibraryCardIssue(student.value.per_id, student.value.enr_id, 0).then((results) => {
+                // libraryCards.value = results
+                let x = results.cards.findIndex((e) => {
+                    return e.lbrd_status === 1
+                })
+                year.value = results.year[1].sett_yearfrom + ' - ' + results.year[1].sett_yearto
+                //map profile picture
+                libraryCards.value = results.cards.map((e) => {
+                    let z = ''
+                    if (e.per_profile) {
+                        // z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        z = 'http://sims.clcst.edu.local:8000/api/get-person-image/' + e.per_profile +'/1'
+                    } else {
+                        if (e.per_gender == 2) {
+                            z = '/img/woman.png'
+                        } else {
+                            z = '/img/man.png'
+                        }
+                    }
+
+                    return {
+                        ...e,
+                        profile_picture: z,
+                    }
+                })
+
+                if (x !== -1) {
+                    hasActiveCard.value = true
+                }
+                preLoading.value = false
+            })
+        })
+    } catch (err) {
+        // preLoading.value = false
+        // alert('error loading the list default components')
+        Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+            footer: '<a href="#" disabled>Have you checked your internet connection?</a>'
+        }).then(()=>{
+            preLoading.value = false
+            emit('doneLoading', false)
+        });
+    }
+    
 })
 
 const deactivateCard = (card) => {
@@ -201,8 +270,19 @@ const registerNewCard = () => {
                 text: "Changes applied, refreshing the page",
                 icon: "success"
             }).then(() => {
-                Swal.close()
-                location.reload()
+                preLoading.value = true
+                getLibraryCardIssue(student.value.per_id, student.value.enr_id, 0).then((results) => {
+                    libraryCards.value = results.cards
+                    let x = libraryCards.value.findIndex((e) => {
+                        return e.lbrd_status === 1
+                    })
+                    year.value = results.year[1].sett_yearfrom + ' - ' + results.year[1].sett_yearto
+                    if (x !== -1) {
+                        hasActiveCard.value = true
+                    }
+                    preLoading.value = false
+                    Swal.close()
+                })
             });
         } else {
             // alert('Update Failed')
@@ -248,13 +328,13 @@ const printCard = async (enrid, data) =>{
         // location.reload();
     }, 1000);
 }
-
+ 
 const printForm = async (enrid, data) => {
     const name = `LC-${enrid}-${data}`;
 
     Swal.fire({
         icon: "success",
-        title: "Receipt Ready",
+        title: "Card is Ready",
         text: "Click OK to generate and download the PDF.",
         confirmButtonText: "Ok, Got it!"
     }).then(async (result) => {
@@ -270,11 +350,25 @@ const printForm = async (enrid, data) => {
         });
 
         try {
+
+            let key = "SIMS_CLCST_@2026!--*";
+            let original = JSON.stringify({
+                sid: data
+            });
+
+            const encrypted = lvl2Encrypt(original, key);
+            console.log("QR DATA:", encrypted);
+
+            const decrypted = lvl2Decrypt(encrypted, key);
+            console.log("BACK:", JSON.parse(decrypted));
+
             // Generate QR first
-            qrimage.value = await qrImageGenerator(data);
+            qrimage.value = await qrImageGenerator(encrypted);
 
             // Generate PDF
-            await pdfGenerator(name, 'a6', 'landscape', 0);
+            let size = [2.125,3.375]
+            pdfGenerator(name, size, 'landscape', 0.03)
+            // await pdfGenerator(name, 'a6', 'landscape', 0);
 
             setTimeout(() => {
                 Swal.close();
@@ -370,98 +464,8 @@ const printForm = async (enrid, data) => {
                                 <li class="list-group-item"><span class="fw-bold">Card Status:</span> {{ lc.lbrd_status
                                     == 1 ?
                                     'Active' : 'Inactive' }}</li>
-                                <li class="list-group-item" v-show="false">
-                                    <div class="d-flex justify-content-center small-font">
-                                        <div class="w-100 row bg-opaque" style="height:375px; font-size:12px" id="printform">
-                                            <!-- <div class="col-3 bg-opaque d-flex flex-column justify-content-center align-content-center p-0">
-                                                <div class="bg-danger">
-                                                    <img class="card-img-top" src="/img/clcst_logo.png" height="50px" width="50px" alt="...">
-                                                </div>
-                                                <div class="bg-success d-flex align-items-center justify-content-center  h-100">
-                                                    <p style="writing-mode: vertical-rl; text-orientation: upright; font-size:6px; font-weight:bold;">
-                                                        {{ lc.lbrd_cardcode }}
-                                                    </p>
-                                                </div>
-                                            </div> -->
-                                            <div class="">
-                                                <div class="card-body p-3">
-                                                    <div class="row">
-                                                        <div
-                                                            class="col-3 d-flex justify-content-center align-items-center">
-                                                            <img class="card-img-top" src="/img/clcst_logo.png"
-                                                                alt="...">
-                                                        </div>
-                                                        <div
-                                                            class="col-9 justify-content-center align-content-center">
-                                                            <p class="m-0 fw-bold">CENTRAL LUZON COLLEGE OF SCIENCE AND
-                                                                TECHNOLOGY, INC.
-                                                                CELTECH COLLEGE</p>
-                                                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy.
-                                                                Sto. Rosario, City of San Fernando,
-                                                                Pampanga, Philippines, 2000</p>
-                                                            <!-- <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
-                                                                <p class="m-0 fw-normal small-font">Founded 1959</p> -->
-                                                        </div>
-                                                        <!-- <div class="col-3 border d-flex justify-content-center align-items-center">
-                                                            <div class="" id="qrcode" v-html="qrimage"></div>
-                                                        </div> -->
-                                                    </div>
-
-                                                </div>
-                                                <div class="row bg-white">
-                                                    <div class="col-9">
-                                                        <ul class="list-group list-group-flush p-3">
-                                                            <li class="list-group-item">
-                                                                <span>
-                                                                    Name:
-                                                                    <span class="fw-bold">
-                                                                        {{ lc.per_firstname }}
-                                                                        {{ lc.per_middlename ? lc.per_middlename : ' ' }}
-                                                                        {{ lc.per_lastname }}
-                                                                        {{ lc.per_suffixname ? lc.per_suffixname : ' ' }}
-                                                                    </span>
-                                                                </span>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <span>
-                                                                    Date Issued:
-                                                                    <span class="fw-bold">
-                                                                        {{ lc.lbrd_dateissued }}
-                                                                    </span>
-                                                                </span>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <span>
-                                                                    Library ID:
-                                                                    <span class="fw-bold">
-                                                                        {{ lc.lbrd_cardno }}
-                                                                    </span>
-                                                                </span>
-                                                            </li>
-                                                            <li class="list-group-item">
-                                                                <span>
-                                                                    Card Code:
-                                                                    <span class="fw-bold">
-                                                                        {{ lc.lbrd_cardcode }}
-                                                                    </span>
-                                                                </span>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                    <div class="col-3 border">
-                                                        <div class="d-flex flex-column justify-content-center align-items-center h-100">
-                                                            <div class="" id="qrcode" v-html="qrimage"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="card-body p-3">
-                                                    <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
-                                                    <p class="m-0 fw-normal small-font">Founded 1959</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <li class="list-group-item"> <!--v-show -->
+                                    
                                 </li>
                             </ul>
                             <div class="card-body d-flex gap-1 mt-3">
@@ -481,6 +485,198 @@ const printForm = async (enrid, data) => {
                                     <font-awesome-icon icon="fa-solid fa-ban"  /> Deactivated
                                 </button>
                             </div>
+
+                            <div id="printform">
+                                <div class="d-flex justify-content-center small-font">
+                                    <div class="bg-opaque position-relative"
+                                        style="height:197px; width:314px; font-size:8px;">
+
+                                        <!-- HEADER -->
+                                        <div class="p-1" style="font-size:6px;">
+                                            <div class="row g-0">
+                                                <div class="col-9 text-start">
+                                                    <p class="m-0 fw-bold">
+                                                        CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.
+                                                        CELTECH COLLEGE
+                                                    </p>
+
+                                                    <p class="m-0 fw-normal small-font">
+                                                        B. Mendoza St., Brgy. Sto. Rosario,
+                                                        City of San Fernando, Pampanga,
+                                                        Philippines, 2000
+                                                    </p>
+                                                </div>
+
+                                                <div class="col-3 d-flex justify-content-around align-items-center">
+                                                    <img src="/img/clcst_logo.png"
+                                                        alt=""
+                                                        height="30px"
+                                                        width="30px">
+                                                    <img src="/img/sims_logo.png"
+                                                        alt=""
+                                                        height="30px"
+                                                        width="30px">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- TITLE -->
+                                        <div class="row g-0 bg-white">
+                                            <div class="col-12 d-flex justify-content-center align-items-center"
+                                                style="height:20px; background-color:#113d11;">
+
+                                                <p class="text-white fw-bold m-0">
+                                                    Library Card (S.Y {{ year }})
+                                                </p>
+                                            </div>
+
+                                            <!-- DETAILS -->
+                                            <div class="col-9 border p-1">
+                                                <ul class="list-group list-group-flush w-100">
+
+                                                    <li class="list-group-item p-1">
+                                                        Student ID:
+                                                        <span class="fw-bold">
+                                                            {{ lc.studentid }}
+                                                        </span>
+                                                    </li>
+
+                                                    <li class="list-group-item p-1">
+                                                        Name:
+                                                        <span class="fw-bold text-uppercase">
+                                                            {{ lc.per_firstname }}
+                                                            {{ lc.per_middlename ? lc.per_middlename : '' }}
+                                                            {{ lc.per_lastname }}
+                                                            {{ lc.per_suffixname ? lc.per_suffixname : '' }}
+                                                        </span>
+                                                    </li>
+
+                                                    <li class="list-group-item p-1">
+                                                        Course:
+                                                        <span class="fw-bold">
+                                                            {{ course.find(c => c.prog_id === studentdata.enr_course)?.prog_name || '—' }}
+                                                        </span>
+                                                    </li>
+
+                                                    <li class="list-group-item p-1">
+                                                        Grade Level:
+                                                        <span class="fw-bold">
+                                                            {{ gradelvl.find(g => g.grad_id === studentdata.enr_gradelvl)?.grad_name || '—' }}
+                                                        </span>
+                                                    </li>
+
+                                                    <li class="list-group-item p-1">
+                                                        Date Issued:
+                                                        <span class="fw-bold">
+                                                            {{ lc.lbrd_dateissued }}
+                                                        </span>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+
+                                            <!-- PHOTO -->
+                                            <div class="col-3 border">
+                                                <div class="d-flex flex-column justify-content-center align-items-center h-100 p-1">
+                                                    <img class="neu-card p-1"
+                                                        height="60px"
+                                                        width="60px"
+                                                        :src="lc.profile_picture"
+                                                        alt="">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- FOOTER -->
+                                        <div class="p-1 d-flex justify-content-between">
+                                            <div>
+                                                <p class="m-0 fw-normal small-font">
+                                                    Tel. Nos: (045) 435-1495
+                                                </p>
+
+                                                <p class="m-0 fw-normal small-font">
+                                                    Founded 1959
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <p class="m-0 fw-bold small-font">
+                                                    QF-LIB-01-04-03-SEPT22
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-center small-font">
+                                    <div class="bg-opaque position-relative"
+                                        style="height:197px; width:314px; font-size:8px;">
+
+                                        <!-- HEADER -->
+                                        <div class="p-1" style="font-size:6px; height: 18px;">
+                                            
+                                        </div>
+                                        <!-- TITLE -->
+                                        <div class="row g-0 bg-white">
+                                            <div class="col-12 d-flex justify-content-center align-items-center"
+                                                :style="'height:20px; background-color:' + cardCurrentColor">
+                                            </div>
+
+                                            <!-- DETAILS -->
+                                            <div class="col-9 border p-1">
+                                                <ul class="list-group list-group-flush w-100">
+
+                                                    <li class="list-group-item p-1">
+                                                        In Case this card is found, please contact:<br/>
+                                                        <span class="fw-bold">
+                                                            0{{ studentdata.per_contact }} / {{ studentdata.per_email }}
+                                                        </span>
+                                                    </li>
+                                                    <li class="list-group-item p-1">
+                                                        LIBRARY CARD GUIDELINES:<br/>
+                                                        <ul class="mb-0 ps-3" style="font-size:7px; line-height:1.3;">
+                                                            <li>This card is non-transferable.</li>
+                                                            <li>Present this card when borrowing books.</li>
+                                                            <li>Report lost cards immediately to the library.</li>
+                                                            <li>Damaged or altered cards are invalid.</li>
+                                                            <li>Replacement of lost cards may require a fee.</li>
+                                                            <li>Follow all library rules and regulations.</li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <!-- PHOTO -->
+                                            <div class="col-3 border">
+                                                <div class="d-flex flex-column justify-content-center align-items-center h-100 p-1">
+                                                    <div class="" id="qrcode" v-html="qrimage"></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 d-flex justify-content-center align-items-center"
+                                                :style="'height:20px; background-color:' + cardCurrentColor">
+                                            </div>
+                                        </div>
+
+                                        <!-- FOOTER -->
+                                        <div class="p-1 d-flex justify-content-between">
+                                            <div>
+                                                <p class="m-0 fw-normal small-font">
+                                                   Please return if found
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <p class="m-0 fw-bold small-font">
+                                                    Property of CLCST Library 
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            
                         </div>
 
                     </div>

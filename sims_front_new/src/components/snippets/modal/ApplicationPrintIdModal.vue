@@ -132,7 +132,7 @@ const printForm = (studentid) => {
     })
 }
 
-
+ 
 </script>
 <template>
     <!-- CR80 cards are 3.375" x 2.125" (the same size as a credit card) and are the standard, most commonly used size of PVC card. -->
@@ -142,7 +142,7 @@ const printForm = (studentid) => {
             <div id="printform">
                 <!-- Front -->
                 <div class="position-relative d-flex flex-column justify-content-center align-items-center align-content-start" style="height: 319px;">
-                    <div style="height: 81px; width:100%; background-color: #237a5b; color:#FFFFFF" class="bg-opaque">
+                    <div style="height: 81px; width:100%; background-color: #113d11; color:#FFFFFF" class="bg-opaque">
                         <div style="width:100%; line-height: 0.3;text-align: center; padding: 1px; margin-top: 12px;">
                             <span class="classic-font" style="font-size:7px; font-weight: bold;">
                                 CENTRAL LUZON COLLEGE OF SCIENCE & TECHNOLOGY, INC <br/>
@@ -200,7 +200,7 @@ const printForm = (studentid) => {
                                 Student's Signature
                             </p>
                         </div>  
-                        <div style="width:100%;background-color: #237a5b;" class="d-flex justify-content-center align-content-center align-items-center">
+                        <div style="width:100%;background-color: #113d11;" class="d-flex justify-content-center align-content-center align-items-center">
                         <div style="width: 150px; text-align: center; padding: 5px; color: #FFFFFF;font-size: 4px; font-weight: thin;">
                             To protect your ID card, be mindful of where you display it and be cautious about sharing information online. 
                             Avoid posting your ID card on social media, and consider using security features like laminating or badge holders. 
