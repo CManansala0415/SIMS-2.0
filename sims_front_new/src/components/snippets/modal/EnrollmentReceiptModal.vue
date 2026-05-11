@@ -151,11 +151,21 @@ onMounted(async () => {
                         })
 
                         getMilestone(studentData.value.enr_id).then((results) => {
-                            milestone.value = results
+                            // milestone.value = results
+                            // milestone.value.forEach((e) => {
+                            //     addedSubject.value.push(e)
+                            //     addedSubjectId.value.push(e.subj_id)
+                            // })
+
+                            milestone.value = results.sort((a, b) => {
+                                return (a.subj_extra ?? -1) - (b.subj_extra ?? -1)
+                            })
+
                             milestone.value.forEach((e) => {
                                 addedSubject.value.push(e)
                                 addedSubjectId.value.push(e.subj_id)
                             })
+
                                 // console.log('program: ', prog)
                                 // console.log('semester: ', studentSemId.value)
                                 // console.log('course: ', cour)
@@ -201,6 +211,8 @@ onMounted(async () => {
                                     ).then((results) => {
                                         chargeBreakdown.value = results
                                         console.log(chargeBreakdown.value)
+                                        console.log(milestone.value)
+
                                     })
                                 })
                             })

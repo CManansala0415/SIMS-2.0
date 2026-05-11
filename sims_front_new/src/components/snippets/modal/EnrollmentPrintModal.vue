@@ -125,7 +125,6 @@ onMounted(async () => {
 
                         preloading.value = false
                         milestoneLoading.value = false
-
                         
                     })
 

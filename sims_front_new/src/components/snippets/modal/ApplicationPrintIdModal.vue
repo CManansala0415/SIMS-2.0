@@ -262,7 +262,7 @@ const printForm = (studentid) => {
                                     {{ family.fam_lastname }}
                                     {{ family.fam_suffixname ? family.fam_suffixname : ' ' }}
                                 </span> 
-                                <br/>{{ family.fam_contact }}
+                                <br/>0{{ family.fam_contact }}
                             </span>
                             <span v-else style="font-size: 7px; font-weight: bold; text-transform: uppercase;">N/A</span>
                             <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Emergency Contact</span>
