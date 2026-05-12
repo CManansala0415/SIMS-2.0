@@ -125,7 +125,7 @@ onMounted(async () => {
                         //     addedSubjectId.value.push(e.subj_id)
                         // })
 
-                        milestone.value = results.sort((a, b) => {
+                        milestone.value = results2.sort((a, b) => {
                             return (a.subj_extra ?? -1) - (b.subj_extra ?? -1)
                         })
 
@@ -395,230 +395,178 @@ const downloadPdf = () => {
 </script>
 
 <template>
-    <div id="printform" v-if="!milestoneLoading && Object.keys(milestone).length" class="d-flex justify-content-center">
-        <div class="border small-font bg-opaque h-100" 
-                        style="width: 770px; height: 1105px; border:2px solid black; font-size: 8.8px;">
-            <table class="table table-fixed" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th class="align-middle">
-                            <img src="/img/clcst_logo.png" height="60px" width="60px" alt="...">
-                        </th>
-                        <th class="align-middle text-center">
-                            <p class="m-0">CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.
-                                CELTECH COLLEGE</p>
-                            <p class="m-0 fw-normal small-font">B. Mendoza St., Brgy. Sto. Rosario, City of San Fernando,
-                                Pampanga, Philippines, 2000</p>
-                            <p class="m-0 fw-normal small-font">Tel. Nos: (045) 435-1495</p>
-                            <p class="m-0 fw-normal small-font">Founded 1959</p>
-                        </th>
-                        <th class="align-middle"><img src="/img/clcst_logo.png" height="60px" width="60px" alt="..."></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3">
-                            <div class="d-flex flex-column text-center w-100">
-                                <span class="fw-bold">Clearance</span>
-                                <span>Subject Grades</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="align-middle" colspan="3">
-                            <table class="table" v-for="(e, index) in enrolleeData">
-                                <tbody>
-                                    <tr class="text-start">
-                                        <td class="p-2 border" colspan="2">
-                                            <span style="text-transform:none">Name: </span>
-                                            <span class="fw-semibold">
-                                                {{ studentData.per_firstname }}
-                                                {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
-                                                {{ studentData.per_lastname }}
-                                                {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
-                                            </span>
-                                        </td>
-                                        <td class="p-2 border">
-                                            <span style="text-transform:none">Student ID: </span>
-                                            <span class="fw-semibold">
-                                                {{ e.ident_identification }}
-                                            </span>
-                                        </td>
-                                        <td class="p-2 border">
-                                            <span style="text-transform:none">Date: </span>
-                                            <span class="fw-semibold">
-                                                {{ e.enr_dateenrolled }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr class="text-start">
-                                        <td class="p-2 border">
-                                            <span style="text-transform:none">Course: </span>
-                                            <span class="fw-semibold">
-                                                {{ e.prog_name }}
-                                            </span>
-                                        </td>
-                                        <td class="p-2 border">
-                                            <span style="text-transform:none">Grade/Year: </span>
-                                            <span class="fw-semibold">
-                                                {{ e.grad_name }}
-                                            </span>
-                                        </td>
-                                        <td class="p-2 border">
-                                            <span style="text-transform:none">Section: </span>
-                                            <span class="fw-semibold">
-                                                {{ e.sec_name ? e.sec_name : 'N/A' }}
-                                            </span>
-                                        </td>
-                                        <td class="p-2 border">
-                                            <span style="text-transform:none">Semester: </span>
-                                            <span class="fw-semibold">
-                                                {{ e.quar_desc }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="text-center w-100">
-                <p class="fw-bold">Subjects Enrolled</p>
-            </div>
-            <table class="table table-fixed" style="text-transform:uppercase">
-                <thead>
-                    <tr>
-                        <th style="background-color: #000000;" class="text-white">Code</th>
-                        <th style="background-color: #000000; width: 300px;" class="text-white">Subject</th>
-                        <th style="background-color: #000000;" class="text-white">Units</th>
-                        <!-- <th style="background-color: #000000;" class="text-white">Total</th> -->
-                        <!-- <th style="background-color: #000000;" class="text-white">Prelim</th> -->
-                        <!-- <th style="background-color: #000000;" class="text-white">Midterm</th> -->
-                        <!-- <th style="background-color: #000000;" class="text-white">Pre-Final</th> -->
-                        <!-- <th style="background-color: #000000;" class="text-white">Final</th> -->
-                        <th style="background-color: #000000;" class="text-white">Final Grade</th>
-                        <th style="background-color: #000000;" class="text-white">Faculty</th>
-                        <th style="background-color: #000000;" class="text-white">Signature</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(c, index) in milestone">
-                        <td class="align-middle p-2 text-start">
-                            {{ c.subj_code }}
-                        </td>
-                        <td class="align-middle p-2 text-start">
-                            {{ c.subj_name }}
-                        </td>
-                        <td class="align-middle p-2">
-                            <p class="m-0">Lec: {{ c.subj_lec_units }}</p>
-                            <p class="m-0">Lab: {{ c.subj_lab_units }}</p>
-                        </td>
-                        <!-- <td class="align-middle p-2">
-                            {{ c.subj_lec_units + c.subj_lab_units }}
-                        </td> -->
-                        <!-- <td class="align-middle p-2">
-                            {{ c.grs_prelims? c.grs_prelims:'N/A' }}
-                        </td>
-                        <td class="align-middle p-2">
-                            {{ c.grs_midterms? c.grs_midterms:'N/A' }}
-                        </td>
-                        <td class="align-middle p-2">
-                            {{ c.grs_prefinals? c.grs_prefinals:'N/A' }}
-                        </td>
-                        <td class="align-middle p-2">
-                            {{ c.grs_finals? c.grs_finals:'N/A' }}
-                        </td> -->
-                        <td v-if="c.grs_prelims && c.grs_midterms && c.grs_prefinals && c.grs_finals" class="align-middle p-2">
-                            {{ (c.grs_prelims + c.grs_midterms + c.grs_prefinals + c.grs_finals)/4 }}
-                        </td>
-                        <td v-else class="align-middle p-2">
-                            Term is not completed yet
-                        </td>
-                        <td class="align-middle p-2">
-                            {{ c.faculty_name }}
-                        </td>
-                        <td class="align-middle p-2">
+    <div class="p-3 flex-fill d-flex justify-content-center align-items-center neu-card-inner neu-bg">
+      <div class="rounded bg-white w-100 d-flex justify-content-center align-items-center">
+            <div id="printform" v-if="!milestoneLoading && Object.keys(milestone).length" class="d-flex justify-content-center">
+                <div class="border small-font bg-opaque h-100" 
+                                style="width:103mm; height: 148mm; border:2px solid black; font-size: 7px;">
+                    <table class="table table-fixed" style="text-transform:uppercase">
+                        <thead>
+                            <tr>
+                                <th class="align-middle">
+                                    <img src="/img/clcst_logo.png" height="40px" width="40px" alt="...">
+                                </th>
+                                <th class="align-middle text-center">
+                                    <p class="m-0" style="font-size:8px">CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.</p>
+                                    <p class="m-0 fw-normal small-font" style="font-size:6px">B. Mendoza St., Brgy. Sto. Rosario, City of San Fernando,
+                                        Pampanga, Philippines, 2000</p>
+                                    <p class="m-0 fw-normal small-font" style="font-size:6px">Tel. Nos: (045) 435-1495</p>
+                                    <p class="m-0 fw-normal small-font" style="font-size:6px">Founded 1959</p>
+                                </th>
+                                <th class="align-middle"><img src="/img/sims_logo.png" height="40px" width="40px" alt="..."></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="3">
+                                    <div class="d-flex flex-column text-center w-100">
+                                        <span class="fw-bold">Clearance</span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="align-middle" colspan="3">
+                                    <table class="table" v-for="(e, index) in enrolleeData">
+                                        <tbody>
+                                            <tr class="text-start">
+                                                <td class="p-2 border" colspan="2">
+                                                    <span style="text-transform:none">Name: </span>
+                                                    <span class="fw-semibold">
+                                                        {{ studentData.per_firstname }}
+                                                        {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
+                                                        {{ studentData.per_lastname }}
+                                                        {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}
+                                                    </span>
 
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="d-flex flex-column justify-content-center align-items-center mb-2" style="font-size:8px">
-                <div class="w-75 p-1 ">
-                    <span class="fst-italic">
-                        I shall abide by all the rules and regulations now enforced or may be promulgated by Central Luzon
-                        College of Science and Technology, Inc. from time to time
-                        Likewise, I agree to the cancellation of the credits I have earned in subjects I have enrolled under
-                        false pretenses.
-                    </span>
-                </div>
-                <div class="p-1 d-flex flex-column gap-1 justify-content-center align-content-center align-items-center border border-dark-subtle rounded bg-body-tertiary shadow-sm">
-                    <span class="text-danger fw-bold mt-1"> IMPORTANT </span>
-                    <span class="fw-bold mt-1">
-                        OFFICIAL STUDY LOAD - means officially enrolled subjects and it will serve as an admission slip to the classroom.
-                    </span>
-                    <span class="fw-bold fa-underline mt-1  border-0 border-bottom border-dark-subtle">
-                        * CHARGES TO STUDENTS WITHDRAWING/ DROPPING *
-                    </span>
-                    <ul class="text-start">
-                        <li>
-                            <strong>Before the start of classes:</strong> charged the full amount of the registration
-                            fee, School ID, report cards, etc., <em>plus</em> <strong>10% of the total tuition
-                                fees</strong>.
-                        </li>
-                        <li>
-                            <strong>Within the first week of classes:</strong> charged an amount equal to <strong>30% of
-                                the total charges for the whole semester</strong>, regardless of whether or not he has
-                            actually attended classes.
-                        </li>
-                        <li>
-                            <strong>Within the second week of classes:</strong> charged an amount equal to <strong>80%
-                                of the total charges for the whole semester</strong>, regardless of whether or not he
-                            has actually attended classes.
-                        </li>
-                        <li>
-                            <strong>After the second week of classes:</strong> charged the <strong>full amount due for
-                                the whole semester</strong>, regardless of whether or not he has actually attended
-                            classes.
-                        </li>
-                    </ul>
-                    <small>
-                            Note: This statement serves as the official policy regarding
-                            withdrawal/drop charges. For questions, contact the Registrar's Office.
-                    </small>
+                                                    <br/>
 
-                    <!-- <div class="d-flex gap-2 w-75 justify-content-between mt-3">
-                        <div class="w-100 text-center">
-                            <div style="height:1px; background:#808080;"></div>
-                            <p style="font-size:8px; color:#374151;">Student Signature over
-                                Printed Name</p>
+                                                    <span style="text-transform:none">Course: </span>
+                                                    <span class="fw-semibold">
+                                                        {{ e.prog_name }}
+                                                    </span>
+
+                                                    <br/>
+
+                                                    <span style="text-transform:none">Grade/Year: </span>
+                                                    <span class="fw-semibold">
+                                                        {{ e.grad_name }}
+                                                    </span>
+                                                </td>
+                                                <td class="p-2 border">
+                                                    <span style="text-transform:none">Student ID: </span>
+                                                    <span class="fw-semibold">
+                                                        {{ e.ident_identification }}
+                                                    </span>
+
+                                                    <br/>
+
+                                                    <span style="text-transform:none">Section: </span>
+                                                    <span class="fw-semibold">
+                                                        {{ e.sec_name ? e.sec_name : 'N/A' }}
+                                                    </span>
+
+                                                    <br/>
+
+                                                    <span style="text-transform:none">Semester: </span>
+                                                    <span class="fw-semibold">
+                                                        {{ e.quar_desc }}
+                                                    </span>
+
+                                                </td>
+                                                
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-fixed" style="text-transform:uppercase">
+                        <thead>
+                            <tr>
+                                <th style="background-color: #000000;" class="text-white">Subject</th>
+                                <!-- <th style="background-color: #000000;" class="text-white">Units</th> -->
+                                <!-- <th style="background-color: #000000;" class="text-white">Total</th> -->
+                                <!-- <th style="background-color: #000000;" class="text-white">Prelim</th> -->
+                                <!-- <th style="background-color: #000000;" class="text-white">Midterm</th> -->
+                                <!-- <th style="background-color: #000000;" class="text-white">Pre-Final</th> -->
+                                <!-- <th style="background-color: #000000;" class="text-white">Final</th> -->
+                                <th style="background-color: #000000;" class="text-white">Grade</th>
+                                <th style="background-color: #000000;" class="text-white">Faculty</th>
+                                <th style="background-color: #000000;" class="text-white">Signature</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(c, index) in milestone">
+                                <td class="align-middle p-2 text-start">
+                                    <!-- <span>{{ c.subj_name }} (<span class="fw-bold">{{ c.subj_code }}</span>)</span> -->
+                                    <span class="fw-bold">{{ c.subj_code }}</span>
+                                </td>
+                                <!-- <td class="align-middle p-2">
+                                    <p class="m-0">Lec: {{ c.subj_lec_units }}</p>
+                                    <p class="m-0">Lab: {{ c.subj_lab_units }}</p>
+                                </td> -->
+                                <!-- <td class="align-middle p-2">
+                                    {{ c.subj_lec_units + c.subj_lab_units }}
+                                </td> -->
+                                <!-- <td class="align-middle p-2">
+                                    {{ c.grs_prelims? c.grs_prelims:'N/A' }}
+                                </td>
+                                <td class="align-middle p-2">
+                                    {{ c.grs_midterms? c.grs_midterms:'N/A' }}
+                                </td>
+                                <td class="align-middle p-2">
+                                    {{ c.grs_prefinals? c.grs_prefinals:'N/A' }}
+                                </td>
+                                <td class="align-middle p-2">
+                                    {{ c.grs_finals? c.grs_finals:'N/A' }}
+                                </td> -->
+                                <td v-if="c.grs_prelims && c.grs_midterms && c.grs_prefinals && c.grs_finals" class="align-middle p-2">
+                                    {{ (c.grs_prelims + c.grs_midterms + c.grs_prefinals + c.grs_finals)/4 }}
+                                </td>
+                                <td v-else class="align-middle p-2">
+                                    INC
+                                </td>
+                                <td class="align-middle p-2">
+                                    {{ c.faculty_name }}
+                                </td>
+                                <td class="align-middle p-2">
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="d-flex flex-column justify-content-center align-items-center mb-2" style="font-size:8px">
+                        <div class="w-75 p-1 ">
+                            <span class="fst-italic">
+                                I shall abide by all the rules and regulations now enforced or may be promulgated by Central Luzon
+                                College of Science and Technology, Inc. from time to time
+                                Likewise, I agree to the cancellation of the credits I have earned in subjects I have enrolled under
+                                false pretenses.
+                            </span>
                         </div>
-                        <div class="w-100 text-center">
-                            <div style="height:1px; background:#808080;"></div>
-                            <p style="font-size:8px; color:#374151;">Registrar / Authorized
-                                Signature</p>
-                        </div>
-                    </div> -->
+                    </div>
+                    
                 </div>
             </div>
-            
+
+            <div v-if="!milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
+                <div class="p-3 text-center" style="text-transform:none">
+                    No Records Found
+                </div>
+            </div>
+            <div v-if="milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
+                <div class="p-3 text-center" style="text-transform:none">
+                    <div class="m-3">
+                        <NeuLoader2 />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     
-    <div v-if="!milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
-        <div class="p-3 text-center" style="text-transform:none">
-            No Records Found
-        </div>
-    </div>
-    <div v-if="milestoneLoading && !Object.keys(milestone).length" style="text-transform:none">
-        <div class="p-3 text-center" style="text-transform:none">
-            <div class="m-3">
-                <NeuLoader2 />
-            </div>
-        </div>
-    </div>
+    
 
 
     <button class="neu-btn neu-green p-2 mt-3" @click="downloadPdf()" v-if="!milestoneLoading && Object.keys(milestone).length"
