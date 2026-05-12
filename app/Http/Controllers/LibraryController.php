@@ -554,6 +554,45 @@ class LibraryController extends Controller
         ];
     }
 
+    public function getLibraryCardMassPrint(Request $request)
+    {
+        $results = [];
+
+        foreach ($request->data as $card) {
+
+        $cards = DB::table('def_library_card_issue as lbd')
+            ->leftJoin('users as user', 'lbd.lbrd_issuedby', '=', 'user.id')
+            ->leftJoin('def_employee as emp', 'user.id', '=', 'emp.emp_accid')
+            ->leftJoin('def_person as per', 'lbd.lbrd_personid', '=', 'per.per_id')
+            ->leftJoin('def_student_identification as des', 'per.per_id', '=', 'des.ident_personid')
+            ->select(
+                'lbd.*',
+                'emp.*',
+                'per.per_firstname',
+                'per.per_middlename',
+                'per.per_lastname',
+                'per.per_suffixname',
+                'per.per_profile',
+                'per.per_contact',
+                'per.per_email',
+                'des.ident_identification as studentid',
+            )
+            ->where('lbd.lbrd_personid', $card['per_id'])
+            ->where('lbd.lbrd_enrid', $card['enr_id'])
+            ->where('lbd.lbrd_status', 1)
+            ->first();
+
+        if ($cards) {
+            $results[] = $cards;
+        }
+    }
+
+        return response()->json([
+            'data' => $results,
+            'status' => 200,
+        ]);
+    }
+
     public function deactivateLibraryCard(Request $request){
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d H:i:s');
@@ -582,7 +621,7 @@ class LibraryController extends Controller
     public function addLibraryCard(Request $request){
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d H:i:s');
-        $code = 'LB-'.$request->input('lbrd_dateissued').$request->input('lbrd_enrid');
+        $code = 'LB-'.$request->input('lbrd_dateissued').'-'.$request->input('lbrd_enrid');
 
         try{
             $primary = DB::table('def_library_card_issue')->insert([

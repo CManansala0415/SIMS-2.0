@@ -332,7 +332,7 @@ onMounted(async () => {
                                 class="neu-input" />
                         </div>
                         <div class="d-flex flex-wrap form-group">
-                            <label for="type">Laboratory Units (1 Unit = 3 Hour)</label>
+                            <label for="type" >Laboratory Units (1 Unit = 3 Hour, if Actual unit/PE/NSTP 1 = 1)</label>
                             <input v-model="editData.subj_lab_units" required type="text"
                                 class="neu-input" />
                         </div>
@@ -377,6 +377,7 @@ onMounted(async () => {
                                 <option value="" >N/A</option>
                                 <option value="1" >PE</option>
                                 <option value="2" >NSTP</option>
+                                <option value="3" >Actual Unit</option>
                             </select>
                         </div>
                         

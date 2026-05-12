@@ -663,7 +663,7 @@ const resolveGroupLabel = (groupKey) => {
 const isExtra = (data, extra) =>{
     // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
     let mult = 0
-    if(extra == 1 || extra == 2){
+    if(extra == 1 || extra == 2 || extra == 3){
         mult = data * 1
     } else {
         mult = data * 3

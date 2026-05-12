@@ -489,8 +489,8 @@ class DefaultsController extends Controller
                 }
             }
 
-            //1 pe 2 nstp
-            if($request->input('subj_extra') == 1 || $request->input('subj_extra') == 2){
+            //1 pe 2 nstp 3 actual unit
+            if($request->input('subj_extra') == 1 || $request->input('subj_extra') == 2 || $request->input('subj_extra') == 3){
                 $labmult = $request->input('subj_lab_units') * 1;
             }else{
                 $labmult = $request->input('subj_lab_units') * 3;
