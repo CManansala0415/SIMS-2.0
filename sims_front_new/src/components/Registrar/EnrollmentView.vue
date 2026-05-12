@@ -55,7 +55,7 @@ const showFilterModal = ref(false)
 const showPrintID = ref(false)
 const showFormData = ref([])
 const activeForm = ref(1)
-const limit = ref(3000)
+const limit = ref(10)
 const offset = ref(0)
 const studentCount = ref(0)
 const searchValue = ref([])
@@ -254,7 +254,7 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
 
@@ -298,7 +298,7 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
 
@@ -779,7 +779,7 @@ const getNoPrint = (data) =>{
                 <div v-else class="row mb-3" v-if="!preLoading && Object.keys(student).length">
                     <div class="col-12 col-lg-8">
                         <div class="p-4 neu-card">
-                            <div v-for="(stud, index) in student">
+                            <div v-for="(stud, index) in student"> 
                                 <div class="row border">
                                     <div class="col-12 col-lg-4 border-0 border-end">
                                         <div class="d-flex p-2">
