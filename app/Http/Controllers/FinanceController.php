@@ -723,10 +723,10 @@ class FinanceController extends Controller
                     foreach (get_object_vars($template) as $key => $value) {
                         $mergedItem->$key = $value;
                     }
-
+ 
                     // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
                     $computedLab = 0;
-                    if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2){
+                    if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2 || $template->tuitemp_extra == 3){
                         $computedLab = $template->tuitemp_lab * 1;
                     } else {
                         $computedLab = $template->tuitemp_lab * 3;
@@ -837,8 +837,7 @@ class FinanceController extends Controller
             ->leftJoin('def_section as section', 'das.soa_section', '=', 'section.sec_id')
             ->select(
                 'das.*',
-                'subj.subj_code',
-                'subj.subj_name',
+                'subj.*',
                 'person.per_id',
                 'person.per_firstname',
                 'person.per_middlename',

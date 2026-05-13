@@ -155,15 +155,26 @@ const recomputeAccountTotals = async () => {
         totalPayment.value += Number(p.acy_payment || 0)
     })
 
-    scholarshipDetails.value.forEach(e => {
+    scholarshipDetails.value.forEach(e => { 
         if (e.sch_type === 1) totalPercentDiscount.value += e.sch_total
         if (e.sch_type === 2) totalFixedDiscount.value += e.sch_total
     })
 
     rows.forEach(item => {
+        let computedLab = 0;
         if (item.soa_subjid) {
+
+            if(item.subj_extra == 1 || item.subj_extra == 2 || item.subj_extra == 3){
+                computedLab = item.subj_lab_units * 1;
+            } else {
+                computedLab = item.subj_lab_units * 3;
+            }
+
+            // console.log(item)
+
             totalLecCost.value += (item.soa_lec_price || 0) * (item.soa_lec || 0)
-            totalLabCost.value += (item.soa_lab_price || 0) * (item.soa_lab || 0)
+            totalLabCost.value += (item.soa_lab_price || 0) * (computedLab || 0)
+
         } else if (item.soa_custype === 4) {
             const amount = (item.soa_price || 0) * (item.soa_quantity || 0)
             if (item.soa_disc_type === 1) {

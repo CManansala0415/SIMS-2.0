@@ -210,8 +210,8 @@ onMounted(async () => {
                                         enrolleeData.value[0].enr_personid
                                     ).then((results) => {
                                         chargeBreakdown.value = results
-                                        console.log(chargeBreakdown.value)
-                                        console.log(milestone.value)
+                                        // console.log(chargeBreakdown.value)
+                                        // console.log(milestone.value)
 
                                     })
                                 })
