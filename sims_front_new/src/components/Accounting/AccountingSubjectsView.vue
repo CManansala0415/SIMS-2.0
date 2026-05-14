@@ -79,6 +79,8 @@ const edit = (data) => {
         editData.value.subj_dtypeid = ''
         editData.value.subj_specid = ''
         editData.value.subj_schedpass = ''
+         editData.value.subj_lec_units_rate = 0
+        editData.value.subj_lab_units_rate = 0
         editData.value.subj_addedby = userID.value
         searchValueModal.value = ''
 
