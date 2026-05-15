@@ -231,7 +231,7 @@ const printForm = (studentid) => {
                                 or laminate for protection, and always store it safely to prevent loss or theft.
                             </div> -->
                             <div style="width: 150px; text-align: center; padding: 5px; color: #FFFFFF;font-size: 8px; font-weight: bold; ">
-                                A.Y {{ yrFromInfo }} - {{ yrFromto }}<br/>
+                                A.Y. {{ yrFromInfo }} - {{ yrFromto }}<br/>
                             </div>
                         </div>
                         <br/>
@@ -268,20 +268,20 @@ const printForm = (studentid) => {
                                 studentData.brgyDesc&&
                                 studentData.citymunDesc&&
                                 studentData.provDesc
-                            " style="font-size: 9px; font-weight: bold; text-transform: uppercase;">
+                            " style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_curr_home }}, {{ studentData.brgyDesc }},
                                 <br/>{{ studentData.citymunDesc }}, {{ studentData.provDesc }}
                             </span>
-                            <span v-else style="font-size: 9px; font-weight: bold; text-transform: uppercase;">N/A</span>
-                            <span style="font-size: 9px; width: 80%; border-top: 1px solid gray">Address</span>
+                            <span v-else style="font-size: 7px; font-weight: bold; text-transform: uppercase;">N/A</span>
+                            <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Address</span>
 
                             <span v-if="
                                 family.fam_firstname&&
                                 family.fam_lastname
                             "
-                            style="font-size: 9px; font-weight: bold; margin-top: 2px;">
+                            style="font-size: 7px; font-weight: bold; margin-top: 2px;">
                                 <br/>
-                                <span style="font-size: 9px; font-weight: bold; text-transform: uppercase;">
+                                <span style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                     {{ family.fam_firstname }}
                                     {{ family.fam_middlename ? family.fam_middlename : ' ' }}
                                     {{ family.fam_lastname }}
@@ -289,13 +289,13 @@ const printForm = (studentid) => {
                                 </span> 
                                 <br/><span style="font-family:Arial, Helvetica, sans-serif;font-weight:bold">0{{ family.fam_contact }}</span>
                             </span>
-                            <span v-else style="font-size: 9px; font-weight: bold; text-transform: uppercase;">N/A</span>
-                            <span style="font-size: 9px; width: 80%; border-top: 1px solid gray">Emergency Contact</span>
+                            <span v-else style="font-size: 7px; font-weight: bold; text-transform: uppercase;">N/A</span>
+                            <span style="font-size: 7px; width: 80%; border-top: 1px solid gray">Emergency Contact</span>
 
                         </div>
                         <div style="margin-top:1.5px; width:100%; line-height: 1.2;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
                             <img src="/img/rpl.png" height="43px" width="43px"/>
-                            <p style="font-size: 8px;">
+                            <p style="font-size: 7px;">
                                 <span style="font-weight:bold;">Renato P. Legaspi, Ph.D.</span>
                                 <br/> President / CEO
                             </p>
