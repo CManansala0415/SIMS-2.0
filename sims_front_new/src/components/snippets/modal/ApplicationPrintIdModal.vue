@@ -209,7 +209,7 @@ const printForm = (studentid) => {
                         <!-- b8048e -->
                     
                         <div style="margin-top:1px; width:100%; line-height: 0.1;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
-                            <img :src="signatureId" height="43px" width="43px" style="opacity: 0;"/>
+                            <img :src="signatureId" height="43px" width="43px" style="opacity: 1;"/>
                             <p style="font-size: 4px; font-weight: bold;">
                                 Student's Signature
                             </p>

@@ -782,8 +782,8 @@ const getNoPrint = (data) =>{
                             <div v-for="(stud, index) in student"> 
                                 <div class="row border">
                                     <div class="col-12 col-lg-4 border-0 border-end">
-                                        <div class="d-flex p-2">
-                                            <div class="w-100">
+                                        <div class="d-flex p-2 w-100 gap-2 justify-content-center align-items-center">
+                                            <div class="d-flex justify-content-between align-items-center w-100">
                                                 <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
                                                     class="text_guide img_hover p-1 d-flex justify-content-center align-items-center">
                                                     <!-- stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
