@@ -748,9 +748,9 @@ class FinanceController extends Controller
 
                     $computedLab = 0;
                     if($ms->subj_extra == 1 || $ms->subj_extra == 2 || $ms->subj_extra == 3){
-                        $computedLab = $ms->tuitemp_lab * 1;
+                        $computedLab = $ms->subj_lab_units * 1;
                     } else {
-                        $computedLab = $ms->tuitemp_lab * 3;
+                        $computedLab = $ms->subj_lab_units * 3;
                     }
                     // Fallback to milestone rates
                     $total_price =

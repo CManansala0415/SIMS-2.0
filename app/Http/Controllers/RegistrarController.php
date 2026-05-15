@@ -1206,6 +1206,9 @@ class RegistrarController extends Controller
             $mergedMilestones = [];
             $deductions_fixed = 0;
             $deductions_percent = 0;
+            $subjectsTotal = 0;
+            $miscTotal = 0;
+            $allMatched = true;
 
             foreach ($milestonedata as $ms) {
 
@@ -1221,6 +1224,11 @@ class RegistrarController extends Controller
                         break;
                     }
                 }
+
+                // if no match found
+                if ($template === null) {
+                    $allMatched = false;
+                }
  
                 $total_price = 0;
                 $mergedItem  = clone $ms; // copy object safely
@@ -1233,7 +1241,7 @@ class RegistrarController extends Controller
 
                     // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
                     $computedLab = 0;
-                    if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2){
+                    if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2 || $template->tuitemp_extra == 3){
                         $computedLab = $template->tuitemp_lab * 1;
                     } else {
                         $computedLab = $template->tuitemp_lab * 3;
@@ -1250,15 +1258,16 @@ class RegistrarController extends Controller
                 } else {
                     $computedLab = 0;
                     if($ms->subj_extra == 1 || $ms->subj_extra == 2 || $ms->subj_extra == 3){
-                        $computedLab = $ms->tuitemp_lab * 1;
+                        $computedLab = $ms->subj_lab_units * 1;
                     } else {
-                        $computedLab = $ms->tuitemp_lab * 3;
+                        $computedLab = $ms->subj_lab_units * 3;
                     }
 
                     // Fallback to milestone rates
                     $total_price =
-                        ((float) ($ms->subj_lec_rate ?? 0) * (float) (($computedLab) ?? 0)) +
-                        ((float) ($ms->subj_lab_rate ?? 0) * (float) (($ms->subj_lab_units) ?? 0));
+                        ((float) ($ms->subj_lec_rate ?? 0) * (float) (($ms->subj_lec_units) ?? 0)) +
+                        ((float) ($ms->subj_lab_rate ?? 0) * (float) (($computedLab) ?? 0));
+                    $subjectsTotal += $total_price;
                 }
 
                 /*
@@ -1280,9 +1289,11 @@ class RegistrarController extends Controller
                 // for items and other charges without subject ID
                 if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 3) {
                     $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    $miscTotal += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
                 }
                 if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid == null) {
                     $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    $miscTotal += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
                 }
             }
 
@@ -1363,12 +1374,18 @@ class RegistrarController extends Controller
            
             return [
                 'templatePricesData' => $templatePricesData,
+                'template' => $template,
                 'milestonedata' => $milestonedata,
                 'soa' => $soa,
                 'message' => $msg,
                 'status' => $status,
                 'totalCost' => $totalCost,
+                'final' => $final,
                 'studentid' => $studentid,
+                'subjectsTotal' => $subjectsTotal,
+                'miscTotal' => $miscTotal,
+                'allMatched' => $allMatched,
+                
             ];
 
             // return 204;

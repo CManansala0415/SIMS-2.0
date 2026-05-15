@@ -143,7 +143,7 @@ const booter = async () => {
 
 
 onMounted(async () => {
-    window.stop()
+    // window.stop()
     getUserID().then(async (results) => {
         userID.value = results.account.data.id
         accessData.value = results.access
@@ -777,7 +777,7 @@ const getNoPrint = (data) =>{
                 </div>
                       
                 <div v-else class="row mb-3" v-if="!preLoading && Object.keys(student).length">
-                    <div class="col-12 col-lg-8">
+                    <div class="col-12">
                         <div class="p-4 neu-card">
                             <div v-for="(stud, index) in student"> 
                                 <div class="row border">
@@ -875,7 +875,7 @@ const getNoPrint = (data) =>{
                                         </div>
                                     </div>
                                     <div class="col-12 col-lg-8">
-                                        <div class="d-flex flex-column justify-content-around h-100">
+                                        <div class="d-flex justify-content-around align-items-center h-100">
                                             <div class="d-flex flex-column gap-2 p-2">
                                                 <div class="text-start">
                                                     <span class="text-uppercase fw-bold" style="font-size: 13px;"> {{ stud.per_firstname }} {{
@@ -883,7 +883,7 @@ const getNoPrint = (data) =>{
                                                         stud.per_lastname }} {{
                                                         stud.per_suffixname }}</span>
                                                 </div>
-                                                <div class="text-center d-flex justify-content-between">
+                                                <div class="text-start d-flex flex-column">
                                                     <div>
                                                         <span class="d-inline-block">
                                                         {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
@@ -900,12 +900,15 @@ const getNoPrint = (data) =>{
                                                         <span class="d-inline-block">
                                                         {{ quarter.find(q => q.quar_id === stud.enr_quarter)?.quar_desc || '—' }}
                                                         </span>
+                                                        
                                                     </div>
                                                     <div>
-                                                        <span v-if="stud.is_paid" class="text-success fw-bold d-inline-block" style="font-size: 10px;">Officially
-                                                            Enrolled</span>
-                                                        <span v-else class="text-danger fw-bold d-inline-block" style="font-size: 10px;">Not Officially Enrolled
-                                                        </span>
+                                                        <small v-if="stud.is_paid" class="text-success fw-bold">
+                                                            Officially Enrolled
+                                                        </small>
+                                                        <small v-else class="text-danger fw-bold">
+                                                            Not Officially Enrolled
+                                                        </small>
                                                     </div>
                                                 </div>
                                             </div>
@@ -955,7 +958,7 @@ const getNoPrint = (data) =>{
                             </div>
                         </div>    
                     </div>
-                    <div class="col-12 col-lg-4">
+                    <!-- <div class="col-12 col-lg-4">
                         <div class="p-2 neu-card">
                             <p class="fw-bold mt-2">In Queue for Printing</p>
                             <div v-if="Object.keys(inQueue).length" class="text-start p-2">
@@ -971,7 +974,7 @@ const getNoPrint = (data) =>{
                                 </ul>
                             </div>
                         </div>    
-                    </div>
+                    </div> -->
                 </div>
                 <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
                     <div class="d-flex gap-1">
@@ -1084,7 +1087,7 @@ const getNoPrint = (data) =>{
     <!-- Print ID Modal -->
     <div class="modal fade" id="printidmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Print ID</h5>
