@@ -167,12 +167,25 @@ const printForm = (studentid) => {
                     </div>
                     <div style="height: 235px; width:100%; color:black" class="idbg">
                         <div style="margin-top: 75px; width:100%; line-height: 0.1;text-align: center; padding: 1px;">
-                            <span style="font-size: 9px; font-weight: bolder; text-transform: uppercase;">
+                            <!-- <span style="font-size: 9.5px; font-weight: bolder; text-transform: uppercase;">
                                 {{ studentData.per_firstname }}
                                 {{ studentData.per_middlename ? studentData.per_middlename : ' ' }}
                                 {{ studentData.per_lastname }}
                                 {{ studentData.per_suffixname ? studentData.per_suffixname : ' ' }}<br/>
-                                <!-- <span style="font-size: 4px; font-weight: thin;">Student Name</span> -->
+                                <span style="font-size: 4px; font-weight: thin;">Student Name</span>
+                            </span> -->
+                            <span style="font-size: 9.5px; font-weight: bolder; text-transform: uppercase;">
+                                {{ studentData.per_firstname }}
+
+                                {{ studentData.per_middlename
+                                    ? studentData.per_middlename.charAt(0) + '.'
+                                    : '' }}
+
+                                {{ studentData.per_lastname }}
+
+                                {{ studentData.per_suffixname
+                                    ? studentData.per_suffixname
+                                    : '' }}
                             </span>
                         </div>  
                          <!-- display: flex; justify-content: center; align-items: center; align-content: center; -->
@@ -187,7 +200,7 @@ const printForm = (studentid) => {
                             </span>
                         </div>
                         <div style="width:100%; line-height: 0.6;text-align: center; padding: 1px; margin-top:3px">
-                            <span style="font-size: 8px; font-weight: bold; text-transform: uppercase;">
+                            <span style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.course }}<br/>
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
                             </span>
@@ -212,7 +225,7 @@ const printForm = (studentid) => {
                                 Student's Signature
                             </p>
                         </div>  
-                        <div style="height:28px;width:100%;background-color: #185718; border-top: 5px solid #f5e90f;" class="d-flex justify-content-center align-content-center align-items-center">
+                        <div style="height:30px;width:100%;background-color: #185718; border-top: 5px solid #f5e90f;" class="d-flex justify-content-center align-content-center align-items-center">
                             <!-- <div style="width: 150px; text-align: center; padding: 5px; color: #FFFFFF;font-size: 6.5px; font-weight: thin; ">
                                 Keep your ID card secure and avoid posting it on social media. Use a badge holder 
                                 or laminate for protection, and always store it safely to prevent loss or theft.
