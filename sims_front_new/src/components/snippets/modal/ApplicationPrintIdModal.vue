@@ -263,11 +263,12 @@ const printForm = (studentid) => {
                             </div>
                         </div>
                         <div class="d-flex flex-column justify-content-center align-items-center mt-2 text-center">
-                            <span v-if="
-                                studentData.per_curr_home&&
+                            <span v-if="(studentData.per_curr_home||(
                                 studentData.brgyDesc&&
                                 studentData.citymunDesc&&
                                 studentData.provDesc
+                            ))
+                                
                             " style="font-size: 7px; font-weight: bold; text-transform: uppercase;">
                                 {{ studentData.per_curr_home }}, {{ studentData.brgyDesc }},
                                 <br/>{{ studentData.citymunDesc }}, {{ studentData.provDesc }}
