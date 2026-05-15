@@ -64,52 +64,50 @@ onMounted(() => {
                 semInfo.value = result[0].quar_code;
                 yrFromInfo.value = result[1].sett_yearfrom;
                 yrFromto.value = result[1].sett_yearto;
+                // eb1757 1st
+                // c0c90e 2nd
+                // 9cff12 3rd
+                // 23377a 4th
+                // 1202c4 G11
+                // b8048e G12
+                switch(student.value.enr_gradelvl){
+                    case 1:
+                        indicator.value = '#eb1757'
+                        break;
+                    case 2:
+                        indicator.value = '#c0c90e'
+                        break;
+                    case 3:
+                        indicator.value = '#9cff12'
+                        break;
+                    case 4:
+                        indicator.value = '#23377a'
+                        break;
+                    case 5:
+                        indicator.value = '#1202c4'
+                        break;
+                    case 6:
+                        indicator.value = '#b8048e'
+                        break;
+                }   
 
-                // fetchingUserAccess.value = false;
-                // isLoading.value = false;
+
+                // imageFetcher(student.value.per_profile,'myImage').then(response => {
+                //         // console.log(response)
+                // });
+
+                profileId.value = student.value.per_profile ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
+                signatureId.value = student.value.per_signature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + student.value.per_signature+'/3' : '/img/sig1.png'
+                // console.log( signatureId.value)
+                // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
+                preLoading.value = false
+
+                // let decrypted = lvl2Decrypt('OG4wOjB9aWdxZHdjbnxzY2RtcTg=', 'CLCST_SECRET');
+                // let obj = JSON.parse(decrypted);
+                // console.log(obj.sid);
+                // console.log(studentData.value)
             });
-            // eb1757 1st
-            // c0c90e 2nd
-            // 9cff12 3rd
-            // 23377a 4th
-            // 1202c4 G11
-            // b8048e G12
-            switch(student.value.enr_gradelvl){
-                case 1:
-                    indicator.value = '#eb1757'
-                    break;
-                case 2:
-                    indicator.value = '#c0c90e'
-                    break;
-                case 3:
-                    indicator.value = '#9cff12'
-                    break;
-                case 4:
-                    indicator.value = '#23377a'
-                    break;
-                case 5:
-                    indicator.value = '#1202c4'
-                    break;
-                case 6:
-                    indicator.value = '#b8048e'
-                    break;
-            }   
 
-
-            // imageFetcher(student.value.per_profile,'myImage').then(response => {
-            //         // console.log(response)
-            // });
-
-            profileId.value = student.value.per_profile ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + student.value.per_profile +'/1' : '/img/profile_default.png'
-            signatureId.value = student.value.per_signature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + student.value.per_signature+'/3' : '/img/sig1.png'
-            // console.log( signatureId.value)
-            // idGenerator.value = '<img style="height: 100px; width: 100px; border-radius:100%;" src="'+profileId.value+'"/>'
-            preLoading.value = false
-
-            // let decrypted = lvl2Decrypt('OG4wOjB9aWdxZHdjbnxzY2RtcTg=', 'CLCST_SECRET');
-            // let obj = JSON.parse(decrypted);
-            // console.log(obj.sid);
-            // console.log(studentData.value)
         })
     })
     
@@ -194,8 +192,8 @@ const printForm = (studentid) => {
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
                             </span>
                         </div>
-                        <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px; margin-top:3px">
-                            <span style="font-size: 7px; font-weight: bold;">
+                        <div style="width:100%; line-height: 0.1;text-align: center; padding: 1px; margin-top:4px">
+                            <span style="font-size: 6px; font-weight: normal;">
                                 {{ studentData.program }} Department<br/>
                                 <!-- <span style="font-size: 4px; font-weight: thin;">Course</span> -->
                             </span>
@@ -209,12 +207,12 @@ const printForm = (studentid) => {
                         <!-- b8048e -->
                     
                         <div style="margin-top:1px; width:100%; line-height: 0.1;text-align: center; padding: 1px; display: flex; flex-direction: column; justify-content: center; align-items: center; align-content: center;">
-                            <img :src="signatureId" height="45px" width="45px" style="opacity: 1;"/>
+                            <img :src="signatureId" height="44px" width="44px" style="opacity: 1;"/>
                             <p style="font-size: 7px; font-weight: bold;">
                                 Student's Signature
                             </p>
                         </div>  
-                        <div style="height:30px;width:100%;background-color: #185718; border-top: 5px solid #f5e90f;" class="d-flex justify-content-center align-content-center align-items-center">
+                        <div style="height:28px;width:100%;background-color: #185718; border-top: 5px solid #f5e90f;" class="d-flex justify-content-center align-content-center align-items-center">
                             <!-- <div style="width: 150px; text-align: center; padding: 5px; color: #FFFFFF;font-size: 6.5px; font-weight: thin; ">
                                 Keep your ID card secure and avoid posting it on social media. Use a badge holder 
                                 or laminate for protection, and always store it safely to prevent loss or theft.
