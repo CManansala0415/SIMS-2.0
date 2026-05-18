@@ -380,7 +380,7 @@ const printForm = async (libraryCard) => {
             qrImageGenerator(encrypted).then(async(result) => {
                 qrimage.value = result
                 let size = [2.125,3.375]
-                await pdfGenerator(name, size, 'portrait', 0.03)
+                await pdfGenerator(name, size, 'landscape', 0.03)
                 Swal.fire({
                     icon: "success",
                     title: "Download Complete",
