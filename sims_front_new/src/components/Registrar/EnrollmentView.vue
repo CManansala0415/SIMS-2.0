@@ -155,6 +155,7 @@ onMounted(async () => {
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
+                    console.log(results.data)
 
                     let x = student.value.map((e) => {
 

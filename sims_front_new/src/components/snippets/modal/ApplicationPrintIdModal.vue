@@ -115,13 +115,13 @@ onMounted(() => {
 })
 
 const downloading = ref(false)
-const printForm = (studentid) => {
+const printForm = (studentData) => {
     downloading.value = true
-    let name = 'LC-'+studentid
+    let name = 'LC-'+studentData.per_firstname+'-'+studentData.per_middlename+'-'+studentData.per_lastname+'-'+studentData.studentid
 
     let key = "SIMS_CLCST_@2026!--*";
     let original = JSON.stringify({
-        sid: studentid
+        sid: studentData.studentid
     });
 
     const encrypted = lvl2Encrypt(original, key);
@@ -304,6 +304,6 @@ const printForm = (studentid) => {
                     </div>
                 </div>
             </div>
-            <button class="neu-btn neu-green mt-2" @click="printForm(studentData.studentid)" :disabled="downloading">Download ID</button>
+            <button class="neu-btn neu-green mt-2" @click="printForm(studentData)" :disabled="downloading">Download ID</button>
         </div>
 </template>

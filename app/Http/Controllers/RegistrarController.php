@@ -686,63 +686,142 @@ class RegistrarController extends Controller
         if(($fname == 404)&&($mname == 404)&&($lname == 404)&&($program == 0)&&($gradelvl == 0)&&($course == 0)&&($mode==1)){
 
             if($limit == 0 && $offset == 0){
-                $student = DB::table('def_enrollment')
-                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
-                ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
-                ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
-                ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
-                ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+                // $student = DB::table('def_enrollment')
+                // ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
+                // ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+                // ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+                // ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+                // ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
 
-                ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
-                ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
-                ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
-                ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
+                // ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+                // ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+                // ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+                // ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
 
+                // ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                // ->select(  
+                //     'def_enrollment.*',
+                //     'def_person.*',
+                //     'def_student_identification.ident_identification as studentid',
+                //     'currcountry.name as currcountryname',
+                //     'currprovince.provDesc as currprovincename',
+                //     'currcity.citymunDesc as currcityname',
+                //     'currbarangay.brgyDesc as currbarangayname',
+
+                //     'permcountry.name as permcountryname',
+                //     'permprovince.provDesc as permprovincename',
+                //     'permcity.citymunDesc as permcityname',
+                //     'permbarangay.brgyDesc as permbarangayname',
+                // )
+                // ->orderBy('def_enrollment.enr_course')
+                // ->orderByDesc('def_enrollment.enr_dateenrolled')
+                // ->where('def_enrollment.enr_status', '=' , 1)
+                // ->get();
+
+                $demograph = new DefaultsController();
+                $demographData = $demograph->getDemograph();
+                // $def_person = DB::table('def_person')->get();
+
+                $def_person = DB::table('def_enrollment')
+                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
                 ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                 ->select(  
                     'def_enrollment.*',
                     'def_person.*',
                     'def_student_identification.ident_identification as studentid',
-                    'currcountry.name as currcountryname',
-                    'currprovince.provDesc as currprovincename',
-                    'currcity.citymunDesc as currcityname',
-                    'currbarangay.brgyDesc as currbarangayname',
-
-                    'permcountry.name as permcountryname',
-                    'permprovince.provDesc as permprovincename',
-                    'permcity.citymunDesc as permcityname',
-                    'permbarangay.brgyDesc as permbarangayname',
                 )
-                ->orderBy('def_enrollment.enr_course')
+                ->orderBy('def_enrollment.enr_dateenrolled')
                 ->orderByDesc('def_enrollment.enr_dateenrolled')
                 ->where('def_enrollment.enr_status', '=' , 1)
                 ->get();
-            }else{
-                $student = DB::table('def_enrollment')
-                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
-                ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
-                ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
-                ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
-                ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
 
-                ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
-                ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
-                ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
-                ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode')
+                // 1. Key everything by their UNIQUE geographic code for instant direct lookup
+                $countries = collect($demographData['country'])->keyBy('countryID'); 
+                $regions   = collect($demographData['region'])->keyBy('regCode'); 
+                $provinces = collect($demographData['province'])->keyBy('provCode'); // Key by its own unique code
+                $cities    = collect($demographData['city'])->keyBy('citymunCode');   // Key by its own unique code
+                $barangays = collect($demographData['barangay'])->keyBy('brgyCode');    // Key by its own unique code
+
+                // 2. Map the person data (Added $regions to the use statement)
+                $student = collect($def_person)->map(function ($person) use ($countries, $regions, $provinces, $cities, $barangays) {
+                    
+                    // Birth Address Lookups
+                    $person->per_birth_country  = $countries->get($person->per_birth_country)->name ?? null;
+                    $person->per_birth_province = $provinces->get($person->per_birth_province)->provDesc ?? null;
+                    $person->per_birth_city     = $cities->get($person->per_birth_city)->citymunDesc ?? null;
+
+                    // Current Address Lookups
+                    $person->per_curr_country  = $countries->get($person->per_curr_country)->name ?? null;
+                    $person->per_curr_region   = $regions->get($person->per_curr_region)->regDesc ?? null;
+                    $person->per_curr_province = $provinces->get($person->per_curr_province)->provDesc ?? null;
+                    $person->per_curr_city     = $cities->get($person->per_curr_city)->citymunDesc ?? null;
+                    $person->per_curr_barangay = $barangays->get($person->per_curr_barangay)->brgyDesc ?? null;
+
+                    // Permanent Address Lookups
+                    $person->per_perm_country  = $countries->get($person->per_perm_country)->name ?? null;
+                    $person->per_perm_region   = $regions->get($person->per_perm_region)->regDesc ?? null;
+                    $person->per_perm_province = $provinces->get($person->per_perm_province)->provDesc ?? null;
+                    $person->per_perm_city     = $cities->get($person->per_perm_city)->citymunDesc ?? null;
+                    $person->per_perm_barangay = $barangays->get($person->per_perm_barangay)->brgyDesc ?? null;
+
+                    // Create a complete, clean address string (Fixed duplicate province typo)
+                    $addressParts = array_filter([
+                        $person->per_curr_barangay,
+                        $person->per_curr_city,
+                        $person->per_curr_province,
+                        $person->per_curr_region,
+                        $person->per_curr_country
+                    ]);
+                    
+                    $person->full_address = implode(', ', $addressParts);
+                    return $person;
+                })->all();
+                
+            }else{
+                // $student = DB::table('def_enrollment')
+                // ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                // ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+                // ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+                // ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+                // ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+
+                // ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+                // ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+                // ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+                // ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode')
+                // ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+                // ->select(  
+                //     'def_enrollment.*',
+                //     'def_person.*',
+                //     'def_student_identification.ident_identification as studentid',
+                //     'currcountry.name as currcountryname',
+                //     'currprovince.provDesc as currprovincename',
+                //     'currcity.citymunDesc as currcityname',
+                //     'currbarangay.brgyDesc as currbarangayname',
+
+                //     'permcountry.name as permcountryname',
+                //     'permprovince.provDesc as permprovincename',
+                //     'permcity.citymunDesc as permcityname',
+                //     'permbarangay.brgyDesc as permbarangayname',
+                // )
+                // ->orderBy('def_enrollment.enr_dateenrolled')
+                // ->orderByDesc('def_enrollment.enr_dateenrolled')
+                // ->where('def_enrollment.enr_status', '=' , 1)
+                // ->limit($limit)
+                // ->offset($offset)
+                // ->get();
+
+                $demograph = new DefaultsController();
+                $demographData = $demograph->getDemograph();
+                // $def_person = DB::table('def_person')->get();
+
+                $def_person = DB::table('def_enrollment')
+                ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
                 ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                 ->select(  
                     'def_enrollment.*',
                     'def_person.*',
                     'def_student_identification.ident_identification as studentid',
-                    'currcountry.name as currcountryname',
-                    'currprovince.provDesc as currprovincename',
-                    'currcity.citymunDesc as currcityname',
-                    'currbarangay.brgyDesc as currbarangayname',
-
-                    'permcountry.name as permcountryname',
-                    'permprovince.provDesc as permprovincename',
-                    'permcity.citymunDesc as permcityname',
-                    'permbarangay.brgyDesc as permbarangayname',
                 )
                 ->orderBy('def_enrollment.enr_dateenrolled')
                 ->orderByDesc('def_enrollment.enr_dateenrolled')
@@ -750,6 +829,48 @@ class RegistrarController extends Controller
                 ->limit($limit)
                 ->offset($offset)
                 ->get();
+
+                // 1. Key everything by their UNIQUE geographic code for instant direct lookup
+                $countries = collect($demographData['country'])->keyBy('countryID'); 
+                $regions   = collect($demographData['region'])->keyBy('regCode'); 
+                $provinces = collect($demographData['province'])->keyBy('provCode'); // Key by its own unique code
+                $cities    = collect($demographData['city'])->keyBy('citymunCode');   // Key by its own unique code
+                $barangays = collect($demographData['barangay'])->keyBy('brgyCode');    // Key by its own unique code
+
+                // 2. Map the person data (Added $regions to the use statement)
+                $student = collect($def_person)->map(function ($person) use ($countries, $regions, $provinces, $cities, $barangays) {
+                    
+                    // Birth Address Lookups
+                    $person->per_birth_country  = $countries->get($person->per_birth_country)->name ?? null;
+                    $person->per_birth_province = $provinces->get($person->per_birth_province)->provDesc ?? null;
+                    $person->per_birth_city     = $cities->get($person->per_birth_city)->citymunDesc ?? null;
+
+                    // Current Address Lookups
+                    $person->per_curr_country  = $countries->get($person->per_curr_country)->name ?? null;
+                    $person->per_curr_region   = $regions->get($person->per_curr_region)->regDesc ?? null;
+                    $person->per_curr_province = $provinces->get($person->per_curr_province)->provDesc ?? null;
+                    $person->per_curr_city     = $cities->get($person->per_curr_city)->citymunDesc ?? null;
+                    $person->per_curr_barangay = $barangays->get($person->per_curr_barangay)->brgyDesc ?? null;
+
+                    // Permanent Address Lookups
+                    $person->per_perm_country  = $countries->get($person->per_perm_country)->name ?? null;
+                    $person->per_perm_region   = $regions->get($person->per_perm_region)->regDesc ?? null;
+                    $person->per_perm_province = $provinces->get($person->per_perm_province)->provDesc ?? null;
+                    $person->per_perm_city     = $cities->get($person->per_perm_city)->citymunDesc ?? null;
+                    $person->per_perm_barangay = $barangays->get($person->per_perm_barangay)->brgyDesc ?? null;
+
+                    // Create a complete, clean address string (Fixed duplicate province typo)
+                    $addressParts = array_filter([
+                        $person->per_curr_barangay,
+                        $person->per_curr_city,
+                        $person->per_curr_province,
+                        $person->per_curr_region,
+                        $person->per_curr_country
+                    ]);
+                    
+                    $person->full_address = implode(', ', $addressParts);
+                    return $person;
+                })->all();
             }
            
             $count = DB::table('def_enrollment')
@@ -766,31 +887,65 @@ class RegistrarController extends Controller
         // kapag may params for search
         // ($fname != 404)||($mname != 404)||($lname != 404) && ($limit == 1 && $offset == 1)
         else if (($fname == 404)&&($mname == 404)&&($lname == 404)&&($mode==1)){
-            $student = DB::table('def_enrollment')
-                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
-                        ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
-                        ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
-                        ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
-                        ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
+            // $student = DB::table('def_enrollment')
+            //             ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
+            //             ->leftJoin('sett_ph_country as currcountry', 'def_person.per_curr_country', '=', 'currcountry.countryCode') 
+            //             ->leftJoin('sett_ph_province as currprovince', 'def_person.per_curr_province', '=', 'currprovince.provCode') 
+            //             ->leftJoin('sett_ph_city as currcity', 'def_person.per_curr_city', '=', 'currcity.citymunCode') 
+            //             ->leftJoin('sett_ph_barangay as currbarangay', 'def_person.per_curr_barangay', '=', 'currbarangay.brgyCode') 
 
-                        ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
-                        ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
-                        ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
-                        ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
+            //             ->leftJoin('sett_ph_country as permcountry', 'def_person.per_perm_country', '=', 'permcountry.countryCode') 
+            //             ->leftJoin('sett_ph_province as permprovince', 'def_person.per_perm_province', '=', 'permprovince.provCode') 
+            //             ->leftJoin('sett_ph_city as permcity', 'def_person.per_perm_city', '=', 'permcity.citymunCode') 
+            //             ->leftJoin('sett_ph_barangay as permbarangay', 'def_person.per_perm_barangay', '=', 'permbarangay.brgyCode') 
+            //             ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
+            //             ->select(  
+            //                 'def_enrollment.*',
+            //                 'def_person.*',
+            //                 'def_student_identification.ident_identification as studentid',
+            //                 'currcountry.name as currcountryname',
+            //                 'currprovince.provDesc as currprovincename',
+            //                 'currcity.citymunDesc as currcityname',
+            //                 'currbarangay.brgyDesc as currbarangayname',
+
+            //                 'permcountry.name as permcountryname',
+            //                 'permprovince.provDesc as permprovincename',
+            //                 'permcity.citymunDesc as permcityname',
+            //                 'permbarangay.brgyDesc as permbarangayname',
+            //             )
+            //             ->orderBy('def_enrollment.enr_course')
+            //             ->orderByDesc('def_enrollment.enr_dateenrolled')
+            //             ->where('def_person.per_status', '=',  1)
+            //             ->where('def_enrollment.enr_status', '=' , 1)
+            //             ->orWhere('def_enrollment.enr_gradelvl', '=' , $gradelvl)
+            //             ->orWhere('def_enrollment.enr_program', '=' , $program)
+            //             ->orWhere('def_enrollment.enr_course', '=' , $course)
+            //             ->get();
+            // $count =  DB::table('def_enrollment')
+            //             ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+            //             ->select(  
+            //                 'def_enrollment.*',
+            //                 'def_person.*',
+            //             )                        
+            //             ->orderBy('def_enrollment.enr_course')
+            //             ->orderByDesc('def_enrollment.enr_dateenrolled')
+            //             ->where('def_person.per_status', '=',  1)
+            //             ->where('def_enrollment.enr_status', '=' , 1)
+            //             ->orWhere('def_enrollment.enr_gradelvl', '=' , $gradelvl)
+            //             ->orWhere('def_enrollment.enr_program', '=' , $program)
+            //             ->orWhere('def_enrollment.enr_course', '=' , $course)
+            //             ->count();   
+                        
+            $demograph = new DefaultsController();
+            $demographData = $demograph->getDemograph();
+            // $def_person = DB::table('def_person')->get();
+            $def_person = $student = DB::table('def_enrollment')
+                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id')
                         ->leftJoin('def_student_identification', 'def_person.per_id', '=', 'def_student_identification.ident_personid') 
                         ->select(  
                             'def_enrollment.*',
                             'def_person.*',
                             'def_student_identification.ident_identification as studentid',
-                            'currcountry.name as currcountryname',
-                            'currprovince.provDesc as currprovincename',
-                            'currcity.citymunDesc as currcityname',
-                            'currbarangay.brgyDesc as currbarangayname',
-
-                            'permcountry.name as permcountryname',
-                            'permprovince.provDesc as permprovincename',
-                            'permcity.citymunDesc as permcityname',
-                            'permbarangay.brgyDesc as permbarangayname',
                         )
                         ->orderBy('def_enrollment.enr_course')
                         ->orderByDesc('def_enrollment.enr_dateenrolled')
@@ -800,20 +955,65 @@ class RegistrarController extends Controller
                         ->orWhere('def_enrollment.enr_program', '=' , $program)
                         ->orWhere('def_enrollment.enr_course', '=' , $course)
                         ->get();
+
+            // 1. Key everything by their UNIQUE geographic code for instant direct lookup
+            $countries = collect($demographData['country'])->keyBy('countryID'); 
+            $regions   = collect($demographData['region'])->keyBy('regCode'); 
+            $provinces = collect($demographData['province'])->keyBy('provCode'); // Key by its own unique code
+            $cities    = collect($demographData['city'])->keyBy('citymunCode');   // Key by its own unique code
+            $barangays = collect($demographData['barangay'])->keyBy('brgyCode');    // Key by its own unique code
+
+            // 2. Map the person data (Added $regions to the use statement)
+            $student = collect($def_person)->map(function ($person) use ($countries, $regions, $provinces, $cities, $barangays) {
+                
+                // Birth Address Lookups
+                $person->per_birth_country  = $countries->get($person->per_birth_country)->name ?? null;
+                $person->per_birth_province = $provinces->get($person->per_birth_province)->provDesc ?? null;
+                $person->per_birth_city     = $cities->get($person->per_birth_city)->citymunDesc ?? null;
+
+                // Current Address Lookups
+                $person->per_curr_country  = $countries->get($person->per_curr_country)->name ?? null;
+                $person->per_curr_region   = $regions->get($person->per_curr_region)->regDesc ?? null;
+                $person->per_curr_province = $provinces->get($person->per_curr_province)->provDesc ?? null;
+                $person->per_curr_city     = $cities->get($person->per_curr_city)->citymunDesc ?? null;
+                $person->per_curr_barangay = $barangays->get($person->per_curr_barangay)->brgyDesc ?? null;
+
+                // Permanent Address Lookups
+                $person->per_perm_country  = $countries->get($person->per_perm_country)->name ?? null;
+                $person->per_perm_region   = $regions->get($person->per_perm_region)->regDesc ?? null;
+                $person->per_perm_province = $provinces->get($person->per_perm_province)->provDesc ?? null;
+                $person->per_perm_city     = $cities->get($person->per_perm_city)->citymunDesc ?? null;
+                $person->per_perm_barangay = $barangays->get($person->per_perm_barangay)->brgyDesc ?? null;
+
+                // Create a complete, clean address string (Fixed duplicate province typo)
+                $addressParts = array_filter([
+                    $person->per_curr_barangay,
+                    $person->per_curr_city,
+                    $person->per_curr_province,
+                    $person->per_curr_region,
+                    $person->per_curr_country
+                ]);
+                
+                $person->full_address = implode(', ', $addressParts);
+                return $person;
+            })->all();
+
             $count =  DB::table('def_enrollment')
-                        ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
-                        ->select(  
-                            'def_enrollment.*',
-                            'def_person.*',
-                        )                        
-                        ->orderBy('def_enrollment.enr_course')
-                        ->orderByDesc('def_enrollment.enr_dateenrolled')
-                        ->where('def_person.per_status', '=',  1)
-                        ->where('def_enrollment.enr_status', '=' , 1)
-                        ->orWhere('def_enrollment.enr_gradelvl', '=' , $gradelvl)
-                        ->orWhere('def_enrollment.enr_program', '=' , $program)
-                        ->orWhere('def_enrollment.enr_course', '=' , $course)
-                        ->count();       
+                    ->leftJoin('def_person', 'def_enrollment.enr_personid', '=', 'def_person.per_id') 
+                    ->select(  
+                        'def_enrollment.*',
+                        'def_person.*',
+                    )                        
+                    ->orderBy('def_enrollment.enr_course')
+                    ->orderByDesc('def_enrollment.enr_dateenrolled')
+                    ->where('def_person.per_status', '=',  1)
+                    ->where('def_enrollment.enr_status', '=' , 1)
+                    ->orWhere('def_enrollment.enr_gradelvl', '=' , $gradelvl)
+                    ->orWhere('def_enrollment.enr_program', '=' , $program)
+                    ->orWhere('def_enrollment.enr_course', '=' , $course)
+                    ->count();  
+
+                    
         }
         //para to sa enrollment view listing filter
         else if ($mode==2){
