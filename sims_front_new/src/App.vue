@@ -442,7 +442,7 @@ const checkPath = (data) => {
 const def_class = ref("nav-static border p-2");
 const active_class = ref("nav-static border p-2 active");
 const bgStudents = ref(`
-      background-image: linear-gradient(rgba(229, 237, 245, 0.9)), url('/img/students_cropped.png');
+      background-image: linear-gradient(rgba(229, 237, 245, 0.9)), url('/img/students_cropped.svg');
       background-position: center ;
       background-repeat: no-repeat;
       background-size:contain;
@@ -472,7 +472,7 @@ const bgGradient = ref(`
             <div class="mb-2 w-75">
               <div class="row">
                 <div class="col-2">
-                  <img src="/img/sims_logo.png" height="75px" width="75px" alt="..." v-once>
+                  <img src="/img/sims_logo.svg" height="75px" width="75px" alt="..." v-once>
                 </div>
                 <div class="col-10 text-start d-flex flex-column justify-content-center">
                   <h5 class="fw-bold text-green">SIMS</h5>
@@ -488,7 +488,7 @@ const bgGradient = ref(`
                   <small id="emailHelp" class="form-text text-muted">City of San Fernando, Pampanga</small>
                 </div>
                 <div class="col-2">
-                  <img src="/img/clcst_logo.png" height="75px" width="75px" alt="..." v-once>
+                  <img src="/img/clcst_logo.svg" height="75px" width="75px" alt="..." v-once>
                 </div>
               </div>
             </div>
