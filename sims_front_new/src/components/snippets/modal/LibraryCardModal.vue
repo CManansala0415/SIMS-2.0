@@ -364,23 +364,34 @@ const printForm = async (libraryCard) => {
             });
 
             const encrypted = lvl2Encrypt(original, key);
-            console.log("QR DATA:", encrypted);
+            // console.log("QR DATA:", encrypted);
 
             const decrypted = lvl2Decrypt(encrypted, key);
-            console.log("BACK:", JSON.parse(decrypted));
+            // console.log("BACK:", JSON.parse(decrypted));
 
             // Generate QR first
-            qrimage.value = await qrImageGenerator(encrypted);
+            // qrimage.value = await qrImageGenerator(encrypted);
 
             // Generate PDF
-            let size = [2.125,3.375]
-            pdfGenerator(name, size, 'landscape', 0.03)
+            // let size = [2.125,3.375]
+            // await pdfGenerator(name, size, 'landscape', 0.03)
             // await pdfGenerator(name, 'a6', 'landscape', 0);
 
-            setTimeout(() => {
-                Swal.close();
-                // location.reload();
-            }, 1000);
+            qrImageGenerator(encrypted).then(async(result) => {
+                qrimage.value = result
+                let size = [2.125,3.375]
+                await pdfGenerator(name, size, 'portrait', 0.03)
+                Swal.fire({
+                    icon: "success",
+                    title: "Download Complete",
+                    text: "Check your file manager, refreshing the page",
+                }).then(()=>{
+                    setTimeout(async() => {
+                        Swal.close();
+                        location.reload();
+                    }, 200);
+                });
+            })
 
         } catch (error) {
             Swal.fire({
@@ -394,6 +405,8 @@ const printForm = async (libraryCard) => {
         }
     });
 };
+
+
 
 </script>
 <template>
