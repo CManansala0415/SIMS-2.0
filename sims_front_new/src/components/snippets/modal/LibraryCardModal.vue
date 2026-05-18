@@ -335,8 +335,9 @@ const printCard = async (enrid, data) =>{
     }, 1000);
 }
  
-const printForm = async (enrid, data) => {
-    const name = `LC-${enrid}-${data}`;
+const printForm = async (libraryCard) => {
+    const name = `${libraryCard.per_firstname}_${libraryCard.per_middlename}_${libraryCard.per_lastname}-${libraryCard.lbrd_enrid}`.toUpperCase();
+    // const name = `LC-${libraryCard.lbrd_enrid}-${libraryCard.lbrd_cardcode}`;
 
     Swal.fire({
         icon: "success",
@@ -359,7 +360,7 @@ const printForm = async (enrid, data) => {
 
             let key = "SIMS_CLCST_@2026!--*";
             let original = JSON.stringify({
-                sid: data
+                sid: libraryCard.studentid,
             });
 
             const encrypted = lvl2Encrypt(original, key);
@@ -378,7 +379,7 @@ const printForm = async (enrid, data) => {
 
             setTimeout(() => {
                 Swal.close();
-                location.reload();
+                // location.reload();
             }, 1000);
 
         } catch (error) {
@@ -387,7 +388,9 @@ const printForm = async (enrid, data) => {
                 title: "Generation Failed",
                 text: "Something went wrong while creating the PDF."
             });
-            console.error(error);
+            Swal.close();
+             location.reload();
+             return;
         }
     });
 };
@@ -538,14 +541,14 @@ const printForm = async (enrid, data) => {
 
                                                             <li class="list-group-item p-1">
                                                                 Course:
-                                                                <span class="fw-bold">
+                                                                <span class="fw-bold text-uppercase">
                                                                     {{ course.find(c => c.prog_id === studentdata.enr_course)?.prog_name || '—' }}
                                                                 </span>
                                                             </li>
 
                                                             <li class="list-group-item p-1">
                                                                 Grade Level:
-                                                                <span class="fw-bold">
+                                                                <span class="fw-bold text-uppercase">
                                                                     {{ gradelvl.find(g => g.grad_id === studentdata.enr_gradelvl)?.grad_name || '—' }}
                                                                 </span>
                                                             </li>
@@ -669,7 +672,7 @@ const printForm = async (enrid, data) => {
                                     class="neu-btn neu-blue p-2">
                                     <font-awesome-icon icon="fa-solid fa-print"  /> Print Card
                                 </button>
-                                <button @click="printForm(lc.lbrd_enrid,lc.lbrd_cardcode)" v-if="lc.lbrd_status == 1" type="button"
+                                <button @click="printForm(lc)" v-if="lc.lbrd_status == 1" type="button"
                                     class="neu-btn neu-green p-2">
                                     <font-awesome-icon icon="fa-solid fa-download"  /> Download Card
                                 </button>
