@@ -497,7 +497,7 @@ const printForm = async (libraryCard) => {
                                                     <div class="row g-0">
                                                         <div class="col-9 text-start">
                                                             <p class="m-0 fw-bold">
-                                                                CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.
+                                                                CENTRAL LUZON COLLEGE OF SCIENCE AND TECHNOLOGY, INC.<br/>
                                                                 CELTECH COLLEGE
                                                             </p>
 
@@ -546,16 +546,30 @@ const printForm = async (libraryCard) => {
                                                                 Name:
                                                                 <span class="fw-bold text-uppercase">
                                                                     {{ lc.per_firstname }}
-                                                                    {{ lc.per_middlename ? lc.per_middlename : '' }}
+                                                                    {{ lc.per_middlename
+                                                                        ? lc.per_middlename.charAt(0) + '.'
+                                                                        : '' }}
+
                                                                     {{ lc.per_lastname }}
-                                                                    {{ lc.per_suffixname ? lc.per_suffixname : '' }}
+
+                                                                    {{ lc.per_suffixname
+                                                                        ? lc.per_suffixname
+                                                                        : '' }}
                                                                 </span>
                                                             </li>
 
                                                             <li class="list-group-item p-1">
                                                                 Course:
-                                                                <span class="fw-bold text-uppercase">
+                                                                <!-- <span class="fw-bold text-uppercase">
                                                                     {{ course.find(c => c.prog_id === studentdata.enr_course)?.prog_name || '—' }}
+                                                                </span> -->
+                                                                <span class="fw-bold text-uppercase">
+                                                                    {{
+                                                                        course.find(c => c.prog_id === studentdata.enr_course)
+                                                                        ?.prog_name
+                                                                        ?.replace(/^BACHELOR OF SCIENCE IN\s*/i, 'BS IN ')
+                                                                        || '—'
+                                                                    }}
                                                                 </span>
                                                             </li>
 
@@ -584,6 +598,11 @@ const printForm = async (libraryCard) => {
                                                                 width="60px"
                                                                 :src="lc.profile_picture"
                                                                 alt="">
+                                                            <img class="p-1"
+                                                                height="30px"
+                                                                width="30px"
+                                                                :src="lc.per_sinature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + lc.per_sinature +'/1' : '/img/rpl.png'"
+                                                                alt="">
 
                                                         </div>
                                                     </div>
@@ -596,9 +615,9 @@ const printForm = async (libraryCard) => {
                                                             Tel. Nos: (045) 435-1495
                                                         </p>
 
-                                                        <p class="m-0 fw-normal small-font">
+                                                        <!-- <p class="m-0 fw-normal small-font">
                                                             Founded 1959
-                                                        </p>
+                                                        </p> -->
                                                     </div>
 
                                                     <div>
