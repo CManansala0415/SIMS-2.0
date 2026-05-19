@@ -1387,7 +1387,6 @@ class RegistrarController extends Controller
                     $templatePricesData[] = $row;
                 }
             }
-
             /*
             |--------------------------------------------------------------------------
             | Get milestone data
@@ -1396,6 +1395,41 @@ class RegistrarController extends Controller
             $milestonedata = $this->getMilestone(
                 $request->input('enr_id')
             );
+
+            /*
+            |--------------------------------------------------------------------------
+            | Filter template prices
+            | Keep only:
+            | - subjects existing in milestone
+            | - non-subject charges (misc, discounts, etc.)
+            |--------------------------------------------------------------------------
+            */
+
+            // Get all enrolled subject IDs
+            $milestoneSubjectIds = collect($milestonedata)
+                ->pluck('mi_subjid')
+                ->filter()
+                ->map(fn($id) => (int)$id)
+                ->toArray();
+
+            // Filter template prices
+            $templatePricesData = collect($templatePricesData)
+                ->filter(function ($tp) use ($milestoneSubjectIds) {
+
+                    // KEEP misc fees / discounts / non-subject items
+                    if (empty($tp->tuitemp_subjid)) {
+                        return true;
+                    }
+
+                    // KEEP only enrolled subjects
+                    return in_array(
+                        (int)$tp->tuitemp_subjid,
+                        $milestoneSubjectIds
+                    );
+
+                })
+                ->values()
+                ->all();
 
             /*
             |--------------------------------------------------------------------------
