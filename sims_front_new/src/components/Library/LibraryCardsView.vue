@@ -23,6 +23,7 @@ import LibraryCard from '../snippets/modal/LibraryCardModal.vue';
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router'
 import SearchQR from '../snippets/tech/SearchQR.vue';
+import LibraryCardMassPrinting from '../snippets/modal/LibraryCardMassPrinting.vue';
 
 const router = useRouter();
 const preLoading = ref(true)
@@ -55,6 +56,7 @@ const searchLname = ref('')
 const paramsProgram = ref(0)
 const paramsGradelvl = ref(0)
 const paramsCourse = ref(0)
+const showMassPrinter = ref(false)
 
 const booter = async () => {
     // getProgram().then((results) => {
@@ -304,12 +306,12 @@ const showForm = (data) => {
 const showQRScanner = ref(false)
 
 const getData = (result) =>{
-    console.log(result)
+    // console.log(result)
     student.value = result
     showQRScanner.value = !showQRScanner
     document.getElementById('hideqrscanner').click();
 }
-
+ 
 </script>
 
 <template>
@@ -338,6 +340,9 @@ const getData = (result) =>{
                     </button>
                     <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1" :disabled="preLoading?true:false">
                         <font-awesome-icon icon="fa-solid fa-id-card"/> Scan QR 
+                    </button>
+                    <button @click="showMassPrinter = true" data-bs-toggle="modal" data-bs-target="#massprintmodal" type="button" class="neu-btn neu-green" tabindex="-1" :disabled="preLoading?true:false">
+                        <font-awesome-icon icon="fa-solid fa-print"/> Mass Print 
                     </button>
                 </div>
             </div>
@@ -530,5 +535,37 @@ const getData = (result) =>{
             </div>
         </div>
     </div>
+
+    <!-- Scan ID Modal -->
+    <div class="modal fade" id="massprintmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Mass Print</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showMassPrinter = false" id="hideqrscanner"></button>
+                </div>
+                <div class="modal-body">
+                     <!-- <SearchQR v-if="showMassPrinter" @fetchData="getData" modeData="2"/> -->
+                      <LibraryCardMassPrinting v-if="showMassPrinter" :useriddata="userID"  />
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showMassPrinter = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
 
 </template>

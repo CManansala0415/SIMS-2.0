@@ -2983,6 +2983,43 @@ const resetPassword = async (data) => {
 //         return err
 //     }
 // }
+let getlibrarycardmass = {}
+const getLibraryCardMassPrint = async (data) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-library-card-mass-print/',
+            params: {
+                data: data
+            }
+        }).then(async (results) => {
+            // console.log(results.data)
+            getlibrarycardmass = results.data
+        })
+        return getlibrarycardmass
+    } catch (err) {
+        return err
+    }
+}
+
+let gettotalenrollees = {}
+const getTotalEnrollees = async (data) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-total-enrollees/',
+            params: {
+                data: data
+            }
+        }).then(async (results) => {
+            // console.log(results.data)
+            gettotalenrollees = results.data
+        })
+        return gettotalenrollees
+    } catch (err) {
+        return err
+    }
+}
 
 export {
 
@@ -3163,6 +3200,8 @@ export {
     getSectionCount,
     getAnnouncement,
     editAnnouncement,
-    resetPassword
+    resetPassword,
+    getLibraryCardMassPrint,
+    getTotalEnrollees
 }
 

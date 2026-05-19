@@ -3610,6 +3610,23 @@ class RegistrarController extends Controller
             ];
         }     
     }
+
+    public function getTotalEnrollees()
+    {
+        $gradelvl = DB::table('def_gradelvl')
+            ->where('grad_status', 1)
+            ->get();
+
+        foreach ($gradelvl as $grade) {
+
+            $grade->total_enrollees = DB::table('def_enrollment')
+                ->where('enr_status', 1)
+                ->where('enr_gradelvl', $grade->grad_id)
+                ->count();
+        }
+
+        return $gradelvl;
+    }
     
     
 }

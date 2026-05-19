@@ -793,6 +793,13 @@ option{
     -2px -2px 10px rgba(255, 255, 255, 0.6);
 }
 
+.neu-green-text{
+  color: #04AA6D;
+}
+
+.neu-green-pink{
+  color: #d20bc8;
+}
 
 .neu-pastel-grass{
   background-color: #9ded9e;

@@ -19,7 +19,8 @@ import {
     getAccountsDetails,
     getStudentFiltering,
     getAcademicDefaults,
-    getPaymentDetails
+    getPaymentDetails,
+    getTotalEnrollees
 } from "../Fetchers.js"; 
 // import NeuLoader1 from '../snippets/loaders/NeuLoader1.vue';
 import NeuLoader4 from '../snippets/loaders/NeuLoader4.vue';
@@ -37,6 +38,7 @@ import EnrollmentReceiptModal from '../snippets/modal/EnrollmentReceiptModal.vue
 import EnrollmentClearanceModal from '../snippets/modal/EnrollmentClearanceModal.vue';
 
 const preLoading = ref(true)
+const totalEnrollees = ref([])
 const student = ref([])
 const quarter = ref([])
 const gradelvl = ref([])
@@ -100,11 +102,11 @@ const booter = async () => {
     //     booting.value = 'Loading Courses...'
     //     bootingCount.value += 1
     // })
-    // getGradelvl().then((results) => {
-    //     gradelvl.value = results
-    //     booting.value = 'Loading Levels...'
-    //     bootingCount.value += 1
-    // })
+    getGradelvl().then((results) => {
+        gradelvl.value = results
+        booting.value = 'Loading Levels...'
+        bootingCount.value += 1
+    })
     // getQuarter().then((results) => {
     //     quarter.value = results
     //     booting.value = 'Loading Quarters...'
@@ -139,6 +141,11 @@ const booter = async () => {
     //     booting.value = 'Loading Users...'
     //     bootingCount.value += 1
     // })
+    getTotalEnrollees().then((results) => {
+        totalEnrollees.value = results
+        booting.value = 'Loading Enrollees...'
+        bootingCount.value += 1
+    })
 }
 
 
@@ -693,7 +700,7 @@ const getNoPrint = (data) =>{
 
         <div>
             <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
-            <div  v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
+            <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-center align-content-center">
                     <input type="text" v-model="searchFname" @keyup.enter="search()" class="neu-input"
                         :disabled="preLoading ? true : false" placeholder="First Name" />
@@ -740,6 +747,19 @@ const getNoPrint = (data) =>{
                     </div>
                 </div> -->
             </div>
+            <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
+            <div v-else class="p-3 mb-3">
+                <div class="neu-card p-3 d-flex gap-2 justify-content-between ">
+                    <div class="card-body" v-for="te in totalEnrollees" v-show="te.grad_id != 5">
+                        <small class="text-muted mb-1" style="font-size:9px;">Total Enrollees</small>
+                        <h2 class="fw-bold mb-0" :class="te.grad_dtypeid == 2 ? 'neu-green-text':'neu-green-pink'">{{ te.total_enrollees }}</h2>
+                        <small class="text-dim fw-bold small">
+                            {{ te.grad_name}}
+                        </small>
+
+                    </div>
+                </div>
+            </div>
 
             <div class="table-responsive border p-3 small-font">
                 <!-- <div class="row justify-content-center">
@@ -782,8 +802,8 @@ const getNoPrint = (data) =>{
                         <div class="p-4 neu-card">
                             <div v-for="(stud, index) in student"> 
                                 <div class="row border">
-                                    <div class="col-12 col-lg-4 border-0 border-end">
-                                        <div class="d-flex p-2 w-100 gap-2 justify-content-center align-items-center">
+                                    <div class="col-12 col-lg-3 border-0 border-end">
+                                        <div class="d-flex p-2 h-100 w-100 gap-2 justify-content-center align-items-center">
                                             <div class="d-flex justify-content-between align-items-center w-100">
                                                 <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
                                                     class="text_guide img_hover p-1 d-flex justify-content-center align-items-center">
@@ -824,18 +844,18 @@ const getNoPrint = (data) =>{
                                                     </form>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                            <div class="d-flex justify-content-around align-items-center w-100">
                                                 <div v-if="stud.per_signature"
                                                     @click="showLinkSignature = !showLinkSignature, linkId = index"
                                                     class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
                                                     <img class="signature-size-card"
                                                         :src="'http://sims.clcst.edu.local:8000/storage/signatures/' + stud.per_signature" alt="">
                                                 </div>
-                                                <div v-else class="text_guide img_hover p-3"
+                                                <div v-else class="text_guide img_hover p-3 d-flex justify-content-center align-items-center border"
                                                     @click="showLinkSignature = !showLinkSignature, linkId = index">
                                                     <div
-                                                        class="signature-size-card-none d-flex justify-content-center align-items-center">
-                                                        <span class="text-muted">No Signature Uploaded</span>
+                                                        class="signature-size-card d-flex justify-content-center align-items-center">
+                                                        <span class="text-muted">No Signature</span>
                                                     </div>
                                                 </div>
 
@@ -875,17 +895,17 @@ const getNoPrint = (data) =>{
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-lg-8">
-                                        <div class="d-flex justify-content-around align-items-center h-100">
-                                            <div class="d-flex flex-column gap-2 p-2">
-                                                <div class="text-start">
-                                                    <span class="text-uppercase fw-bold" style="font-size: 13px;"> {{ stud.per_firstname }} {{
-                                                    stud.per_middlename }} {{
-                                                        stud.per_lastname }} {{
-                                                        stud.per_suffixname }}</span>
-                                                </div>
-                                                <div class="text-start d-flex flex-column">
-                                                    <div>
+                                    <div class="col-12 col-lg-9">
+                                        <div class="row h-100">
+                                            <div class="col-12 col-md-9 d-flex flex-column justify-content-center align-items-center gap-2 p-2">
+                                                <div class="text-start d-flex justify-content-between w-100">
+                                                    <div class="p-2">
+                                                        <span class="text-uppercase fw-bold" style="font-size: 14px;"> {{ stud.per_firstname }} {{
+                                                        stud.per_middlename }} {{
+                                                            stud.per_lastname }} {{
+                                                            stud.per_suffixname }}</span>
+                                                    </div>
+                                                    <div class="p-2">
                                                         <span class="d-inline-block">
                                                         {{ program.find(p => p.dtype_id === stud.enr_program)?.dtype_desc || '—' }}
                                                         </span>
@@ -903,7 +923,7 @@ const getNoPrint = (data) =>{
                                                         </span>
                                                         
                                                     </div>
-                                                    <div>
+                                                    <div class="p-2">
                                                         <small v-if="stud.is_paid" class="text-success fw-bold">
                                                             Officially Enrolled
                                                         </small>
@@ -913,40 +933,46 @@ const getNoPrint = (data) =>{
                                                     </div>
                                                 </div>
                                             </div>
-                                            
-                                            <div class="text-center">
+                                        
+                                            <div class="col-12 col-md-3 d-flex justify-content-center align-items-center p-2">
                                                 <div v-if="accessData[1].useracc_modifying == 1"
-                                                    class="d-flex gap-2 justify-content-center p-1 w-100">
+                                                    class="d-flex flex-column gap-1 justify-content-center p-1 w-100 ">
                                                     <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
                                                         data-bs-toggle="modal" data-bs-target="#taggingmodal" class="neu-btn-sm neu-white">
                                                         <font-awesome-icon icon="fa-solid fa-pen" />
+                                                        Edit Subjects
                                                     </button>
                                                     <!-- v-if="Number(stud.acs_amount) > 0" -->
                                                     <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Grades"
                                                         data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
                                                         class="neu-btn-sm neu-white">
                                                         <font-awesome-icon icon="fa-solid fa-print" />
+                                                        Print Grades
                                                     </button>
                                                     <!-- v-if="Number(stud.acs_amount) > 0" -->
                                                     <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt"
                                                         data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
                                                         class="neu-btn-sm neu-white">
                                                         <font-awesome-icon icon="fa-solid fa-print" />
+                                                        Print Receipt
                                                     </button>
                                                     <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1" @click="showForm(3, stud, 3)"
                                                         data-bs-target="#printmodal" type="button" title="Print Clearance"
                                                         class="neu-btn-sm neu-white">
                                                         <font-awesome-icon icon="fa-solid fa-print" />
+                                                        Print Clearance
                                                     </button>
                                                     <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
                                                         class="neu-btn-sm neu-white">
                                                         <font-awesome-icon icon="fa-solid fa-trash" />
+                                                        Drop Student
                                                     </button>
                                                     <!-- v-if="Number(stud.acs_amount) > 0" -->
                                                     <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1"
                                                         data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="Print ID"
                                                         class="neu-btn-sm neu-white">
                                                         <font-awesome-icon icon="fa-solid fa-id-card-clip" />
+                                                        Print ID
                                                     </button>
                                                 </div>
                                                 <div v-else class="d-flex gap-2 justify-content-center p-3 bg-secondary-subtle">
@@ -1205,7 +1231,7 @@ const getNoPrint = (data) =>{
 
 .signature-size-card-none {
     height: 75px;
-    width: 100%;
+    width: 75px;
 }
 
 .text_guide {

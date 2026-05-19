@@ -86,6 +86,7 @@ Route::middleware(['auth:sanctum'])->get('/get-building', [DefaultsController::c
 Route::middleware(['auth:sanctum'])->get('/get-classroom', [DefaultsController::class,'getClassroom']);
 Route::middleware(['auth:sanctum'])->get('/get-launch/{limit}/{offset}/{search}', [RegistrarController::class,'getLaunch']);
 Route::middleware(['auth:sanctum'])->get('/get-launch-checker', [RegistrarController::class,'getLaunchChecker']);
+Route::middleware(['auth:sanctum'])->get('/get-total-enrollees', [RegistrarController::class,'getTotalEnrollees']);
 
 Route::middleware(['auth:sanctum'])->post('/add-launch', [RegistrarController::class,'addLaunch']);
 Route::middleware(['auth:sanctum'])->post('/add-schedule', [RegistrarController::class,'addSchedule']);
@@ -179,6 +180,7 @@ Route::middleware(['auth:sanctum'])->get('/get-library-card-issue/{personid}/{en
 Route::middleware(['auth:sanctum'])->get('/get-library-books-borrowed-by/{cardid}/{personid}/{enrid}', [LibraryController::class,'getBorrowedBooksBy']);
 Route::middleware(['auth:sanctum'])->post('/deactivate-library-card', [LibraryController::class,'deactivateLibraryCard']);
 Route::middleware(['auth:sanctum'])->post('/add-library-card', [LibraryController::class,'addLibraryCard']);
+Route::middleware(['auth:sanctum'])->get('/get-library-card-mass-print', [LibraryController::class,'getLibraryCardMassPrint']);
 
  
 Route::middleware(['auth:sanctum'])->get('/get-faculty-class/{empid}', [FacultyController::class,'getFacultyClass']);
