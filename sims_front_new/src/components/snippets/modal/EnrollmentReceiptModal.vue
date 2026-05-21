@@ -21,7 +21,7 @@ import {
     pdfGenerator,
     pdfGeneratorEnrollment,
     pesoConverter,
-    pdfAutoPrint
+    pdfAutoPrintA4
 } from "../../Generators.js";
 import { useRouter, useRoute } from 'vue-router'
 
@@ -433,7 +433,7 @@ const downloadPdf = () => {
 const printSheet = async () =>{
     Swal.fire({
         title: "Generating File...",
-        text: "Please wait while we prepare your receipt.",
+        text: "Please wait while we prepare your forms.",
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
@@ -442,7 +442,7 @@ const printSheet = async () =>{
     let receiptWidth = 8.27; // in inches, your receipt width
 
     try {
-        const pdfBlob = await pdfAutoPrint(name, receiptWidth, "portrait", 0.1);
+        const pdfBlob = await pdfAutoPrintA4(name, receiptWidth, "portrait", 0.1);
 
         const pdfUrl = URL.createObjectURL(pdfBlob);
         const printWindow = window.open(pdfUrl, 'PrintWindow', 'width=900,height=700');

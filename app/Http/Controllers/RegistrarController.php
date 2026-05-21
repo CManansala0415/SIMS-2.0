@@ -1272,6 +1272,7 @@ class RegistrarController extends Controller
                 'b.*',
                 'a.*',
                 'c.*',
+                'c.subj_name as mi_subjname',
                 'd.subj_code as subj_preq_code',
                 'e.grs_prelims',
                 'e.grs_midterms',
@@ -1352,282 +1353,729 @@ class RegistrarController extends Controller
         return $newStudID;
        
     }
-    
-    public function updateEnrollment(Request $request){
-        try{
-            
-            date_default_timezone_set('Asia/Manila');
-            $date = date('Y-m-d H:i:s');
-                
-            $par = [
-                'enr_personid' => $request->input('enr_personid'),
-            ];
 
-            $studentid = $this->generateStudentIDAuto($par);
-            
+    public function updateEnrollment(Request $request)
+{
+    try {
 
-            $finance = new FinanceController();
-            $financedata = $finance->getChargesTemplateHeader(
-                $request->input('enr_curriculum') ?: 0,
-                $request->input('enr_quarter') ?: 0,
-                $request->input('enr_program') ?: 0,
-                $request->input('enr_course') ?: 0,
-                $request->input('enr_gradelvl') ?: 0,
-                $request->input('enr_section') ?: 0
-            );
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d H:i:s');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Generate Student ID
+        |--------------------------------------------------------------------------
+        */
+        $par = [
+            'enr_personid' => $request->input('enr_personid'),
+        ];
+
+        $studentid = $this->generateStudentIDAuto($par);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Load Finance Template
+        |--------------------------------------------------------------------------
+        */
+        $finance = new FinanceController();
+
+        $financedata = $finance->getChargesTemplateHeader(
+            $request->input('enr_curriculum') ?: 0,
+            $request->input('enr_quarter') ?: 0,
+            $request->input('enr_program') ?: 0,
+            $request->input('enr_course') ?: 0,
+            $request->input('enr_gradelvl') ?: 0,
+            $request->input('enr_section') ?: 0
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Flatten template data
+        |--------------------------------------------------------------------------
+        */
+        $templatePricesData = [];
+
+        foreach ($financedata['template'] as $template) {
+            foreach ($template['data'] as $row) {
+                $templatePricesData[] = $row;
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Get milestone data
+        |--------------------------------------------------------------------------
+        */
+        $milestonedata = $this->getMilestone(
+            $request->input('enr_id')
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Build Maps
+        |--------------------------------------------------------------------------
+        */
+        $milestoneMap = collect($milestonedata)
+            ->filter(fn($ms) => !empty($ms->mi_subjid))
+            ->keyBy(fn($ms) => (int) $ms->mi_subjid);
+
+        $templateMap = collect($templatePricesData)
+            ->filter(fn($tp) => !empty($tp->tuitemp_subjid))
+            ->keyBy(fn($tp) => (int) $tp->tuitemp_subjid);
+
+        /*
+        |--------------------------------------------------------------------------
+        | FINAL TEMPLATE DATA
+        |--------------------------------------------------------------------------
+        |
+        | RULES:
+        | - KEEP misc/non-subject items ALWAYS
+        | - KEEP matched subjects
+        | - REMOVE template subjects not in milestone
+        | - ADD milestone subjects not in template
+        |
+        |--------------------------------------------------------------------------
+        */
+        $finalTemplatePrices = collect();
+
+        /*
+        |--------------------------------------------------------------------------
+        | KEEP misc / discounts / non-subject items
+        |--------------------------------------------------------------------------
+        */
+        foreach ($templatePricesData as $tp) {
+
+            if (empty($tp->tuitemp_subjid)) {
+                $finalTemplatePrices->push($tp);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | KEEP template subjects existing in milestone
+        |--------------------------------------------------------------------------
+        */
+        foreach ($templatePricesData as $tp) {
+
+            if (empty($tp->tuitemp_subjid)) {
+                continue;
+            }
+
+            if ($milestoneMap->has((int) $tp->tuitemp_subjid)) {
+                $finalTemplatePrices->push($tp);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADD milestone subjects missing from template
+        |--------------------------------------------------------------------------
+        */
+        foreach ($milestonedata as $ms) {
+
+            if (empty($ms->mi_subjid)) {
+                continue;
+            }
+
+            if (!$templateMap->has((int) $ms->mi_subjid)) {
+
+                $item = new \stdClass();
+
+                $item->tuitemp_id = 0;
+                $item->tuitemp_desc = $ms->subj_name;
+                $item->tuitemp_subjcode = $ms->subj_code;
+                $item->tuitemp_subjid = $ms->mi_subjid;
+
+                $item->tuitemp_lec_price = $ms->subj_lec_rate;
+                $item->tuitemp_lab_price = $ms->subj_lab_rate;
+
+                $item->tuitemp_lec = $ms->subj_lec_units;
+                $item->tuitemp_lab = $ms->subj_lab_units;
+                $item->tuitemp_updatedby = $request->input('enr_addedby');
+
+                // optional defaults
+                // $item->tuitemp_extra = $ms->subj_extra ?? 0;
+                // $item->tuitemp_quantity = 1;
+                // $item->tuitemp_price = 0;
+                // $item->tuitemp_custype = null;
+                // $item->tuitemp_custid = null;
+
+                $finalTemplatePrices->push($item);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Final cleaned template prices
+        |--------------------------------------------------------------------------
+        */
+        $templatePricesData = $finalTemplatePrices
+            ->values()
+            ->all();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Merge milestone + template and compute totals
+        |--------------------------------------------------------------------------
+        */
+        $totalCost = 0;
+        $mergedMilestones = [];
+        $deductions_fixed = 0;
+        $deductions_percent = 0;
+        $subjectsTotal = 0;
+        $miscTotal = 0;
+        $allMatched = true;
+
+        foreach ($milestonedata as $ms) {
+
+            $template = null;
 
             /*
             |--------------------------------------------------------------------------
-            | Flatten template data (same as Object.values + push in Vue)
+            | Find matching template
             |--------------------------------------------------------------------------
             */
-            $templatePricesData = [];
-            foreach ($financedata['template'] as $template) {
-                foreach ($template['data'] as $row) {
-                    $templatePricesData[] = $row;
+            foreach ($templatePricesData as $tp) {
+
+                if (
+                    isset($tp->tuitemp_subjid, $ms->mi_subjid) &&
+                    (int) $tp->tuitemp_subjid === (int) $ms->mi_subjid
+                ) {
+                    $template = $tp;
+                    break;
                 }
             }
-            /*
-            |--------------------------------------------------------------------------
-            | Get milestone data
-            |--------------------------------------------------------------------------
-            */
-            $milestonedata = $this->getMilestone(
-                $request->input('enr_id')
-            );
+
+            if ($template === null) {
+                $allMatched = false;
+            }
+
+            $total_price = 0;
+            $mergedItem = clone $ms;
 
             /*
             |--------------------------------------------------------------------------
-            | Filter template prices
-            | Keep only:
-            | - subjects existing in milestone
-            | - non-subject charges (misc, discounts, etc.)
+            | COMPUTE USING TEMPLATE
             |--------------------------------------------------------------------------
             */
+            if ($template) {
 
-            // Get all enrolled subject IDs
-            $milestoneSubjectIds = collect($milestonedata)
-                ->pluck('mi_subjid')
-                ->filter()
-                ->map(fn($id) => (int)$id)
-                ->toArray();
-
-            // Filter template prices
-            $templatePricesData = collect($templatePricesData)
-                ->filter(function ($tp) use ($milestoneSubjectIds) {
-
-                    // KEEP misc fees / discounts / non-subject items
-                    if (empty($tp->tuitemp_subjid)) {
-                        return true;
-                    }
-
-                    // KEEP only enrolled subjects
-                    return in_array(
-                        (int)$tp->tuitemp_subjid,
-                        $milestoneSubjectIds
-                    );
-
-                })
-                ->values()
-                ->all();
-
-            /*
-            |--------------------------------------------------------------------------
-            | Merge milestone + template and compute totals
-            |--------------------------------------------------------------------------
-            */
-            $totalCost = 0;
-            $mergedMilestones = [];
-            $deductions_fixed = 0;
-            $deductions_percent = 0;
-            $subjectsTotal = 0;
-            $miscTotal = 0;
-            $allMatched = true;
-
-            foreach ($milestonedata as $ms) {
-
-                $template = null;
-
-                // Find matching template by subject ID
-                foreach ($templatePricesData as $tp) {
-                    if (
-                        isset($tp->tuitemp_subjid, $ms->mi_subjid) &&
-                        (int) $tp->tuitemp_subjid === (int) $ms->mi_subjid
-                    ) {
-                        $template = $tp;
-                        break;
-                    }
+                foreach (get_object_vars($template) as $key => $value) {
+                    $mergedItem->$key = $value;
                 }
 
-                // if no match found
-                if ($template === null) {
-                    $allMatched = false;
+                $computedLab = 0;
+
+                if (
+                    $template->tuitemp_extra == 1 ||
+                    $template->tuitemp_extra == 2 ||
+                    $template->tuitemp_extra == 3
+                ) {
+                    $computedLab = $template->tuitemp_lab * 1;
+                } else {
+                    $computedLab = $template->tuitemp_lab * 3;
                 }
- 
-                $total_price = 0;
-                $mergedItem  = clone $ms; // copy object safely
 
-                if ($template) {
-                    // Merge template fields into milestone
-                    foreach (get_object_vars($template) as $key => $value) {
-                        $mergedItem->$key = $value;
-                    }
+                $total_price =
+                    ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
+                    ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($computedLab ?? 0));
 
-                    // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
-                    $computedLab = 0;
-                    if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2 || $template->tuitemp_extra == 3){
-                        $computedLab = $template->tuitemp_lab * 1;
-                    } else {
-                        $computedLab = $template->tuitemp_lab * 3;
-                    }
+                $mergedItem->tuitemp_id = $template->tuitemp_id;
+            }
 
-                    // Compute from template
-                    $total_price =
-                        ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
-                        ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($computedLab ?? 0));
+            /*
+            |--------------------------------------------------------------------------
+            | FALLBACK TO MILESTONE
+            |--------------------------------------------------------------------------
+            */
+            else {
 
-                    // Ensures template exists in UI
-                    $mergedItem->tuitemp_id = $template->tuitemp_id;
+                $computedLab = 0;
+
+                if (
+                    $ms->subj_extra == 1 ||
+                    $ms->subj_extra == 2 ||
+                    $ms->subj_extra == 3
+                ) {
+                    $computedLab = $ms->subj_lab_units * 1;
+                } else {
+                    $computedLab = $ms->subj_lab_units * 3;
+                }
+
+                $total_price =
+                    ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0)) +
+                    ((float) ($ms->subj_lab_rate ?? 0) * (float) ($computedLab ?? 0));
+
+                $subjectsTotal += $total_price;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Exclude already taken subjects
+            |--------------------------------------------------------------------------
+            */
+            if ((int) ($ms->mi_tag ?? 0) !== 1) {
+                $totalCost += $total_price;
+            }
+
+            $mergedItem->total_price = $total_price;
+
+            $mergedMilestones[] = $mergedItem;
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | ADD MISC FEES
+        |--------------------------------------------------------------------------
+        */
+        foreach ($templatePricesData as $tp) {
+
+            if (
+                empty($tp->tuitemp_subjid) &&
+                $tp->tuitemp_custype == 3
+            ) {
+
+                $totalCost += (float) (($tp->tuitemp_price ?? 0) * ($tp->tuitemp_quantity ?? 0));
+
+                $miscTotal += (float) (($tp->tuitemp_price ?? 0) * ($tp->tuitemp_quantity ?? 0));
+            }
+
+            if (
+                empty($tp->tuitemp_subjid) &&
+                $tp->tuitemp_custid == null
+            ) {
+
+                $totalCost += (float) (($tp->tuitemp_price ?? 0) * ($tp->tuitemp_quantity ?? 0));
+
+                $miscTotal += (float) (($tp->tuitemp_price ?? 0) * ($tp->tuitemp_quantity ?? 0));
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | DEDUCTIONS
+        |--------------------------------------------------------------------------
+        */
+        foreach ($templatePricesData as $tp) {
+
+            if (
+                empty($tp->tuitemp_subjid) &&
+                $tp->tuitemp_custype == 4
+            ) {
+
+                if ($tp->tuitemp_disc_type == 1) {
+
+                    $deductions_percent +=
+                        (float) (($tp->tuitemp_price ?? 0) * ($tp->tuitemp_quantity ?? 0));
 
                 } else {
-                    $computedLab = 0;
-                    if($ms->subj_extra == 1 || $ms->subj_extra == 2 || $ms->subj_extra == 3){
-                        $computedLab = $ms->subj_lab_units * 1;
-                    } else {
-                        $computedLab = $ms->subj_lab_units * 3;
-                    }
 
-                    // Fallback to milestone rates
-                    $total_price =
-                        ((float) ($ms->subj_lec_rate ?? 0) * (float) (($ms->subj_lec_units) ?? 0)) +
-                        ((float) ($ms->subj_lab_rate ?? 0) * (float) (($computedLab) ?? 0));
-                    $subjectsTotal += $total_price;
-                }
-
-                /*
-                |--------------------------------------------------------------------------
-                | APPLY CONDITION HERE, mi_tag 1 means exclude from total cost, already taken
-                |--------------------------------------------------------------------------
-                */
-                if ((int) ($ms->mi_tag ?? 0) !== 1) {
-                    $totalCost += $total_price;
-                }
-
-                // Always attach total_price for UI
-                $mergedItem->total_price = $total_price;
-                $mergedMilestones[] = $mergedItem;
-            }
-
-            
-            foreach ($templatePricesData as $tp) {
-                // for items and other charges without subject ID
-                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 3) {
-                    $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
-                    $miscTotal += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
-                }
-                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid == null) {
-                    $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
-                    $miscTotal += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+                    $deductions_fixed +=
+                        (float) (($tp->tuitemp_price ?? 0) * ($tp->tuitemp_quantity ?? 0));
                 }
             }
+        }
 
-            foreach ($templatePricesData as $tp) {
-                if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 4) {
-                    if ($tp->tuitemp_disc_type == 1) {
-                        $deductions_percent += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
-                    }else{
-                        $deductions_fixed += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
-                    }
+        /*
+        |--------------------------------------------------------------------------
+        | SCHOLARSHIP
+        |--------------------------------------------------------------------------
+        */
+        $scholarship_percent = 0;
+        $scholarship_fixed = 0;
+
+        $scholarship = DB::table('def_accounts_scholarship')
+            ->where('sch_status', '=', 1)
+            ->where('sch_personid', '=', $request->input('enr_personid'))
+            ->get();
+
+        foreach ($scholarship as $tp) {
+
+            if ($tp->sch_status == 1) {
+
+                if ($tp->sch_type == 1) {
+                    $scholarship_percent += $tp->sch_value;
+                } else {
+                    $scholarship_fixed += $tp->sch_value;
                 }
             }
+        }
 
-            $scholarship_percent = 0;
-            $scholarship_fixed = 0;
+        /*
+        |--------------------------------------------------------------------------
+        | CHECK SOA
+        |--------------------------------------------------------------------------
+        */
+        $soa = DB::table('def_accounts_student')
+            ->where('soa_enrid', '=', $request->input('enr_id'))
+            ->where('soa_personid', '=', $request->input('enr_personid'))
+            ->where('soa_status', '=', 1)
+            ->first();
 
-            $scholarship = DB::table('def_accounts_scholarship')
-                          ->where('sch_status', '=',  1)
-                          ->where('sch_personid', '=',  $request->input('enr_personid'))
-                          ->get();
+        $settlement = DB::table('def_accounts_settlement')
+            ->where('acs_enrid', '=', $request->input('enr_id'))
+            ->where('acs_personid', '=', $request->input('enr_personid'))
+            ->where('acs_status', '=', 1)
+            ->get();
 
-            foreach ($scholarship as $tp) {
-                if ($tp->sch_status == 1) {
-                    if ($tp->sch_type == 1) { // 1 percent 2 amount
-                        $scholarship_percent += $tp->sch_value;
-                    }else{
-                        $scholarship_fixed += $tp->sch_value;
-                    }
-                }
-            }
-            
+        /*
+        |--------------------------------------------------------------------------
+        | GENERATE ACCOUNT
+        |--------------------------------------------------------------------------
+        */
+        if (!$soa) {
 
-            $soa = DB::table('def_accounts_student')
-                          ->where('soa_enrid', '=',  $request->input('enr_id'))
-                          ->where('soa_personid', '=',  $request->input('enr_personid'))
-                          ->where('soa_status', '=',  1)
-                          ->first();
+            $final =
+                $totalCost -
+                (
+                    ($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100))) +
+                    ($scholarship_fixed + ($totalCost * (float) ($scholarship_percent / 100)))
+                );
 
-            $settlement = DB::table('def_accounts_settlement')
-                ->where('acs_enrid', '=',  $request->input('enr_id'))
-                ->where('acs_personid', '=',  $request->input('enr_personid'))
-                ->where('acs_status', '=',  1)
-                ->get();
+            DB::table('def_accounts_settlement')
+                ->where('acs_enrid', '=', $request->input('enr_id'))
+                ->where('acs_status', '=', 1)
+                ->update([
+                    'acs_amount' => $final,
+                    'acs_dateupdated' => $date,
+                    'acs_updatedby' => $request->input('user_id'),
+                ]);
 
-            if(!$soa){
+            $finance->generateStudentAccount(
+                $milestonedata,
+                $templatePricesData,
+                $settlement
+            );
 
-                $final = $totalCost
-                        -(
-                            ($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100)))+
-                            ($scholarship_fixed + ($totalCost * (float) ($scholarship_percent / 100)))
-                        );
+            $msg = "Enrollment updated and student account generated.";
+            $status = 200;
 
-                 $account = DB::table('def_accounts_settlement')
-                    ->where('acs_enrid','=', $request->input('enr_id'))
-                    ->where('acs_status','=', 1)
-                    ->update([
-                        'acs_amount' => $final,
-                        'acs_dateupdated' => $date,
-                        'acs_updatedby' => $request->input('user_id'),
-                    ]);
+        } else {
 
-                $finance->generateStudentAccount($milestonedata, $templatePricesData, $settlement);
-                $msg = "Enrollment updated and student account generated.";
-                $status = 200;
-            }else{
-                $msg = "Enrollment updated. Student account already exists.";
-                $status = 409; 
-            }
+            $msg = "Enrollment updated. Student account already exists.";
+            $status = 409;
+        }
 
-            $primary = DB::table('def_enrollment')
-            ->where('enr_id','=', $request->input('enr_id'))
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE ENROLLMENT
+        |--------------------------------------------------------------------------
+        */
+        DB::table('def_enrollment')
+            ->where('enr_id', '=', $request->input('enr_id'))
             ->update([
                 'enr_curriculum' => $request->input('enr_curriculum'),
                 'enr_section' => $request->input('enr_section'),
                 'enr_updatedby' => $request->input('enr_updatedby'),
                 'enr_dateupdated' => $date,
             ]);
-           
-            return [
-                'templatePricesData' => $templatePricesData,
-                'template' => $template,
-                'milestonedata' => $milestonedata,
-                'soa' => $soa,
-                'message' => $msg,
-                'status' => $status,
-                'totalCost' => $totalCost,
-                'final' => $final,
-                'studentid' => $studentid,
-                'subjectsTotal' => $subjectsTotal,
-                'miscTotal' => $miscTotal,
-                'allMatched' => $allMatched,
-                
-            ];
 
-            // return 204;
-        }
-        catch (Exception $ex) {
-            return 500;
-        }
+        /*
+        |--------------------------------------------------------------------------
+        | RESPONSE
+        |--------------------------------------------------------------------------
+        */
+        return [
+            'templatePricesData' => $templatePricesData,
+            'milestonedata' => $milestonedata,
+            'soa' => $soa,
+            'message' => $msg,
+            'status' => $status,
+            'totalCost' => $totalCost,
+            'final' => $final ?? 0,
+            'studentid' => $studentid,
+            'subjectsTotal' => $subjectsTotal,
+            'miscTotal' => $miscTotal,
+            'allMatched' => $allMatched,
+        ];
+
+    } catch (Exception $ex) {
+
+        return [
+            'status' => 500,
+            'msg' => $ex->getMessage(),
+        ];
     }
+}
+    
+    // public function updateEnrollment(Request $request){
+    //     try{
+            
+    //         date_default_timezone_set('Asia/Manila');
+    //         $date = date('Y-m-d H:i:s');
+                
+    //         $par = [
+    //             'enr_personid' => $request->input('enr_personid'),
+    //         ];
+
+    //         $studentid = $this->generateStudentIDAuto($par);
+            
+
+    //         $finance = new FinanceController();
+    //         $financedata = $finance->getChargesTemplateHeader(
+    //             $request->input('enr_curriculum') ?: 0,
+    //             $request->input('enr_quarter') ?: 0,
+    //             $request->input('enr_program') ?: 0,
+    //             $request->input('enr_course') ?: 0,
+    //             $request->input('enr_gradelvl') ?: 0,
+    //             $request->input('enr_section') ?: 0
+    //         );
+
+    //         /*
+    //         |--------------------------------------------------------------------------
+    //         | Flatten template data (same as Object.values + push in Vue)
+    //         |--------------------------------------------------------------------------
+    //         */
+    //         $templatePricesData = [];
+    //         foreach ($financedata['template'] as $template) {
+    //             foreach ($template['data'] as $row) {
+    //                 $templatePricesData[] = $row;
+    //             }
+    //         }
+    //         /*
+    //         |--------------------------------------------------------------------------
+    //         | Get milestone data
+    //         |--------------------------------------------------------------------------
+    //         */
+    //         $milestonedata = $this->getMilestone(
+    //             $request->input('enr_id')
+    //         );
+
+    //         /*
+    //         |--------------------------------------------------------------------------
+    //         | Filter template prices
+    //         | Keep only:
+    //         | - subjects existing in milestone
+    //         | - non-subject charges (misc, discounts, etc.)
+    //         |--------------------------------------------------------------------------
+    //         */
+
+    //         // Get all enrolled subject IDs
+    //         $milestoneSubjectIds = collect($milestonedata)
+    //             ->pluck('mi_subjid')
+    //             ->filter()
+    //             ->map(fn($id) => (int)$id)
+    //             ->toArray();
+
+    //         // Filter template prices
+    //         $templatePricesData = collect($templatePricesData)
+    //             ->filter(function ($tp) use ($milestoneSubjectIds) {
+
+    //                 // KEEP misc fees / discounts / non-subject items
+    //                 if (empty($tp->tuitemp_subjid)) {
+    //                     return true;
+    //                 }
+
+    //                 // KEEP only enrolled subjects
+    //                 return in_array(
+    //                     (int)$tp->tuitemp_subjid,
+    //                     $milestoneSubjectIds
+    //                 );
+
+    //             })
+    //             ->values()
+    //             ->all();
+
+    //         /*
+    //         |--------------------------------------------------------------------------
+    //         | Merge milestone + template and compute totals
+    //         |--------------------------------------------------------------------------
+    //         */
+    //         $totalCost = 0;
+    //         $mergedMilestones = [];
+    //         $deductions_fixed = 0;
+    //         $deductions_percent = 0;
+    //         $subjectsTotal = 0;
+    //         $miscTotal = 0;
+    //         $allMatched = true;
+
+    //         foreach ($milestonedata as $ms) {
+
+    //             $template = null;
+
+    //             // Find matching template by subject ID
+    //             foreach ($templatePricesData as $tp) {
+    //                 if (
+    //                     isset($tp->tuitemp_subjid, $ms->mi_subjid) &&
+    //                     (int) $tp->tuitemp_subjid === (int) $ms->mi_subjid
+    //                 ) {
+    //                     $template = $tp;
+    //                     break;
+    //                 }
+    //             }
+
+    //             // if no match found
+    //             if ($template === null) {
+    //                 $allMatched = false;
+    //             }
+ 
+    //             $total_price = 0;
+    //             $mergedItem  = clone $ms; // copy object safely
+
+    //             if ($template) {
+    //                 // Merge template fields into milestone
+    //                 foreach (get_object_vars($template) as $key => $value) {
+    //                     $mergedItem->$key = $value;
+    //                 }
+
+    //                 // if pe 2 nstp 1, means yung lab is 1 unit lang, so 1 lec unit = 1 fee unit, pero kung hindi extra, 1 lec unit = 3 fee unit, 1 lab unit = 3 fee unit
+    //                 $computedLab = 0;
+    //                 if($template->tuitemp_extra == 1 || $template->tuitemp_extra == 2 || $template->tuitemp_extra == 3){
+    //                     $computedLab = $template->tuitemp_lab * 1;
+    //                 } else {
+    //                     $computedLab = $template->tuitemp_lab * 3;
+    //                 }
+
+    //                 // Compute from template
+    //                 $total_price =
+    //                     ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
+    //                     ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($computedLab ?? 0));
+
+    //                 // Ensures template exists in UI
+    //                 $mergedItem->tuitemp_id = $template->tuitemp_id;
+
+    //             } else {
+    //                 $computedLab = 0;
+    //                 if($ms->subj_extra == 1 || $ms->subj_extra == 2 || $ms->subj_extra == 3){
+    //                     $computedLab = $ms->subj_lab_units * 1;
+    //                 } else {
+    //                     $computedLab = $ms->subj_lab_units * 3;
+    //                 }
+
+    //                 // Fallback to milestone rates
+    //                 $total_price =
+    //                     ((float) ($ms->subj_lec_rate ?? 0) * (float) (($ms->subj_lec_units) ?? 0)) +
+    //                     ((float) ($ms->subj_lab_rate ?? 0) * (float) (($computedLab) ?? 0));
+    //                 $subjectsTotal += $total_price;
+    //             }
+
+    //             /*
+    //             |--------------------------------------------------------------------------
+    //             | APPLY CONDITION HERE, mi_tag 1 means exclude from total cost, already taken
+    //             |--------------------------------------------------------------------------
+    //             */
+    //             if ((int) ($ms->mi_tag ?? 0) !== 1) {
+    //                 $totalCost += $total_price;
+    //             }
+
+    //             // Always attach total_price for UI
+    //             $mergedItem->total_price = $total_price;
+    //             $mergedMilestones[] = $mergedItem;
+    //         }
+
+            
+    //         foreach ($templatePricesData as $tp) {
+    //             // for items and other charges without subject ID
+    //             if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 3) {
+    //                 $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+    //                 $miscTotal += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+    //             }
+    //             if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custid == null) {
+    //                 $totalCost += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+    //                 $miscTotal += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+    //             }
+    //         }
+
+    //         foreach ($templatePricesData as $tp) {
+    //             if (empty($tp->tuitemp_subjid) && $tp->tuitemp_custype == 4) {
+    //                 if ($tp->tuitemp_disc_type == 1) {
+    //                     $deductions_percent += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+    //                 }else{
+    //                     $deductions_fixed += (float) ($tp->tuitemp_price * $tp->tuitemp_quantity ?? 0);
+    //                 }
+    //             }
+    //         }
+
+    //         $scholarship_percent = 0;
+    //         $scholarship_fixed = 0;
+
+    //         $scholarship = DB::table('def_accounts_scholarship')
+    //                       ->where('sch_status', '=',  1)
+    //                       ->where('sch_personid', '=',  $request->input('enr_personid'))
+    //                       ->get();
+
+    //         foreach ($scholarship as $tp) {
+    //             if ($tp->sch_status == 1) {
+    //                 if ($tp->sch_type == 1) { // 1 percent 2 amount
+    //                     $scholarship_percent += $tp->sch_value;
+    //                 }else{
+    //                     $scholarship_fixed += $tp->sch_value;
+    //                 }
+    //             }
+    //         }
+            
+
+    //         $soa = DB::table('def_accounts_student')
+    //                       ->where('soa_enrid', '=',  $request->input('enr_id'))
+    //                       ->where('soa_personid', '=',  $request->input('enr_personid'))
+    //                       ->where('soa_status', '=',  1)
+    //                       ->first();
+
+    //         $settlement = DB::table('def_accounts_settlement')
+    //             ->where('acs_enrid', '=',  $request->input('enr_id'))
+    //             ->where('acs_personid', '=',  $request->input('enr_personid'))
+    //             ->where('acs_status', '=',  1)
+    //             ->get();
+
+    //         if(!$soa){
+
+    //             $final = $totalCost
+    //                     -(
+    //                         ($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100)))+
+    //                         ($scholarship_fixed + ($totalCost * (float) ($scholarship_percent / 100)))
+    //                     );
+
+    //              $account = DB::table('def_accounts_settlement')
+    //                 ->where('acs_enrid','=', $request->input('enr_id'))
+    //                 ->where('acs_status','=', 1)
+    //                 ->update([
+    //                     'acs_amount' => $final,
+    //                     'acs_dateupdated' => $date,
+    //                     'acs_updatedby' => $request->input('user_id'),
+    //                 ]);
+
+    //             $finance->generateStudentAccount($milestonedata, $templatePricesData, $settlement);
+    //             $msg = "Enrollment updated and student account generated.";
+    //             $status = 200;
+    //         }else{
+    //             $msg = "Enrollment updated. Student account already exists.";
+    //             $status = 409; 
+    //         }
+
+    //         $primary = DB::table('def_enrollment')
+    //         ->where('enr_id','=', $request->input('enr_id'))
+    //         ->update([
+    //             'enr_curriculum' => $request->input('enr_curriculum'),
+    //             'enr_section' => $request->input('enr_section'),
+    //             'enr_updatedby' => $request->input('enr_updatedby'),
+    //             'enr_dateupdated' => $date,
+    //         ]);
+           
+    //         return [
+    //             'templatePricesData' => $templatePricesData,
+    //             'template' => $template,
+    //             'milestonedata' => $milestonedata,
+    //             'soa' => $soa,
+    //             'message' => $msg,
+    //             'status' => $status,
+    //             'totalCost' => $totalCost,
+    //             'final' => $final,
+    //             'studentid' => $studentid,
+    //             'subjectsTotal' => $subjectsTotal,
+    //             'miscTotal' => $miscTotal,
+    //             'allMatched' => $allMatched,
+                
+    //         ];
+
+    //         // return 204;
+    //     }
+    //     catch (Exception $ex) {
+    //         return [
+    //             'status' => 500,
+    //             'msg' => $ex->getMessage(),
+    //         ];
+    //     }
+    // }
 
     public function updateMilestone(Request $request)
     {

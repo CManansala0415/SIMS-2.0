@@ -116,6 +116,39 @@ const pdfGeneratorEnrollment = async (name, paper, orientation, margin) => {
     return html2pdf().set(opt).from(element).save();
 };
 
+const pdfAutoPrintA4 = async (name, contentWidth, orientation, margin) => {
+    var element = document.getElementById('printform');
+    var opt = {
+      margin: margin,
+      filename: name + '.pdf',
+      pagebreak: { mode: 'css', before: '.pagebreak' },
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: {
+          scale: 2,
+          useCORS: true,
+          scrollY: 0
+      },
+      jsPDF: { 
+          unit: 'mm',
+          format: 'a4',
+          orientation: orientation
+      },
+    }
+
+    // Temporarily wrap the content in a centered container
+    const wrapper = document.createElement('div');
+    wrapper.style.width = contentWidth + 'in';
+    wrapper.style.margin = '0 auto';
+    wrapper.style.display = 'block';
+    wrapper.appendChild(element.cloneNode(true));
+
+    const pdf = await html2pdf()
+        .set(opt)
+        .from(wrapper)
+        .outputPdf('blob');
+
+    return pdf;
+}
 
 const pdfGenerator = async (name, paper, orientation, margin) => {
     var element = document.getElementById('printform');
@@ -395,4 +428,5 @@ export {
     lvl1Decrypt,
     lvl2Encrypt,
     lvl2Decrypt,
+    pdfAutoPrintA4
 }

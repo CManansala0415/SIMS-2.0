@@ -77,6 +77,7 @@ const emit = defineEmits(['fetchUser', 'doneLoading'])
 const accessData = ref([])
 const paymentDetails = ref([])
 const inQueue = ref([])
+const overallEnrollees = ref(0)
 
 const booter = async () => {
     getAcademicDefaults().then((results) => {
@@ -145,6 +146,10 @@ const booter = async () => {
         totalEnrollees.value = results
         booting.value = 'Loading Enrollees...'
         bootingCount.value += 1
+        
+        totalEnrollees.value.forEach((e) => {
+            overallEnrollees.value += e.total_enrollees
+        })
     })
 }
 
@@ -162,7 +167,6 @@ onMounted(async () => {
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
-                    console.log(results.data)
 
                     let x = student.value.map((e) => {
 
@@ -749,15 +753,38 @@ const getNoPrint = (data) =>{
             </div>
             <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
             <div v-else class="p-3 mb-3">
-                <div class="neu-card p-3 d-flex gap-2 justify-content-between ">
-                    <div class="card-body" v-for="te in totalEnrollees" v-show="te.grad_id != 5">
-                        <small class="text-muted mb-1" style="font-size:9px;">Total Enrollees</small>
-                        <h2 class="fw-bold mb-0" :class="te.grad_dtypeid == 2 ? 'neu-green-text':'neu-green-pink'">{{ te.total_enrollees }}</h2>
-                        <small class="text-dim fw-bold small">
-                            {{ te.grad_name}}
+                <div class="neu-card p-3 d-flex gap-2 justify-content-between align-items-center flex-wrap">
+                     <!-- OVERALL -->
+                    <div class="card-body">
+                        <small class="text-muted mb-1" style="font-size:9px;">
+                            Overall Enrollees
                         </small>
 
+                        <h2 class="fw-bold mb-0 neu-green-text">
+                            {{ overallEnrollees? overallEnrollees : 0 }}
+                        </h2>
+
+                        <small class="text-dim fw-bold small">
+                            All Grade Levels
+                        </small>
                     </div>
+                    
+                    <div class="card-body" v-for="te in totalEnrollees" v-show="te.grad_id != 5">
+                        <small class="text-muted mb-1" style="font-size:9px;">
+                            Total Enrollees
+                        </small>
+
+                        <h5 class="fw-bold mb-0" 
+                            :class="te.grad_dtypeid == 2 ? 'neu-blue-text':'neu-pink-text'">
+                            {{ te.total_enrollees }}
+                        </h5>
+
+                        <small class="text-dim fw-bold small" style="font-size:12px;">
+                            {{ te.grad_name }}
+                        </small>
+                    </div>
+
+                   
                 </div>
             </div>
 
@@ -897,8 +924,8 @@ const getNoPrint = (data) =>{
                                     </div>
                                     <div class="col-12 col-lg-9">
                                         <div class="row h-100">
-                                            <div class="col-12 col-md-9 d-flex flex-column justify-content-center align-items-center gap-2 p-2">
-                                                <div class="text-start d-flex justify-content-between w-100">
+                                            <div class="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center gap-2 p-2">
+                                                <div class="px-3 py-4 text-start d-flex flex-column justify-content-between w-100">
                                                     <div class="p-2">
                                                         <span class="text-uppercase fw-bold" style="font-size: 14px;"> {{ stud.per_firstname }} {{
                                                         stud.per_middlename }} {{
@@ -934,48 +961,113 @@ const getNoPrint = (data) =>{
                                                 </div>
                                             </div>
                                         
-                                            <div class="col-12 col-md-3 d-flex justify-content-center align-items-center p-2">
-                                                <div v-if="accessData[1].useracc_modifying == 1"
-                                                    class="d-flex flex-column gap-1 justify-content-center p-1 w-100 ">
-                                                    <button tabindex="-1" title="Subject Taggings" @click="showForm(2, stud)"
-                                                        data-bs-toggle="modal" data-bs-target="#taggingmodal" class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-pen" />
-                                                        Edit Subjects
-                                                    </button>
-                                                    <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                                    <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Grades"
-                                                        data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 1)"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-print" />
-                                                        Print Grades
-                                                    </button>
-                                                    <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                                    <button v-if="Number(stud.acs_amount) > 0" tabindex="-1" title="Print Receipt"
-                                                        data-bs-toggle="modal" data-bs-target="#printmodal" @click="showForm(3, stud, 2)"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-print" />
-                                                        Print Receipt
-                                                    </button>
-                                                    <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1" @click="showForm(3, stud, 3)"
-                                                        data-bs-target="#printmodal" type="button" title="Print Clearance"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-print" />
-                                                        Print Clearance
-                                                    </button>
-                                                    <button tabindex="-1" title="Drop Student" @click="dropStudent(stud.enr_id)"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-trash" />
-                                                        Drop Student
-                                                    </button>
-                                                    <!-- v-if="Number(stud.acs_amount) > 0" -->
-                                                    <button v-if="Number(stud.acs_amount) > 0" data-bs-toggle="modal" tabindex="-1"
-                                                        data-bs-target="#printidmodal" @click="printID(stud)" type="button" title="Print ID"
-                                                        class="neu-btn-sm neu-white">
-                                                        <font-awesome-icon icon="fa-solid fa-id-card-clip" />
-                                                        Print ID
-                                                    </button>
+                                            <div class="col-12 col-md-6 d-flex justify-content-center align-items-center p-2">
+                                                <div v-if="accessData[1].useracc_modifying == 1" class="w-100">
+
+                                                    <div class="row g-2">
+
+                                                        <!-- PRINT ACTIONS -->
+                                                        <div class="col-12 col-md-6 col-sm-2">
+                                                            <small class="text-muted fw-bold d-block mb-1">Print Options</small>
+
+                                                            <div class="d-flex flex-wrap gap-2">
+
+                                                                <button
+                                                                    v-if="Number(stud.acs_amount) > 0"
+                                                                    tabindex="-1"
+                                                                    title="Print Grades"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#printmodal"
+                                                                    @click="showForm(3, stud, 1)"
+                                                                    class="neu-btn-sm neu-white">
+                                                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                                                    Grades
+                                                                </button>
+
+                                                                <button
+                                                                    v-if="Number(stud.acs_amount) > 0"
+                                                                    tabindex="-1"
+                                                                    title="Print Registration"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#printmodal"
+                                                                    @click="showForm(3, stud, 2)"
+                                                                    class="neu-btn-sm neu-white">
+                                                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                                                    Registration
+                                                                </button>
+
+                                                                <button
+                                                                    v-if="Number(stud.acs_amount) > 0"
+                                                                    tabindex="-1"
+                                                                    title="Print Clearance"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#printmodal"
+                                                                    @click="showForm(3, stud, 3)"
+                                                                    class="neu-btn-sm neu-white">
+                                                                    <font-awesome-icon icon="fa-solid fa-print" />
+                                                                    Clearance
+                                                                </button>
+
+                                                                <button
+                                                                    v-if="Number(stud.acs_amount) > 0"
+                                                                    tabindex="-1"
+                                                                    title="Print ID"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#printidmodal"
+                                                                    @click="printID(stud)"
+                                                                    class="neu-btn-sm neu-white">
+                                                                    <font-awesome-icon icon="fa-solid fa-id-card-clip" />
+                                                                    ID
+                                                                </button>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <!-- STUDENT ACTIONS -->
+                                                        <div class="col-12 col-md-6 col-sm-2">
+                                                            <small class="text-muted fw-bold d-block mb-1">Student Actions</small>
+
+                                                            <div class="d-flex flex-wrap gap-2">
+
+                                                                <button
+                                                                    tabindex="-1"
+                                                                    title="Subject Taggings"
+                                                                    @click="showForm(2, stud)"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#taggingmodal"
+                                                                    class="neu-btn-sm neu-white">
+                                                                    <font-awesome-icon icon="fa-solid fa-pen" />
+                                                                    Subjects
+                                                                </button>
+
+                                                                <button
+                                                                    tabindex="-1"
+                                                                    title="Drop Student"
+                                                                    @click="dropStudent(stud.enr_id)"
+                                                                    class="neu-btn-sm neu-white">
+                                                                    <font-awesome-icon icon="fa-solid fa-trash" />
+                                                                    Drop
+                                                                </button>
+
+                                                                <button
+                                                                    tabindex="-1"
+                                                                    title="Delete Student"
+                                                                    @click="deleteStudent(stud.enr_id)"
+                                                                    class="neu-btn-sm neu-danger">
+                                                                    <font-awesome-icon icon="fa-solid fa-trash-can" />
+                                                                    Delete
+                                                                </button>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
                                                 </div>
-                                                <div v-else class="d-flex gap-2 justify-content-center p-3 bg-secondary-subtle">
+
+                                                <div
+                                                    v-else
+                                                    class="w-100 text-center p-3 rounded bg-secondary-subtle text-muted fw-semibold">
                                                     No access to modify student records.
                                                 </div>
                                             </div>
