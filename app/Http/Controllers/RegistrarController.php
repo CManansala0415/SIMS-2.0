@@ -1491,7 +1491,10 @@ class RegistrarController extends Controller
 
                 $item->tuitemp_lec = $ms->subj_lec_units;
                 $item->tuitemp_lab = $ms->subj_lab_units;
+                $item->tuitemp_extra = $ms->subj_extra ?? 0;
                 $item->tuitemp_updatedby = $request->input('enr_addedby');
+
+                
 
                 // optional defaults
                 // $item->tuitemp_extra = $ms->subj_extra ?? 0;
