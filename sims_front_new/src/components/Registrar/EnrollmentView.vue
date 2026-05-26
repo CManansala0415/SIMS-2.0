@@ -257,18 +257,20 @@ const paginate = (mode) => {
     searchMname.value = searchMname.value.trim()
     searchLname.value = searchLname.value.trim()
 
-    switch (mode) {
-        case 'prev':
-            if (offset.value <= 0) {
-                offset.value = 0
-            } else {
-                student.value = []
-                offset.value -= 10
-                studentCount.value = 0
-                preLoading.value = true
-                getAccountsDetails().then((results) => {
-                    accounts.value = results
+    accounts.value = []
+    getAccountsDetails().then((accountdata) => {
+        accounts.value = accountdata
 
+        switch (mode) {
+            case 'prev':
+                if (offset.value <= 0) {
+                    offset.value = 0
+                } else {
+                    student.value = []
+                    offset.value -= 10
+                    studentCount.value = 0
+                    preLoading.value = true
+                    
                     getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                         student.value = results.data
                         studentCount.value = results.count
@@ -302,21 +304,17 @@ const paginate = (mode) => {
                         student.value = x
                         preLoading.value = false
                     })
-                })
-                
-            }
-            break;
-        case 'next':
+                }
+                break;
+            case 'next':
 
-            if (offset.value >= studentCount.value) {
-                offset.value = studentCount.value
-            } else {
-                student.value = []
-                offset.value += 10
-                studentCount.value = 0
-                preLoading.value = true
-                getAccountsDetails().then((results) => {
-                    accounts.value = results
+                if (offset.value >= studentCount.value) {
+                    offset.value = studentCount.value
+                } else {
+                    student.value = []
+                    offset.value += 10
+                    studentCount.value = 0
+                    preLoading.value = true
                     getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                         student.value = results.data
                         studentCount.value = results.count
@@ -350,19 +348,15 @@ const paginate = (mode) => {
                         student.value = x
                         preLoading.value = false
                     })
-                })
-                
-            }
-            break;
-        case 'search':
-            // searchValue.value = searchValue.value.trim()
-            if (searchValue.value || searchValue.value == '') {
-                student.value = []
-                offset.value = 0
-                studentCount.value = 0
-                preLoading.value = true
-                getAccountsDetails().then((results) => {
-                    accounts.value = results
+                }
+                break;
+            case 'search':
+                // searchValue.value = searchValue.value.trim()
+                if (searchValue.value || searchValue.value == '') {
+                    student.value = []
+                    offset.value = 0
+                    studentCount.value = 0
+                    preLoading.value = true
                     getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
                         student.value = results.data
                         studentCount.value = results.count
@@ -398,36 +392,37 @@ const paginate = (mode) => {
                     }).catch((err) => {
                         // console.log(err)
                     })
-                })
-                
-            } else {
-                // alert('Please search a valid record')
-                // preLoading.value = false
-                Swal.fire({
-                    title: "Search Failed",
-                    text: "Please search a valid record",
-                    icon: "error"
-                }).then(() => {
-                    preLoading.value = false
-                });
-            }
-            break;
-        // case 'course':
-        //     student.value = []
-        //     offset.value = 0
-        //     studentCount.value = 0
-        //     preLoading.value = true
-        //     getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
-        //         student.value = results.data
-        //         studentCount.value = results.count
-        //         preLoading.value = false
-        //     }).catch((err) => {
-        //         // console.log(err)
-        //     })
+                } else {
+                    // alert('Please search a valid record')
+                    // preLoading.value = false
+                    Swal.fire({
+                        title: "Search Failed",
+                        text: "Please search a valid record",
+                        icon: "error"
+                    }).then(() => {
+                        preLoading.value = false
+                    });
+                }
+                break;
+            // case 'course':
+            //     student.value = []
+            //     offset.value = 0
+            //     studentCount.value = 0
+            //     preLoading.value = true
+            //     getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
+            //         student.value = results.data
+            //         studentCount.value = results.count
+            //         preLoading.value = false
+            //     }).catch((err) => {
+            //         // console.log(err)
+            //     })
 
-        //     break;
+            //     break;
 
-    }
+        }
+    })
+
+
 }
 
 // image uploading
