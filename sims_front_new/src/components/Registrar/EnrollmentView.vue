@@ -266,39 +266,44 @@ const paginate = (mode) => {
                 offset.value -= 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
-                    student.value = results.data
-                    studentCount.value = results.count
+                getAccountsDetails().then((results) => {
+                    accounts.value = results
 
-                    let x = student.value.map((e) => {
-                        let y = accounts.value.findIndex((f) => {
-                            return f.acs_enrid === e.enr_id
+                    getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
+                        student.value = results.data
+                        studentCount.value = results.count
+
+                        let x = student.value.map((e) => {
+                            let y = accounts.value.findIndex((f) => {
+                                return f.acs_enrid === e.enr_id
+                            })
+
+                            // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+
+                            let z = ''
+                            if (e.per_profile) {
+                                z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                            } else {
+                                if (e.per_gender == 2) {
+                                    z = '/img/woman.png'
+                                } else {
+                                    z = '/img/man.png'
+                                }
+                            }
+
+
+                            return {
+                                ...e,
+                                profile_picture: z,
+                                ...accounts.value[y],
+                            }
                         })
 
-                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
-
-                        let z = ''
-                        if (e.per_profile) {
-                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
-                        } else {
-                            if (e.per_gender == 2) {
-                                z = '/img/woman.png'
-                            } else {
-                                z = '/img/man.png'
-                            }
-                        }
-
-
-                        return {
-                            ...e,
-                            profile_picture: z,
-                            ...accounts.value[y],
-                        }
+                        student.value = x
+                        preLoading.value = false
                     })
-
-                    student.value = x
-                    preLoading.value = false
                 })
+                
             }
             break;
         case 'next':
@@ -310,39 +315,43 @@ const paginate = (mode) => {
                 offset.value += 10
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
-                    student.value = results.data
-                    studentCount.value = results.count
+                getAccountsDetails().then((results) => {
+                    accounts.value = results
+                    getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
+                        student.value = results.data
+                        studentCount.value = results.count
 
-                    let x = student.value.map((e) => {
-                        let y = accounts.value.findIndex((f) => {
-                            return f.acs_enrid === e.enr_id
+                        let x = student.value.map((e) => {
+                            let y = accounts.value.findIndex((f) => {
+                                return f.acs_enrid === e.enr_id
+                            })
+
+                            // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+
+                            let z = ''
+                            if (e.per_profile) {
+                                z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                            } else {
+                                if (e.per_gender == 2) {
+                                    z = '/img/woman.png'
+                                } else {
+                                    z = '/img/man.png'
+                                }
+                            }
+
+
+                            return {
+                                ...e,
+                                profile_picture: z,
+                                ...accounts.value[y],
+                            }
                         })
 
-                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
-
-                        let z = ''
-                        if (e.per_profile) {
-                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
-                        } else {
-                            if (e.per_gender == 2) {
-                                z = '/img/woman.png'
-                            } else {
-                                z = '/img/man.png'
-                            }
-                        }
-
-
-                        return {
-                            ...e,
-                            profile_picture: z,
-                            ...accounts.value[y],
-                        }
+                        student.value = x
+                        preLoading.value = false
                     })
-
-                    student.value = x
-                    preLoading.value = false
                 })
+                
             }
             break;
         case 'search':
@@ -352,41 +361,45 @@ const paginate = (mode) => {
                 offset.value = 0
                 studentCount.value = 0
                 preLoading.value = true
-                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
-                    student.value = results.data
-                    studentCount.value = results.count
+                getAccountsDetails().then((results) => {
+                    accounts.value = results
+                    getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
+                        student.value = results.data
+                        studentCount.value = results.count
 
-                    let x = student.value.map((e) => {
-                        let y = accounts.value.findIndex((f) => {
-                            return f.acs_enrid === e.enr_id
+                        let x = student.value.map((e) => {
+                            let y = accounts.value.findIndex((f) => {
+                                return f.acs_enrid === e.enr_id
+                            })
+
+                            // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+
+                            let z = ''
+                            if (e.per_profile) {
+                                z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                            } else {
+                                if (e.per_gender == 2) {
+                                    z = '/img/woman.png'
+                                } else {
+                                    z = '/img/man.png'
+                                }
+                            }
+
+
+                            return {
+                                ...e,
+                                profile_picture: z,
+                                ...accounts.value[y],
+                            }
                         })
 
-                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
-
-                        let z = ''
-                        if (e.per_profile) {
-                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
-                        } else {
-                            if (e.per_gender == 2) {
-                                z = '/img/woman.png'
-                            } else {
-                                z = '/img/man.png'
-                            }
-                        }
-
-
-                        return {
-                            ...e,
-                            profile_picture: z,
-                            ...accounts.value[y],
-                        }
+                        student.value = x
+                        preLoading.value = false
+                    }).catch((err) => {
+                        // console.log(err)
                     })
-
-                    student.value = x
-                    preLoading.value = false
-                }).catch((err) => {
-                    // console.log(err)
                 })
+                
             } else {
                 // alert('Please search a valid record')
                 // preLoading.value = false
@@ -581,7 +594,7 @@ const showForm = (type, data, printtype) => {
     }
 }
 
-const dropStudent = (id) => {
+const dropStudent = (id, mode) => {
 
     // if (confirm("Are you sure you want to drop this student? this action cannot be reverted") == true) {
     //     let x = {
@@ -624,7 +637,8 @@ const dropStudent = (id) => {
 
             let x = {
                 enr_updatedby: userID.value,
-                enr_id: id
+                enr_id: id,
+                mode: mode // 1 means drop, 2 means delete all
             }
             deleteEnrollment(x).then((results) => {
                 // alert('Student Dropped')
@@ -829,13 +843,14 @@ const getNoPrint = (data) =>{
                         <div class="p-4 neu-card">
                             <div v-for="(stud, index) in student"> 
                                 <div class="row border">
-                                    <div class="col-12 col-lg-3 border-0 border-end">
+                                    <div class="col-12 col-lg-4 border-0 border-end">
                                         <div class="d-flex p-2 h-100 w-100 gap-2 justify-content-center align-items-center">
-                                            <div class="d-flex justify-content-between align-items-center w-100">
+                                            <div class="d-flex flex-column justify-content-between align-items-center w-100">
                                                 <div @click="showLinkProfile = !showLinkProfile, linkId = index" :for="index"
                                                     class="text_guide img_hover p-1 d-flex justify-content-center align-items-center">
                                                     <!-- stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png' -->
-                                                    <img class=" img-size-card img_profile" :src="stud.profile_picture" alt="">
+                                                    <img class=" img-size-card img_profile" :src="stud.profile_picture" 
+                                                        onerror="this.onerror=null; this.src='/img/404.png';">
                                                 </div>
                                                 <div v-if="showLinkProfile && index === linkId"
                                                     class="upload-section d-flex flex-column align-items-center justify-content-center p-1 rounded-4 shadow-sm w-100">
@@ -871,12 +886,13 @@ const getNoPrint = (data) =>{
                                                     </form>
                                                 </div>
                                             </div>
-                                            <div class="d-flex justify-content-around align-items-center w-100">
+                                            <div class="d-flex flex-column justify-content-around align-items-center w-100">
                                                 <div v-if="stud.per_signature"
                                                     @click="showLinkSignature = !showLinkSignature, linkId = index"
                                                     class="text_guide img_hover p-3 d-flex justify-content-center align-items-center">
                                                     <img class="signature-size-card"
-                                                        :src="'http://sims.clcst.edu.local:8000/storage/signatures/' + stud.per_signature" alt="">
+                                                        :src="'http://sims.clcst.edu.local:8000/storage/signatures/' + stud.per_signature" 
+                                                        onerror="this.onerror=null; this.src='/img/404.png';">
                                                 </div>
                                                 <div v-else class="text_guide img_hover p-3 d-flex justify-content-center align-items-center border"
                                                     @click="showLinkSignature = !showLinkSignature, linkId = index">
@@ -922,7 +938,7 @@ const getNoPrint = (data) =>{
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-lg-9">
+                                    <div class="col-12 col-lg-8">
                                         <div class="row h-100">
                                             <div class="col-12 col-md-6 d-flex flex-column justify-content-center align-items-center gap-2 p-2">
                                                 <div class="px-3 py-4 text-start d-flex flex-column justify-content-between w-100">
@@ -1043,18 +1059,18 @@ const getNoPrint = (data) =>{
                                                                 <button
                                                                     tabindex="-1"
                                                                     title="Drop Student"
-                                                                    @click="dropStudent(stud.enr_id)"
+                                                                    @click="dropStudent(stud.enr_id, 1)"
                                                                     class="neu-btn-sm neu-white">
-                                                                    <font-awesome-icon icon="fa-solid fa-trash" />
+                                                                    <font-awesome-icon icon="fa-solid fa-ban" />
                                                                     Drop
                                                                 </button>
 
                                                                 <button
                                                                     tabindex="-1"
                                                                     title="Delete Student"
-                                                                    @click="deleteStudent(stud.enr_id)"
+                                                                    @click="dropStudent(stud.enr_id, 2)"
                                                                     class="neu-btn-sm neu-danger">
-                                                                    <font-awesome-icon icon="fa-solid fa-trash-can" />
+                                                                    <font-awesome-icon icon="fa-solid fa-trash" />
                                                                     Delete
                                                                 </button>
 
@@ -1307,9 +1323,9 @@ const getNoPrint = (data) =>{
 <style scoped>
 .img_profile {
     /* border: 1px solid #ddd; */
-    border-radius: 100%;
-    height: 100px;
-    width: 100px;
+    border-radius: 5%;
+    height: 150px;
+    width: 150px;
     padding: 10px;
     box-shadow:
         3px 3px 5px rgba(122, 122, 122, 0.8),
@@ -1317,13 +1333,13 @@ const getNoPrint = (data) =>{
 }
 
 .signature-size-card {
-    height: 75px;
-    width: 75px;
+    height: 100px;
+    width: 100px;
 }
 
 .signature-size-card-none {
-    height: 75px;
-    width: 75px;
+     height: 100px;
+    width: 100px;
 }
 
 .text_guide {
@@ -1345,6 +1361,8 @@ const getNoPrint = (data) =>{
     position: absolute;
     inset: 0;
     background-color: rgba(0, 0, 0, 0);
+    border-radius: 5%;
+
     /* transparent by default */
     transition: background-color 0.3s ease;
     z-index: 1;

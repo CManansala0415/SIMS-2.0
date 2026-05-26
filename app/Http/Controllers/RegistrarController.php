@@ -3525,7 +3525,13 @@ class RegistrarController extends Controller
         try {
             date_default_timezone_set('Asia/Manila');
             $date = now();
+            
+            // if($request->mode == 1){
 
+            // }else{
+                
+            // }
+            
             DB::beginTransaction();
 
             DB::table('def_enrollment')
