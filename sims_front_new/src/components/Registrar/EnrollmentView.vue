@@ -257,172 +257,165 @@ const paginate = (mode) => {
     searchMname.value = searchMname.value.trim()
     searchLname.value = searchLname.value.trim()
 
-    accounts.value = []
-    getAccountsDetails().then((accountdata) => {
-        accounts.value = accountdata
+    switch (mode) {
+        case 'prev':
+            if (offset.value <= 0) {
+                offset.value = 0
+            } else {
+                student.value = []
+                offset.value -= 10
+                studentCount.value = 0
+                preLoading.value = true
+                
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
+                    student.value = results.data
+                    studentCount.value = results.count
 
-        switch (mode) {
-            case 'prev':
-                if (offset.value <= 0) {
-                    offset.value = 0
-                } else {
-                    student.value = []
-                    offset.value -= 10
-                    studentCount.value = 0
-                    preLoading.value = true
-                    
-                    getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
-                        student.value = results.data
-                        studentCount.value = results.count
-
-                        let x = student.value.map((e) => {
-                            let y = accounts.value.findIndex((f) => {
-                                return f.acs_enrid === e.enr_id
-                            })
-
-                            // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
-
-                            let z = ''
-                            if (e.per_profile) {
-                                z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
-                            } else {
-                                if (e.per_gender == 2) {
-                                    z = '/img/woman.png'
-                                } else {
-                                    z = '/img/man.png'
-                                }
-                            }
-
-
-                            return {
-                                ...e,
-                                profile_picture: z,
-                                ...accounts.value[y],
-                            }
+                    let x = student.value.map((e) => {
+                        let y = accounts.value.findIndex((f) => {
+                            return f.acs_enrid === e.enr_id
                         })
 
-                        student.value = x
-                        preLoading.value = false
-                    })
-                }
-                break;
-            case 'next':
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
-                if (offset.value >= studentCount.value) {
-                    offset.value = studentCount.value
-                } else {
-                    student.value = []
-                    offset.value += 10
-                    studentCount.value = 0
-                    preLoading.value = true
-                    getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
-                        student.value = results.data
-                        studentCount.value = results.count
-
-                        let x = student.value.map((e) => {
-                            let y = accounts.value.findIndex((f) => {
-                                return f.acs_enrid === e.enr_id
-                            })
-
-                            // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
-
-                            let z = ''
-                            if (e.per_profile) {
-                                z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        let z = ''
+                        if (e.per_profile) {
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        } else {
+                            if (e.per_gender == 2) {
+                                z = '/img/woman.png'
                             } else {
-                                if (e.per_gender == 2) {
-                                    z = '/img/woman.png'
-                                } else {
-                                    z = '/img/man.png'
-                                }
+                                z = '/img/man.png'
                             }
+                        }
 
 
-                            return {
-                                ...e,
-                                profile_picture: z,
-                                ...accounts.value[y],
-                            }
+                        return {
+                            ...e,
+                            profile_picture: z,
+                            ...accounts.value[y],
+                        }
+                    })
+
+                    student.value = x
+                    preLoading.value = false
+                })
+            }
+            break;
+        case 'next':
+
+            if (offset.value >= studentCount.value) {
+                offset.value = studentCount.value
+            } else {
+                student.value = []
+                offset.value += 10
+                studentCount.value = 0
+                preLoading.value = true
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
+                    student.value = results.data
+                    studentCount.value = results.count
+
+                    let x = student.value.map((e) => {
+                        let y = accounts.value.findIndex((f) => {
+                            return f.acs_enrid === e.enr_id
                         })
 
-                        student.value = x
-                        preLoading.value = false
-                    })
-                }
-                break;
-            case 'search':
-                // searchValue.value = searchValue.value.trim()
-                if (searchValue.value || searchValue.value == '') {
-                    student.value = []
-                    offset.value = 0
-                    studentCount.value = 0
-                    preLoading.value = true
-                    getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
-                        student.value = results.data
-                        studentCount.value = results.count
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
 
-                        let x = student.value.map((e) => {
-                            let y = accounts.value.findIndex((f) => {
-                                return f.acs_enrid === e.enr_id
-                            })
-
-                            // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
-
-                            let z = ''
-                            if (e.per_profile) {
-                                z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        let z = ''
+                        if (e.per_profile) {
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        } else {
+                            if (e.per_gender == 2) {
+                                z = '/img/woman.png'
                             } else {
-                                if (e.per_gender == 2) {
-                                    z = '/img/woman.png'
-                                } else {
-                                    z = '/img/man.png'
-                                }
+                                z = '/img/man.png'
                             }
+                        }
 
 
-                            return {
-                                ...e,
-                                profile_picture: z,
-                                ...accounts.value[y],
-                            }
+                        return {
+                            ...e,
+                            profile_picture: z,
+                            ...accounts.value[y],
+                        }
+                    })
+
+                    student.value = x
+                    preLoading.value = false
+                })
+            }
+            break;
+        case 'search':
+            // searchValue.value = searchValue.value.trim()
+            if (searchValue.value || searchValue.value == '') {
+                student.value = []
+                offset.value = 0
+                studentCount.value = 0
+                preLoading.value = true
+                getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
+                    student.value = results.data
+                    studentCount.value = results.count
+
+                    let x = student.value.map((e) => {
+                        let y = accounts.value.findIndex((f) => {
+                            return f.acs_enrid === e.enr_id
                         })
 
-                        student.value = x
-                        preLoading.value = false
-                    }).catch((err) => {
-                        // console.log(err)
+                        // stud.per_profile ? 'http://sims.clcst.edu.local:8000/storage/profiles/' + stud.per_profile : '/img/man.png'
+
+                        let z = ''
+                        if (e.per_profile) {
+                            z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        } else {
+                            if (e.per_gender == 2) {
+                                z = '/img/woman.png'
+                            } else {
+                                z = '/img/man.png'
+                            }
+                        }
+
+
+                        return {
+                            ...e,
+                            profile_picture: z,
+                            ...accounts.value[y],
+                        }
                     })
-                } else {
-                    // alert('Please search a valid record')
-                    // preLoading.value = false
-                    Swal.fire({
-                        title: "Search Failed",
-                        text: "Please search a valid record",
-                        icon: "error"
-                    }).then(() => {
-                        preLoading.value = false
-                    });
-                }
-                break;
-            // case 'course':
-            //     student.value = []
-            //     offset.value = 0
-            //     studentCount.value = 0
-            //     preLoading.value = true
-            //     getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
-            //         student.value = results.data
-            //         studentCount.value = results.count
-            //         preLoading.value = false
-            //     }).catch((err) => {
-            //         // console.log(err)
-            //     })
 
-            //     break;
+                    student.value = x
+                    preLoading.value = false
+                }).catch((err) => {
+                    // console.log(err)
+                })
+            } else {
+                // alert('Please search a valid record')
+                // preLoading.value = false
+                Swal.fire({
+                    title: "Search Failed",
+                    text: "Please search a valid record",
+                    icon: "error"
+                }).then(() => {
+                    preLoading.value = false
+                });
+            }
+            break;
+        // case 'course':
+        //     student.value = []
+        //     offset.value = 0
+        //     studentCount.value = 0
+        //     preLoading.value = true
+        //     getStudentByCourse(limit.value, offset.value, courseId.value).then((results) => {
+        //         student.value = results.data
+        //         studentCount.value = results.count
+        //         preLoading.value = false
+        //     }).catch((err) => {
+        //         // console.log(err)
+        //     })
 
-        }
-    })
+        //     break;
 
-
+    }
 }
 
 // image uploading
