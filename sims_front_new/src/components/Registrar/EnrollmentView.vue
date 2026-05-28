@@ -551,8 +551,12 @@ const handleImage = (e) => {
 // image uploading
 
 
-const search = () => {
-    paginate('search')
+const search = (mode) => {
+    accounts.value = []
+    getAccountsDetails().then((results) => {
+        accounts.value = results
+        paginate(mode)
+    })
 }
 const studentVal = ref([])
 const showForm = (type, data, printtype) => {
@@ -708,13 +712,13 @@ const getNoPrint = (data) =>{
             <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
             <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-center align-content-center">
-                    <input type="text" v-model="searchFname" @keyup.enter="search()" class="neu-input"
+                    <input type="text" v-model="searchFname" @keyup.enter="search('search')" class="neu-input"
                         :disabled="preLoading ? true : false" placeholder="First Name" />
-                    <input type="text" v-model="searchMname" @keyup.enter="search()" class="neu-input"
+                    <input type="text" v-model="searchMname" @keyup.enter="search('search')" class="neu-input"
                         :disabled="preLoading ? true : false" placeholder="Middle Name" />
-                    <input type="text" v-model="searchLname" @keyup.enter="search()" class="neu-input"
+                    <input type="text" v-model="searchLname" @keyup.enter="search('search')" class="neu-input"
                         :disabled="preLoading ? true : false" placeholder="Last Name" />
-                    <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1"
+                    <button @click="search('search')" type="button" class="neu-btn neu-blue" tabindex="-1"
                         :disabled="preLoading ? true : false">
                         <font-awesome-icon icon="fa-solid fa-magnifying-glass" /> Search
                     </button>
@@ -1101,9 +1105,9 @@ const getNoPrint = (data) =>{
                 </div>
                 <div class="d-flex justify-content-between align-content-center" v-if="!preLoading">
                     <div class="d-flex gap-1">
-                        <button :disabled="offset == 0 ? true : false" @click="paginate('prev')"
+                        <button :disabled="offset == 0 ? true : false" @click="search('prev')"
                             class="neu-btn neu-light-gray">Prev</button>
-                        <button :disabled="Object.keys(student).length < 10 ? true : false" @click="paginate('next')"
+                        <button :disabled="Object.keys(student).length < 10 ? true : false" @click="search('next')"
                             class="neu-btn neu-dark-gray">Next</button>
                     </div>
                     <p class="">showing total of <span class="font-semibold">({{ studentCount }})</span> items</p>
