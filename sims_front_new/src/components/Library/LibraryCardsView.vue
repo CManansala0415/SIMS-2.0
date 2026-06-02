@@ -328,12 +328,12 @@ const getData = (result) =>{
             <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
             <div  v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-between align-content-center w-75">
-                    <input type="text" v-model="searchFname" @keyup.enter="search()"
-                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
-                    <input type="text" v-model="searchMname" @keyup.enter="search()"
-                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
                     <input type="text" v-model="searchLname" @keyup.enter="search()"
                         class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
                 
                     <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
                         <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search

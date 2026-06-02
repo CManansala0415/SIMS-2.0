@@ -85,7 +85,7 @@ onMounted(async () => {
 
     studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
     studentSettlements.value = accountRes.student_settlement || []
-    selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid
+    selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid ? studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid : ''
     studentAccountSubjects.value = accountRes.student_account.filter((e)=>{
         if(e.soa_subjid != null){
             return e

@@ -2889,6 +2889,39 @@ const addScholarshipDetails = async (data) => {
     }
 }
 
+let getotherchargesdetails = {}
+const getOtherChargesDetails = async (perid) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-other-charges-details/' + perid,
+        }).then(async (results) => {
+            // console.log(results.data)
+            getotherchargesdetails = results.data
+        })
+        return getotherchargesdetails
+    } catch (err) {
+        return err
+    }
+}
+
+let addotherchargesdetails = {}
+const addOtherChargesDetails = async (data) => {
+    try {
+        await axios({
+            method: "POST",
+            url: 'api/add-other-charges-details/',
+            data:data
+        }).then(async (results) => {
+            // console.log(results.data)s
+            addotherchargesdetails = results.data
+        })
+        return addotherchargesdetails
+    } catch (err) {
+        return err
+    }
+}
+
 let getsectioncount = {}
 const getSectionCount = async (enr_program, enr_quarter, enr_course, enr_gradelvl, enr_curriculum, enr_section) => {
     try {
@@ -3202,6 +3235,8 @@ export {
     editAnnouncement,
     resetPassword,
     getLibraryCardMassPrint,
-    getTotalEnrollees
+    getTotalEnrollees,
+    getOtherChargesDetails,
+    addOtherChargesDetails
 }
 

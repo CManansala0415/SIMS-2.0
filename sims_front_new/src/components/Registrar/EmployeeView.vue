@@ -265,12 +265,12 @@ onMounted(async () => {
                         :disabled="preLoading ? true : false">
                 </div> -->
                 <div class="d-flex gap-2 justify-content-center align-content-center">
-                    <input type="text" v-model="searchFname" @keyup.enter="search()"
-                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
-                    <input type="text" v-model="searchMname" @keyup.enter="search()"
-                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
                     <input type="text" v-model="searchLname" @keyup.enter="search()"
                         class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
                     <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
                         <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
                     </button>

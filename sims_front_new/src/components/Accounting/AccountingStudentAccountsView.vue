@@ -44,7 +44,9 @@ import {
     getAcademicStatus,
     getScholarshipDetails,
     addScholarshipDetails,
-    getStudentAccount
+    getStudentAccount,
+    getOtherChargesDetails,
+    addOtherChargesDetails
 } from "../Fetchers.js";
 import ApplicationPrintIdModal from '../snippets/modal/ApplicationPrintIdModal.vue';
 import SearchQR from '../snippets/tech/SearchQR.vue';
@@ -67,6 +69,7 @@ const userID = ref('')
 const router = useRouter();
 const showForm = ref(false)
 const showStudAccModal = ref(false)
+const showOtherChargesModal = ref(false)
 const showEnroll = ref(false)
 const showIdentification = ref(false)
 const showPrintID = ref(false)
@@ -102,6 +105,12 @@ const scholarshipDescription = ref('')
 const scholarshipAccountId = ref('')
 const loadingScholarship = ref(true)
 const showScholarship = ref(false)
+const otherChargesType = ref('')
+const otherChargesAmount = ref(0)
+const otherChargesDetails = ref([])
+const otherChargesDescription = ref('')
+const otherChargesAccountId = ref('')
+const loadingOtherCharges = ref(true)
 const showStudPermitModal = ref(false)
 const studentSettlement = ref([])
 const emit = defineEmits(['fetchUser','doneLoading'])
@@ -418,13 +427,24 @@ const editData = (id, mode) => {
             scholarshipDetails.value = []
             getStudentAccount(id).then((results) => {
                 studentSettlement.value = results.student_settlement
-                refreshState()
+                refreshState(1)
             })
             break;
         case 3:
             // permits
             showStudPermitModal.value = !showStudPermitModal.value
             break;
+        case 4:
+            // other charges
+            loadingOtherCharges.value = true
+            otherChargesDetails.value = []
+            getStudentAccount(id).then((results) => {
+                studentSettlement.value = results.student_settlement
+                refreshState(2)
+            })
+            break;
+
+            
     }
 }
 const enrollApplicant = (data) => {
@@ -563,7 +583,7 @@ const saveScholarship = async (mode, data) => {
                 icon: "success"
             })
 
-            refreshState()
+            refreshState(1)
 
         } else {
             throw new Error('Request failed')
@@ -576,7 +596,7 @@ const saveScholarship = async (mode, data) => {
             icon: "error"
         })
 
-        refreshState()
+        refreshState(1)
     }
 }
 
@@ -587,15 +607,138 @@ const resetScholarshipDetails = () =>{
     scholarshipAccountId.value = ''
 }
 
-const refreshState = () =>{
-    resetScholarshipDetails()
-    scholarshipDetails.value = []
+const refreshState = (mode) =>{
+    if(mode == 1){
+        resetScholarshipDetails()
+        scholarshipDetails.value = []
 
-    getScholarshipDetails(editId.value).then((results) => {
-        scholarshipDetails.value = results.raw
-        loadingScholarship.value = false
-    })
+        getScholarshipDetails(editId.value).then((results) => {
+            scholarshipDetails.value = results.raw
+            loadingScholarship.value = false
+        })
+    }else{
+        resetOtherChargesDetails()
+        otherChargesDetails.value = []
+
+        getOtherChargesDetails(editId.value).then((results) => {
+            otherChargesDetails.value = results.raw
+            loadingOtherCharges.value = false
+        })
+    }
 }
+
+const addOtherCharges = () =>{
+    if(!otherChargesDescription.value || !otherChargesType.value || !otherChargesAmount.value || otherChargesAmount.value <= 0 || !otherChargesAccountId.value){
+         Swal.fire({
+            title: "Saving Declined",
+            html: `Please complete the form before adding`,
+            icon: "warning",
+            confirmButtonText: "Ok, Got it!"
+        });
+    }else{
+        let x = {
+            oth_description: otherChargesDescription.value,
+            oth_type: otherChargesType.value,
+            oth_personid: editId.value,
+            oth_value: otherChargesAmount.value,
+            oth_acsid: otherChargesAccountId.value,
+            user_id: userID.value
+        }
+
+        saveOtherCharges(1, x)
+        // otherChargesDetails.value.push(x)
+        // resetotherChargesDetails()
+
+    }
+    
+}
+
+const saveOtherCharges = async (mode, data) => {
+
+    const actionMap = {
+        1: {
+            title: 'New Record',
+            text: 'Are you sure you want to add this other charge?',
+            confirmText: "Yes, Add it!"
+        },
+        2: {
+            title: 'Update',
+            text: 'Are you sure you want to update this other charge? There’s no turning back.',
+            confirmText: "Yes, update it!"
+        },
+        3: {
+            title: 'Delete',
+            text: 'Are you sure you want to delete this other charge? There’s no turning back.',
+            confirmText: "Yes, delete it!"
+        }
+    }
+
+    const action = actionMap[mode]
+    if (!action) return
+
+    const payload = {
+        ...data,
+        oth_mode: mode,
+        user_id: userID.value
+    }
+
+    const confirm = await Swal.fire({
+        title: action.title,
+        text: action.text,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: action.confirmText
+    })
+
+    if (!confirm.isConfirmed) return
+
+    Swal.fire({
+        title: "Processing",
+        text: "Please wait...",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    })
+
+    try {
+        const results = await addOtherChargesDetails(payload)
+        Swal.close()
+
+        if (results.status === 200) {
+            await Swal.fire({
+                title: "Success",
+                text: "Changes applied successfully",
+                icon: "success"
+            })
+
+            refreshState(2)
+
+        } else {
+            throw new Error('Request failed')
+        }
+
+    } catch (err) {
+        Swal.fire({
+            title: "Action Failed",
+            text: "Cannot proceed. Contact the Administrator for assistance.",
+            icon: "error"
+        })
+
+        refreshState(2)
+    }
+}
+
+const resetOtherChargesDetails = () =>{
+    otherChargesDescription.value = ''
+    otherChargesType.value = ''
+    otherChargesAmount.value = ''
+    otherChargesAccountId.value = ''
+}
+
+
+
+
 </script>
 <template>
     <div>
@@ -617,12 +760,12 @@ const refreshState = () =>{
                         v-if="!showForm" v-model="searchValue" @keyup.enter="search()" aria-describedby="searchaddon" :disabled="preLoading? true:false">
                 </div> -->
                 <div class="d-flex gap-2 justify-content-center align-content-center">
-                    <input type="text" v-model="searchFname" @keyup.enter="search()"
-                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
-                    <input type="text" v-model="searchMname" @keyup.enter="search()"
-                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
                     <input type="text" v-model="searchLname" @keyup.enter="search()"
                         class="neu-input" :disabled="preLoading?true:false" placeholder="Last Name"/>
+                    <input type="text" v-model="searchMname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="Middle Name"/>
+                    <input type="text" v-model="searchFname" @keyup.enter="search()"
+                        class="neu-input" :disabled="preLoading?true:false" placeholder="First Name"/>
                     <button @click="search()" type="button" class="neu-btn neu-blue" tabindex="-1" :disabled="preLoading?true:false">
                         <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
                     </button>
@@ -682,6 +825,9 @@ const refreshState = () =>{
                                     <button data-bs-toggle="modal" data-bs-target="#scholarshipmodal" @click="editData(app.per_id, 2)"
                                         type="button" title="Add Scholarship" class="neu-btn-sm neu-white">
                                         <font-awesome-icon icon="fa-solid fa-graduation-cap"/></button>
+                                    <button data-bs-toggle="modal" data-bs-target="#otherchargesmodal" @click="editData(app.per_id, 4)"
+                                        type="button" title="Add Other Charges" class="neu-btn-sm neu-white">
+                                        <font-awesome-icon icon="fa-solid fa-money-bill"/></button>
                                 </div>
                                 <!-- <div class="d-flex gap-2 justify-content-center">
                                     <button data-bs-toggle="modal" data-bs-target="#permitmodal" @click="editData(app.per_id, 3)"
@@ -783,6 +929,7 @@ const refreshState = () =>{
             </div>
         </div>
     </div>
+    
 
         <!-- Scholarship Modal -->
     <div class="modal fade" id="scholarshipmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -809,8 +956,8 @@ const refreshState = () =>{
                                     <td class="align-middle">
                                         <select class="neu-input neu-select" v-model="scholarshipType" :disabled="loadingScholarship? true:false">
                                             <option value="" disabled>-- Select Type --</option>
-                                            <option value="1">Percentage</option>
-                                            <option value="2">Amount</option>
+                                            <option value="1">Amount</option>
+                                            <option value="2">Percentage</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
@@ -861,8 +1008,8 @@ const refreshState = () =>{
                                     <td class="align-middle">
                                         <select class="neu-input neu-select" v-model="sch.sch_type">
                                             <option value="" disabled>-- Select Type --</option>
-                                            <option value="1">Percentage</option>
-                                            <option value="2">Amount</option>
+                                            <option value="1">Amount</option>
+                                            <option value="2">Percentage</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
@@ -910,6 +1057,128 @@ const refreshState = () =>{
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showStudAccModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- other charges modal -->
+    <div class="modal fade" id="otherchargesmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Other Charges</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showOtherChargesModal = false"></button>
+                </div>
+                <div class="modal-body overflow-auto neu-bg" style="height: 500px;">
+                        <!-- <div class="w-100 d-flex justify-content-end p-2">
+                            <button type="button" class="btn btn-sm btn-dark" title="Save Updates">
+                                <font-awesome-icon icon="fa-solid fa-add"/> Add new
+                            </button>
+                        </div> -->
+                         <table class="neu-table small-font">
+                            <thead>
+                                 <tr>
+                                    <td class="align-middle">
+                                        <input type="text" class="neu-input" placeholder="Description Here" v-model="otherChargesDescription"/>
+                                    </td>
+                                    <td class="align-middle">
+                                        <select class="neu-input neu-select" v-model="otherChargesType" :disabled="loadingOtherCharges? true:false">
+                                            <option value="" disabled>-- Select Type --</option>
+                                           <option value="1">Amount</option>
+                                            <option value="2">Percentage</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <input v-if="otherChargesType" type="number" class="neu-input" 
+                                         :placeholder="otherChargesType == 1? 'Enter Amount':'Enter percentage'" v-model="otherChargesAmount" :disabled="loadingOtherCharges? true:false"/>
+                                        <span v-else>Please select other charges type first</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <select class="neu-input neu-select" v-model="otherChargesAccountId" :disabled="loadingOtherCharges? true:false">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option v-for="(sts, index) in studentSettlement" :value="sts.acs_id">{{ sts.acs_accheader }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <button type="button" class="neu-btn neu-green p-2" title="Save Updates" @click="addOtherCharges()" :disabled="loadingOtherCharges? true:false">
+                                            <font-awesome-icon icon="fa-solid fa-add"/> Add new
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th colspan="5" class="p-3 bg-secondary-subtle"></th>
+                                </tr>
+                                <tr>
+                                    <th>Other Charges Description</th>
+                                    <th>Charges Percentage</th>
+                                    <th>Charges Amount</th>
+                                    <th>Account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-if="!Object.keys(otherChargesDetails).length && loadingOtherCharges">
+                                    <td colspan="5">
+                                        <NeuLoader2/>
+                                    </td>
+                                </tr>
+                                <tr v-if="!Object.keys(otherChargesDetails).length && !loadingOtherCharges">
+                                    <td colspan="5" class="p-3 text-center">
+                                        <NeuLoader4/>
+                                        <p class="fw-bold m-0">Nothing here yet!</p>
+                                        <p>try adding something new.</p>
+                                    </td>
+                                </tr>
+                                <tr v-for="(oth, index) in otherChargesDetails" v-if="Object.keys(otherChargesDetails).length && !loadingOtherCharges">
+                                    <td class="align-middle">
+                                        <input type="text" class="neu-input" placeholder="Description Here" v-model="oth.oth_description"/>
+                                    </td>
+                                    <td class="align-middle">
+                                        <select class="neu-input neu-select" v-model="oth.oth_type">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option value="1">Amount</option>
+                                            <option value="2">Percentage</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <input v-if="oth.oth_value" type="number" class="neu-input" 
+                                         :placeholder="oth.oth_value == 1? 'Enter Amount':'Enter percentage'" v-model="oth.oth_value"/>
+                                        <span v-else>Please select other charge type first</span>
+                                    </td>
+                                     <td class="align-middle">
+                                        <select class="neu-input neu-select" v-model="oth.oth_acsid">
+                                            <option value="" disabled>-- Select Type --</option>
+                                            <option v-for="(sts, index) in studentSettlement" :value="sts.acs_id">{{ sts.acs_accheader }}</option>
+                                        </select>
+                                    </td>
+                                    <td class="align-middle">
+                                        <div class="d-flex gap-1 justify-content-center">
+                                            <button v-if="oth.oth_id" type="button" class="neu-btn neu-green" title="Save Updates" @click="saveOtherCharges(2, oth)">
+                                                <font-awesome-icon icon="fa-solid fa-floppy-disk"/>  
+                                            </button>
+                                            <button type="button" class="neu-btn neu-red" title="Delete Other Charge" @click="saveOtherCharges(3, oth)">
+                                                <font-awesome-icon icon="fa-solid fa-trash"/> 
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                         </table>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showOtherChargesModal = false">Close</button>
                         <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>

@@ -49,7 +49,8 @@ import {
   faThumbsUp,
   faThumbsDown,
   faCakeCandles,
-  faGift
+  faGift,
+  faMoneyBill
 } from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
@@ -57,7 +58,7 @@ library.add(
   faUserSecret, faPen, faTrash, faGear, faIdCardClip, faSearch,
   faPowerOff, faAdd, faPrint, faTag, faRotateLeft, faEye, faEarListen,
   faFolder, faPills, faKey, faUserPlus, faIdCard, faGraduationCap, faCashRegister, faFloppyDisk, faArrowsRotate, faWrench,
-  faHand, faBook, faDownload, faBan, faUpload, faFileExcel, faThumbsUp, faThumbsDown, faCakeCandles, faGift
+  faHand, faBook, faDownload, faBan, faUpload, faFileExcel, faThumbsUp, faThumbsDown, faCakeCandles, faGift, faMoneyBill
    
 )
 
