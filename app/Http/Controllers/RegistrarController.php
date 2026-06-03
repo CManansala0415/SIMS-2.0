@@ -1706,6 +1706,31 @@ class RegistrarController extends Controller
 
         /*
         |--------------------------------------------------------------------------
+        | Other Charges, if already applied bago mag enroll
+        |--------------------------------------------------------------------------
+        */
+        $other_charges_percent = 0;
+        $other_charges_fixed = 0;
+
+        $otherCharges = DB::table('def_accounts_other_charges')
+            ->where('och_status', '=', 1)
+            ->where('och_personid', '=', $request->input('enr_personid'))
+            ->get();
+
+        foreach ($otherCharges as $tp) {
+
+            if ($tp->och_status == 1) {
+
+                if ($tp->och_type == 1) {
+                    $other_charges_percent += $tp->och_value;
+                } else {
+                    $other_charges_fixed += $tp->och_value;
+                }
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
         | CHECK SOA
         |--------------------------------------------------------------------------
         */
@@ -1729,7 +1754,7 @@ class RegistrarController extends Controller
         if (!$soa) {
 
             $final =
-                $totalCost -
+                ($totalCost + $chargeAmount) -
                 (
                     ($deductions_fixed + ($totalCost * (float) ($deductions_percent / 100))) +
                     ($scholarship_fixed + ($totalCost * (float) ($scholarship_percent / 100)))
@@ -3531,7 +3556,7 @@ class RegistrarController extends Controller
             // }else{
                 
             // }
-            
+
             DB::beginTransaction();
 
             DB::table('def_enrollment')

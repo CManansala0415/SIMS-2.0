@@ -147,7 +147,7 @@ const paginate = (mode) => {
                 offset.value = 0
                 tuitionInfoCount.value = 0
                 preLoading.value = true
-                getTuitionInformation(limit.value, offset.value, searchValue.value).then((results) => {
+                getTuitionInformation(limit.value, offset.value, 2, searchValue.value).then((results) => {
                     tuitionInfo.value = results.data
                     tuitionInfoCount.value = results.count
                     preLoading.value = false

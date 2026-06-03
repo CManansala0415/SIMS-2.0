@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue"
 import AccountingPaymentModal from "../modal/AccountingPaymentModal.vue"
-import { getStudentAccount, getPaymentDetails, getScholarshipDetails, getDemograph } from "../../Fetchers.js"
+import { getStudentAccount, getPaymentDetails, getScholarshipDetails, getDemograph, getOtherChargesDetails } from "../../Fetchers.js"
 import { pesoConverter,formatDateTime, pdfGenerator, pdfAutoPrint } from "../../Generators.js"
 import NeuLoader2 from "../loaders/NeuLoader2.vue"
 
@@ -37,6 +37,8 @@ const totalItemCost = ref(0)
 const totalMiscCost = ref(0)
 const totalFixedDiscount = ref(0)
 const totalPercentDiscount = ref(0)
+const totalFixedOtherCharges = ref(0)
+const totalPercentOtherCharges = ref(0)
 const totalDiscount = ref(0)
 const grandTotal = ref(0)
 const totalTuition = ref(0)
@@ -51,6 +53,7 @@ const finalBalanceAmount = ref(0)
 const soaStatus = ref(false)
 const studentSettlements = ref([])
 const scholarshipDetails = ref([])
+const otherChargesDetails = ref([])
 const studentAccountSubjects = ref([])
 const totalTuionFeeNodeduction = ref(0)
 const deductionFromSoa = ref(0)
@@ -58,6 +61,7 @@ const studentAccounts = ref([])
 const selectedAccountHeader = ref('')
 const filteredStudentAccount = ref([])
 const filteredStudentSettlement = ref([])
+const totalCharges = ref(0)
 const demograph = ref([])
 /* ───────────── lifecycle ───────────── */
 onMounted(async () => {
@@ -65,22 +69,27 @@ onMounted(async () => {
 
     getDemograph().then((res)=>{ // load the address first to maintain time
         demograph.value = res
-
-       
     })
 
-    const [accountRes, scholarshipRes] = await Promise.all([
+    const [accountRes, scholarshipRes, otherChargesRes] = await Promise.all([
         getStudentAccount(personID.value),
-        getScholarshipDetails(personID.value)
+        getScholarshipDetails(personID.value),
+        getOtherChargesDetails(personID.value)
     ])
 
     scholarshipDetails.value = scholarshipRes.joined.map(e => ({
         ...e,
         sch_total: e.sch_type == 1 ? e.sch_value / 100 : e.sch_value
     }))
-    
-    // console.log(accountRes)
+
+    otherChargesDetails.value = otherChargesRes.joined.map(e => ({
+        ...e,
+        oth_total: e.oth_type == 1 ? e.oth_value / 100 : e.oth_value
+    }))
+
+    console.log(accountRes)
     // console.log(scholarshipRes)
+    // console.log(otherChargesRes)
     
 
     studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
@@ -160,6 +169,11 @@ const recomputeAccountTotals = async () => {
         if (e.sch_type === 2) totalFixedDiscount.value += e.sch_total
     })
 
+    otherChargesDetails.value.forEach(e => { 
+        if (e.oth_type === 1) totalPercentOtherCharges.value += e.oth_total
+        if (e.oth_type === 2) totalFixedOtherCharges.value += e.oth_total
+    })
+    
     rows.forEach(item => {
         let computedLab = 0;
         if (item.soa_subjid) {
@@ -199,8 +213,9 @@ const recomputeAccountTotals = async () => {
 
     totalTuionFeeNodeduction.value = subtotal
     totalDiscount.value = subtotal * totalPercentDiscount.value + totalFixedDiscount.value
+    totalCharges.value = totalTuition.value + (totalTuition.value * totalPercentOtherCharges.value) + totalFixedOtherCharges.value
     totalTuition.value = subtotal - totalDiscount.value
-    grandTotal.value = totalTuition.value - totalPayment.value
+    grandTotal.value = (totalTuition.value + totalCharges.value) - totalPayment.value
 
     prelimAmount.value =
     midtermAmount.value =
@@ -786,19 +801,36 @@ const printPermit = (mode) =>{
                                     <span>{{ pesoConverter(totalLabCost) }}</span>
                                 </div>
 
+                                
                                 <div class="d-flex justify-content-between mb-1">
-                                    <span>Item/Miscellaneous Fees</span>
+                                    <span>Items / Additional</span>
                                     <span>{{ pesoConverter(totalItemCost) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Miscellaneous</span>
+                                    <span>{{ pesoConverter(totalMiscCost) }}</span>
+                                </div>
+
+                                <hr>
+
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Total Tuition Cost</span>
+                                    <span class="fw-bold">{{ pesoConverter(totalLecCost+totalLabCost) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Total Misc Cost</span>
+                                    <span class="fw-bold">{{ pesoConverter(totalMiscCost + totalItemCost) }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Other Charges</span>
+                                    <span class="fw-bold">{{ pesoConverter(totalCharges) }}</span>
                                 </div>
 
                                 <div class="d-flex justify-content-between mb-1">
-                                    <span>Other Charges</span>
-                                    <span>{{ pesoConverter(totalMiscCost) }}</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-1">
                                     <span>Total Tuition</span>
-                                    <span>{{ pesoConverter(totalTuionFeeNodeduction) }}</span>
+                                    <span class="fw-bold text-bg-primary">{{ pesoConverter(totalTuionFeeNodeduction + totalCharges) }}</span>
                                 </div>
+
                                 <hr>
 
                                 <div class="d-flex justify-content-between text-danger mb-1">
@@ -885,7 +917,7 @@ const printPermit = (mode) =>{
                         </div> -->
                         </div>
                     </div>
-
+                  
                     <!-- FOOTER -->
                     <p class="text-center small mt-4">
                         This is a system-generated statement and is valid without signature.

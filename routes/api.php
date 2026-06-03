@@ -144,7 +144,8 @@ Route::middleware(['auth:sanctum'])->get('/get-student-account/{id}', [FinanceCo
 Route::middleware(['auth:sanctum'])->get('/get-settlement-details/{id}', [FinanceController::class,'getSettlementDetails']);
 Route::middleware(['auth:sanctum'])->get('/get-scholarship-details/{id}', [FinanceController::class,'getScholarshipDetails']);
 Route::middleware(['auth:sanctum'])->post('/add-scholarship-details', [FinanceController::class,'addScholarshipDetails']);
-
+Route::middleware(['auth:sanctum'])->get('/get-other-charges-details/{id}', [FinanceController::class,'getOtherChargesDetails']);
+Route::middleware(['auth:sanctum'])->post('/add-other-charges-details', [FinanceController::class,'addOtherChargesDetails']);
 
 
 Route::middleware(['auth:sanctum'])->post('/add-clinical-students', [ClinicController::class,'addStudentClinicalRecord']);

@@ -291,7 +291,28 @@ class FinanceController extends Controller
                 case 1:
                     break;
                 case 2:
+                    $query = DB::table('def_accounts_tuition_header as act')
+                    ->leftJoin('def_program as course', 'act.act_course', '=', 'course.prog_id')
+                    ->leftJoin('sett_degree_types as program', 'act.act_program', '=', 'program.dtype_id')
+                    ->leftJoin('def_gradelvl as gradelvl', 'act.act_gradelvl', '=', 'gradelvl.grad_id')
+                    ->leftJoin('def_section as section', 'act.act_section', '=', 'section.sec_id')      
+                    ->leftJoin('sett_quarter as quarter', 'act.act_sem', '=', 'quarter.quar_id')      
+                    ->select(
+                        'act.*',
+                        'prog_name as prog_code',
+                        'grad_name as gradelvl_desc',
+                        'sec_name as sec_desc',
+                        'dtype_desc as prog_desc',
+                        'quar_desc as quar_desc'
+                    )
+                    ->where('act.act_description', 'like', '%' . $item . '%')
+                    ->limit($limit)
+                    ->offset($offset)
+                    ->get();
+
+                    $count = $query->count();
                     break;
+
                 default:
                     $query = DB::table('def_accounts_tuition_header as act')
                     ->leftJoin('def_program as course', 'act.act_course', '=', 'course.prog_id')
@@ -654,10 +675,16 @@ class FinanceController extends Controller
             );
 
             $scholarship = $this->getScholarshipDetails($personid);
+            $othercharges = $this->getOtherChargesDetails($personid);
 
             $scholarshipdata = [];
             foreach ($scholarship['raw'] as $row) {
                  $scholarshipdata[] = $row;
+            }
+
+            $otherchargesdata = [];
+            foreach ($othercharges['raw'] as $row) {
+                 $otherchargesdata[] = $row;
             }
 
             /*
@@ -696,7 +723,8 @@ class FinanceController extends Controller
             $deductions_fixed = 0;
             $deductions_percent = 0;
             $computed_percent = 0;
-
+            $other_charges_percent = 0;
+            $other_charges_fixed = 0;
             $mergedMilestones = [];
 
             foreach ($milestonedata as $ms) {
@@ -807,16 +835,27 @@ class FinanceController extends Controller
                 }
             }
 
+            foreach ($otherchargesdata as $tp) {
+                if ($tp->oth_type == 1) {
+                    $other_charges_percent += (float) ($tp->oth_value ?? 0);
+                }else{
+                    $other_charges_fixed += (float) ($tp->oth_value ?? 0);
+                }
+            }
+
+            $chargeAmount = ($other_charges_fixed + ($overall_amount * ($other_charges_percent / 100)));
+                    
             return [
                 'subjects_amount' => $subjects_amount,
                 'scholarship' => $scholarshipdata,
+                'othercharges' => $otherchargesdata,
                 'misc_amount' => $misc_amount,
                 'item_amount' => $item_amount,
                 'lab_amount' => $lab_amount,
                 'lec_amount' => $lec_amount,
                 'deductions' => $deductions_fixed + ($overall_amount * ($deductions_percent / 100)),
                 'percent' => $deductions_percent,
-                'overall_amount' => $overall_amount - ($deductions_fixed + ($overall_amount * (float) ($deductions_percent / 100))),
+                'overall_amount' => ($overall_amount + $chargeAmount) - ($deductions_fixed + ($overall_amount * (float) ($deductions_percent / 100))),
                 'status' => 200
             ];
     }
@@ -1009,6 +1048,81 @@ class FinanceController extends Controller
             else{
                 $query = DB::table('def_accounts_scholarship')
                 ->where('sch_id','=', $request->input('sch_id'))
+                ->delete();
+            }
+
+            return [
+                'data' => $request,
+                'status' => 200
+            ];
+        }catch (Exception $ex) {
+            return [
+                'data' => 'No Data',
+                'status' => 500
+            ];
+        }
+    }
+
+    public function getOtherChargesDetails($id)
+    {
+        // raw
+        $otherCharges1 = DB::table('def_accounts_other_charges')
+                          ->where('oth_status', '=',  1)
+                          ->where('oth_personid', '=',  $id)
+                          ->get();
+
+        // joined
+        $otherCharges2 = DB::table('def_accounts_other_charges as oth')
+        ->leftJoin('def_enrollment as enr', 'oth.oth_personid','=','enr.enr_personid') 
+        ->select(
+            'oth.*',
+            'enr.*',
+        )
+        ->where('oth.oth_status', '=',  1)
+        ->where('oth.oth_personid', '=',  $id)
+        ->get();
+
+         return [
+                'raw' => $otherCharges1,
+                'joined' => $otherCharges2,
+                'status' => 200
+            ];
+    }
+
+    public function addOtherChargesDetails(Request $request)
+    {
+        date_default_timezone_set('Asia/Manila');
+        $date = date('Y-m-d H:i:s');
+        try{
+
+            if($request->input('oth_mode') == 1){ // insert
+                $query = DB::table('def_accounts_other_charges')
+                ->insert([
+                    'oth_value' => $request->input('oth_value'),
+                    'oth_description' => $request->input('oth_description'),
+                    'oth_type' => $request->input('oth_type'),
+                    'oth_personid' => $request->input('oth_personid'),
+                    'oth_addedby' => $request->input('user_id'),
+                    'oth_acsid' => $request->input('oth_acsid'),
+                    'oth_dateadded' => $date,
+                ]);
+
+            }else if($request->input('oth_mode') == 2){
+                $query = DB::table('def_accounts_other_charges')
+                ->where('oth_id','=', $request->input('oth_id'))
+                ->update([
+                    'oth_value' => $request->input('oth_value'),
+                    'oth_description' => $request->input('oth_description'),
+                    'oth_type' => $request->input('oth_type'),
+                    'oth_personid' => $request->input('oth_personid'),
+                    'oth_acsid' => $request->input('oth_acsid'),
+                    'oth_updatedby' => $request->input('user_id'),
+                    'oth_dateupdated' => $date,
+                ]);
+            }
+            else{
+                $query = DB::table('def_accounts_other_charges')
+                ->where('oth_id','=', $request->input('oth_id'))
                 ->delete();
             }
 

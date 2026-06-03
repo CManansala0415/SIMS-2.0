@@ -265,7 +265,7 @@ const paginate = (mode) => {
                 student.value = []
                 offset.value -= 10
                 studentCount.value = 0
-                preLoading.value = true
+                
                 
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
@@ -310,7 +310,6 @@ const paginate = (mode) => {
                 student.value = []
                 offset.value += 10
                 studentCount.value = 0
-                preLoading.value = true
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 1).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
@@ -352,7 +351,7 @@ const paginate = (mode) => {
                 student.value = []
                 offset.value = 0
                 studentCount.value = 0
-                preLoading.value = true
+                
                 getStudentFiltering(limit.value, offset.value, searchFname.value, searchMname.value, searchLname.value, paramsProgram.value, paramsGradelvl.value, paramsCourse.value, 0).then((results) => {
                     student.value = results.data
                     studentCount.value = results.count
@@ -553,6 +552,7 @@ const handleImage = (e) => {
 
 const search = (mode) => {
     accounts.value = []
+    preLoading.value = true
     getAccountsDetails().then((results) => {
         accounts.value = results
         paginate(mode)
@@ -712,12 +712,12 @@ const getNoPrint = (data) =>{
             <SkeletonHeaderLoader :elementcount="4" v-if="preLoading"/>
             <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 justify-content-center align-content-center">
-                    <input type="text" v-model="searchFname" @keyup.enter="search('search')" class="neu-input"
-                        :disabled="preLoading ? true : false" placeholder="First Name" />
-                    <input type="text" v-model="searchMname" @keyup.enter="search('search')" class="neu-input"
-                        :disabled="preLoading ? true : false" placeholder="Middle Name" />
                     <input type="text" v-model="searchLname" @keyup.enter="search('search')" class="neu-input"
                         :disabled="preLoading ? true : false" placeholder="Last Name" />
+                    <input type="text" v-model="searchMname" @keyup.enter="search('search')" class="neu-input"
+                        :disabled="preLoading ? true : false" placeholder="Middle Name" />
+                    <input type="text" v-model="searchFname" @keyup.enter="search('search')" class="neu-input"
+                        :disabled="preLoading ? true : false" placeholder="First Name" />
                     <button @click="search('search')" type="button" class="neu-btn neu-blue" tabindex="-1"
                         :disabled="preLoading ? true : false">
                         <font-awesome-icon icon="fa-solid fa-magnifying-glass" /> Search

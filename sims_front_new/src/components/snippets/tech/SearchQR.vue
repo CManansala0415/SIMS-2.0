@@ -5,6 +5,9 @@ import Loader from '../loaders/Loader1.vue';
 import {
     getQRData
 } from "../../Fetchers.js";
+import {
+    lvl2Decrypt
+} from "../../generators.js";
 const refid = ref('')
 const preLoading = ref(false)
 const inactive = ref(true)
@@ -38,9 +41,14 @@ const search = () =>{
     disabler.value=true
     active.value = inactive.value = false
     progress.value = true
-
+    
+    
+    
     let x = refid.value? refid.value:0
-    getQRData(x, mode.value).then((result)=>{
+    let key = "SIMS_CLCST_@2026!--*";
+    const decrypted = lvl2Decrypt(x, key);
+
+    getQRData(decrypted, mode.value).then((result)=>{
         emit('fetchData', result)
         refid.value = ''
         preLoading.value=false

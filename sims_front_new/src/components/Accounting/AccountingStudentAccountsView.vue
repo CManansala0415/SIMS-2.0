@@ -956,13 +956,13 @@ const resetOtherChargesDetails = () =>{
                                     <td class="align-middle">
                                         <select class="neu-input neu-select" v-model="scholarshipType" :disabled="loadingScholarship? true:false">
                                             <option value="" disabled>-- Select Type --</option>
-                                            <option value="1">Amount</option>
-                                            <option value="2">Percentage</option>
+                                            <option value="1">Percentage</option>
+                                            <option value="2">Amount</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
                                         <input v-if="scholarshipType" type="number" class="neu-input" 
-                                         :placeholder="scholarshipType == 1? 'Enter Amount':'Enter percentage'" v-model="scholarshipAmount" :disabled="loadingScholarship? true:false"/>
+                                         :placeholder="scholarshipType == 1? 'Enter percentage':'Enter Amount'" v-model="scholarshipAmount" :disabled="loadingScholarship? true:false"/>
                                         <span v-else>Please select scholarship type first</span>
                                     </td>
                                     <td class="align-middle">
@@ -1008,13 +1008,13 @@ const resetOtherChargesDetails = () =>{
                                     <td class="align-middle">
                                         <select class="neu-input neu-select" v-model="sch.sch_type">
                                             <option value="" disabled>-- Select Type --</option>
-                                            <option value="1">Amount</option>
-                                            <option value="2">Percentage</option>
+                                            <option value="1">Percentage</option>
+                                            <option value="2">Amount</option>
                                         </select>
                                     </td>
                                     <td class="align-middle">
                                         <input v-if="sch.sch_value" type="number" class="neu-input" 
-                                         :placeholder="sch.sch_value == 1? 'Enter Amount':'Enter percentage'" v-model="sch.sch_value"/>
+                                         :placeholder="sch.sch_value == 1? 'Enter percentage':'Enter Amount'" v-model="sch.sch_value"/>
                                         <span v-else>Please select scholarship type first</span>
                                     </td>
                                      <td class="align-middle">
