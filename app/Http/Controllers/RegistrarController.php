@@ -1713,21 +1713,22 @@ class RegistrarController extends Controller
         $other_charges_fixed = 0;
 
         $otherCharges = DB::table('def_accounts_other_charges')
-            ->where('och_status', '=', 1)
-            ->where('och_personid', '=', $request->input('enr_personid'))
+            ->where('oth_status', '=', 1)
+            ->where('oth_personid', '=', $request->input('enr_personid'))
             ->get();
 
         foreach ($otherCharges as $tp) {
 
-            if ($tp->och_status == 1) {
+            if ($tp->oth_status == 1) {
 
-                if ($tp->och_type == 1) {
-                    $other_charges_percent += $tp->och_value;
+                if ($tp->oth_type == 1) {
+                    $other_charges_percent += $tp->oth_value;
                 } else {
-                    $other_charges_fixed += $tp->och_value;
+                    $other_charges_fixed += $tp->oth_value;
                 }
             }
         }
+
 
         /*
         |--------------------------------------------------------------------------
@@ -1753,6 +1754,8 @@ class RegistrarController extends Controller
         */
         if (!$soa) {
 
+            $chargeAmount = ($other_charges_fixed + ($totalCost * ($other_charges_percent / 100)));
+ 
             $final =
                 ($totalCost + $chargeAmount) -
                 (
