@@ -601,7 +601,7 @@ const printForm = async (libraryCard) => {
                                                             <img class="p-1"
                                                                 height="30px"
                                                                 width="30px"
-                                                                :src="lc.per_sinature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + lc.per_sinature +'/1' : '/img/rpl.png'"
+                                                                :src="lc.per_sinature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + lc.per_sinature +'/1' : '/img/blank.png'"
                                                                 alt="">
 
                                                         </div>
