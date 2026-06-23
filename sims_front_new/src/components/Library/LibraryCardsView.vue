@@ -341,9 +341,9 @@ const getData = (result) =>{
                     <button @click="showQRScanner = true" data-bs-toggle="modal" data-bs-target="#scanqrmodal" type="button" class="neu-btn neu-purple" tabindex="-1" :disabled="preLoading?true:false">
                         <font-awesome-icon icon="fa-solid fa-id-card"/> Scan QR 
                     </button>
-                    <button @click="showMassPrinter = true" data-bs-toggle="modal" data-bs-target="#massprintmodal" type="button" class="neu-btn neu-green" tabindex="-1" :disabled="preLoading?true:false">
+                    <!-- <button @click="showMassPrinter = true" data-bs-toggle="modal" data-bs-target="#massprintmodal" type="button" class="neu-btn neu-green" tabindex="-1" :disabled="preLoading?true:false">
                         <font-awesome-icon icon="fa-solid fa-print"/> Mass Print 
-                    </button>
+                    </button> -->
                 </div>
             </div>
             <div class="table-responsive border p-3 small-font"  style="text-transform:uppercase">
