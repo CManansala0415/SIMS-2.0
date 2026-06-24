@@ -514,6 +514,7 @@ class LibraryController extends Controller
                     'per.per_lastname',
                     'per.per_suffixname',
                     'per.per_profile',
+                    'per.per_signature',
                     'des.ident_identification as studentid',
                 )
                 ->where('lbd.lbrd_personid','=', $personid)
@@ -534,6 +535,7 @@ class LibraryController extends Controller
                 'per.per_lastname',
                 'per.per_suffixname',
                 'per.per_profile',
+                'per.per_signature',
                 'per.per_contact',
                 'per.per_email',
                 'des.ident_identification as studentid',
@@ -573,6 +575,7 @@ class LibraryController extends Controller
                 'per.per_lastname',
                 'per.per_suffixname',
                 'per.per_profile',
+                'per.per_signature',
                 'per.per_contact',
                 'per.per_email',
                 'des.ident_identification as studentid',
