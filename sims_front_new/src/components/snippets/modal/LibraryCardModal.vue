@@ -90,6 +90,7 @@ onMounted(async() => {
                 //map profile picture
                 libraryCards.value = results.cards.map((e) => {
                     let z = ''
+                    let y = ''
                     if (e.per_profile) {
                         // z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
                         z = 'http://sims.clcst.edu.local:8000/api/get-person-image/' + e.per_profile +'/1'
@@ -101,9 +102,17 @@ onMounted(async() => {
                         }
                     }
 
+                    if (e.per_signature) {
+                        // z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        y = 'http://sims.clcst.edu.local:8000/api/get-person-image/' + e.per_signature +'/3'
+                    } else {
+                       y = '/img/blank.png'
+                    }
+
                     return {
                         ...e,
                         profile_picture: z,
+                        signature_picture: y,
                     }
                 })
 
@@ -111,7 +120,10 @@ onMounted(async() => {
                     hasActiveCard.value = true
                 }
                 preLoading.value = false
+            // console.log(libraryCards.value)
+
             })
+
         })
     } catch (err) {
         // preLoading.value = false
@@ -574,7 +586,7 @@ const printForm = async (libraryCard) => {
                                                             </li>
 
                                                             <li class="list-group-item p-1">
-                                                                Grade Level:
+                                                                Year Level:
                                                                 <span class="fw-bold text-uppercase">
                                                                     {{ gradelvl.find(g => g.grad_id === studentdata.enr_gradelvl)?.grad_name || '—' }}
                                                                 </span>
@@ -601,7 +613,7 @@ const printForm = async (libraryCard) => {
                                                             <img class="p-1"
                                                                 height="30px"
                                                                 width="30px"
-                                                                :src="lc.per_sinature ? 'http://sims.clcst.edu.local:8000/api/get-person-image/' + lc.per_sinature +'/1' : '/img/blank.png'"
+                                                                :src="lc.signature_picture"
                                                                 alt="">
 
                                                         </div>
