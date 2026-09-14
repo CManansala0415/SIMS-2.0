@@ -55,6 +55,8 @@ const userID = computed(() => {
     return props.userIdData
 });
 
+const showArchiveModal = ref(false)
+const courseID = ref(0)
 const showCommandCenterModal = ref(false)
 const formValue = ref(0)
 const preLoading = ref(false)
@@ -228,36 +230,62 @@ const execute = (type, mode) => {
                                 allowOutsideClick: false
                             });
                             
-                            resetStopwatch()
-                            startStopwatch()// trigger progress bar
-                            
+                           
+                            // getAcademicStatus(1,'cs_06').then((results)=>{
+                            //     results[0].sett_status == 1? semesterstat = true: semesterstat = false
 
-                            let semesterstat = false
-                            getAcademicStatus(1,'cs_06').then((results)=>{
-                                results[0].sett_status == 1? semesterstat = true: semesterstat = false
-
-                                if(semesterstat){
-                                    stopStopwatch()
-                                    setTimeout(Swal.fire("Terminate semester first to use this command", "", "info"), 1500);
+                            //     if(semesterstat){
+                            //         stopStopwatch()
+                            //         setTimeout(Swal.fire("Terminate semester first to use this command", "", "info"), 1500);
                                     
-                                }else{
-                                    let x = {
-                                        mode:3,//means archive semester,
-                                        userid:userID.value,
-                                    }
-                                    setAcademicStatus(x).then((result)=>{
-                                        if (result.status == 200) {
-                                            stopStopwatch();
-                                            setTimeout(noticeAlert, 1800);
-                                            alertNotice.value = 1
-                                        } else {
-                                            stopStopwatch();
-                                            setTimeout(noticeAlert, 1800);
-                                            alertNotice.value = 2
-                                        }
-                                    })
+                            //     }else{
+                            //         let x = {
+                            //             course: courseID.value,
+                            //             mode:3,//means archive semester,
+                            //             userid:userID.value,
+                            //         }
+                            //         console.log(x)
+                            //         setAcademicStatus(x).then((result)=>{
+                            //             if (result.status == 200) {
+                            //                 stopStopwatch();
+                            //                 setTimeout(noticeAlert, 1800);
+                            //                 alertNotice.value = 1
+                            //             } else {
+                            //                 stopStopwatch();
+                            //                 setTimeout(noticeAlert, 1800);
+                            //                 alertNotice.value = 2
+                            //             }
+                            //         })
+                            //     }
+                            // })
+
+                            if(courseID.value == null || courseID.value == undefined){
+                                Swal.fire("Please select course first to use this command", "", "info");
+
+                            }else{
+                                resetStopwatch()
+                                startStopwatch()// trigger progress bar
+                                
+                                let semesterstat = false
+                                let x = {
+                                    course: courseID.value,
+                                    mode:3,//means archive semester,
+                                    userid:userID.value,
                                 }
-                            })
+                                setAcademicStatus(x).then((result)=>{
+                                    if (result.status == 200) {
+                                        stopStopwatch();
+                                        setTimeout(noticeAlert, 1800);
+                                        alertNotice.value = 1
+                                    } else {
+                                        stopStopwatch();
+                                        setTimeout(noticeAlert, 1800);
+                                        alertNotice.value = 2
+                                    }
+                                })
+                            }
+                           
+
                         }
                     });
                     break;
@@ -346,9 +374,13 @@ const savingBar = (data) =>{
 
     if(width<=100){
         elem.style.width = width + "%";
+        percent.innerHTML = width
+
+    }else{
+        elem.style.width = "100%";
+        percent.innerHTML = "100";
     }
 
-    percent.innerHTML = width
     // var i = 0;
     // if (i == 0) {
     //     i = 1;
@@ -557,7 +589,10 @@ const resetStopwatch = () => {
                                             Generate and save all current semester information to the server.
                                         </td>
                                         <td class="align-middle">
-                                            <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 5)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button>
+                                            <button @click="showArchiveModal = true" data-bs-toggle="modal" data-bs-target="#archivemodal" type="button" class="neu-btn-sm neu-white" tabindex="-1" :disabled="preLoading?true:false">
+                                                <font-awesome-icon icon="fa-solid fa-wrench"/> Execute
+                                            </button>
+                                            <!-- <button type="button" class="neu-btn-sm neu-white" @click="execute(2, 5)"><font-awesome-icon icon="fa-solid fa-wrench"/> Execute</button> -->
                                         </td>
                                     </tr>
                                     <tr>
@@ -708,6 +743,47 @@ const resetStopwatch = () => {
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             @click="showCommandCenterModal = false">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Archive Modal -->
+    <div class="modal fade" id="archivemodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Archive</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        @click="showArchiveModal = false" id="hidearchivemodal"></button>
+                </div>
+                <div class="modal-body neu-bg">
+                    <div class="d-flex flex-column gap-3">
+                        <select class="neu-input neu-select" aria-label="Default" v-model="courseID">
+                            <option value="0">All Course</option>
+                            <option v-for="(item, index) in courseData" :key="index" :value="item.prog_id">{{ item.prog_name }}</option>
+                        </select>
+                        <p class="p-0 m-0 small-font">Courses to be archived: 
+                            <span class="fw-bold">
+                                {{ courseID == 0? 'All Courses': courseData.find(x=> x.prog_id == courseID)?.prog_name }}
+                            </span>
+                        </p>
+                        <button type="button" class="neu-btn neu-green"
+                                @click="execute(2, 5)">Execute </button>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div class="form-group">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your personal information
+                            with anyone
+                            else (Data Privacy Act of 2012)</small>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            @click="showArchiveModal = false">Close</button>
+                        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
                     </div>
                 </div>
             </div>

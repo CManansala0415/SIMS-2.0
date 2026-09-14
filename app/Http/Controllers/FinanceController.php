@@ -663,6 +663,48 @@ class FinanceController extends Controller
         }
     }
 
+    public function getSubjectRate(Request $params)
+    {
+        try {
+           if($params->mode == 2){
+            if($params->course == 0){
+                $query = DB::table('def_subject')
+                ->where('subj_id', $params->id)
+                ->where('subj_status', 1)
+                ->get();
+
+            }else{
+                $query = DB::table('def_subject_rate')
+                ->where('subjrate_subjid', $params->id)
+                ->where('subjrate_course', $params->course)
+                ->where('subjrate_status', 1)
+                ->get();
+            }
+
+            $query? $status = 200 : $status = 500;  
+
+           }else{
+             $query = DB::table('def_subject_rate')
+                ->where('subjrate_status', 1)
+                ->get();
+
+             $query? $status = 200 : $status = 500;      
+           }
+
+            return [
+                'data' => $query,
+                'status' => $status
+            ];
+
+        } catch (Exception $ex) {
+            return [
+                'data' => 'No Data',
+                'status' => 500
+            ];
+        }
+
+    }
+
     public function getTotalCharges($curr, $sem, $program, $course, $gradelvl, $section, $enrid, $personid){
             $financedata = $this->getChargesTemplateHeader(
                 $curr ?: 0,
@@ -676,6 +718,10 @@ class FinanceController extends Controller
 
             $scholarship = $this->getScholarshipDetails($personid);
             $othercharges = $this->getOtherChargesDetails($personid);
+            $defaultrate = DB::table('def_subject_rate')
+                            ->where('subjrate_status', 1)
+                            ->where('subjrate_course', $course)
+                            ->get();
 
             $scholarshipdata = [];
             foreach ($scholarship['raw'] as $row) {
@@ -685,6 +731,11 @@ class FinanceController extends Controller
             $otherchargesdata = [];
             foreach ($othercharges['raw'] as $row) {
                  $otherchargesdata[] = $row;
+            }
+
+            $defaultratedata = [];
+            foreach ($defaultrate as $row) {
+                 $defaultratedata[] = $row;
             }
 
             /*
@@ -730,7 +781,6 @@ class FinanceController extends Controller
             foreach ($milestonedata as $ms) {
 
                 $template = null;
-
                 // Find matching template by subject ID
                 foreach ($templatePricesData as $tp) {
                     if (
@@ -738,6 +788,18 @@ class FinanceController extends Controller
                         (int) $tp->tuitemp_subjid === (int) $ms->mi_subjid
                     ) {
                         $template = $tp;
+                        break;
+                    }
+                }
+                
+                $drate = null;
+                // Find matching default rate by subject ID sa subjects_rate table
+                foreach ($defaultratedata as $dr) {
+                    if (
+                        isset($dr->subjrate_subjid, $ms->mi_subjid) &&
+                        (int) $dr->subjrate_subjid === (int) $ms->mi_subjid
+                    ) {
+                        $drate = $dr;
                         break;
                     }
                 }
@@ -780,13 +842,21 @@ class FinanceController extends Controller
                     } else {
                         $computedLab = $ms->subj_lab_units * 3;
                     }
-                    // Fallback to milestone rates
-                    $total_price =
+                    
+                    // Fallback to milestone rates, check muna if nasa subject_rate table, if wala, use milestone rates
+
+                    if($drate){
+                        $total_price =((float) ($drate->subjrate_lec_rate ?? 0) + (float) ($drate->subjrate_lab_rate ?? 0));
+                        $lab_amount += ((float) ($drate->subjrate_lab_rate ?? 0) * (float) ($computedLab ?? 0));
+                        $lec_amount += ((float) ($drate->subjrate_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0)); //ms kunin dahil nandun lec value
+                    }else{
+                        $total_price =
                         ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0)) +
                         ((float) ($ms->subj_lab_rate ?? 0) * (float) ($computedLab ?? 0));
 
-                    $lab_amount += ((float) ($ms->subj_lab_rate ?? 0) * (float) ($computedLab ?? 0));
-                    $lec_amount += ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0));
+                        $lab_amount += ((float) ($ms->subj_lab_rate ?? 0) * (float) ($computedLab ?? 0));
+                        $lec_amount += ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0));
+                    }
                 }
 
                 /*

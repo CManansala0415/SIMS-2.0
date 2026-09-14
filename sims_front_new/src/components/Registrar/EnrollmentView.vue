@@ -586,7 +586,7 @@ const showForm = (type, data, printtype) => {
     }
 }
 
-const dropStudent = (id, mode) => {
+const dropStudent = (id, mode, msg) => {
 
     // if (confirm("Are you sure you want to drop this student? this action cannot be reverted") == true) {
     //     let x = {
@@ -609,13 +609,13 @@ const dropStudent = (id, mode) => {
     //     return false;
     // }
     Swal.fire({
-        title: "Drop Student",
-        text: "Are you sure you want to drop this student? this action cannot be reverted",
+        title: msg + " Student",
+        text: "Are you sure you want to " + msg.toLowerCase() + " this student? this action cannot be reverted",
         icon: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Im Gonna Drop it!"
+        confirmButtonText: "Yes, Im Gonna " + msg + " it!"
     }).then(async (result) => {
         if (result.isConfirmed) {
             Swal.fire({
@@ -638,7 +638,7 @@ const dropStudent = (id, mode) => {
                 if (results.status != 200) {
                     Swal.fire({
                         title: "Update Failed",
-                        text: "Dropping student failed, try again later",
+                        text: msg + " student failed, try again later",
                         icon: "error"
                     });
                     return
@@ -1051,7 +1051,7 @@ const getNoPrint = (data) =>{
                                                                 <button
                                                                     tabindex="-1"
                                                                     title="Drop Student"
-                                                                    @click="dropStudent(stud.enr_id, 1)"
+                                                                    @click="dropStudent(stud.enr_id, 1,'Drop')"
                                                                     class="neu-btn-sm neu-white">
                                                                     <font-awesome-icon icon="fa-solid fa-ban" />
                                                                     Drop
@@ -1060,7 +1060,7 @@ const getNoPrint = (data) =>{
                                                                 <button
                                                                     tabindex="-1"
                                                                     title="Delete Student"
-                                                                    @click="dropStudent(stud.enr_id, 2)"
+                                                                    @click="dropStudent(stud.enr_id, 2,'Delete')"
                                                                     class="neu-btn-sm neu-danger">
                                                                     <font-awesome-icon icon="fa-solid fa-trash" />
                                                                     Delete

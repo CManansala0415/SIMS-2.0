@@ -714,20 +714,40 @@ const renderPayment = (paymentdata) =>{
 
                         <div class="form-group p-1">
                             <label class="text-xs">Actual Payment</label>
-                            <input 
-                                v-model.number="amountPaid"
-                                required
-                                step="0.01" 
-                                min="0.00"
-                                :max="amountTobePaid"
-                                :disabled="balance == 0 || account.by_pass"
-                                @input="
-                                if (amountPaid < 0) amountPaid = 0;
-                                if (amountPaid > amountTobePaid) amountPaid = amountTobePaid;
-                                "
-                                type="number"
-                                class="neu-input amount-text"
-                            />
+
+                            <div class="d-flex gap-1">
+                                <input
+                                    v-model.number="amountPaid"
+                                    required
+                                    type="number"
+                                    step="0.01"
+                                    min="0.00"
+                                    :max="amountTobePaid"
+                                    :disabled="(balance == 0 || account.by_pass) && paymentMode"
+                                    @input="
+                                        if (amountPaid < 0) amountPaid = 0;
+                                        if (amountPaid > amountTobePaid) amountPaid = amountTobePaid;
+                                    "
+                                    class="neu-input amount-text"
+                                />
+
+                                <div
+                                    class="form-check w-100 d-flex justify-content-center align-items-center gap-2"
+                                    v-if="balance != 0"
+                                >
+                                    <input
+                                        class="form-check-input m-0"
+                                        type="checkbox"
+                                        id="flexCheckDefault"
+                                        :disabled="disabler"
+                                        @change="amountPaid = $event.target.checked ? amountTobePaid : 0"
+                                    />
+
+                                    <label class="form-check-label m-0" for="flexCheckDefault">
+                                        Full Payment
+                                    </label>
+                                </div>
+                            </div>
                             <!-- Helper message -->
                             <small v-if="amountPaid === amountTobePaid" class="text-red-500">
                                 ⚠️ Maximum allowed is {{ amountTobePaid }}
@@ -735,6 +755,7 @@ const renderPayment = (paymentdata) =>{
                             <small v-else-if="amountPaid === 0" class="text-yellow-500">
                                 ⚠️ Minimum is 0
                             </small>
+                           
                         </div>
 
 

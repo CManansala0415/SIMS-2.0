@@ -33,7 +33,7 @@ Route::middleware(['auth:sanctum'])->get('/get-country', [DefaultsController::cl
 Route::middleware(['auth:sanctum'])->get('/get-region', [DefaultsController::class,'getRegion']);
 Route::middleware(['auth:sanctum'])->get('/get-province', [DefaultsController::class,'getProvince']);
 Route::middleware(['auth:sanctum'])->get('/get-city', [DefaultsController::class,'getCity']);
-Route::middleware(['auth:sanctum'])->get('/get-barangay', [DefaultsController::class,'getBarangay']);
+Route::middleware(['auth:sanctum'])->get('/get-barangay/{city}', [DefaultsController::class,'getBarangay']);
 Route::middleware(['auth:sanctum'])->get('/get-demograph', [DefaultsController::class,'getDemograph']);
 Route::middleware(['auth:sanctum'])->get('/get-academic-defaults', [DefaultsController::class,'getAcademicDefaults']);
 Route::middleware(['auth:sanctum'])->get('/get-tagged-subject', [DefaultsController::class,'getTaggedSubject']);
@@ -146,6 +146,7 @@ Route::middleware(['auth:sanctum'])->get('/get-scholarship-details/{id}', [Finan
 Route::middleware(['auth:sanctum'])->post('/add-scholarship-details', [FinanceController::class,'addScholarshipDetails']);
 Route::middleware(['auth:sanctum'])->get('/get-other-charges-details/{id}', [FinanceController::class,'getOtherChargesDetails']);
 Route::middleware(['auth:sanctum'])->post('/add-other-charges-details', [FinanceController::class,'addOtherChargesDetails']);
+Route::middleware(['auth:sanctum'])->get('/get-subject-rate', [FinanceController::class,'getSubjectRate']);
 
 
 Route::middleware(['auth:sanctum'])->post('/add-clinical-students', [ClinicController::class,'addStudentClinicalRecord']);

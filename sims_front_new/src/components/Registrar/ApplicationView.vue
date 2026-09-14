@@ -81,6 +81,7 @@ const civilstatus = ref([])
 const quarter = ref([])
 const gradelvl = ref([])
 const degree = ref([])
+const program = ref([])
 const course = ref([])
 const dtype = ref([])
 const semester = ref([])
@@ -92,131 +93,166 @@ const bootingCount = ref(0)
 const accessData = ref([])
 const emit = defineEmits(['fetchUser','doneLoading'])
 
-
 const booter = async () => {
+    const [
+        degree,
+        demograph,
+        academic,
+        status
+    ] = await Promise.all([
+        getDegree(),
+        getDemograph(),
+        getAcademicDefaults(),
+        getAcademicStatus(1, 'cs_05')
+    ])
 
-    // getGender().then((results) => {
-    //     gender.value = results
-    //     booting.value = 'Loading Genders'
-    //     bootingCount.value += 1
-    // })
+    dtype.value = degree
 
-    // getNationality().then((results) => {
-    //     nationality.value = results
-    //     booting.value = 'Loading Nationalities'
-    //     bootingCount.value += 1
-    // })
+    country.value = demograph.country
+    region.value = demograph.region
+    province.value = demograph.province
+    city.value = demograph.city
+    barangay.value = demograph.barangay
+    gender.value = demograph.gender
+    nationality.value = demograph.nationality
+    civilstatus.value = demograph.civilstatus
 
-    // getCivilStatus().then((results) => {
-    //     civilstatus.value = results
-    //     booting.value = 'Loading Civil Status'
-    //     bootingCount.value += 1
-    // })
+    gradelvl.value = academic.gradelvl
+    program.value = academic.program
+    quarter.value = academic.quarter
+    course.value = academic.course
+    semester.value = academic.semester
+    section.value = academic.section
 
-    // getGradelvl().then((results) => {
-    //     gradelvl.value = results
-    //     booting.value = 'Loading Grade Levels'
-    //     bootingCount.value += 1
-    // })
-
-    // getProgram().then((results) => {
-    //     degree.value = results
-    //     booting.value = 'Loading Degrees'
-    //     bootingCount.value += 1
-    // })
-
-    // getQuarter().then((results) => {
-    //     quarter.value = results
-    //     booting.value = 'Loading Quarters'
-    //     bootingCount.value += 1
-    // })
-
-    getDegree().then((results) => {
-        dtype.value = results
-        booting.value = 'Loading Degree Types'
-        bootingCount.value += 1
-    })
-
-    // getProgramList().then((results) => {
-    //     course.value = results
-    //     booting.value = 'Loading Courses'
-    //     bootingCount.value += 1
-    // })
-
-    // getSemester().then((results) => {
-    //     semester.value = results
-    //     booting.value = 'Loading Semesters'
-    //     bootingCount.value += 1
-    // })
-
-    // getSection().then((results) => {
-    //     section.value = results
-    //     booting.value = 'Loading Sections'
-    //     bootingCount.value += 1
-    // })
-
-    getDemograph().then((results) => {
-        country.value = results.country
-        region.value = results.region
-        province.value = results.province
-        city.value = results.city
-        barangay.value = results.barangay
-        gender.value = results.gender
-        nationality.value = results.nationality
-        civilstatus.value = results.civilstatus
-        booting.value = 'Loading Demographic Information'
-        bootingCount.value += 1
-    })
-    getAcademicDefaults().then((results) => {
-        gradelvl.value = results.gradelvl
-        degree.value = results.program
-        quarter.value = results.quarter
-        course.value = results.course
-        semester.value = results.semester
-        section.value = results.section
-        booting.value = 'Loading Academic Information'
-        bootingCount.value += 1
-    })
-
-    getAcademicStatus(1,'cs_05').then((results) => {
-        results[0].sett_status == 1? activeEnrollment.value = true: activeEnrollment.value = false
-    })
-    // getCountry().then((results) => {
-    //     country.value = results
-    //     booting.value = 'Loading Countries'
-    //     bootingCount.value += 1
-    // })
-
-    // getRegion().then((results) => {
-    //     region.value = results
-    //     booting.value = 'Loading Regions'
-    //     bootingCount.value += 1
-    // })
-
-    // getProvince().then((results) => {
-    //     province.value = results
-    //     booting.value = 'Loading Provinces'
-    //     bootingCount.value += 1
-    // })
-
-    // getCity().then((results) => {
-    //     city.value = results
-    //     booting.value = 'Loading Cities'
-    //     bootingCount.value += 1
-    // })
-
-    // getBarangay().then((results) => {
-    //     barangay.value = results
-    //     booting.value = 'Loading Barangays'
-    //     bootingCount.value += 1
-    // })
-    // getUserID().then((results) => {
-    //     userID.value = results.account.data.id
-    //     booting.value = 'Loading Users'
-    //     bootingCount.value += 1
-    //     emit('fetchUser', results)
-    // })
+    // console.log(dtype.value)
+    activeEnrollment.value = status[0].sett_status == 1
 }
+
+
+// const booter = async () => {
+
+//     // getGender().then((results) => {
+//     //     gender.value = results
+//     //     booting.value = 'Loading Genders'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getNationality().then((results) => {
+//     //     nationality.value = results
+//     //     booting.value = 'Loading Nationalities'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getCivilStatus().then((results) => {
+//     //     civilstatus.value = results
+//     //     booting.value = 'Loading Civil Status'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getGradelvl().then((results) => {
+//     //     gradelvl.value = results
+//     //     booting.value = 'Loading Grade Levels'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getProgram().then((results) => {
+//     //     degree.value = results
+//     //     booting.value = 'Loading Degrees'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getQuarter().then((results) => {
+//     //     quarter.value = results
+//     //     booting.value = 'Loading Quarters'
+//     //     bootingCount.value += 1
+//     // })
+
+//     getDegree().then((results) => {
+//         dtype.value = results
+//         booting.value = 'Loading Degree Types'
+//         bootingCount.value += 1
+//     })
+
+//     // getProgramList().then((results) => {
+//     //     course.value = results
+//     //     booting.value = 'Loading Courses'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getSemester().then((results) => {
+//     //     semester.value = results
+//     //     booting.value = 'Loading Semesters'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getSection().then((results) => {
+//     //     section.value = results
+//     //     booting.value = 'Loading Sections'
+//     //     bootingCount.value += 1
+//     // })
+ 
+//     getDemograph().then((results) => {
+//         country.value = results.country
+//         region.value = results.region
+//         province.value = results.province
+//         city.value = results.city
+//         // barangay.value = results.barangay
+//         gender.value = results.gender
+//         nationality.value = results.nationality
+//         civilstatus.value = results.civilstatus
+//         booting.value = 'Loading Demographic Information'
+//         bootingCount.value += 1
+//     })
+//     getAcademicDefaults().then((results) => {
+//         gradelvl.value = results.gradelvl
+//         degree.value = results.program
+//         quarter.value = results.quarter
+//         course.value = results.course
+//         semester.value = results.semester
+//         section.value = results.section
+//         booting.value = 'Loading Academic Information'
+//         bootingCount.value += 1
+//     })
+
+//     getAcademicStatus(1,'cs_05').then((results) => {
+//         results[0].sett_status == 1? activeEnrollment.value = true: activeEnrollment.value = false
+//     })
+//     // getCountry().then((results) => {
+//     //     country.value = results
+//     //     booting.value = 'Loading Countries'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getRegion().then((results) => {
+//     //     region.value = results
+//     //     booting.value = 'Loading Regions'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getProvince().then((results) => {
+//     //     province.value = results
+//     //     booting.value = 'Loading Provinces'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getCity().then((results) => {
+//     //     city.value = results
+//     //     booting.value = 'Loading Cities'
+//     //     bootingCount.value += 1
+//     // })
+
+//     // getBarangay().then((results) => {
+//     //     barangay.value = results
+//     //     booting.value = 'Loading Barangays'
+//     //     bootingCount.value += 1
+//     // })
+//     // getUserID().then((results) => {
+//     //     userID.value = results.account.data.id
+//     //     booting.value = 'Loading Users'
+//     //     bootingCount.value += 1
+//     //     emit('fetchUser', results)
+//     // })
+// }
 
 const userData = ref([])
 onMounted(async () => {
@@ -590,7 +626,7 @@ const hideModal = () => {
                 <div class="modal-body neu-bg">
                     <ApplicationModal v-if="showFormModal" :genderData="gender" :civilstatusData="civilstatus"
                         :nationalityData="nationality" :regionData="region" :provinceData="province" :cityData="city"
-                        :barangayData="barangay" :formId="editId" :formMode="formMode" :countryData="country" :userdata="userData"/>
+                        :formId="editId" :formMode="formMode" :countryData="country" :userdata="userData"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
@@ -620,7 +656,7 @@ const hideModal = () => {
                 </div>
                 <div class="modal-body neu-bg">
                     <EnrollmentModal v-if="showEnroll" :personid="editId" :personname="fullName"
-                        :gradelvldata="gradelvl" :programdata="degree" :quarterdata="quarter" :coursedata="course" @close-modal="hideModal()"/>
+                        :gradelvldata="gradelvl" :programdata="program" :quarterdata="quarter" :coursedata="course" @close-modal="hideModal()"/>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">

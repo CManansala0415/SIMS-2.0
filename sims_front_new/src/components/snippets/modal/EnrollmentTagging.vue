@@ -108,6 +108,8 @@ onMounted(async () => {
         })
  
         getEnrollment(studentData.value.per_id).then((results) => {
+            console.log(studentData.value.per_id)
+            console.log(results)
             enrolleeData.value = results
             let curr = enrolleeData.value[0].enr_curriculum
             let prog = enrolleeData.value[0].enr_program
@@ -381,6 +383,7 @@ const saveData = async () => {
              
             if(Object.keys(res.template).length > 0){ 
                 addMilestone(addedSubject.value).then((results) => { 
+                    console.log(addedSubject.value)
                     updateEnrollment(x).then((results) => {
                         // alert('Tagging Successful')
                         // //router.replace({ name: 'Academics', params: { id: 2}});
@@ -394,7 +397,7 @@ const saveData = async () => {
                                 icon: "success"
                             }).then(()=>{
                                 Swal.close()
-                                location.reload()
+                                // location.reload()
                             });
                         }else{
                             Swal.fire({

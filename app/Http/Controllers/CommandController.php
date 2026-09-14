@@ -407,7 +407,7 @@ class CommandController extends Controller
             }
             else if($req['mode'] == 3){
                 
-                return $this->generateArchive($date,  $req->input('userid'));
+                return $this->generateArchive($date,  $req->input('userid'), $req['course']);
 
             }else{
                 return $data = [
@@ -430,7 +430,7 @@ class CommandController extends Controller
         return $s2;
     }
 
-    public function generateArchive($date, $userid){
+    public function generateArchive($date, $userid, $course){
         $controller = new RegistrarController();
         date_default_timezone_set('Asia/Manila');
         $defdate = date('Y-m-d h:i:s', time());
@@ -496,6 +496,9 @@ class CommandController extends Controller
 
                     )
                     ->where('def_person.per_status', '=' ,  1)
+                    ->when($course != 0, function ($query) use ($course) {
+                        $query->where('def_enrollment.enr_course', $course);
+                    })
                     ->get();   
 
         if($persons){
@@ -583,33 +586,51 @@ class CommandController extends Controller
                 ->where('acs_status','=',1)
                 ->first();
 
-                // 1 means active, 2 means completed, 3 means leaved with balance, 0 means dropped
-                DB::table('def_accounts_settlement')
-                ->where('acs_enrid','=',$details->enr_id)
-                ->where('acs_status','=',1)
-                ->update([
-                    'acs_status' => DB::raw('CASE WHEN acs_balance = 0 THEN 2 ELSE 3 END')
-                ]);
-                // update student account details based on balance status
-                DB::table('def_accounts_student')
-                ->where('soa_enrid','=',$studentaccount->acs_enrid)
-                ->where('soa_acsid','=',$studentaccount->acs_id)
-                ->where('soa_status','=',1)
-                ->update([
-                    'soa_status' => $studentaccount->acs_balance == 0? 2:3
-                ]);
+                if($studentaccount){
+                    // 1 means active, 2 means completed, 3 means leaved with balance, 0 means dropped
+                    DB::table('def_accounts_settlement')
+                    ->where('acs_enrid','=',$details->enr_id)
+                    ->where('acs_status','=',1)
+                    ->update([
+                        'acs_status' => DB::raw('CASE WHEN acs_balance = 0 THEN 2 ELSE 3 END')
+                    ]);
+                    // update student account details based on balance status
+                    DB::table('def_accounts_student')
+                    ->where('soa_enrid','=',$studentaccount->acs_enrid)
+                    ->where('soa_acsid','=',$studentaccount->acs_id)
+                    ->where('soa_status','=',1)
+                    ->update([
+                        'soa_status' => $studentaccount->acs_balance == 0? 2:3
+                    ]);
+                }
+            
+                //delete the enrollee data
+                DB::table('def_enrollment')
+                ->where('enr_id','=', $details->enr_id)
+                ->where('enr_personid','=', $details->per_id)
+                ->delete();
 
+                //delete enrollee milestone data
+                DB::table('def_milestone')
+                ->where('mi_enrid','=', $details->enr_id)
+                ->delete();
             } 
         }
 
-        // truncate these table to start new tables in fresh state after backuping important information
-        DB::table('def_enrollment')->truncate();
-        DB::table('def_milestone')->truncate();
-        // DB::table('def_faculty_grading_header')->truncate();
-        // DB::table('def_faculty_grading_sheet')->truncate();
-        // DB::table('def_launch')->truncate();
-        // DB::table('def_launch_faculty')->truncate();
-        // DB::table('def_employee_load')->truncate();
+        if($course !=0){
+           $launch = DB::table('def_launch')
+                ->where('ln_course','=', $course)
+                ->get();
+        }else{
+            // truncate these table to start new tables in fresh state after backuping important information
+            DB::table('def_enrollment')->truncate();
+            DB::table('def_milestone')->truncate();
+            DB::table('def_faculty_grading_header')->truncate();
+            DB::table('def_faculty_grading_sheet')->truncate();
+            DB::table('def_launch')->truncate();
+            DB::table('def_launch_faculty')->truncate();
+            DB::table('def_employee_load')->truncate();         
+        }
 
         return $data = [
             'date' => $date,

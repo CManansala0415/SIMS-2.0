@@ -5,6 +5,9 @@ import {
     getSubject,
     getProgram,
     getSpecialization,
+    getSubjectRate,
+    getProgramList
+
 } from "../Fetchers.js";
 import { getUserID } from "../../routes/user";
 import { useRouter, useRoute } from 'vue-router';
@@ -24,7 +27,9 @@ const searchValueModal = ref('')
 const editForm = ref(false)
 const saving = ref(false)
 const filteredSubject = ref([])
-
+const course = ref([])
+const selectedCourse = ref('')
+const rateId = ref('')
 const editData = ref({
     subj_id: '',
     subj_name: '',
@@ -79,7 +84,7 @@ const edit = (data) => {
         editData.value.subj_dtypeid = ''
         editData.value.subj_specid = ''
         editData.value.subj_schedpass = ''
-         editData.value.subj_lec_units_rate = 0
+        editData.value.subj_lec_units_rate = 0
         editData.value.subj_lab_units_rate = 0
         editData.value.subj_addedby = userID.value
         searchValueModal.value = ''
@@ -99,6 +104,16 @@ const registerSubject = () => {
         }
     });
 
+    editData.value = {
+        ...editData.value,
+        course_id: selectedCourse.value,
+        rate_id: rateId.value,
+        user_id: userID.value,
+    };
+
+    // console.log(editData.value)
+
+
     addSubject(editData.value).then((results) => {
         // alert('Successfull Registered')
         // location.reload()
@@ -108,7 +123,11 @@ const registerSubject = () => {
             text: "Successfull registered, refreshing the page",
             icon: "success"
         }).then(()=>{
-            location.reload()
+            // location.reload()
+            selectedCourse.value = ''
+            saving.value = false
+            editData.value.subj_lec_units_rate = 0
+            editData.value.subj_lab_units_rate = 0
         })
     })
 }
@@ -178,6 +197,9 @@ const booter = async () => {
     await getSubject().then((results) => {
         subject.value = results
     })
+    await getProgramList().then((results) => {
+        course.value = results
+    })
 }
 
 const preLoading = ref(true)
@@ -220,6 +242,136 @@ onMounted(async () => {
     })
 
 })
+
+const loadingRate = ref(false)
+const loadCourseRate = () => {
+    //mode 2 means specific search, 1 means select *
+    loadingRate.value = true
+    if(selectedCourse.value == ''){
+        rateId.value = ''
+        editData.value.subj_lec_units_rate = 0
+        editData.value.subj_lab_units_rate = 0
+        loadingRate.value = false
+    }else{
+        getSubjectRate(2, editData.value.subj_id, selectedCourse.value).then((results) => {
+            if(results.data.length > 0){
+                if(selectedCourse.value != 0){
+                    rateId.value = results.data[0].subjrate_id
+                    editData.value.subj_lec_units_rate = results.data[0].subjrate_lec_rate
+                    editData.value.subj_lab_units_rate = results.data[0].subjrate_lab_rate
+                }else{
+                    rateId.value = ''
+                    editData.value.subj_lec_units_rate = results.data[0].subj_lec_rate
+                    editData.value.subj_lab_units_rate = results.data[0].subj_lab_rate
+                }
+                loadingRate.value = false
+            }else{
+                rateId.value = ''
+                editData.value.subj_lec_units_rate = 0
+                editData.value.subj_lab_units_rate = 0
+                loadingRate.value = false
+            }
+        })
+    }
+
+   
+}
+
+const clearRate = () =>{
+    if(rateId.value == ''){
+        if(selectedCourse.value == 0){ // i-clear yung general rate
+            Swal.fire({
+                title: "Clear Rate",
+                text: "Are you sure you want to clear the rate for this subject?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, Clear it!"
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Clearing Rate...",
+                        text: "Please wait while we clear the rates for this subject.",
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    let x = {
+                        subj_id: editData.value.subj_id,
+                        subj_lec_units_rate:null,
+                        subj_lab_units_rate:null,
+                        user_id: userID.value,
+                        mode: 1
+                    }
+                    addSubject(x).then((results) => {
+                        Swal.fire({
+                            title: "Rate Cleared",
+                            text: "Changes applied, refreshing the page",
+                            icon: "success"
+                        }).then(()=>{
+                            rateId.value = ''
+                            selectedCourse.value = ''
+                            editData.value.subj_lec_units_rate = 0
+                            editData.value.subj_lab_units_rate = 0
+                            loadingRate.value = false
+                        });
+                    })
+                }
+            });
+        }else{
+            Swal.fire({
+                title: "No Rate Found",
+                text: "There is no rate to clear for this subject.",
+                icon: "info"
+            });
+            return false
+        }
+    }else{
+        Swal.fire({
+            title: "Clear Rate",
+            text: "Are you sure you want to clear the rate for this subject?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Clear it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: "Clearing Rate...",
+                    text: "Please wait while we clear the rates for this subject.",
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                let x = {
+                    subj_id: editData.value.subj_id,
+                    course_id: selectedCourse.value,
+                    user_id: userID.value,
+                    clear_rate: true,
+                    rate_id: rateId.value,
+                    mode: 1
+                }
+                addSubject(x).then((results) => {
+                    Swal.fire({
+                        title: "Rate Cleared",
+                        text: "Changes applied, refreshing the page",
+                        icon: "success"
+                    }).then(()=>{
+                        rateId.value = ''
+                        editData.value.subj_lec_units_rate = 0
+                        editData.value.subj_lab_units_rate = 0
+                        loadingRate.value = false
+                    });
+                })
+            }
+        });
+    }
+   
+}
 
 const labRate = ref(0)
 const lecRate = ref(0)
@@ -322,7 +474,7 @@ const lecRate = ref(0)
     <!-- Add New Modal -->
     <div class="modal fade" id="addnewmodal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Settings</h5>
@@ -346,6 +498,13 @@ const lecRate = ref(0)
                                         <th colspan="3" class="text-start fw-normal">
                                             <span>{{ editData.subj_name }}</span> (<span class="fw-bold">{{ editData.subj_code }}</span>)
                                         </th>
+                                        <th colspan="3" class="text-start fw-normal">
+                                            <select class="neu-input neu-select" v-model="selectedCourse" @change="loadCourseRate" required>
+                                                <option value="">Select Program</option>
+                                                <option value="0">General Rate</option>
+                                                <option v-for="(crs, index) in course" :key="index" :value="crs.prog_id">{{ crs.prog_name }}</option>
+                                            </select>
+                                        </th>
                                     </tr>
                                     <tr>
                                         <th class="w-25 text-center">Type</th>
@@ -355,7 +514,7 @@ const lecRate = ref(0)
                                         <th class="w-25 text-center">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody v-if="!loadingRate">
                                     <tr>
                                         <td class="align-middle text-center"><span class="fw-bold">Lecture</span></td>
                                         <td class="align-middle text-center">{{ editData.subj_lec_units }}</td>
@@ -367,6 +526,7 @@ const lecRate = ref(0)
                                                     min="0.00"
                                                     @input="if (editData.subj_lec_units_rate <= 0) editData.subj_lec_units_rate = 0;"
                                                     type="number"
+                                                    :disabled="!selectedCourse? true:false "
                                                     class="neu-input" placeholder="Price Per Unit"/>
                                         </td>
                                         <td class="align-middle text-center">
@@ -386,7 +546,7 @@ const lecRate = ref(0)
                                                     min="0.00"
                                                     @input="if (editData.subj_lab_units_rate <= 0) editData.subj_lab_units_rate = 0;"
                                                     type="number"
-                                                    :disabled="editData.subj_lab_units==0?true:false"
+                                                    :disabled="editData.subj_lab_units==0 || !selectedCourse? true:false"
                                                     class="neu-input" placeholder="Price Per Unit"/>
                                         </td>
                                         <td class="align-middle text-center">
@@ -404,11 +564,18 @@ const lecRate = ref(0)
                                         </td>
                                     </tr>
                                 </tbody>
+                                <tbody v-else>
+                                    <tr>
+                                        <SkeletonTableLoader :tdcount="5" />
+                                    </tr>
+                                </tbody>
                             </table>
                         </div>
-                        <div class="d-flex flex-column mt-3">
+                        <div class="d-flex gap-2 mt-3">
                             <button :disabled="saving ? true : false" type="submit"
                                 class="neu-btn neu-green p-2"><font-awesome-icon icon="fa-solid fa-floppy-disk"/> Assign Rate</button>
+                            <button :disabled="saving ? true : false" type="button" @click="clearRate()"
+                                class="neu-btn neu-red p-2"><font-awesome-icon icon="fa-solid fa-trash"/> Clear Rate</button>
                         </div>
                     </form>
                 </div>

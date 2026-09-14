@@ -160,9 +160,10 @@ class DefaultsController extends Controller
         ->get();
         return $city; 
     }
-    public function getBarangay()
+    public function getBarangay($city)
     {
         $barangay = DB::table('sett_ph_barangay')->orderBy('brgyDesc')
+        ->where('sett_ph_barangay.citymunCode','=',$city)
         ->get();
         return $barangay; 
     }
@@ -464,7 +465,7 @@ class DefaultsController extends Controller
     }
 
     public function addSubject(Request $request){
-
+        $msg= '';
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d H:i:s');
     
@@ -530,14 +531,45 @@ class DefaultsController extends Controller
                 try{
                     
                     if($request->input('mode')  == 1){ //means edit rates
-                        $s1 = DB::table('def_subject')
-                        ->where('subj_id','=', $request['subj_id'])
-                        ->update([
-                            'subj_lec_rate' => $request->input('subj_lec_units_rate'),
-                            'subj_lab_rate' => $request->input('subj_lab_units_rate'),
-                            'subj_updatedby' => $request->input('subj_updatedby'),
-                            'subj_dateupdated' => $date,
-                        ]);
+                       if($request->input('rate_id')){
+                            $msg = 'meron';
+                            if($request->input('clear_rate')){
+                                $s2 = DB::table('def_subject_rate')
+                                ->where('subjrate_id','=', $request['rate_id'])
+                                ->delete();
+                            }else{
+                                $s2 = DB::table('def_subject_rate')
+                                ->where('subjrate_id','=', $request['rate_id'])
+                                ->update([
+                                    'subjrate_lec_rate' => (float) $request->input('subj_lec_units_rate'),
+                                    'subjrate_lab_rate' => (float) $request->input('subj_lab_units_rate'),
+                                    'subjrate_updatedby' => $request->input('user_id'),
+                                    'subjrate_dateupdated' => $date,
+                                ]);
+                            }
+                       }else{
+                            $msg = 'wala';
+                            if($request['course_id'] == 0){ // means i-apply yung edit sa general rate, wala sya sa def_subject_rate table
+                                $s2 = DB::table('def_subject')
+                                ->where('subj_id','=', $request['subj_id'])
+                                ->update([
+                                    'subj_lec_rate' => $request->input('subj_lec_units_rate'),
+                                    'subj_lab_rate' => $request->input('subj_lab_units_rate'),
+                                    'subj_updatedby' => $request->input('subj_updatedby'),
+                                    'subj_dateupdated' => $date,
+                                ]);
+                            }else{
+                                $s2 = DB::table('def_subject_rate')
+                                ->insert([
+                                    'subjrate_subjid' => $request->input('subj_id'),
+                                    'subjrate_course' => $request->input('course_id'),
+                                    'subjrate_lec_rate' => (float) $request->input('subj_lec_units_rate'),
+                                    'subjrate_lab_rate' => (float) $request->input('subj_lab_units_rate'),
+                                    'subjrate_addedby' => $request->input('user_id'),
+                                    'subjrate_dateadded' => $date,
+                                ]);
+                            }
+                       }
                     }else{
                          $s1 = DB::table('def_subject')
                         ->where('subj_id','=', $request['subj_id'])
@@ -562,6 +594,7 @@ class DefaultsController extends Controller
     
                     return $data = [
                         'status' => 200,
+                        'message' => $msg
                     ];
                 }catch(Exception $ex) {
                     return $data = [

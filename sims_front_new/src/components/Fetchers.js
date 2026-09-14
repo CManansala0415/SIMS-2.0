@@ -3054,6 +3054,27 @@ const getTotalEnrollees = async (data) => {
     }
 }
 
+let getsubjectrate = {}
+const getSubjectRate = async (mode, id, course) => {
+    try {
+        await axios({
+            method: "GET",
+            url: 'api/get-subject-rate/',
+            params: {
+                mode: mode,
+                id: id,
+                course: course,
+            }
+        }).then(async (results) => {
+            // console.log(results.data)
+            getsubjectrate = results.data
+        })
+        return getsubjectrate
+    } catch (err) {
+        return err
+    }
+}
+
 export {
 
     getApplicant,
@@ -3237,6 +3258,7 @@ export {
     getLibraryCardMassPrint,
     getTotalEnrollees,
     getOtherChargesDetails,
-    addOtherChargesDetails
+    addOtherChargesDetails,
+    getSubjectRate
 }
 

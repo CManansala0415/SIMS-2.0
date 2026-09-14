@@ -90,13 +90,12 @@ onMounted(async () => {
         filteredCourse.value = program.value
         filteredGradelvl.value = gradelvl.value
         filteredQuarter.value = quarter.value
-
-        await booter().then(() => {
+        await booter().then(async() => {
            
             getEnrollment(personID.value).then((results) => {
 
                 hasBalance.value = accounts.value.some(a => parseFloat(a.acs_balance) > 0);
-                // console.log('Has Balance:', hasBalance.value);
+                console.log('Has Balance:', hasBalance.value);
 
 
                     if (results.length != 0) {
@@ -114,7 +113,7 @@ onMounted(async () => {
                     enrollChecker.value = false
                     preLoading.value = false
                 
-                
+             
                 
             })
 
@@ -282,7 +281,6 @@ const enroll = () => {
         <div class="d-flex flex-wrap form-group">
             <label for="sem">Semester / Quarter</label>
             <select v-model="enrollData.quarter" class="neu-input neu-select"
-                disabled
                 title="Click Edit to modify details" id="sem" aria-describedby="sem">
                 <option value="" disabled>-- Select Type --</option>
                 <option v-for="(q, index) in filteredQuarter" :value="q.quar_id">{{ q.quar_desc }}</option>

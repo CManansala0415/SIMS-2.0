@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue"
 import AccountingPaymentModal from "../modal/AccountingPaymentModal.vue"
-import { getStudentAccount, getPaymentDetails, getScholarshipDetails, getDemograph, getOtherChargesDetails } from "../../Fetchers.js"
+import { getStudentAccount, getPaymentDetails, getScholarshipDetails, getDemograph, getOtherChargesDetails, getSubjectRate } from "../../Fetchers.js"
 import { pesoConverter,formatDateTime, pdfGenerator, pdfAutoPrint } from "../../Generators.js"
 import NeuLoader2 from "../loaders/NeuLoader2.vue"
 
@@ -87,22 +87,36 @@ onMounted(async () => {
         oth_total: e.oth_type == 1 ? e.oth_value / 100 : e.oth_value
     }))
 
-    console.log(accountRes)
+    // console.log(accountRes)
     // console.log(scholarshipRes)
     // console.log(otherChargesRes)
     
+    if (accountRes.student_account.length === 0) {
+        Swal.fire({
+            title: "No Billing Items Found",
+            text: "This student has no billing items, please check the enrollment status.",
+            icon: "warning",
+            confirmButtonText: "Ok, Got it!"
+        }).then(() => {
+            Swal.close()
+            preLoading.value = false
+        });
 
-    studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
-    studentSettlements.value = accountRes.student_settlement || []
-    selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid ? studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid : ''
-    studentAccountSubjects.value = accountRes.student_account.filter((e)=>{
-        if(e.soa_subjid != null){
-            return e
-        }
-    })
+    }else{
+        studentAccounts.value = groupByAcsIdArray(accountRes.student_account)
+        studentSettlements.value = accountRes.student_settlement || []
+        selectedAcsId.value = studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid ? studentAccounts.value[Object.keys(studentAccounts.value).length-1].soa_acsid : ''
+        studentAccountSubjects.value = accountRes.student_account.filter((e)=>{
+            if(e.soa_subjid != null){
+                return e
+            }
+        })
 
-    loadAccount()
-    preLoading.value = false
+        loadAccount()
+        preLoading.value = false
+    }
+
+   
 
     
 })
@@ -173,6 +187,10 @@ const recomputeAccountTotals = async () => {
         if (e.oth_type === 1) totalPercentOtherCharges.value += e.oth_total
         if (e.oth_type === 2) totalFixedOtherCharges.value += e.oth_total
     })
+
+    const defaultsubjrate = await getSubjectRate(1)
+    console.log(defaultsubjrate)
+    console.log(filteredStudentAccount.value)
     
     rows.forEach(item => {
         let computedLab = 0;
@@ -210,7 +228,7 @@ const recomputeAccountTotals = async () => {
         totalLabCost.value +
         totalItemCost.value +
         totalMiscCost.value
-
+ 
     totalTuionFeeNodeduction.value = subtotal
     totalDiscount.value = subtotal * totalPercentDiscount.value + totalFixedDiscount.value
     totalCharges.value = totalTuition.value + (totalTuition.value * totalPercentOtherCharges.value) + totalFixedOtherCharges.value

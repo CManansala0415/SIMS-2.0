@@ -97,6 +97,7 @@ onMounted(async() => {
             getLibraryCardMassPrint(cards.value).then((results) => {
                 libraryCards.value = results.data.map((e) => {
                     let z = ''
+                    let y = ''
                     if (e.per_profile) {
                         // z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
                         z = 'http://sims.clcst.edu.local:8000/api/get-person-image/' + e.per_profile +'/1'
@@ -108,15 +109,23 @@ onMounted(async() => {
                         }
                     }
 
+                    if (e.per_signature) {
+                        // z = 'http://sims.clcst.edu.local:8000/storage/profiles/' + e.per_profile
+                        y = 'http://sims.clcst.edu.local:8000/api/get-person-image/' + e.per_signature +'/3'
+                    } else {
+                       y = '/img/blank.png'
+                    }
+
                     return {
                         ...e,
                         profile_picture: z,
+                        signature_picture: y,
                     }
                 })
 
                 groupedLibraryCards.value = groupCard(libraryCards.value)
                 preLoading.value = false
-                console.log(groupedLibraryCards.value)
+                // console.log(groupedLibraryCards.value)
             })
             // getLibraryCardIssue(student.value.per_id, student.value.enr_id, 0).then((results) => {
             //     // libraryCards.value = results
@@ -373,7 +382,11 @@ const printForm = async (enrid, data) => {
                                                 width="60px"
                                                 :src="lc.profile_picture"
                                                 alt="">
-
+                                            <img class="p-1"
+                                                height="30px"
+                                                width="30px"
+                                                :src="lc.signature_picture"
+                                                alt="">
                                         </div>
                                     </div>
                                 </div>

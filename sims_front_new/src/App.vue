@@ -217,7 +217,7 @@ const menuItemsHandler = (data) => {
 
   // next steps
   linker();
-
+ 
   // existing post-fetch work
   getCommandUpdate().then((result) => {
     semInfo.value = result[0].quar_code;

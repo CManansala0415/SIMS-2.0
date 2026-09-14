@@ -475,7 +475,7 @@ class RegistrarController extends Controller
             ->orderBy('def_enrollment.enr_dateenrolled','DESC')
             ->where('def_enrollment.enr_personid', '=' , $id)
             ->where('def_enrollment.enr_status', '=' , 1)
-            ->where('def_accounts_settlement.acs_status', '=' , 1)
+            // ->where('def_accounts_settlement.acs_status', '=' , 1)
             ->get();
         return $enrollment; 
        
@@ -1403,12 +1403,17 @@ class RegistrarController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Get milestone data
+        | Get milestone data and Subject rates
         |--------------------------------------------------------------------------
         */
         $milestonedata = $this->getMilestone(
             $request->input('enr_id')
         );
+
+        $defaultrate = DB::table('def_subject_rate')
+                ->where('subjrate_status', 1)
+                ->where('subjrate_course', $request->input('enr_course'))
+                ->get();
 
         /*
         |--------------------------------------------------------------------------
@@ -1422,7 +1427,11 @@ class RegistrarController extends Controller
         $templateMap = collect($templatePricesData)
             ->filter(fn($tp) => !empty($tp->tuitemp_subjid))
             ->keyBy(fn($tp) => (int) $tp->tuitemp_subjid);
-
+        
+        $defaultratedata = [];
+            foreach ($defaultrate as $row) {
+                 $defaultratedata[] = $row;
+            }
         /*
         |--------------------------------------------------------------------------
         | FINAL TEMPLATE DATA
@@ -1472,6 +1481,18 @@ class RegistrarController extends Controller
         |--------------------------------------------------------------------------
         */
         foreach ($milestonedata as $ms) {
+                    
+            // Find matching default subject rate
+            $drate = null;
+            foreach ($defaultratedata as $dr) {
+                if (
+                    isset($dr->subjrate_subjid, $ms->mi_subjid) &&
+                    (int) $dr->subjrate_subjid === (int) $ms->mi_subjid
+                ) {
+                    $drate = $dr;
+                    break;
+                }
+            }
 
             if (empty($ms->mi_subjid)) {
                 continue;
@@ -1486,8 +1507,8 @@ class RegistrarController extends Controller
                 $item->tuitemp_subjcode = $ms->subj_code;
                 $item->tuitemp_subjid = $ms->mi_subjid;
 
-                $item->tuitemp_lec_price = $ms->subj_lec_rate;
-                $item->tuitemp_lab_price = $ms->subj_lab_rate;
+                $item->tuitemp_lec_price = $drate->subjrate_lec_rate ?? $ms->subj_lec_rate;
+                $item->tuitemp_lab_price = $drate->subjrate_lab_rate ?? $ms->subj_lab_rate;
 
                 $item->tuitemp_lec = $ms->subj_lec_units;
                 $item->tuitemp_lab = $ms->subj_lab_units;
@@ -1531,13 +1552,25 @@ class RegistrarController extends Controller
 
         foreach ($milestonedata as $ms) {
 
-            $template = null;
 
             /*
             |--------------------------------------------------------------------------
-            | Find matching template
+            | Find matching template and default subject rate
             |--------------------------------------------------------------------------
             */
+
+            $drate = null;
+            foreach ($defaultratedata as $dr) {
+                if (
+                    isset($dr->subjrate_subjid, $ms->mi_subjid) &&
+                    (int) $dr->subjrate_subjid === (int) $ms->mi_subjid
+                ) {
+                    $drate = $dr;
+                    break;
+                }
+            }
+
+            $template = null;
             foreach ($templatePricesData as $tp) {
 
                 if (
@@ -1579,9 +1612,13 @@ class RegistrarController extends Controller
                     $computedLab = $template->tuitemp_lab * 3;
                 }
 
-                $total_price =
+                if($drate){
+                    $total_price =((float) ($drate->subjrate_lec_rate ?? 0) + (float) ($drate->subjrate_lab_rate ?? 0));
+                }else{
+                    $total_price =
                     ((float) ($template->tuitemp_lec_price ?? 0) * (float) ($template->tuitemp_lec ?? 0)) +
                     ((float) ($template->tuitemp_lab_price ?? 0) * (float) ($computedLab ?? 0));
+                }
 
                 $mergedItem->tuitemp_id = $template->tuitemp_id;
             }
@@ -1604,6 +1641,8 @@ class RegistrarController extends Controller
                 } else {
                     $computedLab = $ms->subj_lab_units * 3;
                 }
+
+                
 
                 $total_price =
                     ((float) ($ms->subj_lec_rate ?? 0) * (float) ($ms->subj_lec_units ?? 0)) +
@@ -3554,45 +3593,77 @@ class RegistrarController extends Controller
             date_default_timezone_set('Asia/Manila');
             $date = now();
             
-            // if($request->mode == 1){
+            if($request->mode == 1){
+                DB::beginTransaction();
 
-            // }else{
-                
-            // }
-
-            DB::beginTransaction();
-
-            DB::table('def_enrollment')
+                DB::table('def_enrollment')
                 ->where('enr_id', $request->enr_id)
                 ->delete();
 
-            DB::table('def_milestone')
-                ->where('mi_enrid', $request->enr_id)
-                ->delete();
+                DB::table('def_milestone')
+                    ->where('mi_enrid', $request->enr_id)
+                    ->delete();
 
-            DB::table('def_accounts_settlement')
+                DB::table('def_accounts_settlement')
                 ->where('acs_enrid', $request->enr_id)
                 ->where('acs_status', 1)
                 ->update([
                     'acs_status'      => 0,
+                    'acs_balance'     => DB::raw("
+                        CASE
+                             WHEN acs_balance IS NULL
+                            THEN acs_amount
+                            ELSE acs_balance
+                        END
+                    "),
                     'acs_updatedby'   => $request->enr_updatedby,
                     'acs_dateupdated' => $date,
                 ]);
 
-            DB::table('def_accounts_student')
-                ->where('soa_enrid', $request->enr_id)
-                ->update([
-                    'soa_status'      => 0,
-                    'soa_updatedby'   => $request->enr_updatedby,
-                    'soa_dateupdated' => $date,
+                DB::table('def_accounts_student')
+                    ->where('soa_enrid', $request->enr_id)
+                    ->update([
+                        'soa_status'      => 0,
+                        'soa_updatedby'   => $request->enr_updatedby,
+                        'soa_dateupdated' => $date,
+                    ]);
+
+                DB::commit();
+
+                return response()->json([
+                    'status'  => 200,
+                    'message' => 'Enrollment successfully deleted',
                 ]);
+            }else{
 
-            DB::commit();
+                DB::beginTransaction();
 
-            return response()->json([
-                'status'  => 200,
-                'message' => 'Enrollment successfully deleted',
-            ]);
+                DB::table('def_milestone')
+                    ->where('mi_enrid', $request->enr_id)
+                    ->delete();
+
+                DB::table('def_accounts_settlement')
+                    ->where('acs_enrid', $request->enr_id)
+                    ->where('acs_status', 1)
+                    ->update([
+                        'acs_amount'      => 0,
+                        'acs_updatedby'   => $request->enr_updatedby,
+                        'acs_dateupdated' => $date,
+                    ]);
+
+                DB::table('def_accounts_student')
+                    ->where('soa_enrid', $request->enr_id)
+                    ->delete();
+
+                DB::commit();
+
+                return response()->json([
+                    'status'  => 200,
+                    'message' => 'Subjects successfully deleted',
+                ]);
+            }
+
+           
 
         } catch (\Throwable $e) {
 
