@@ -352,8 +352,8 @@ onMounted(async () => {
                         );
                     })
 
-                    // console.log(hasSched)
-                    // console.log(e.subj_id + ' : ' + hasSched + ' : ' + empid)
+                    console.log(hasSched)
+                    console.log(e.subj_id + ' : ' + hasSched + ' : ' + empid)
 
                     if (indexer !== -1) {
                         return {
@@ -363,8 +363,7 @@ onMounted(async () => {
                             faculty_id: empid,
                             lock: hasSched !== -1 ? true : false
                         }
-                    } else {
-
+                    }else {
                         return {
                             ...e,
                             lf_id: '',
@@ -378,7 +377,6 @@ onMounted(async () => {
 
                 // console.log(curriculumSubject.value)
                 // console.log(faculty.value)
-
                 // console.log(curriculumSubject.value)
             })
         })

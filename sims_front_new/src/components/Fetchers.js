@@ -868,7 +868,7 @@ const getClassroom = async (type) => {
 }
 
 let launch = {}
-const getLaunch = async (limit, offset, id) => {
+const getLaunch = async (limit, offset, id, mode) => {
     let search = id
     if (!id) {
         search = 204
@@ -876,7 +876,7 @@ const getLaunch = async (limit, offset, id) => {
     try {
         await axios({
             method: "GET",
-            url: 'api/get-launch/' + limit + '/' + offset + '/' + search,
+            url: 'api/get-launch/' + limit + '/' + offset + '/' + search + '/' + mode,
         }).then(async (results) => {
             // console.log(results.data)
             launch = results.data

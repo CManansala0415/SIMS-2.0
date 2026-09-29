@@ -2349,116 +2349,155 @@ class RegistrarController extends Controller
         return $launch;
     }
 
-    public function getlaunch($limit, $offset, $search)
+    public function getlaunch($limit, $offset, $search, $mode)
     {
-        if($search==204){
+        if($mode == 1){ // means filter by course
+            $launchQuery = DB::table('def_launch')
+                ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id')
+                ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
+                ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
+                ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
+                ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
+                ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
+                ->select(
+                    'def_launch.*',
+                    'def_program.prog_id',
+                    'def_program.prog_code',
+                    'def_program.prog_name',
+                    'def_section.sec_id',
+                    'def_section.sec_name',
+                    'def_curriculum.curr_id',
+                    'def_curriculum.curr_code',
+                    'def_gradelvl.grad_id',
+                    'def_gradelvl.grad_code',
+                    'def_gradelvl.grad_name',
+                    'def_gradelvl.grad_dtypeid',
+                    'sett_quarter.quar_id',
+                    'sett_quarter.quar_desc',
+                    'sett_quarter.quar_code',
+                    'sett_degree_types.dtype_id',
+                    'sett_degree_types.dtype_desc'
+                )
+                ->where('ln_status', 1)
+                ->where('ln_course', $search)
+                ->orderBy('def_launch.ln_id', 'DESC');
 
-            $launch = DB::table('def_launch')
-            ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
-            ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
-            ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
-            ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
-            ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
-            ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
-            ->select(  
-                'def_launch.*',
-                'def_program.prog_id',
-                'def_program.prog_code',
-                'def_program.prog_name',
-                'def_section.sec_id',
-                'def_section.sec_name',
-                'def_curriculum.curr_id',
-                'def_curriculum.curr_code',
-                'def_gradelvl.grad_id',
-                'def_gradelvl.grad_code',
-                'def_gradelvl.grad_name',
-                'def_gradelvl.grad_dtypeid',
-                'sett_quarter.quar_id',
-                'sett_quarter.quar_desc',
-                'sett_quarter.quar_code',
-                'sett_degree_types.dtype_id',
-                'sett_degree_types.dtype_desc',
+            // Get the results
+            $launch = $launchQuery->get();
 
-            )->orderBy('def_launch.ln_id','DESC')
-            ->limit($limit)
-            ->offset($offset)
-            ->get();
-                            
+            // Get the count using the same query
+            $count = (clone $launchQuery)->count();
+        }else{
+            if($search==204){
+                $launch = DB::table('def_launch')
+                ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
+                ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
+                ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
+                ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
+                ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
+                ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
+                ->select(  
+                    'def_launch.*',
+                    'def_program.prog_id',
+                    'def_program.prog_code',
+                    'def_program.prog_name',
+                    'def_section.sec_id',
+                    'def_section.sec_name',
+                    'def_curriculum.curr_id',
+                    'def_curriculum.curr_code',
+                    'def_gradelvl.grad_id',
+                    'def_gradelvl.grad_code',
+                    'def_gradelvl.grad_name',
+                    'def_gradelvl.grad_dtypeid',
+                    'sett_quarter.quar_id',
+                    'sett_quarter.quar_desc',
+                    'sett_quarter.quar_code',
+                    'sett_degree_types.dtype_id',
+                    'sett_degree_types.dtype_desc',
 
-            $count = DB::table('def_launch')
-            ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
-            ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
-            ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
-            ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
-            ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
-            ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
-            ->select(  
-                'def_launch.*',
-            )->count();
+                )->orderBy('def_launch.ln_id','DESC')
+                ->limit($limit)
+                ->offset($offset)
+                ->get();
+                                
+
+                $count = DB::table('def_launch')
+                ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
+                ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
+                ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
+                ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
+                ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
+                ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
+                ->select(  
+                    'def_launch.*',
+                )->count();
+            }
+            else{
+                $launch = DB::table('def_launch')
+                            ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
+                            ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
+                            ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
+                            ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
+                            ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
+                            ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
+                            ->select(  
+                                'def_launch.*',
+                                'def_program.prog_id',
+                                'def_program.prog_code',
+                                'def_program.prog_name',
+                                'def_section.sec_id',
+                                'def_section.sec_name',
+                                'def_curriculum.curr_id',
+                                'def_curriculum.curr_code',
+                                'def_gradelvl.grad_id',
+                                'def_gradelvl.grad_code',
+                                'def_gradelvl.grad_name',
+                                'def_gradelvl.grad_dtypeid',
+                                'sett_quarter.quar_id',
+                                'sett_quarter.quar_desc',
+                                'sett_quarter.quar_code',
+                                'sett_degree_types.dtype_id',
+                                'sett_degree_types.dtype_desc',
+                
+                            )->orderBy('def_launch.ln_id','DESC')
+                            ->where('ln_status', '=',  1)
+                            ->where(function($query) use ($search) {
+                                $query->where('def_launch.ln_year', 'like',  '%' . $search .'%')
+                                ->orWhere('def_launch.ln_slots', 'like',  '%' . $search .'%')
+                                ->orWhere('def_program.prog_name', 'like',  '%' . $search .'%')
+                                ->orWhere('sett_quarter.quar_desc', 'like',  '%' . $search .'%')
+                                ->orWhere('sett_degree_types.dtype_desc', 'like',  '%' . $search .'%')
+                                ->orWhere('def_section.sec_name', 'like',  '%' . $search .'%')
+                                ->orWhere('def_gradelvl.grad_name', 'like',  '%' . $search .'%');
+                            })
+                            ->limit($limit)->offset($offset)
+                            ->get();
+                $count =  DB::table('def_launch')
+                            ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
+                            ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
+                            ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
+                            ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
+                            ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
+                            ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
+                            ->select(  
+                                'def_launch.*'
+                            )->orderBy('def_launch.ln_id','DESC')
+                            ->where('ln_status', '=',  1)
+                            ->where(function($query) use ($search) {
+                                $query->where('def_launch.ln_year', 'like',  '%' . $search .'%')
+                                ->orWhere('def_launch.ln_slots', 'like',  '%' . $search .'%')
+                                ->orWhere('def_program.prog_name', 'like',  '%' . $search .'%')
+                                ->orWhere('sett_quarter.quar_desc', 'like',  '%' . $search .'%')
+                                ->orWhere('sett_degree_types.dtype_desc', 'like',  '%' . $search .'%')
+                                ->orWhere('def_section.sec_name', 'like',  '%' . $search .'%')
+                                ->orWhere('def_gradelvl.grad_name', 'like',  '%' . $search .'%');
+                            })
+                            // ->limit($limit)->offset($offset)
+                            ->count();       
+            }
         }
-        else{
-             $launch = DB::table('def_launch')
-                        ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
-                        ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
-                        ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
-                        ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
-                        ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
-                        ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
-                        ->select(  
-                            'def_launch.*',
-                            'def_program.prog_id',
-                            'def_program.prog_code',
-                            'def_program.prog_name',
-                            'def_section.sec_id',
-                            'def_section.sec_name',
-                            'def_curriculum.curr_id',
-                            'def_curriculum.curr_code',
-                            'def_gradelvl.grad_id',
-                            'def_gradelvl.grad_code',
-                            'def_gradelvl.grad_name',
-                            'def_gradelvl.grad_dtypeid',
-                            'sett_quarter.quar_id',
-                            'sett_quarter.quar_desc',
-                            'sett_quarter.quar_code',
-                            'sett_degree_types.dtype_id',
-                            'sett_degree_types.dtype_desc',
-            
-                        )->orderBy('def_launch.ln_id','DESC')
-                        ->where('ln_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('def_launch.ln_year', 'like',  '%' . $search .'%')
-                            ->orWhere('def_launch.ln_slots', 'like',  '%' . $search .'%')
-                            ->orWhere('def_program.prog_name', 'like',  '%' . $search .'%')
-                            ->orWhere('sett_quarter.quar_desc', 'like',  '%' . $search .'%')
-                            ->orWhere('sett_degree_types.dtype_desc', 'like',  '%' . $search .'%')
-                            ->orWhere('def_section.sec_name', 'like',  '%' . $search .'%')
-                            ->orWhere('def_gradelvl.grad_name', 'like',  '%' . $search .'%');
-                        })
-                        ->limit($limit)->offset($offset)
-                        ->get();
-            $count =  DB::table('def_launch')
-                        ->leftJoin('def_program', 'def_launch.ln_course', '=', 'def_program.prog_id') 
-                        ->leftJoin('def_section', 'def_launch.ln_section', '=', 'def_section.sec_id')
-                        ->leftJoin('def_curriculum', 'def_launch.ln_curriculum', '=', 'def_curriculum.curr_id')
-                        ->leftJoin('def_gradelvl', 'def_launch.ln_gradelvl', '=', 'def_gradelvl.grad_id')
-                        ->leftJoin('sett_quarter', 'def_launch.ln_quarter', '=', 'sett_quarter.quar_id')
-                        ->leftJoin('sett_degree_types', 'def_launch.ln_dtype', '=', 'sett_degree_types.dtype_id')
-                        ->select(  
-                            'def_launch.*'
-                        )->orderBy('def_launch.ln_id','DESC')
-                        ->where('ln_status', '=',  1)
-                        ->where(function($query) use ($search) {
-                            $query->where('def_launch.ln_year', 'like',  '%' . $search .'%')
-                            ->orWhere('def_launch.ln_slots', 'like',  '%' . $search .'%')
-                            ->orWhere('def_program.prog_name', 'like',  '%' . $search .'%')
-                            ->orWhere('sett_quarter.quar_desc', 'like',  '%' . $search .'%')
-                            ->orWhere('sett_degree_types.dtype_desc', 'like',  '%' . $search .'%')
-                            ->orWhere('def_section.sec_name', 'like',  '%' . $search .'%')
-                            ->orWhere('def_gradelvl.grad_name', 'like',  '%' . $search .'%');
-                        })
-                        // ->limit($limit)->offset($offset)
-                        ->count();       
-        }
+
+       
 
         return $data = [
             'data' => $launch,
@@ -2495,639 +2534,876 @@ class RegistrarController extends Controller
     {
        date_default_timezone_set('Asia/Manila');
        $date = date('Y-m-d H:i:s');
+       
+       DB::beginTransaction();
 
        try{
-            if($request->input('sched_id')){
-                $s1 = DB::table('def_launch_schedule')
-                    ->where('sched_id','=', $request['sched_id'])
-                    ->update([
-                        "sched_time" => $request['sched_time'],
-                        "sched_mergeable" => $request['sched_mergeable'],
+            foreach ($request->all() as $ms){
+
+                if(isset($ms['sched_id']) && $ms['sched_id']){
+                    $s1 = DB::table('def_launch_schedule')
+                        ->where('sched_id','=', $ms['sched_id'])
+                        ->update([
+                            "sched_time" => $ms['sched_time'],
+                            "sched_mergeable" => $ms['sched_mergeable'],
+                            
+                            "sched_mon" => $ms['sched_mon'],
+                            "sched_mon_code" => $ms['sched_mon_code'],
+                            "sched_mon_bid" => $ms['sched_mon_bid'],
+                            "sched_mon_classrid" => $ms['sched_mon_classrid'],
+                            "sched_mon_mergeable" => $ms['sched_mon_mergeable'],
+                            "sched_mon_mergedto" => $ms['sched_mon_mergedto'],
+                            "sched_mon_faculty" => $ms['sched_mon_faculty'],
+
+                            "sched_tue" => $ms['sched_tue'],
+                            "sched_tue_code" => $ms['sched_tue_code'],
+                            "sched_tue_bid" => $ms['sched_tue_bid'],
+                            "sched_tue_classrid" => $ms['sched_tue_classrid'],
+                            "sched_tue_mergeable" => $ms['sched_tue_mergeable'],
+                            "sched_tue_mergedto" => $ms['sched_tue_mergedto'],
+                            "sched_tue_faculty" => $ms['sched_tue_faculty'],
+
+                            "sched_wed" => $ms['sched_wed'],
+                            "sched_wed_code" => $ms['sched_wed_code'],
+                            "sched_wed_bid" => $ms['sched_wed_bid'],
+                            "sched_wed_classrid" => $ms['sched_wed_classrid'],
+                            "sched_wed_mergeable" => $ms['sched_wed_mergeable'],
+                            "sched_wed_mergedto" => $ms['sched_wed_mergedto'],
+                            "sched_wed_faculty" => $ms['sched_wed_faculty'],
+
+                            "sched_thurs" => $ms['sched_thurs'],
+                            "sched_thurs_code" => $ms['sched_thurs_code'],
+                            "sched_thurs_bid" => $ms['sched_thurs_bid'],
+                            "sched_thurs_classrid" => $ms['sched_thurs_classrid'],
+                            "sched_thurs_mergeable" => $ms['sched_thurs_mergeable'],
+                            "sched_thurs_mergedto" => $ms['sched_thurs_mergedto'],
+                            "sched_thurs_faculty" => $ms['sched_thurs_faculty'],
+
+                            "sched_fri" => $ms['sched_fri'],
+                            "sched_fri_code" => $ms['sched_fri_code'],
+                            "sched_fri_bid" => $ms['sched_fri_bid'],
+                            "sched_fri_classrid" => $ms['sched_fri_classrid'],
+                            "sched_fri_mergeable" => $ms['sched_fri_mergeable'],
+                            "sched_fri_mergedto" => $ms['sched_fri_mergedto'],
+                            "sched_fri_faculty" => $ms['sched_fri_faculty'],
+
+                            "sched_sat" => $ms['sched_sat'],
+                            "sched_sat_code" => $ms['sched_sat_code'],
+                            "sched_sat_bid" => $ms['sched_sat_bid'],
+                            "sched_sat_classrid" => $ms['sched_sat_classrid'],
+                            "sched_sat_mergeable" => $ms['sched_sat_mergeable'],
+                            "sched_sat_mergedto" => $ms['sched_sat_mergedto'],
+                            "sched_sat_faculty" => $ms['sched_sat_faculty'],
+
+                            "sched_sun" => $ms['sched_sun'],
+                            "sched_sun_code" => $ms['sched_sun_code'],
+                            "sched_sun_bid" => $ms['sched_sun_bid'],
+                            "sched_sun_classrid" => $ms['sched_sun_classrid'],
+                            "sched_sun_mergeable" => $ms['sched_sun_mergeable'],
+                            "sched_sun_mergedto" => $ms['sched_sun_mergedto'],
+                            "sched_sun_faculty" => $ms['sched_sun_faculty'],
+
+                            "sched_lnid" => $ms['sched_lnid'],
+                    ]);
+
+                    if(empty($ms['sched_mon'])){
+                        if($ms['sched_mon_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_mon_schedid" => null
+                            ]);
+                            // return 'yey nag update amputa';
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_mon_faculty_occid'])
+                            ->delete();    
+                        }
                         
-                        "sched_mon" => $request['sched_mon'],
-                        "sched_mon_code" => $request['sched_mon_code'],
-                        "sched_mon_bid" => $request['sched_mon_bid'],
-                        "sched_mon_classrid" => $request['sched_mon_classrid'],
-                        "sched_mon_mergeable" => $request['sched_mon_mergeable'],
-                        "sched_mon_mergedto" => $request['sched_mon_mergedto'],
-                        "sched_mon_faculty" => $request['sched_mon_faculty'],
+                    }else{
+                        // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                        if($ms['sched_mon_mergedto'] == ''){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_mon_bid','=', $ms['sched_mon_bid'])
+                            ->where('occ_mon_classrid','=', $ms['sched_mon_classrid'])
+                            ->update([
+                                "occ_mon_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
 
-                        "sched_tue" => $request['sched_tue'],
-                        "sched_tue_code" => $request['sched_tue_code'],
-                        "sched_tue_bid" => $request['sched_tue_bid'],
-                        "sched_tue_classrid" => $request['sched_tue_classrid'],
-                        "sched_tue_mergeable" => $request['sched_tue_mergeable'],
-                        "sched_tue_mergedto" => $request['sched_tue_mergedto'],
-                        "sched_tue_faculty" => $request['sched_tue_faculty'],
-
-                        "sched_wed" => $request['sched_wed'],
-                        "sched_wed_code" => $request['sched_wed_code'],
-                        "sched_wed_bid" => $request['sched_wed_bid'],
-                        "sched_wed_classrid" => $request['sched_wed_classrid'],
-                        "sched_wed_mergeable" => $request['sched_wed_mergeable'],
-                        "sched_wed_mergedto" => $request['sched_wed_mergedto'],
-                        "sched_wed_faculty" => $request['sched_wed_faculty'],
-
-                        "sched_thurs" => $request['sched_thurs'],
-                        "sched_thurs_code" => $request['sched_thurs_code'],
-                        "sched_thurs_bid" => $request['sched_thurs_bid'],
-                        "sched_thurs_classrid" => $request['sched_thurs_classrid'],
-                        "sched_thurs_mergeable" => $request['sched_thurs_mergeable'],
-                        "sched_thurs_mergedto" => $request['sched_thurs_mergedto'],
-                        "sched_thurs_faculty" => $request['sched_thurs_faculty'],
-
-                        "sched_fri" => $request['sched_fri'],
-                        "sched_fri_code" => $request['sched_fri_code'],
-                        "sched_fri_bid" => $request['sched_fri_bid'],
-                        "sched_fri_classrid" => $request['sched_fri_classrid'],
-                        "sched_fri_mergeable" => $request['sched_fri_mergeable'],
-                        "sched_fri_mergedto" => $request['sched_fri_mergedto'],
-                        "sched_fri_faculty" => $request['sched_fri_faculty'],
-
-                        "sched_sat" => $request['sched_sat'],
-                        "sched_sat_code" => $request['sched_sat_code'],
-                        "sched_sat_bid" => $request['sched_sat_bid'],
-                        "sched_sat_classrid" => $request['sched_sat_classrid'],
-                        "sched_sat_mergeable" => $request['sched_sat_mergeable'],
-                        "sched_sat_mergedto" => $request['sched_sat_mergedto'],
-                        "sched_sat_faculty" => $request['sched_sat_faculty'],
-
-                        "sched_lnid" => $request['sched_lnid'],
-                ]);
-
-                if(empty($request['sched_mon'])){
-                    if($request['sched_mon_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_mon_schedid" => null
-                        ]);
-                        // return 'yey nag update amputa';
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_mon_faculty_occid'])
-                        ->delete();    
+                        if($ms['sched_mon_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_mon_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_mon_faculty'],
+                                "occ_subjid" =>  $ms['sched_mon'],
+                            ]);
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_mon_faculty'],
+                                "occ_subjid" =>  $ms['sched_mon'],
+                                "occ_day" =>  'Monday',
+                            ]); 
+                        }
+    
                     }
-                    
-                }else{
+
+                    if(empty($ms['sched_tue'])){
+                        if($ms['sched_tue_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_tue_schedid" => null
+                            ]);
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_tue_faculty_occid'])
+                            ->delete();    
+                        }
+                        
+                    }else{
                     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if($request['sched_mon_mergedto'] == ''){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_mon_bid','=', $request['sched_mon_bid'])
-                        ->where('occ_mon_classrid','=', $request['sched_mon_classrid'])
-                        ->update([
-                            "occ_mon_schedid" =>  $request->input('sched_id')
-                        ]);
+                        if(empty($ms['sched_tue_mergedto'])){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_tue_bid','=', $ms['sched_tue_bid'])
+                            ->where('occ_tue_classrid','=', $ms['sched_tue_classrid'])
+                            ->update([
+                                "occ_tue_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
+
+                        if($ms['sched_tue_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_tue_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_tue_faculty'],
+                                "occ_subjid" =>  $ms['sched_tue'],
+                            ]);   
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_tue_faculty'],
+                                "occ_subjid" =>  $ms['sched_tue'],
+                                "occ_day" =>  'Tuesday',
+                            ]); 
+                        }
                     }
 
-                    if($request['sched_mon_faculty_occid']){
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_mon_faculty_occid'])
-                        ->update([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_mon_faculty'),
-                            "occ_subjid" =>  $request->input('sched_mon'),
-                        ]);
+                    if(empty($ms['sched_wed'])){
+                        if($ms['sched_wed_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_wed_schedid" => null,
+                            ]);
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_wed_faculty_occid'])
+                            ->delete();      
+                        }
+                    
                     }else{
-                        $s3 = DB::table('def_launch_occupancy_faculty')
-                        ->insert([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_mon_faculty'),
-                            "occ_subjid" =>  $request->input('sched_mon'),
-                            "occ_day" =>  'Monday',
-                        ]); 
+                        // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                        if(empty($ms['sched_wed_mergedto'])){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_wed_bid','=', $ms['sched_wed_bid'])
+                            ->where('occ_wed_classrid','=', $ms['sched_wed_classrid'])
+                            ->update([
+                                "occ_wed_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
+                        
+                        if($ms['sched_wed_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_wed_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_wed_faculty'],
+                                "occ_subjid" =>  $ms['sched_wed'],
+                            ]);
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_wed_faculty'],
+                                "occ_subjid" =>  $ms['sched_wed'],
+                                "occ_day" =>  'Wednesday',
+                            ]); 
+                        }
+                        
                     }
- 
+
+                    if(empty($ms['sched_thurs'])){
+                        if($ms['sched_thurs_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_thurs_schedid" => null
+                            ]);
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_thurs_faculty_occid'])
+                            ->delete();       
+                        }
+                        
+                    }else{
+                        // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                        if(empty($ms['sched_thurs_mergedto'])){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_thurs_bid','=', $ms['sched_thurs_bid'])
+                            ->where('occ_thurs_classrid','=', $ms['sched_thurs_classrid'])
+                            ->update([
+                                "occ_thurs_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
+                        
+                        if($ms['sched_thurs_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_thurs_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_thurs_faculty'],
+                                "occ_subjid" =>  $ms['sched_thurs'],
+                            ]);
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_thurs_faculty'],
+                                "occ_subjid" =>  $ms['sched_thurs'],
+                                "occ_day" =>  'Thursday',
+                            ]);
+                        }
+
+                        
+                    }
+
+                    if(empty($ms['sched_fri'])){
+                        if($ms['sched_fri_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_fri_schedid" => null
+                            ]);
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_fri_faculty_occid'])
+                            ->delete();        
+                        }
+                        
+                    }else{
+                        // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                        if(empty($ms['sched_fri_mergedto'])){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_fri_bid','=', $ms['sched_fri_bid'])
+                            ->where('occ_fri_classrid','=', $ms['sched_fri_classrid'])
+                            ->update([
+                                "occ_fri_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
+                        
+                        if($ms['sched_fri_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_fri_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_fri_faculty'],
+                                "occ_subjid" =>  $ms['sched_fri'],
+                            ]);
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_fri_faculty'],
+                                "occ_subjid" =>  $ms['sched_fri'],
+                                "occ_day" =>  'Friday',
+                            ]);
+                        }
+                                
+                    }
+
+                    if(empty($ms['sched_sat'])){
+                        if($ms['sched_sat_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_sat_schedid" => null
+                            ]);
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_sat_faculty_occid'])
+                            ->delete();        
+                        }
+                    
+                    }else{
+                        // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                        if(empty($ms['sched_sat_mergedto'])){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_sat_bid','=', $ms['sched_sat_bid'])
+                            ->where('occ_sat_classrid','=', $ms['sched_sat_classrid'])
+                            ->update([
+                                "occ_sat_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
+                        
+                        if($ms['sched_sat_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_sat_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_sat_faculty'],
+                                "occ_subjid" =>  $ms['sched_sat'],
+                            ]);
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_sat_faculty'],
+                                "occ_subjid" =>  $ms['sched_sat'],
+                                "occ_day" =>  'Saturday',
+                            ]);
+                        }
+                                    
+                    }
+
+                    if(empty($ms['sched_sun'])){
+                        if($ms['sched_sun_remove'] == true){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->update([
+                                "occ_sun_schedid" => null
+                            ]);
+
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_sun_faculty_occid'])
+                            ->delete();        
+                        }
+                    
+                    }else{
+                        // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                        if(empty($ms['sched_sun_mergedto'])){
+                            $s1 = DB::table('def_launch_occupancy_subjects')
+                            ->where('occ_time','=', $ms['sched_time'])
+                            ->where('occ_sun_bid','=', $ms['sched_sun_bid'])
+                            ->where('occ_sun_classrid','=', $ms['sched_sun_classrid'])
+                            ->update([
+                                "occ_sun_schedid" =>  $ms['sched_id']
+                            ]);
+                        }
+                        
+                        if($ms['sched_sun_faculty_occid']){
+                            $s2 = DB::table('def_launch_occupancy_faculty')
+                            ->where('occ_id','=', $ms['sched_sun_faculty_occid'])
+                            ->update([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_sun_faculty'],
+                                "occ_subjid" =>  $ms['sched_sun'],
+                            ]);
+                        }else{
+                            $s3 = DB::table('def_launch_occupancy_faculty')
+                            ->insert([
+                                "occ_time" =>  $ms['sched_time'],
+                                "occ_lnid" =>  $ms['sched_lnid'],
+                                "occ_faculty" =>  $ms['sched_sun_faculty'],
+                                "occ_subjid" =>  $ms['sched_sun'],
+                                "occ_day" =>  'Sunday',
+                            ]);
+                        }
+                                    
+                    }
+
                 }
+                else{
+                    $s1 = DB::table('def_launch_schedule')->insert([
+                        'sched_lnid' => $ms['sched_lnid'],
+                        'sched_time' => $ms['sched_time'],
 
-                if(empty($request['sched_tue'])){
-                    if($request['sched_tue_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_tue_schedid" => null
-                        ]);
+                        'sched_mon' => $ms['sched_mon'],
+                        'sched_mon_code' => $ms['sched_mon_code'],
+                        'sched_mon_bid' => $ms['sched_mon_bid'],
+                        'sched_mon_classrid' => $ms['sched_mon_classrid'],
+                        'sched_mon_mergeable' => $ms['sched_mon_mergeable'],
+                        "sched_mon_mergedto" => $ms['sched_mon_mergedto'],
+                        "sched_mon_faculty" => $ms['sched_mon_faculty'],
 
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_tue_faculty_occid'])
-                        ->delete();    
+                        'sched_tue' => $ms['sched_tue'],
+                        'sched_tue_code' => $ms['sched_tue_code'],
+                        'sched_tue_bid' => $ms['sched_tue_bid'],
+                        'sched_tue_classrid' => $ms['sched_tue_classrid'],
+                        'sched_tue_mergeable' => $ms['sched_tue_mergeable'],
+                        "sched_tue_mergedto" => $ms['sched_tue_mergedto'],
+                        "sched_tue_faculty" => $ms['sched_tue_faculty'],
+
+                        'sched_wed' => $ms['sched_wed'],
+                        'sched_wed_code' => $ms['sched_wed_code'],
+                        'sched_wed_bid' => $ms['sched_wed_bid'],
+                        'sched_wed_classrid' => $ms['sched_wed_classrid'],
+                        'sched_wed_mergeable' => $ms['sched_wed_mergeable'],
+                        "sched_wed_mergedto" => $ms['sched_wed_mergedto'],
+                        "sched_wed_faculty" => $ms['sched_wed_faculty'],
+
+                        'sched_thurs' => $ms['sched_thurs'],
+                        'sched_thurs_code' => $ms['sched_thurs_code'],
+                        'sched_thurs_bid' => $ms['sched_thurs_bid'],
+                        'sched_thurs_classrid' => $ms['sched_thurs_classrid'],
+                        'sched_thurs_mergeable' => $ms['sched_thurs_mergeable'],
+                        "sched_thurs_mergedto" => $ms['sched_thurs_mergedto'],
+                        "sched_thurs_faculty" => $ms['sched_thurs_faculty'],
+
+                        'sched_fri' => $ms['sched_fri'],
+                        'sched_fri_code' => $ms['sched_fri_code'],
+                        'sched_fri_bid' => $ms['sched_fri_bid'],
+                        'sched_fri_classrid' => $ms['sched_fri_classrid'],
+                        'sched_fri_mergeable' => $ms['sched_fri_mergeable'],
+                        "sched_fri_mergedto" => $ms['sched_fri_mergedto'],
+                        "sched_fri_faculty" => $ms['sched_fri_faculty'],
+
+                        'sched_sat' => $ms['sched_sat'],
+                        'sched_sat_code' => $ms['sched_sat_code'],
+                        'sched_sat_bid' => $ms['sched_sat_bid'],
+                        'sched_sat_classrid' => $ms['sched_sat_classrid'],
+                        'sched_sat_mergeable' => $ms['sched_sat_mergeable'],
+                        "sched_sat_mergedto" => $ms['sched_sat_mergedto'],
+                        "sched_sat_faculty" => $ms['sched_sat_faculty'],
+
+                        'sched_sun' => $ms['sched_sun'],
+                        'sched_sun_code' => $ms['sched_sun_code'],
+                        'sched_sun_bid' => $ms['sched_sun_bid'],
+                        'sched_sun_classrid' => $ms['sched_sun_classrid'],
+                        'sched_sun_mergeable' => $ms['sched_sun_mergeable'],
+                        "sched_sun_mergedto" => $ms['sched_sun_mergedto'],
+                        "sched_sun_faculty" => $ms['sched_sun_faculty'],
+    
+                        
+                        'sched_addedby' => $ms['sched_addedby'],
+                        'sched_dateadded' => $date
+                    ]);
+
+                    $schedid = DB::table('def_launch_schedule')
+                        ->select('sched_id')
+                        ->where('sched_lnid', '=',  $ms['sched_lnid'])
+                        ->where('sched_time', '=',  $ms['sched_time'])
+                        ->where('sched_status', '=', 1)
+                        ->first();
+
+                    if(empty($ms['sched_mon'] ?? null)){
+                        if(($ms['sched_mon_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_mon_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_mon_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_mon_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
                     }
+
+                    if(empty($ms['sched_tue'] ?? null)){
+                        if(($ms['sched_tue_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_tue_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_tue_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_tue_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    if(empty($ms['sched_wed'] ?? null)){
+                        if(($ms['sched_wed_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_wed_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_wed_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_wed_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    if(empty($ms['sched_thurs'] ?? null)){
+                        if(($ms['sched_thurs_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_thurs_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_thurs_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_thurs_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    if(empty($ms['sched_fri'] ?? null)){
+                        if(($ms['sched_fri_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_fri_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_fri_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_fri_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    if(empty($ms['sched_sat'] ?? null)){
+                        if(($ms['sched_sat_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_sat_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_sat_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_sat_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
+                    }
+
+                    if(empty($ms['sched_sun'] ?? null)){
+                        if(($ms['sched_sun_remove'] ?? false) == true){
+
+                            DB::table('def_launch_occupancy_subjects')
+                                ->where('occ_time', $ms['sched_time'])
+                                ->update([
+                                    "occ_sun_schedid" => null
+                                ]);
+
+                            if(!empty($ms['sched_sun_faculty_occid'] ?? null)){
+                                DB::table('def_launch_occupancy_faculty')
+                                    ->where('occ_id', $ms['sched_sun_faculty_occid'])
+                                    ->delete();
+                            }
+                        }
+                    }
+
                     
-                }else{
-                   // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_tue_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_tue_bid','=', $request['sched_tue_bid'])
-                        ->where('occ_tue_classrid','=', $request['sched_tue_classrid'])
-                        ->update([
-                            "occ_tue_schedid" =>  $request->input('sched_id')
-                        ]);
-                    }
+                    // if(empty($request['sched_mon'])){
+                    //     if($request['sched_mon_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $request['sched_time'])
+                    //         ->update([
+                    //             "occ_mon_schedid" => null
+                    //         ]);
 
-                    if($request['sched_tue_faculty_occid']){
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_tue_faculty_occid'])
-                        ->update([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_tue_faculty'),
-                            "occ_subjid" =>  $request->input('sched_tue'),
-                        ]);   
-                    }else{
-                        $s3 = DB::table('def_launch_occupancy_faculty')
-                        ->insert([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_tue_faculty'),
-                            "occ_subjid" =>  $request->input('sched_tue'),
-                            "occ_day" =>  'Tuesday',
-                        ]); 
-                    }
-                }
-
-                if(empty($request['sched_wed'])){
-                    if($request['sched_wed_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_wed_schedid" => null,
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_wed_faculty_occid'])
-                        ->delete();      
-                    }
-                   
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_wed_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_wed_bid','=', $request['sched_wed_bid'])
-                        ->where('occ_wed_classrid','=', $request['sched_wed_classrid'])
-                        ->update([
-                            "occ_wed_schedid" =>  $request->input('sched_id')
-                        ]);
-                    }
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $request['sched_mon_faculty_occid'])
+                    //         ->delete();        
+                    //     }
+                        
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_mon_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->where('occ_mon_bid','=', $ms['sched_mon_bid'])
+                    //         ->where('occ_mon_classrid','=', $ms['sched_mon_classrid'])
+                    //         ->update([
+                    //             "occ_mon_schedid" =>  $schedid->sched_id
+                    //         ]);
+                    //     }
                     
-                    if($request['sched_wed_faculty_occid']){
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_wed_faculty_occid'])
-                        ->update([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_wed_faculty'),
-                            "occ_subjid" =>  $request->input('sched_wed'),
-                        ]);
-                    }else{
-                        $s3 = DB::table('def_launch_occupancy_faculty')
-                        ->insert([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_wed_faculty'),
-                            "occ_subjid" =>  $request->input('sched_wed'),
-                            "occ_day" =>  'Wednesday',
-                        ]); 
-                    }
-                     
-                }
+                        
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_mon_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_mon'],
+                    //         "occ_day" =>  'Monday',
+                    //     ]);       
+                    // }
 
-                if(empty($request['sched_thurs'])){
-                    if($request['sched_thurs_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_thurs_schedid" => null
-                        ]);
+                    // if(empty($ms['sched_tue'])){
+                    //     if($ms['sched_tue_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->update([
+                    //             "occ_tue_schedid" => null
+                    //         ]);
 
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_thurs_faculty_occid'])
-                        ->delete();       
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_thurs_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_thurs_bid','=', $request['sched_thurs_bid'])
-                        ->where('occ_thurs_classrid','=', $request['sched_thurs_classrid'])
-                        ->update([
-                            "occ_thurs_schedid" =>  $request->input('sched_id')
-                        ]);
-                    }
-                    
-                    if($request['sched_thurs_faculty_occid']){
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_thurs_faculty_occid'])
-                        ->update([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_thurs_faculty'),
-                            "occ_subjid" =>  $request->input('sched_thurs'),
-                        ]);
-                    }else{
-                        $s3 = DB::table('def_launch_occupancy_faculty')
-                        ->insert([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_thurs_faculty'),
-                            "occ_subjid" =>  $request->input('sched_thurs'),
-                            "occ_day" =>  'Thursday',
-                        ]);
-                    }
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $ms['sched_tue_faculty_occid'])
+                    //         ->delete();        
+                    //     }
 
-                     
-                }
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_tue_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //             ->where('occ_time','=', $ms['sched_time'])
+                    //             ->where('occ_tue_bid','=', $ms['sched_tue_bid'])
+                    //             ->where('occ_tue_classrid','=', $ms['sched_tue_classrid'])
+                    //             ->update([
+                    //                 "occ_tue_schedid" =>  $schedid->sched_id
+                    //             ]);
+                    //     }
+                        
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_tue_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_tue'],
+                    //         "occ_day" =>  'Tuesday',
+                    //     ]);        
+                    // }
 
-                if(empty($request['sched_fri'])){
-                    if($request['sched_fri_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_fri_schedid" => null
-                        ]);
+                    // if(empty($ms['sched_wed'])){
+                    //     if($ms['sched_wed_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->update([
+                    //             "occ_wed_schedid" => null
+                    //         ]);
 
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_fri_faculty_occid'])
-                        ->delete();        
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_fri_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_fri_bid','=', $request['sched_fri_bid'])
-                        ->where('occ_fri_classrid','=', $request['sched_fri_classrid'])
-                        ->update([
-                            "occ_fri_schedid" =>  $request->input('sched_id')
-                        ]);
-                    }
-                    
-                    if($request['sched_fri_faculty_occid']){
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_fri_faculty_occid'])
-                        ->update([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_fri_faculty'),
-                            "occ_subjid" =>  $request->input('sched_fri'),
-                        ]);
-                    }else{
-                        $s3 = DB::table('def_launch_occupancy_faculty')
-                        ->insert([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_fri_faculty'),
-                            "occ_subjid" =>  $request->input('sched_fri'),
-                            "occ_day" =>  'Friday',
-                        ]);
-                    }
-                             
-                }
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $ms['sched_wed_faculty_occid'])
+                    //         ->delete();        
+                    //     }
+                        
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_wed_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->where('occ_wed_bid','=', $ms['sched_wed_bid'])
+                    //         ->where('occ_wed_classrid','=', $ms['sched_wed_classrid'])
+                    //         ->update([
+                    //             "occ_wed_schedid" =>  $schedid->sched_id
+                    //         ]);
+                    //     }
+                    //     $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->where('occ_wed_bid','=', $ms['sched_wed_bid'])
+                    //         ->where('occ_wed_classrid','=', $ms['sched_wed_classrid'])
+                    //         ->update([
+                    //             "occ_wed_schedid" =>  $schedid->sched_id
+                    //         ]);
 
-                if(empty($request['sched_sat'])){
-                    if($request['sched_sat_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_sat_schedid" => null
-                        ]);
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_wed_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_wed'],
+                    //         "occ_day" =>  'Wednesday',
+                    //     ]);       
+                    // }
 
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_sat_faculty_occid'])
-                        ->delete();        
-                    }
-                
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_sat_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_sat_bid','=', $request['sched_sat_bid'])
-                        ->where('occ_sat_classrid','=', $request['sched_sat_classrid'])
-                        ->update([
-                            "occ_sat_schedid" =>  $request->input('sched_id')
-                        ]);
-                    }
-                    
-                    if($request['sched_sat_faculty_occid']){
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_sat_faculty_occid'])
-                        ->update([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_sat_faculty'),
-                            "occ_subjid" =>  $request->input('sched_sat'),
-                        ]);
-                    }else{
-                        $s3 = DB::table('def_launch_occupancy_faculty')
-                        ->insert([
-                            "occ_time" =>  $request->input('sched_time'),
-                            "occ_lnid" =>  $request->input('sched_lnid'),
-                            "occ_faculty" =>  $request->input('sched_sat_faculty'),
-                            "occ_subjid" =>  $request->input('sched_sat'),
-                            "occ_day" =>  'Saturday',
-                        ]);
-                    }
-                                 
+                    // if(empty($ms['sched_thurs'])){
+                    //     if($ms['sched_thurs_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->update([
+                    //             "occ_thurs_schedid" => null
+                    //         ]);
+
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $ms['sched_thurs_faculty_occid'])
+                    //         ->delete();        
+                    //     }
+                        
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_thurs_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //             ->where('occ_time','=', $ms['sched_time'])
+                    //             ->where('occ_thurs_bid','=', $ms['sched_thurs_bid'])
+                    //             ->where('occ_thurs_classrid','=', $ms['sched_thurs_classrid'])
+                    //             ->update([
+                    //                 "occ_thurs_schedid" =>  $schedid->sched_id
+                    //             ]);
+                    //     }
+                            
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_thurs_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_thurs'],
+                    //         "occ_day" =>  'Thursday',
+                    //     ]);        
+                    // }
+
+                    // if(empty($ms['sched_fri'])){
+                    //     if($ms['sched_fri_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->update([
+                    //             "occ_fri_schedid" => null,
+                    //         ]);
+
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $ms['sched_fri_faculty_occid'])
+                    //         ->delete();        
+                    //     }
+                        
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_fri_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //             ->where('occ_time','=', $ms['sched_time'])
+                    //             ->where('occ_fri_bid','=', $ms['sched_fri_bid'])
+                    //             ->where('occ_fri_classrid','=', $ms['sched_fri_classrid'])
+                    //             ->update([
+                    //                 "occ_fri_schedid" =>  $schedid->sched_id
+                    //             ]);
+                    //     }
+                        
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_fri_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_fri'],
+                    //         "occ_day" =>  'Friday',
+                    //     ]);       
+                    // }
+
+                    // if(empty($ms['sched_sat'])){
+                    //     if($ms['sched_sat_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->update([
+                    //             "occ_sat_schedid" => null
+                    //         ]);
+
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $ms['sched_sat_faculty_occid'])
+                    //         ->delete();       
+                    //     }
+                        
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_sat_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //             ->where('occ_time','=', $ms['sched_time'])
+                    //             ->where('occ_sat_bid','=', $ms['sched_sat_bid'])
+                    //             ->where('occ_sat_classrid','=', $ms['sched_sat_classrid'])
+                    //             ->update([
+                    //                 "occ_sat_schedid" =>  $schedid->sched_id
+                    //             ]);
+                    //     }
+
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_sat_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_sat'],
+                    //         "occ_day" =>  'Saturday',
+                    //     ]);        
+                    // }
+
+                    // if(empty($ms['sched_sun'])){
+                    //     if($ms['sched_sun_remove'] == true){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //         ->where('occ_time','=', $ms['sched_time'])
+                    //         ->update([
+                    //             "occ_sun_schedid" => null
+                    //         ]);
+
+                    //         $s2 = DB::table('def_launch_occupancy_faculty')
+                    //         ->where('occ_id','=', $ms['sched_sun_faculty_occid'])
+                    //         ->delete();       
+                    //     }
+                        
+                    // }else{
+                    //     // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
+                    //     if(empty($ms['sched_sun_mergedto'])){
+                    //         $s1 = DB::table('def_launch_occupancy_subjects')
+                    //             ->where('occ_time','=', $ms['sched_time'])
+                    //             ->where('occ_sun_bid','=', $ms['sched_sun_bid'])
+                    //             ->where('occ_sun_classrid','=', $ms['sched_sun_classrid'])
+                    //             ->update([
+                    //                 "occ_sun_schedid" =>  $schedid->sched_id
+                    //             ]);
+                    //     }
+
+                    //     $s2 = DB::table('def_launch_occupancy_faculty')
+                    //     ->insert([
+                    //         "occ_time" =>  $ms['sched_time'],
+                    //         "occ_lnid" =>  $ms['sched_lnid'],
+                    //         "occ_faculty" =>  $ms['sched_sun_faculty'],
+                    //         "occ_subjid" =>  $ms['sched_sun'],
+                    //         "occ_day" =>  'Sunday',
+                    //     ]);        
+                    // }
                 }
 
             }
-            else{
-                $s1 = DB::table('def_launch_schedule')->insert([
-                    'sched_lnid' => $request->input('sched_lnid'),
-                    'sched_time' => $request->input('sched_time'),
+            
+            DB::commit();
 
-                    'sched_mon' => $request->input('sched_mon'),
-                    'sched_mon_code' => $request->input('sched_mon_code'),
-                    'sched_mon_bid' => $request->input('sched_mon_bid'),
-                    'sched_mon_classrid' => $request->input('sched_mon_classrid'),
-                    'sched_mon_mergeable' => $request->input('sched_mon_mergeable'),
-                    "sched_mon_mergedto" => $request['sched_mon_mergedto'],
-                    "sched_mon_faculty" => $request['sched_mon_faculty'],
+            return response()->json([
+                'status' => 200,
+                'message' => 'Schedule saved successfully'
+            ]);
 
-                    'sched_tue' => $request->input('sched_tue'),
-                    'sched_tue_code' => $request->input('sched_tue_code'),
-                    'sched_tue_bid' => $request->input('sched_tue_bid'),
-                    'sched_tue_classrid' => $request->input('sched_tue_classrid'),
-                    'sched_tue_mergeable' => $request->input('sched_tue_mergeable'),
-                    "sched_tue_mergedto" => $request['sched_tue_mergedto'],
-                    "sched_tue_faculty" => $request['sched_tue_faculty'],
-
-                    'sched_wed' => $request->input('sched_wed'),
-                    'sched_wed_code' => $request->input('sched_wed_code'),
-                    'sched_wed_bid' => $request->input('sched_wed_bid'),
-                    'sched_wed_classrid' => $request->input('sched_wed_classrid'),
-                    'sched_wed_mergeable' => $request->input('sched_wed_mergeable'),
-                    "sched_wed_mergedto" => $request['sched_wed_mergedto'],
-                    "sched_wed_faculty" => $request['sched_wed_faculty'],
-
-                    'sched_thurs' => $request->input('sched_thurs'),
-                    'sched_thurs_code' => $request->input('sched_thurs_code'),
-                    'sched_thurs_bid' => $request->input('sched_thurs_bid'),
-                    'sched_thurs_classrid' => $request->input('sched_thurs_classrid'),
-                    'sched_thurs_mergeable' => $request->input('sched_thurs_mergeable'),
-                    "sched_thurs_mergedto" => $request['sched_thurs_mergedto'],
-                    "sched_thurs_faculty" => $request['sched_thurs_faculty'],
-
-                    'sched_fri' => $request->input('sched_fri'),
-                    'sched_fri_code' => $request->input('sched_fri_code'),
-                    'sched_fri_bid' => $request->input('sched_fri_bid'),
-                    'sched_fri_classrid' => $request->input('sched_fri_classrid'),
-                    'sched_fri_mergeable' => $request->input('sched_fri_mergeable'),
-                    "sched_fri_mergedto" => $request['sched_fri_mergedto'],
-                    "sched_fri_faculty" => $request['sched_fri_faculty'],
-
-                    'sched_sat' => $request->input('sched_sat'),
-                    'sched_sat_code' => $request->input('sched_sat_code'),
-                    'sched_sat_bid' => $request->input('sched_sat_bid'),
-                    'sched_sat_classrid' => $request->input('sched_sat_classrid'),
-                    'sched_sat_mergeable' => $request->input('sched_sat_mergeable'),
-                    "sched_sat_mergedto" => $request['sched_sat_mergedto'],
-                    "sched_sat_faculty" => $request['sched_sat_faculty'],
-  
-                    
-                    'sched_addedby' => $request->input('sched_addedby'),
-                    'sched_dateadded' => $date
-                ]);
-
-                $schedid = DB::table('def_launch_schedule')
-                    ->select('sched_id')
-                    ->where('sched_lnid', '=',  $request->input('sched_lnid'))
-                    ->where('sched_time', '=',  $request->input('sched_time'))
-                    ->where('sched_status', '=', 1)
-                    ->first();
-
-                
-                if(empty($request['sched_mon'])){
-                    if($request['sched_mon_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_mon_schedid" => null
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_mon_faculty_occid'])
-                        ->delete();        
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_mon_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_mon_bid','=', $request['sched_mon_bid'])
-                        ->where('occ_mon_classrid','=', $request['sched_mon_classrid'])
-                        ->update([
-                            "occ_mon_schedid" =>  $schedid->sched_id
-                        ]);
-                    }
-                   
-                    
-                    $s2 = DB::table('def_launch_occupancy_faculty')
-                    ->insert([
-                        "occ_time" =>  $request->input('sched_time'),
-                        "occ_lnid" =>  $request->input('sched_lnid'),
-                        "occ_faculty" =>  $request->input('sched_mon_faculty'),
-                        "occ_subjid" =>  $request->input('sched_mon'),
-                        "occ_day" =>  'Monday',
-                    ]);       
-                }
-
-                if(empty($request['sched_tue'])){
-                    if($request['sched_tue_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_tue_schedid" => null
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_tue_faculty_occid'])
-                        ->delete();        
-                    }
-
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_tue_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                            ->where('occ_time','=', $request['sched_time'])
-                            ->where('occ_tue_bid','=', $request['sched_tue_bid'])
-                            ->where('occ_tue_classrid','=', $request['sched_tue_classrid'])
-                            ->update([
-                                "occ_tue_schedid" =>  $schedid->sched_id
-                            ]);
-                    }
-                    
-                    $s2 = DB::table('def_launch_occupancy_faculty')
-                    ->insert([
-                        "occ_time" =>  $request->input('sched_time'),
-                        "occ_lnid" =>  $request->input('sched_lnid'),
-                        "occ_faculty" =>  $request->input('sched_tue_faculty'),
-                        "occ_subjid" =>  $request->input('sched_tue'),
-                        "occ_day" =>  'Tuesday',
-                    ]);        
-                }
-
-                if(empty($request['sched_wed'])){
-                    if($request['sched_wed_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_wed_schedid" => null
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_wed_faculty_occid'])
-                        ->delete();        
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_wed_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_wed_bid','=', $request['sched_wed_bid'])
-                        ->where('occ_wed_classrid','=', $request['sched_wed_classrid'])
-                        ->update([
-                            "occ_wed_schedid" =>  $schedid->sched_id
-                        ]);
-                    }
-                    $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->where('occ_wed_bid','=', $request['sched_wed_bid'])
-                        ->where('occ_wed_classrid','=', $request['sched_wed_classrid'])
-                        ->update([
-                            "occ_wed_schedid" =>  $schedid->sched_id
-                        ]);
-
-                    $s2 = DB::table('def_launch_occupancy_faculty')
-                    ->insert([
-                        "occ_time" =>  $request->input('sched_time'),
-                        "occ_lnid" =>  $request->input('sched_lnid'),
-                        "occ_faculty" =>  $request->input('sched_wed_faculty'),
-                        "occ_subjid" =>  $request->input('sched_wed'),
-                        "occ_day" =>  'Wednesday',
-                    ]);       
-                }
-
-                if(empty($request['sched_thurs'])){
-                    if($request['sched_thurs_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_thurs_schedid" => null
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_thurs_faculty_occid'])
-                        ->delete();        
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_thurs_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                            ->where('occ_time','=', $request['sched_time'])
-                            ->where('occ_thurs_bid','=', $request['sched_thurs_bid'])
-                            ->where('occ_thurs_classrid','=', $request['sched_thurs_classrid'])
-                            ->update([
-                                "occ_thurs_schedid" =>  $schedid->sched_id
-                            ]);
-                    }
-                        
-                    $s2 = DB::table('def_launch_occupancy_faculty')
-                    ->insert([
-                        "occ_time" =>  $request->input('sched_time'),
-                        "occ_lnid" =>  $request->input('sched_lnid'),
-                        "occ_faculty" =>  $request->input('sched_thurs_faculty'),
-                        "occ_subjid" =>  $request->input('sched_thurs'),
-                        "occ_day" =>  'Thursday',
-                    ]);        
-                }
-
-                if(empty($request['sched_fri'])){
-                    if($request['sched_fri_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_fri_schedid" => null,
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_fri_faculty_occid'])
-                        ->delete();        
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_fri_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                            ->where('occ_time','=', $request['sched_time'])
-                            ->where('occ_fri_bid','=', $request['sched_fri_bid'])
-                            ->where('occ_fri_classrid','=', $request['sched_fri_classrid'])
-                            ->update([
-                                "occ_fri_schedid" =>  $schedid->sched_id
-                            ]);
-                    }
-                    
-                    $s2 = DB::table('def_launch_occupancy_faculty')
-                    ->insert([
-                        "occ_time" =>  $request->input('sched_time'),
-                        "occ_lnid" =>  $request->input('sched_lnid'),
-                        "occ_faculty" =>  $request->input('sched_fri_faculty'),
-                        "occ_subjid" =>  $request->input('sched_fri'),
-                        "occ_day" =>  'Friday',
-                    ]);       
-                }
-
-                if(empty($request['sched_sat'])){
-                    if($request['sched_sat_remove'] == true){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                        ->where('occ_time','=', $request['sched_time'])
-                        ->update([
-                            "occ_sat_schedid" => null
-                        ]);
-
-                        $s2 = DB::table('def_launch_occupancy_faculty')
-                        ->where('occ_id','=', $request['sched_sat_faculty_occid'])
-                        ->delete();       
-                    }
-                    
-                }else{
-                    // if may laman yung mergeto dapat di magpalit yung original na nauna sa room and building
-                    if(empty($request['sched_sat_mergedto'])){
-                        $s1 = DB::table('def_launch_occupancy_subjects')
-                            ->where('occ_time','=', $request['sched_time'])
-                            ->where('occ_sat_bid','=', $request['sched_sat_bid'])
-                            ->where('occ_sat_classrid','=', $request['sched_sat_classrid'])
-                            ->update([
-                                "occ_sat_schedid" =>  $schedid->sched_id
-                            ]);
-                    }
-
-                    $s2 = DB::table('def_launch_occupancy_faculty')
-                    ->insert([
-                        "occ_time" =>  $request->input('sched_time'),
-                        "occ_lnid" =>  $request->input('sched_lnid'),
-                        "occ_faculty" =>  $request->input('sched_sat_faculty'),
-                        "occ_subjid" =>  $request->input('sched_sat'),
-                        "occ_day" =>  'Saturday',
-                    ]);        
-                }
-            }
-
+            
         }
-        
-        catch (Exception $ex) {
-            return 500;
+        catch (\Exception $ex) {
+
+            DB::rollBack();
+
+            return response()->json([
+                'error' => $ex->getMessage(),
+                'line' => $ex->getLine(),
+                'file' => $ex->getFile()
+            ], 500);
         }
     }
 
@@ -3177,6 +3453,13 @@ class RegistrarController extends Controller
                         ->get();
                     return $mergedclass;
                     break;
+                case 'Sunday':
+                    $mergedclass = DB::table('def_launch_schedule')
+                        ->where('sched_sun_mergedto', '=', $schedid)
+                        ->where('sched_status', '=', 1)
+                        ->get();
+                    return $mergedclass;
+                    break;
             }
         }
         catch (Exception $ex) {
@@ -3222,6 +3505,7 @@ class RegistrarController extends Controller
             ->leftJoin('def_launch_schedule as thurs_sched', 'sched_occ.occ_thurs_schedid', '=', 'thurs_sched.sched_id') 
             ->leftJoin('def_launch_schedule as fri_sched', 'sched_occ.occ_fri_schedid', '=', 'fri_sched.sched_id') 
             ->leftJoin('def_launch_schedule as sat_sched', 'sched_occ.occ_sat_schedid', '=', 'sat_sched.sched_id') 
+            ->leftJoin('def_launch_schedule as sun_sched', 'sched_occ.occ_sun_schedid', '=', 'sun_sched.sched_id') 
                 
             ->leftJoin('def_launch as mon_launch', 'mon_sched.sched_lnid', '=', 'mon_launch.ln_id') 
             ->leftJoin('def_section as mon_section', 'mon_launch.ln_section', '=', 'mon_section.sec_id') 
@@ -3258,6 +3542,12 @@ class RegistrarController extends Controller
             ->leftJoin('def_gradelvl as sat_gradelvl', 'sat_launch.ln_gradelvl', '=', 'sat_gradelvl.grad_id') 
             ->leftJoin('def_subject as sat_subject', 'sat_sched.sched_sat', '=', 'sat_subject.subj_id') 
             ->leftJoin('def_program as sat_course', 'sat_launch.ln_course', '=', 'sat_course.prog_id') 
+
+            ->leftJoin('def_launch as sun_launch', 'sun_sched.sched_lnid', '=', 'sun_launch.ln_id') 
+            ->leftJoin('def_section as sun_section', 'sun_launch.ln_section', '=', 'sun_section.sec_id') 
+            ->leftJoin('def_gradelvl as sun_gradelvl', 'sun_launch.ln_gradelvl', '=', 'sun_gradelvl.grad_id') 
+            ->leftJoin('def_subject as sun_subject', 'sun_sched.sched_sun', '=', 'sun_subject.subj_id') 
+            ->leftJoin('def_program as sun_course', 'sun_launch.ln_course', '=', 'sun_course.prog_id') 
         
     
             ->select(  
@@ -3346,6 +3636,20 @@ class RegistrarController extends Controller
                 'sat_sched.sched_sat_mergeable',
                 'sat_sched.sched_id as sat_sched_id',
                 'sat_sched.sched_sat_faculty as sat_sched_faculty',
+
+                'sun_sched.sched_lnid as sun_sched_lnid',
+                'sun_sched.sched_sun_code as sun_subj_code',
+                'sun_subject.subj_name as sun_subj_name',
+                'sun_subject.subj_id as sun_subj_id',
+                'sun_section.sec_code as sun_sec_code',
+                'sun_section.sec_name as sun_sec_name',
+                'sun_gradelvl.grad_code as sun_gradelvl_code',
+                'sun_gradelvl.grad_name as sun_gradelvl_name',
+                'sun_course.prog_id as sun_course_id',
+                'sun_course.prog_name as sun_course_name',
+                'sun_sched.sched_sun_mergeable',
+                'sun_sched.sched_id as sun_sched_id',
+                'sun_sched.sched_sun_faculty as sun_sched_faculty',
             )
             ->orderBy('sched_occ.occ_id','ASC')
             ->where('sched_occ.occ_mon_bid', '=', $bid)
@@ -3360,6 +3664,8 @@ class RegistrarController extends Controller
             ->where('sched_occ.occ_fri_classrid', '=', $classrid)
             ->where('sched_occ.occ_sat_bid', '=', $bid)
             ->where('sched_occ.occ_sat_classrid', '=', $classrid)
+            ->where('sched_occ.occ_sun_bid', '=', $bid)
+            ->where('sched_occ.occ_sun_classrid', '=', $classrid)
             ->where('sched_occ.occ_status', '=', 1)
             ->get();
             
@@ -3417,7 +3723,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_id','desc')
+                )->orderBy('def_employee.emp_lastname','asc')
                 ->get();
             }else{
                 $employee = DB::table('def_employee')
@@ -3425,7 +3731,7 @@ class RegistrarController extends Controller
                 ->select(  
                     'def_employee.*',
                     'def_department.*',
-                )->orderBy('def_employee.emp_id','desc')
+                )->orderBy('def_employee.emp_lastname','asc')
                 ->limit($limit)
                 ->offset($offset)
                 ->get();
@@ -3453,6 +3759,7 @@ class RegistrarController extends Controller
                             ->orWhere('emp_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('emp_lastname', 'like',  '%' . $lname .'%');
                         })
+                        ->orderBy('def_employee.emp_lastname','asc')
                         ->get();
             }else{
                 $employee = DB::table('def_employee')
@@ -3467,6 +3774,7 @@ class RegistrarController extends Controller
                             ->orWhere('emp_middlename', 'like',  '%' . $mname .'%')
                             ->orWhere('emp_lastname', 'like',  '%' . $lname .'%');
                         })
+                        ->orderBy('def_employee.emp_lastname','asc')
                         ->limit($limit)->offset($offset)
                         ->get();
             }
@@ -3733,7 +4041,7 @@ class RegistrarController extends Controller
     {
         date_default_timezone_set('Asia/Manila');
         $date = date('Y-m-d H:i:s');
-
+ 
         if(empty($request['lf_id'])){
             try{
                 $primary = DB::table('def_launch_faculty')->insert([

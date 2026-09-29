@@ -84,7 +84,7 @@ Route::middleware(['auth:sanctum'])->get('/get-section-count', [RegistrarControl
 
 Route::middleware(['auth:sanctum'])->get('/get-building', [DefaultsController::class,'getBuilding']);
 Route::middleware(['auth:sanctum'])->get('/get-classroom', [DefaultsController::class,'getClassroom']);
-Route::middleware(['auth:sanctum'])->get('/get-launch/{limit}/{offset}/{search}', [RegistrarController::class,'getLaunch']);
+Route::middleware(['auth:sanctum'])->get('/get-launch/{limit}/{offset}/{search}/{mode}', [RegistrarController::class,'getLaunch']);
 Route::middleware(['auth:sanctum'])->get('/get-launch-checker', [RegistrarController::class,'getLaunchChecker']);
 Route::middleware(['auth:sanctum'])->get('/get-total-enrollees', [RegistrarController::class,'getTotalEnrollees']);
 

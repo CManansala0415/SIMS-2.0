@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, nextTick } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import {
     getCurriculumStudent,
     getCurriculumSubject,
@@ -64,9 +64,6 @@ const headers = ref([
     },
     {
         title: 'Saturday'
-    },
-    {
-        title: 'Sunday'
     },
 ])
 const time = ref([
@@ -414,51 +411,21 @@ const filterSubject = () => {
 
 const wholeTmData = ref([])
 const assignSubject = (timeid, timeday, index, subjectid, building, classroom, merge, whole) => {
-   
+    timeId.value = timeid
+    timeDay.value = timeday
+    timeIndex.value = index
+    addedSubjId.value = subjectid
+    buildingId.value = building
+    classroomId.value = classroom
+    mergeable.value = merge
+    wholeTmData.value = whole
 
-    const exists = selectedList.value.findIndex(
-        item => item.timeid === timeid && item.day === timeday
-    );
-
-    // console.log('exists', exists)
-    // console.log('exists', selectedList.value)
-
-    if(exists !== -1) { // means kapag naka check sya sa checkbox at naka add sa selectedlist
-        timeId.value = timeid
-        timeDay.value = timeday
-        timeIndex.value = index
-        addedSubjId.value = subjectid
-        buildingId.value = building
-        classroomId.value = classroom
-        mergeable.value = merge
-        wholeTmData.value = whole
-
-        showScheduler.value = true
-        document.getElementById('openScheduler').click();
-    }else{
-        swal.fire({
-            icon: "info",
-            title: "Oops...",
-            text: "Please select the checkbox first before assigning a subject!",
-        })
-
-    }
-    
+    showScheduler.value = true
 
 }
 
-const removeCheck = async () => {
-    await nextTick();
-
-    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.checked = false;
-        selectedList.value = []
-    });
-};
-
 const getSched = (subjid, subjname, building, classroom, remove, facultyid, merge, enabler, schedid) => {
-    // console.log(facultyid)
-    // console.log(selectedList.value)
+    console.log(facultyid)
     buildingId.value = building
     classroomId.value = classroom
     // showScheduler.value = false
@@ -466,690 +433,522 @@ const getSched = (subjid, subjname, building, classroom, remove, facultyid, merg
     let schedId = schedid ? schedid : '' // need maging string na empty para madetect ni backend
     // console.log(schedId)
     //id na pinapasa sa scheduler if may nadd kanang subject
+    switch (timeDay.value) {
+        case 'Monday':
+            loadedSched.value[timeIndex.value].sched_mon = subjid
+            loadedSched.value[timeIndex.value].sched_mon_code = subjname
+            loadedSched.value[timeIndex.value].sched_mon_bid = buildingId.value
+            loadedSched.value[timeIndex.value].sched_mon_classrid = classroomId.value
+            loadedSched.value[timeIndex.value].sched_mon_mergeable = merge
+            loadedSched.value[timeIndex.value].sched_mon_mergedto = schedId
+            // loadedSched.value[timeIndex.value].sched_mon_faculty = facultyId.value
+            break;
+        case 'Tuesday':
+            loadedSched.value[timeIndex.value].sched_tue = subjid
+            loadedSched.value[timeIndex.value].sched_tue_code = subjname
+            loadedSched.value[timeIndex.value].sched_tue_bid = buildingId.value
+            loadedSched.value[timeIndex.value].sched_tue_classrid = classroomId.value
+            loadedSched.value[timeIndex.value].sched_tue_mergeable = merge
+            loadedSched.value[timeIndex.value].sched_tue_mergedto = schedId
+            // loadedSched.value[timeIndex.value].sched_tue_faculty = facultyId.value
 
-    selectedList.value.sort((a, b) => {
-        const timeA = parseInt(a.timeid.substring(0, 4), 10);
-        const timeB = parseInt(b.timeid.substring(0, 4), 10);
+            break;
+        case 'Wednesday':
+            loadedSched.value[timeIndex.value].sched_wed = subjid
+            loadedSched.value[timeIndex.value].sched_wed_code = subjname
+            loadedSched.value[timeIndex.value].sched_wed_bid = buildingId.value
+            loadedSched.value[timeIndex.value].sched_wed_classrid = classroomId.value
+            loadedSched.value[timeIndex.value].sched_wed_mergeable = merge
+            loadedSched.value[timeIndex.value].sched_wed_mergedto = schedId
+            // loadedSched.value[timeIndex.value].sched_wed_faculty = facultyId.value
 
-        return timeA - timeB;
+            break;
+        case 'Thursday':
+            loadedSched.value[timeIndex.value].sched_thurs = subjid
+            loadedSched.value[timeIndex.value].sched_thurs_code = subjname
+            loadedSched.value[timeIndex.value].sched_thurs_bid = buildingId.value
+            loadedSched.value[timeIndex.value].sched_thurs_classrid = classroomId.value
+            loadedSched.value[timeIndex.value].sched_thurs_mergeable = merge
+            loadedSched.value[timeIndex.value].sched_thurs_mergedto = schedId
+            // loadedSched.value[timeIndex.value].sched_thurs_faculty = facultyId.value
+
+            break;
+        case 'Friday':
+            loadedSched.value[timeIndex.value].sched_fri = subjid
+            loadedSched.value[timeIndex.value].sched_fri_code = subjname
+            loadedSched.value[timeIndex.value].sched_fri_bid = buildingId.value
+            loadedSched.value[timeIndex.value].sched_fri_classrid = classroomId.value
+            loadedSched.value[timeIndex.value].sched_fri_mergeable = merge
+            loadedSched.value[timeIndex.value].sched_fri_mergedto = schedId
+            // loadedSched.value[timeIndex.value].sched_fri_faculty = facultyId.value
+            break;
+        case 'Saturday':
+            loadedSched.value[timeIndex.value].sched_sat = subjid
+            loadedSched.value[timeIndex.value].sched_sat_code = subjname
+            loadedSched.value[timeIndex.value].sched_sat_bid = buildingId.value
+            loadedSched.value[timeIndex.value].sched_sat_classrid = classroomId.value
+            loadedSched.value[timeIndex.value].sched_sat_mergeable = merge
+            loadedSched.value[timeIndex.value].sched_sat_mergedto = schedId
+            // loadedSched.value[timeIndex.value].sched_sat_faculty = facultyId.value
+            break;
+    }
+
+    let indexer = scheduleList.value.findIndex(object => {
+        return timeId.value === object.sched_time;
     });
 
-    // console.log(selectedList.value)
+    switch (timeDay.value) {
+        case 'Monday':
+            if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
+
+                scheduleList.value[indexer].sched_mon = subjid
+                scheduleList.value[indexer].sched_mon_code = subjname
+
+                scheduleList.value[indexer].sched_mon_bid = building
+                scheduleList.value[indexer].sched_mon_classrid = classroom
+                scheduleList.value[indexer].sched_mon_remove = remove
+                scheduleList.value[indexer].sched_mon_faculty = facultyid
+
+            } else {
+                scheduleList.value.push({
+                    sched_time: timeId.value,
+                    sched_lnid: launch.value.ln_id,
+
+                    sched_mon: subjid,
+                    sched_mon_code: subjname,
+                    sched_mon_bid: building,
+                    sched_mon_classrid: classroom,
+                    sched_mon_remove: false,
+                    sched_mon_faculty: facultyid,
+                    sched_mon_mergeable: merge,
+                    sched_mon_mergedto: schedId,
+
+                    sched_tue: '',
+                    sched_tue_code: '',
+                    sched_tue_bid: '',
+                    sched_tue_classrid: '',
+                    sched_tue_remove: false,
+                    sched_tue_faculty: '',
+                    sched_tue_mergeable: merge,
+                    sched_tue_mergedto: schedId,
+
+                    sched_wed: '',
+                    sched_wed_code: '',
+                    sched_wed_bid: '',
+                    sched_wed_classrid: '',
+                    sched_wed_remove: false,
+                    sched_wed_faculty: '',
+                    sched_wed_mergeable: merge,
+                    sched_wed_mergedto: schedId,
+
+                    sched_thurs: '',
+                    sched_thurs_code: '',
+                    sched_thurs_bid: '',
+                    sched_thurs_classrid: '',
+                    sched_thurs_remove: false,
+                    sched_thurs_faculty: '',
+                    sched_thurs_mergeable: merge,
+                    sched_thurs_mergedto: schedId,
+
+                    sched_fri: '',
+                    sched_fri_code: '',
+                    sched_fri_bid: '',
+                    sched_fri_classrid: '',
+                    sched_fri_remove: false,
+                    sched_fri_faculty: '',
+                    sched_fri_mergeable: merge,
+                    sched_fri_mergedto: schedId,
+
+                    sched_sat: '',
+                    sched_sat_code: '',
+                    sched_sat_bid: '',
+                    sched_sat_classrid: '',
+                    sched_sat_remove: false,
+                    sched_sat_faculty: '',
+                    sched_sat_mergeable: merge,
+                    sched_sat_mergedto: schedId,
+
+                    sched_addedby: userID.value,
+                })
+            }
+            break;
+        case 'Tuesday':
+            if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
+
+                scheduleList.value[indexer].sched_tue = subjid
+                scheduleList.value[indexer].sched_tue_code = subjname
+
+                scheduleList.value[indexer].sched_tue_bid = building
+                scheduleList.value[indexer].sched_tue_classrid = classroom
+                scheduleList.value[indexer].sched_tue_remove = remove
+                scheduleList.value[indexer].sched_tue_faculty = facultyid
+
+            } else {
+
+                scheduleList.value.push({
+                    sched_time: timeId.value,
+                    sched_lnid: launch.value.ln_id,
+
+                    sched_mon: '',
+                    sched_mon_code: '',
+                    sched_mon_bid: '',
+                    sched_mon_classrid: '',
+                    sched_mon_remove: false,
+                    sched_mon_faculty: '',
+                    sched_mon_mergeable: merge,
+                    sched_mon_mergedto: schedId,
+
+                    sched_tue: subjid,
+                    sched_tue_code: subjname,
+                    sched_tue_bid: building,
+                    sched_tue_classrid: classroom,
+                    sched_tue_remove: false,
+                    sched_tue_faculty: facultyid,
+                    sched_tue_mergeable: merge,
+                    sched_tue_mergedto: schedId,
+
+                    sched_wed: '',
+                    sched_wed_code: '',
+                    sched_wed_bid: '',
+                    sched_wed_classrid: '',
+                    sched_wed_remove: false,
+                    sched_wed_faculty: '',
+                    sched_wed_mergeable: merge,
+                    sched_wed_mergedto: schedId,
+
+                    sched_thurs: '',
+                    sched_thurs_code: '',
+                    sched_thurs_bid: '',
+                    sched_thurs_classrid: '',
+                    sched_thurs_remove: false,
+                    sched_thurs_faculty: '',
+                    sched_thurs_mergeable: merge,
+                    sched_thurs_mergedto: schedId,
+
+                    sched_fri: '',
+                    sched_fri_code: '',
+                    sched_fri_bid: '',
+                    sched_fri_classrid: '',
+                    sched_fri_remove: false,
+                    sched_fri_faculty: '',
+                    sched_fri_mergeable: merge,
+                    sched_fri_mergedto: schedId,
+
+                    sched_sat: '',
+                    sched_sat_code: '',
+                    sched_sat_bid: '',
+                    sched_sat_classrid: '',
+                    sched_sat_remove: false,
+                    sched_sat_faculty: '',
+                    sched_sat_mergeable: merge,
+                    sched_sat_mergedto: schedId,
+
+                    sched_addedby: userID.value,
+                })
+            }
+            break;
+        case 'Wednesday':
+            if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
+
+                scheduleList.value[indexer].sched_wed = subjid
+                scheduleList.value[indexer].sched_wed_code = subjname
+
+                scheduleList.value[indexer].sched_wed_bid = building
+                scheduleList.value[indexer].sched_wed_classrid = classroom
+                scheduleList.value[indexer].sched_wed_remove = remove
+                scheduleList.value[indexer].sched_wed_faculty = facultyid
+
+            } else {
+                scheduleList.value.push({
+                    sched_time: timeId.value,
+                    sched_lnid: launch.value.ln_id,
+
+                    sched_mon: '',
+                    sched_mon_code: '',
+                    sched_mon_bid: '',
+                    sched_mon_classrid: '',
+                    sched_mon_remove: false,
+                    sched_mon_faculty: '',
+                    sched_mon_mergeable: merge,
+                    sched_mon_mergedto: schedId,
+
+                    sched_tue: '',
+                    sched_tue_code: '',
+                    sched_tue_bid: '',
+                    sched_tue_classrid: '',
+                    sched_tue_remove: false,
+                    sched_tue_faculty: '',
+                    sched_tue_mergeable: merge,
+                    sched_tue_mergedto: schedId,
+
+                    sched_wed: subjid,
+                    sched_wed_code: subjname,
+                    sched_wed_bid: building,
+                    sched_wed_classrid: classroom,
+                    sched_wed_remove: false,
+                    sched_wed_faculty: facultyid,
+                    sched_wed_mergeable: merge,
+                    sched_wed_mergedto: schedId,
+
+                    sched_thurs: '',
+                    sched_thurs_code: '',
+                    sched_thurs_bid: '',
+                    sched_thurs_classrid: '',
+                    sched_thurs_remove: false,
+                    sched_thurs_faculty: '',
+                    sched_thurs_mergeable: merge,
+                    sched_thurs_mergedto: schedId,
+
+                    sched_fri: '',
+                    sched_fri_code: '',
+                    sched_fri_bid: '',
+                    sched_fri_classrid: '',
+                    sched_fri_remove: false,
+                    sched_fri_faculty: '',
+                    sched_fri_mergeable: merge,
+                    sched_fri_mergedto: schedId,
+
+                    sched_sat: '',
+                    sched_sat_code: '',
+                    sched_sat_bid: '',
+                    sched_sat_classrid: '',
+                    sched_sat_remove: false,
+                    sched_sat_faculty: '',
+                    sched_sat_mergeable: merge,
+                    sched_sat_mergedto: schedId,
+
+                    sched_addedby: userID.value,
+                })
+            }
+            break;
+        case 'Thursday':
+            if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
+
+                scheduleList.value[indexer].sched_thurs = subjid
+                scheduleList.value[indexer].sched_thurs_code = subjname
+
+                scheduleList.value[indexer].sched_thurs_bid = building
+                scheduleList.value[indexer].sched_thurs_classrid = classroom
+                scheduleList.value[indexer].sched_thurs_remove = remove
+                scheduleList.value[indexer].sched_thurs_faculty = facultyid
+
+            } else {
+                scheduleList.value.push({
+                    sched_time: timeId.value,
+                    sched_lnid: launch.value.ln_id,
+
+                    sched_mon: '',
+                    sched_mon_code: '',
+                    sched_mon_bid: '',
+                    sched_mon_classrid: '',
+                    sched_mon_remove: false,
+                    sched_mon_faculty: '',
+                    sched_mon_mergeable: merge,
+                    sched_mon_mergedto: schedId,
+
+                    sched_tue: '',
+                    sched_tue_code: '',
+                    sched_tue_bid: '',
+                    sched_tue_classrid: '',
+                    sched_tue_remove: false,
+                    sched_tue_faculty: '',
+                    sched_tue_mergeable: merge,
+                    sched_tue_mergedto: schedId,
+
+                    sched_wed: '',
+                    sched_wed_code: '',
+                    sched_wed_bid: '',
+                    sched_wed_classrid: '',
+                    sched_wed_remove: false,
+                    sched_wed_faculty: '',
+                    sched_wed_mergeable: merge,
+                    sched_wed_mergedto: schedId,
+
+                    sched_thurs: subjid,
+                    sched_thurs_code: subjname,
+                    sched_thurs_bid: building,
+                    sched_thurs_classrid: classroom,
+                    sched_thurs_remove: false,
+                    sched_thurs_faculty: facultyid,
+                    sched_thurs_mergeable: merge,
+                    sched_thurs_mergedto: schedId,
+
+                    sched_fri: '',
+                    sched_fri_code: '',
+                    sched_fri_bid: '',
+                    sched_fri_classrid: '',
+                    sched_fri_remove: false,
+                    sched_fri_faculty: '',
+                    sched_fri_mergeable: merge,
+                    sched_fri_mergedto: schedId,
+
+                    sched_sat: '',
+                    sched_sat_code: '',
+                    sched_sat_bid: '',
+                    sched_sat_classrid: '',
+                    sched_sat_remove: false,
+                    sched_sat_faculty: '',
+                    sched_sat_mergeable: merge,
+                    sched_sat_mergedto: schedId,
+
+                    sched_addedby: userID.value,
+                })
+            }
+            break;
+        case 'Friday':
+            if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
+
+                scheduleList.value[indexer].sched_fri = subjid
+                scheduleList.value[indexer].sched_fri_code = subjname
+
+                scheduleList.value[indexer].sched_fri_bid = building
+                scheduleList.value[indexer].sched_fri_classrid = classroom
+                scheduleList.value[indexer].sched_fri_remove = remove
+                scheduleList.value[indexer].sched_fri_faculty = facultyid
+
+            } else {
+                scheduleList.value.push({
+                    sched_time: timeId.value,
+                    sched_lnid: launch.value.ln_id,
+
+                    sched_mon: '',
+                    sched_mon_code: '',
+                    sched_mon_bid: '',
+                    sched_mon_classrid: '',
+                    sched_mon_remove: false,
+                    sched_mon_faculty: '',
+                    sched_mon_mergeable: merge,
+                    sched_mon_mergedto: schedId,
+
+                    sched_tue: '',
+                    sched_tue_code: '',
+                    sched_tue_bid: '',
+                    sched_tue_classrid: '',
+                    sched_tue_remove: false,
+                    sched_tue_faculty: '',
+                    sched_tue_mergeable: merge,
+                    sched_tue_mergedto: schedId,
+
+                    sched_wed: '',
+                    sched_wed_code: '',
+                    sched_wed_bid: '',
+                    sched_wed_classrid: '',
+                    sched_wed_remove: false,
+                    sched_wed_faculty: '',
+                    sched_wed_mergeable: merge,
+                    sched_wed_mergedto: schedId,
+
+                    sched_thurs: '',
+                    sched_thurs_code: '',
+                    sched_thurs_bid: '',
+                    sched_thurs_classrid: '',
+                    sched_thurs_remove: false,
+                    sched_thurs_faculty: '',
+                    sched_thurs_mergeable: merge,
+                    sched_thurs_mergedto: schedId,
+
+                    sched_fri: subjid,
+                    sched_fri_code: subjname,
+                    sched_fri_bid: building,
+                    sched_fri_classrid: classroom,
+                    sched_fri_remove: false,
+                    sched_fri_faculty: facultyid,
+                    sched_fri_mergeable: merge,
+                    sched_fri_mergedto: schedId,
+
+                    sched_sat: '',
+                    sched_sat_code: '',
+                    sched_sat_bid: '',
+                    sched_sat_classrid: '',
+                    sched_sat_remove: false,
+                    sched_sat_faculty: '',
+                    sched_sat_mergeable: merge,
+                    sched_sat_mergedto: schedId,
+
+
+                    sched_addedby: userID.value,
+                })
+            }
+            break;
+        case 'Saturday':
+            if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
+
+                scheduleList.value[indexer].sched_sat = subjid
+                scheduleList.value[indexer].sched_sat_code = subjname
+
+                scheduleList.value[indexer].sched_sat_bid = building
+                scheduleList.value[indexer].sched_sat_classrid = classroom
+                scheduleList.value[indexer].sched_sat_remove = remove
+                scheduleList.value[indexer].sched_sat_faculty = facultyid
+
+            } else {
+                scheduleList.value.push({
+                    sched_time: timeId.value,
+                    sched_lnid: launch.value.ln_id,
+
+                    sched_mon: '',
+                    sched_mon_code: '',
+                    sched_mon_bid: '',
+                    sched_mon_classrid: '',
+                    sched_mon_remove: false,
+                    sched_mon_faculty: '',
+                    sched_mon_mergeable: merge,
+                    sched_mon_mergedto: schedId,
+
+                    sched_tue: '',
+                    sched_tue_code: '',
+                    sched_tue_bid: '',
+                    sched_tue_classrid: '',
+                    sched_tue_remove: false,
+                    sched_tue_faculty: '',
+                    sched_tue_mergeable: merge,
+                    sched_tue_mergedto: schedId,
+
+                    sched_wed: '',
+                    sched_wed_code: '',
+                    sched_wed_bid: '',
+                    sched_wed_classrid: '',
+                    sched_wed_remove: false,
+                    sched_wed_faculty: '',
+                    sched_wed_mergeable: merge,
+                    sched_wed_mergedto: schedId,
+
+                    sched_thurs: '',
+                    sched_thurs_code: '',
+                    sched_thurs_bid: '',
+                    sched_thurs_classrid: '',
+                    sched_thurs_remove: false,
+                    sched_thurs_faculty: '',
+                    sched_thurs_mergeable: merge,
+                    sched_thurs_mergedto: schedId,
+
+                    sched_fri: '',
+                    sched_fri_code: '',
+                    sched_fri_bid: '',
+                    sched_fri_classrid: '',
+                    sched_fri_remove: false,
+                    sched_fri_faculty: '',
+                    sched_fri_mergeable: merge,
+                    sched_fri_mergedto: schedId,
+
+                    sched_sat: subjid,
+                    sched_sat_code: subjname,
+                    sched_sat_bid: building,
+                    sched_sat_classrid: classroom,
+                    sched_sat_remove: false,
+                    sched_sat_faculty: facultyid,
+                    sched_sat_mergeable: merge,
+                    sched_sat_mergedto: schedId,
+
+
+                    sched_addedby: userID.value,
+                })
+            }
+            break;
+    }
+
     // console.log(loadedSched.value)
-    // console.log(scheduleList.value)
-    selectedList.value.forEach((e, i) => {
 
-        let multIndex = loadedSched.value.findIndex(ld => {
-            return e.timeid === ld.timeid;
-        });
-
-        switch (e.day) {
-            case 'Monday':
-                loadedSched.value[multIndex].sched_mon = subjid
-                loadedSched.value[multIndex].sched_mon_code = subjname
-                loadedSched.value[multIndex].sched_mon_bid = buildingId.value
-                loadedSched.value[multIndex].sched_mon_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_mon_mergeable = merge
-                loadedSched.value[multIndex].sched_mon_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_mon_faculty = facultyId.value
-                break;
-            case 'Tuesday':
-                loadedSched.value[multIndex].sched_tue = subjid
-                loadedSched.value[multIndex].sched_tue_code = subjname
-                loadedSched.value[multIndex].sched_tue_bid = buildingId.value
-                loadedSched.value[multIndex].sched_tue_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_tue_mergeable = merge
-                loadedSched.value[multIndex].sched_tue_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_tue_faculty = facultyId.value
-
-                break;
-            case 'Wednesday':
-                loadedSched.value[multIndex].sched_wed = subjid
-                loadedSched.value[multIndex].sched_wed_code = subjname
-                loadedSched.value[multIndex].sched_wed_bid = buildingId.value
-                loadedSched.value[multIndex].sched_wed_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_wed_mergeable = merge
-                loadedSched.value[multIndex].sched_wed_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_wed_faculty = facultyId.value
-
-                break;
-            case 'Thursday':
-                loadedSched.value[multIndex].sched_thurs = subjid
-                loadedSched.value[multIndex].sched_thurs_code = subjname
-                loadedSched.value[multIndex].sched_thurs_bid = buildingId.value
-                loadedSched.value[multIndex].sched_thurs_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_thurs_mergeable = merge
-                loadedSched.value[multIndex].sched_thurs_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_thurs_faculty = facultyId.value
-
-                break;
-            case 'Friday':
-                loadedSched.value[multIndex].sched_fri = subjid
-                loadedSched.value[multIndex].sched_fri_code = subjname
-                loadedSched.value[multIndex].sched_fri_bid = buildingId.value
-                loadedSched.value[multIndex].sched_fri_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_fri_mergeable = merge
-                loadedSched.value[multIndex].sched_fri_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_fri_faculty = facultyId.value
-                break;
-            case 'Saturday':
-                loadedSched.value[multIndex].sched_sat = subjid
-                loadedSched.value[multIndex].sched_sat_code = subjname
-                loadedSched.value[multIndex].sched_sat_bid = buildingId.value
-                loadedSched.value[multIndex].sched_sat_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_sat_mergeable = merge
-                loadedSched.value[multIndex].sched_sat_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_sat_faculty = facultyId.value
-                break;
-            case 'Sunday':
-                loadedSched.value[multIndex].sched_sun = subjid
-                loadedSched.value[multIndex].sched_sun_code = subjname
-                loadedSched.value[multIndex].sched_sun_bid = buildingId.value
-                loadedSched.value[multIndex].sched_sun_classrid = classroomId.value
-                loadedSched.value[multIndex].sched_sun_mergeable = merge
-                loadedSched.value[multIndex].sched_sun_mergedto = schedId
-                // loadedSched.value[timeIndex.value].sched_sun_faculty = facultyId.value
-                break;
-        }
-
-        let indexer = scheduleList.value.findIndex(object => {
-            return e.timeid === object.sched_time;
-        });
-
-
-        switch (e.day) {
-            case 'Monday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_mon = subjid
-                    scheduleList.value[indexer].sched_mon_code = subjname
-
-                    scheduleList.value[indexer].sched_mon_bid = building
-                    scheduleList.value[indexer].sched_mon_classrid = classroom
-                    scheduleList.value[indexer].sched_mon_remove = remove
-                    scheduleList.value[indexer].sched_mon_faculty = facultyid
-
-                } else {
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: subjid,
-                        sched_mon_code: subjname,
-                        sched_mon_bid: building,
-                        sched_mon_classrid: classroom,
-                        sched_mon_remove: false,
-                        sched_mon_faculty: facultyid,
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: '',
-                        sched_tue_code: '',
-                        sched_tue_bid: '',
-                        sched_tue_classrid: '',
-                        sched_tue_remove: false,
-                        sched_tue_faculty: '',
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: '',
-                        sched_wed_code: '',
-                        sched_wed_bid: '',
-                        sched_wed_classrid: '',
-                        sched_wed_remove: false,
-                        sched_wed_faculty: '',
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: '',
-                        sched_thurs_code: '',
-                        sched_thurs_bid: '',
-                        sched_thurs_classrid: '',
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: '',
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: '',
-                        sched_fri_code: '',
-                        sched_fri_bid: '',
-                        sched_fri_classrid: '',
-                        sched_fri_remove: false,
-                        sched_fri_faculty: '',
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: '',
-                        sched_sat_code: '',
-                        sched_sat_bid: '',
-                        sched_sat_classrid: '',
-                        sched_sat_remove: false,
-                        sched_sat_faculty: '',
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: '',
-                        sched_sun_code: '',
-                        sched_sun_bid: '',
-                        sched_sun_classrid: '',
-                        sched_sun_remove: false,
-                        sched_sun_faculty: '',
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-                        sched_addedby: userID.value,
-                    })
-                }
-                break;
-            case 'Tuesday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_tue = subjid
-                    scheduleList.value[indexer].sched_tue_code = subjname
-
-                    scheduleList.value[indexer].sched_tue_bid = building
-                    scheduleList.value[indexer].sched_tue_classrid = classroom
-                    scheduleList.value[indexer].sched_tue_remove = remove
-                    scheduleList.value[indexer].sched_tue_faculty = facultyid
-
-                } else {
-
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: '',
-                        sched_mon_code: '',
-                        sched_mon_bid: '',
-                        sched_mon_classrid: '',
-                        sched_mon_remove: false,
-                        sched_mon_faculty: '',
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: subjid,
-                        sched_tue_code: subjname,
-                        sched_tue_bid: building,
-                        sched_tue_classrid: classroom,
-                        sched_tue_remove: false,
-                        sched_tue_faculty: facultyid,
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: '',
-                        sched_wed_code: '',
-                        sched_wed_bid: '',
-                        sched_wed_classrid: '',
-                        sched_wed_remove: false,
-                        sched_wed_faculty: '',
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: '',
-                        sched_thurs_code: '',
-                        sched_thurs_bid: '',
-                        sched_thurs_classrid: '',
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: '',
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: '',
-                        sched_fri_code: '',
-                        sched_fri_bid: '',
-                        sched_fri_classrid: '',
-                        sched_fri_remove: false,
-                        sched_fri_faculty: '',
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: '',
-                        sched_sat_code: '',
-                        sched_sat_bid: '',
-                        sched_sat_classrid: '',
-                        sched_sat_remove: false,
-                        sched_sat_faculty: '',
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: '',
-                        sched_sun_code: '',
-                        sched_sun_bid: '',
-                        sched_sun_classrid: '',
-                        sched_sun_remove: false,
-                        sched_sun_faculty: '',
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-                        sched_addedby: userID.value,
-                    })
-                }
-                break;
-            case 'Wednesday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_wed = subjid
-                    scheduleList.value[indexer].sched_wed_code = subjname
-
-                    scheduleList.value[indexer].sched_wed_bid = building
-                    scheduleList.value[indexer].sched_wed_classrid = classroom
-                    scheduleList.value[indexer].sched_wed_remove = remove
-                    scheduleList.value[indexer].sched_wed_faculty = facultyid
-
-                } else {
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: '',
-                        sched_mon_code: '',
-                        sched_mon_bid: '',
-                        sched_mon_classrid: '',
-                        sched_mon_remove: false,
-                        sched_mon_faculty: '',
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: '',
-                        sched_tue_code: '',
-                        sched_tue_bid: '',
-                        sched_tue_classrid: '',
-                        sched_tue_remove: false,
-                        sched_tue_faculty: '',
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: subjid,
-                        sched_wed_code: subjname,
-                        sched_wed_bid: building,
-                        sched_wed_classrid: classroom,
-                        sched_wed_remove: false,
-                        sched_wed_faculty: facultyid,
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: '',
-                        sched_thurs_code: '',
-                        sched_thurs_bid: '',
-                        sched_thurs_classrid: '',
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: '',
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: '',
-                        sched_fri_code: '',
-                        sched_fri_bid: '',
-                        sched_fri_classrid: '',
-                        sched_fri_remove: false,
-                        sched_fri_faculty: '',
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: '',
-                        sched_sat_code: '',
-                        sched_sat_bid: '',
-                        sched_sat_classrid: '',
-                        sched_sat_remove: false,
-                        sched_sat_faculty: '',
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: '',
-                        sched_sun_code: '',
-                        sched_sun_bid: '',
-                        sched_sun_classrid: '',
-                        sched_sun_remove: false,
-                        sched_sun_faculty: '',
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-                        sched_addedby: userID.value,
-                    })
-                }
-                break;
-            case 'Thursday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_thurs = subjid
-                    scheduleList.value[indexer].sched_thurs_code = subjname
-
-                    scheduleList.value[indexer].sched_thurs_bid = building
-                    scheduleList.value[indexer].sched_thurs_classrid = classroom
-                    scheduleList.value[indexer].sched_thurs_remove = remove
-                    scheduleList.value[indexer].sched_thurs_faculty = facultyid
-
-                } else {
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: '',
-                        sched_mon_code: '',
-                        sched_mon_bid: '',
-                        sched_mon_classrid: '',
-                        sched_mon_remove: false,
-                        sched_mon_faculty: '',
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: '',
-                        sched_tue_code: '',
-                        sched_tue_bid: '',
-                        sched_tue_classrid: '',
-                        sched_tue_remove: false,
-                        sched_tue_faculty: '',
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: '',
-                        sched_wed_code: '',
-                        sched_wed_bid: '',
-                        sched_wed_classrid: '',
-                        sched_wed_remove: false,
-                        sched_wed_faculty: '',
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: subjid,
-                        sched_thurs_code: subjname,
-                        sched_thurs_bid: building,
-                        sched_thurs_classrid: classroom,
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: facultyid,
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: '',
-                        sched_fri_code: '',
-                        sched_fri_bid: '',
-                        sched_fri_classrid: '',
-                        sched_fri_remove: false,
-                        sched_fri_faculty: '',
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: '',
-                        sched_sat_code: '',
-                        sched_sat_bid: '',
-                        sched_sat_classrid: '',
-                        sched_sat_remove: false,
-                        sched_sat_faculty: '',
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: '',
-                        sched_sun_code: '',
-                        sched_sun_bid: '',
-                        sched_sun_classrid: '',
-                        sched_sun_remove: false,
-                        sched_sun_faculty: '',
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-                        sched_addedby: userID.value,
-                    })
-                }
-                break;
-            case 'Friday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_fri = subjid
-                    scheduleList.value[indexer].sched_fri_code = subjname
-
-                    scheduleList.value[indexer].sched_fri_bid = building
-                    scheduleList.value[indexer].sched_fri_classrid = classroom
-                    scheduleList.value[indexer].sched_fri_remove = remove
-                    scheduleList.value[indexer].sched_fri_faculty = facultyid
-
-                } else {
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: '',
-                        sched_mon_code: '',
-                        sched_mon_bid: '',
-                        sched_mon_classrid: '',
-                        sched_mon_remove: false,
-                        sched_mon_faculty: '',
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: '',
-                        sched_tue_code: '',
-                        sched_tue_bid: '',
-                        sched_tue_classrid: '',
-                        sched_tue_remove: false,
-                        sched_tue_faculty: '',
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: '',
-                        sched_wed_code: '',
-                        sched_wed_bid: '',
-                        sched_wed_classrid: '',
-                        sched_wed_remove: false,
-                        sched_wed_faculty: '',
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: '',
-                        sched_thurs_code: '',
-                        sched_thurs_bid: '',
-                        sched_thurs_classrid: '',
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: '',
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: subjid,
-                        sched_fri_code: subjname,
-                        sched_fri_bid: building,
-                        sched_fri_classrid: classroom,
-                        sched_fri_remove: false,
-                        sched_fri_faculty: facultyid,
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: '',
-                        sched_sat_code: '',
-                        sched_sat_bid: '',
-                        sched_sat_classrid: '',
-                        sched_sat_remove: false,
-                        sched_sat_faculty: '',
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: '',
-                        sched_sun_code: '',
-                        sched_sun_bid: '',
-                        sched_sun_classrid: '',
-                        sched_sun_remove: false,
-                        sched_sun_faculty: '',
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-
-                        sched_addedby: userID.value,
-                    })
-                }
-                break;
-            case 'Saturday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_sat = subjid
-                    scheduleList.value[indexer].sched_sat_code = subjname
-
-                    scheduleList.value[indexer].sched_sat_bid = building
-                    scheduleList.value[indexer].sched_sat_classrid = classroom
-                    scheduleList.value[indexer].sched_sat_remove = remove
-                    scheduleList.value[indexer].sched_sat_faculty = facultyid
-
-                } else {
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: '',
-                        sched_mon_code: '',
-                        sched_mon_bid: '',
-                        sched_mon_classrid: '',
-                        sched_mon_remove: false,
-                        sched_mon_faculty: '',
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: '',
-                        sched_tue_code: '',
-                        sched_tue_bid: '',
-                        sched_tue_classrid: '',
-                        sched_tue_remove: false,
-                        sched_tue_faculty: '',
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: '',
-                        sched_wed_code: '',
-                        sched_wed_bid: '',
-                        sched_wed_classrid: '',
-                        sched_wed_remove: false,
-                        sched_wed_faculty: '',
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: '',
-                        sched_thurs_code: '',
-                        sched_thurs_bid: '',
-                        sched_thurs_classrid: '',
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: '',
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: '',
-                        sched_fri_code: '',
-                        sched_fri_bid: '',
-                        sched_fri_classrid: '',
-                        sched_fri_remove: false,
-                        sched_fri_faculty: '',
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: subjid,
-                        sched_sat_code: subjname,
-                        sched_sat_bid: building,
-                        sched_sat_classrid: classroom,
-                        sched_sat_remove: false,
-                        sched_sat_faculty: facultyid,
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: '',
-                        sched_sun_code: '',
-                        sched_sun_bid: '',
-                        sched_sun_classrid: '',
-                        sched_sun_remove: false,
-                        sched_sun_faculty: '',
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-
-                        sched_addedby: userID.value,
-                    })
-                }
-                break;
-            case 'Sunday':
-                if ((Object.keys(scheduleList.value).length >= 1) && (typeof scheduleList.value[indexer] !== 'undefined')) {
-
-                    scheduleList.value[indexer].sched_sun = subjid
-                    scheduleList.value[indexer].sched_sun_code = subjname
-
-                    scheduleList.value[indexer].sched_sun_bid = building
-                    scheduleList.value[indexer].sched_sun_classrid = classroom
-                    scheduleList.value[indexer].sched_sun_remove = remove
-                    scheduleList.value[indexer].sched_sun_faculty = facultyid
-
-                } else {
-                    scheduleList.value.push({
-                        sched_time: e.timeid,
-                        sched_lnid: launch.value.ln_id,
-
-                        sched_mon: '',
-                        sched_mon_code: '',
-                        sched_mon_bid: '',
-                        sched_mon_classrid: '',
-                        sched_mon_remove: false,
-                        sched_mon_faculty: '',
-                        sched_mon_mergeable: merge,
-                        sched_mon_mergedto: schedId,
-
-                        sched_tue: '',
-                        sched_tue_code: '',
-                        sched_tue_bid: '',
-                        sched_tue_classrid: '',
-                        sched_tue_remove: false,
-                        sched_tue_faculty: '',
-                        sched_tue_mergeable: merge,
-                        sched_tue_mergedto: schedId,
-
-                        sched_wed: '',
-                        sched_wed_code: '',
-                        sched_wed_bid: '',
-                        sched_wed_classrid: '',
-                        sched_wed_remove: false,
-                        sched_wed_faculty: '',
-                        sched_wed_mergeable: merge,
-                        sched_wed_mergedto: schedId,
-
-                        sched_thurs: '',
-                        sched_thurs_code: '',
-                        sched_thurs_bid: '',
-                        sched_thurs_classrid: '',
-                        sched_thurs_remove: false,
-                        sched_thurs_faculty: '',
-                        sched_thurs_mergeable: merge,
-                        sched_thurs_mergedto: schedId,
-
-                        sched_fri: '',
-                        sched_fri_code: '',
-                        sched_fri_bid: '',
-                        sched_fri_classrid: '',
-                        sched_fri_remove: false,
-                        sched_fri_faculty: '',
-                        sched_fri_mergeable: merge,
-                        sched_fri_mergedto: schedId,
-
-                        sched_sat: '',
-                        sched_sat_code: '',
-                        sched_sat_bid: '',
-                        sched_sat_classrid: '',
-                        sched_sat_remove: false,
-                        sched_sat_faculty: '',
-                        sched_sat_mergeable: merge,
-                        sched_sat_mergedto: schedId,
-
-                        sched_sun: subjid,
-                        sched_sun_code: subjname,
-                        sched_sun_bid: building,
-                        sched_sun_classrid: classroom,
-                        sched_sun_remove: false,
-                        sched_sun_faculty: facultyid,
-                        sched_sun_mergeable: merge,
-                        sched_sun_mergedto: schedId,
-
-
-                        sched_addedby: userID.value,
-                    })
-                }
-        }
-    })
-
-    // console.log(selectedList.value)
-    // console.log(loadedSched.value)
-    // console.log(scheduleList.value) 
-
-    removeCheck()
 }
 
 const clearSched = () => {
@@ -1189,55 +988,30 @@ const saveSched = () => {
     // console.log(scheduleList.value)
     // console.log(loadedSched.value)
 
-    // scheduleList.value.forEach(async (e) => {
-    //     addSchedule(e).then((results) => {
-    //         savingCount.value += 1
-    //         if (Object.keys(scheduleList.value).length == savingCount.value) {
-    //             // alert('Successfull Saved')
-    //             // saving.value = false
-    //             // savingCount.value = 0
-    //             // scheduleList.value = []
-    //             // loadedSched.value = []
-    //             // loadSched()
-    //             Swal.fire({
-    //                 title: "Update Successful",
-    //                 text: "Changes applied",
-    //                 icon: "success"
-    //             }).then(() => {
-    //                 // saving.value = false
-    //                 // savingCount.value = 0
-    //                 // scheduleList.value = []
-    //                 // loadedSched.value = []
-    //                 // loadSched()
-    //                 location.reload()
-    //             });
-    //         }
-    //     })
-    // })
-    addSchedule(scheduleList.value).then((results) => {
-        savingCount.value += 1
-        if (results.status == 200) {
-            // alert('Successfull Saved')
-            // saving.value = false
-            // savingCount.value = 0
-            // scheduleList.value = []
-            // loadedSched.value = []
-            // loadSched()
-            Swal.fire({
-                title: "Update Successful",
-                text: "Changes applied",
-                icon: "success"
-            }).then(() => {
+    scheduleList.value.forEach(async (e) => {
+        addSchedule(e).then((results) => {
+            savingCount.value += 1
+            if (Object.keys(scheduleList.value).length == savingCount.value) {
+                // alert('Successfull Saved')
                 // saving.value = false
                 // savingCount.value = 0
                 // scheduleList.value = []
                 // loadedSched.value = []
                 // loadSched()
-                // location.reload()
-                // showCalendar.value = false
-                close()
-            });
-        }
+                Swal.fire({
+                    title: "Update Successful",
+                    text: "Changes applied",
+                    icon: "success"
+                }).then(() => {
+                    // saving.value = false
+                    // savingCount.value = 0
+                    // scheduleList.value = []
+                    // loadedSched.value = []
+                    // loadSched()
+                    location.reload()
+                });
+            }
+        })
     })
 }
 
@@ -1304,15 +1078,6 @@ const loadSched = () => {
                     if (object.occ_time === e.timeid && object.occ_day == 'Saturday') {
                         sat_faculty = object.occ_faculty
                         sat_faculty_occid = object.occ_id
-                    }
-                })
-
-                let sun_faculty = ''
-                let sun_faculty_occid = ''
-                availability.value.filter((object) => {
-                    if (object.occ_time === e.timeid && object.occ_day == 'Sunday') {
-                        sun_faculty = object.occ_faculty
-                        sun_faculty_occid = object.occ_id
                     }
                 })
 
@@ -1385,16 +1150,6 @@ const loadSched = () => {
                         sched_sat_mergeable: results[indexer].sched_sat_mergeable,
                         sched_sat_mergedto: results[indexer].sched_sat_mergedto,
 
-                        sched_sun_remove: false,
-                        sched_sun: results[indexer].sched_sun,
-                        sched_sun_code: results[indexer].sched_sun_code,
-                        sched_sun_bid: results[indexer].sched_sun_bid,
-                        sched_sun_classrid: results[indexer].sched_sun_classrid,
-                        sched_sun_faculty: sun_faculty,
-                        sched_sun_faculty_occid: sun_faculty_occid,
-                        sched_sun_mergeable: results[indexer].sched_sun_mergeable,
-                        sched_sun_mergedto: results[indexer].sched_sun_mergedto,
-
                     }
                 } else {
                     return {
@@ -1411,8 +1166,6 @@ const loadSched = () => {
                         sched_fri_code: '',
                         sched_sat: '',
                         sched_sat_code: '',
-                        sched_sun: '',
-                        sched_sun_code: '',
                     }
                 }
 
@@ -1433,7 +1186,6 @@ const loadSched = () => {
 
 
         })
-
     })
 
 
@@ -1544,25 +1296,24 @@ const addToList = (mode, data, day) => {
                     </thead>
 
                     <tbody>
-                        <tr v-for="(tm, index) in loadedSched" :key="index" class="tr-class">
+                        <tr v-for="(tm, index) in loadedSched" :key="index">
                             <!-- Time Column -->
                             <td class="time-cell text-center">
                                 {{ tm.timename }} {{ tm.daytime }}
                             </td>
 
                             <!-- Monday -->
-                            <td class="day-cell hover-me" :class="tm.classname" :style="tm.style">
+                            <td class="day-cell" :class="tm.classname" :style="tm.style">
                                 <div class="d-flex justify-content-center align-items-center gap-1">
                                     <div class="p-1">
                                         <input
                                             type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
+                                            class="form-check-input"
                                             @change="addToList($event.target.checked ? 1 : 2, tm, 'Monday')">
                                     </div>
-                                    <div class="p-1 w-100">
+                                    <div class="p-1">
                                         <template v-if="tm.sched_mon_code">
-                                            <div class="sched-tile neu-pastel-grass"
+                                            <div class="sched-tile neu-pastel-grass" data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid, tm.sched_mon_mergeable, tm)">
                                                 <div class="tile-code">{{ tm.sched_mon_code }}</div>
                                                 <div class="tile-sec">{{ tm.mon_sec_name }}</div>
@@ -1571,11 +1322,11 @@ const addToList = (mode, data, day) => {
                                         </template>
                                         <template v-else>
                                             <input class="form-control form-control-sm border empty-input"
+                                                data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Monday', index, tm.sched_mon, tm.sched_mon_bid, tm.sched_mon_classrid, tm.sched_mon_mergeable, tm)"
                                                 readonly placeholder="—" />
                                         </template>
                                         <input type="hidden" readonly v-model="tm.sched_mon" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
                                     </div>
                                 </div>
                             </td>
@@ -1586,11 +1337,10 @@ const addToList = (mode, data, day) => {
                                     <div class="p-1">
                                          <input
                                             type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
+                                            class="form-check-input"
                                             @change="addToList($event.target.checked ? 1 : 2, tm, 'Tuesday')">
                                     </div>
-                                    <div class="p-1 w-100">
+                                    <div class="p-1">
                                         <template v-if="tm.sched_tue_code">
                                             <div class="sched-tile neu-pastel-mint" data-bs-toggle="modal"
                                                 data-bs-target="#schedulermodal"
@@ -1602,11 +1352,11 @@ const addToList = (mode, data, day) => {
                                         </template>
                                         <template v-else>
                                             <input class="form-control form-control-sm border-0 empty-input"
+                                                data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Tuesday', index, tm.sched_tue, tm.sched_tue_bid, tm.sched_tue_classrid, tm.sched_tue_mergeable, tm)"
                                                 readonly placeholder="—" />
                                         </template>
                                         <input type="hidden" readonly v-model="tm.sched_tue" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
                                         </div>
                                     </div>
                             </td>
@@ -1617,11 +1367,10 @@ const addToList = (mode, data, day) => {
                                     <div class="p-1">
                                          <input
                                             type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
+                                            class="form-check-input"
                                             @change="addToList($event.target.checked ? 1 : 2, tm, 'Wednesday')">
                                     </div>
-                                    <div class="p-1 w-100">
+                                    <div class="p-1">
                                         <template v-if="tm.sched_wed_code">
                                             <div class="sched-tile neu-pastel-sky" data-bs-toggle="modal"
                                                 data-bs-target="#schedulermodal"
@@ -1633,11 +1382,11 @@ const addToList = (mode, data, day) => {
                                         </template>
                                         <template v-else>
                                             <input class="form-control form-control-sm border-0 empty-input"
+                                                data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Wednesday', index, tm.sched_wed, tm.sched_wed_bid, tm.sched_wed_classrid, tm.sched_wed_mergeable, tm)"
                                                 readonly placeholder="—" />
                                         </template>
                                         <input type="hidden" readonly v-model="tm.sched_wed" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
                                     </div>
                                 </div>
                             </td>
@@ -1648,11 +1397,10 @@ const addToList = (mode, data, day) => {
                                     <div class="p-1">
                                          <input
                                             type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
+                                            class="form-check-input"
                                             @change="addToList($event.target.checked ? 1 : 2, tm, 'Thursday')">
                                     </div>
-                                    <div class="p-1 w-100">
+                                    <div class="p-1">
                                         <template v-if="tm.sched_thurs_code">
                                             <div class="sched-tile neu-pastel-blue" data-bs-toggle="modal"
                                                 data-bs-target="#schedulermodal"
@@ -1664,11 +1412,11 @@ const addToList = (mode, data, day) => {
                                         </template>
                                         <template v-else>
                                             <input class="form-control form-control-sm border-0 empty-input"
+                                                data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Thursday', index, tm.sched_thurs, tm.sched_thurs_bid, tm.sched_thurs_classrid, tm.sched_thurs_mergeable, tm)"
                                                 readonly placeholder="—" />
                                         </template>
                                         <input type="hidden" readonly v-model="tm.sched_thurs" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
                                     </div>
                                 </div>
                             </td>
@@ -1679,11 +1427,10 @@ const addToList = (mode, data, day) => {
                                     <div class="p-1">
                                          <input
                                             type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
+                                            class="form-check-input"
                                             @change="addToList($event.target.checked ? 1 : 2, tm, 'Friday')">
                                     </div>
-                                    <div class="p-1 w-100">
+                                    <div class="p-1">
                                         <template v-if="tm.sched_fri_code">
                                             <div class="sched-tile neu-pastel-purple" data-bs-toggle="modal"
                                                 data-bs-target="#schedulermodal"
@@ -1695,11 +1442,11 @@ const addToList = (mode, data, day) => {
                                         </template>
                                         <template v-else>
                                             <input class="form-control form-control-sm border-0 empty-input"
+                                                data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Friday', index, tm.sched_fri, tm.sched_fri_bid, tm.sched_fri_classrid, tm.sched_fri_mergeable, tm)"
                                                 readonly placeholder="—" />
                                         </template>
                                         <input type="hidden" readonly v-model="tm.sched_fri" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
                                     </div>
                                 </div>
                             </td>
@@ -1710,11 +1457,10 @@ const addToList = (mode, data, day) => {
                                     <div class="p-1">
                                          <input
                                             type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
+                                            class="form-check-input"
                                             @change="addToList($event.target.checked ? 1 : 2, tm, 'Saturday')">
                                     </div>
-                                    <div class="p-1 w-100">
+                                    <div class="p-1">
                                         <template v-if="tm.sched_sat_code">
                                             <div class="sched-tile neu-pastel-pink" data-bs-toggle="modal"
                                                 data-bs-target="#schedulermodal"
@@ -1726,42 +1472,11 @@ const addToList = (mode, data, day) => {
                                         </template>
                                         <template v-else>
                                             <input class="form-control form-control-sm border-0 empty-input"
+                                                data-bs-toggle="modal" data-bs-target="#schedulermodal"
                                                 @click="assignSubject(tm.timeid, 'Saturday', index, tm.sched_sat, tm.sched_sat_bid, tm.sched_sat_classrid, tm.sched_sat_mergeable, tm)"
                                                 readonly placeholder="—" />
                                         </template>
                                         <input type="hidden" readonly v-model="tm.sched_sat" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
-                                    </div>
-                                </div>
-                            </td>
-
-                            <!-- Sunday -->
-                            <td class="day-cell" :class="tm.classname" :style="tm.style">
-                                <div class="d-flex justify-content-center align-items-center gap-1">
-                                    <div class="p-1">
-                                         <input
-                                            type="checkbox"
-                                            style="cursor: pointer;"
-                                            class="form-check-input p-2"
-                                            @change="addToList($event.target.checked ? 1 : 2, tm, 'Sunday')">
-                                    </div>
-                                    <div class="p-1 w-100">
-                                        <template v-if="tm.sched_sun_code">
-                                            <div class="sched-tile neu-pastel-red" data-bs-toggle="modal"
-                                                data-bs-target="#schedulermodal"
-                                                @click="assignSubject(tm.timeid, 'Sunday', index, tm.sched_sun, tm.sched_sun_bid, tm.sched_sun_classrid, tm.sched_sun_mergeable, tm)">
-                                                <div class="tile-code">{{ tm.sched_sun_code }}</div>
-                                                <div class="tile-sec">{{ tm.sun_sec_name }}</div>
-                                                <div class="tile-fac text-muted small">{{ tm.sun_faculty }}</div>
-                                            </div>
-                                        </template>
-                                        <template v-else>
-                                            <input class="form-control form-control-sm border-0 empty-input"
-                                                @click="assignSubject(tm.timeid, 'Sunday', index, tm.sched_sun, tm.sched_sun_bid, tm.sched_sun_classrid, tm.sched_sun_mergeable, tm)"
-                                                readonly placeholder="—" />
-                                        </template>
-                                        <input type="hidden" readonly v-model="tm.sched_sun" />
-                                        <input type="hidden" id="openScheduler" readonly data-bs-toggle="modal" data-bs-target="#schedulermodal"/>
                                     </div>
                                 </div>
                             </td>
@@ -1783,15 +1498,14 @@ const addToList = (mode, data, day) => {
 
             <div v-if="preLoading" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
-                    <NeuLoader1/>
-                    <!-- <p class=" mt-3">This may take a while, please wait</p> -->
+                    <SkeletonCardLoader :elementcount="1"/>
+                    <p class=" mt-3">This may take a while, please wait</p>
                 </div>
             </div>
             <div v-if="saving" class="w-100 h-100 bg-opacity-55 border">
                 <div class="p-3 flex flex-col items-center justify-center">
-                    <NeuLoader1/>
                     <!-- <SkeletonCardLoader /> -->
-                    <!-- <p class=" mt-3">{{ savingCount }} out of {{ Object.keys(scheduleList).length }}</p> -->
+                    <p class=" mt-3">{{ savingCount }} out of {{ Object.keys(scheduleList).length }}</p>
                     <p class=" mt-3">Saving Items Please Wait...</p>
                 </div>
             </div>
@@ -1971,12 +1685,5 @@ input:focus {
 .custom-modal {
   max-width: 95% !important; /* or 100% for full width */
   width: 95% !important;
-}
-
-.tr-class {
-    transition: background-color 0.3s ease;
-}
-.tr-class:hover {
-    background-color: rgba(0, 0, 0, 0.05);
 }
 </style>

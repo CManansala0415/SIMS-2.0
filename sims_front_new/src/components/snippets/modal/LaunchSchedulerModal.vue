@@ -39,6 +39,8 @@ const props = defineProps({
   mergeableData: {
   },
   schedData: {
+  },
+  infoData: {
   }
 
 
@@ -100,6 +102,10 @@ const schedule = computed(() => {
   return props.schedData
 });
 
+const selectedList = computed(() => {
+  return props.infoData
+});
+
 const emit = defineEmits(['close-modal', 'assign-sched'])
 const assign = (id, name, bldg, classr, remove) => {
   // alert('Successful')
@@ -115,6 +121,7 @@ const assign = (id, name, bldg, classr, remove) => {
   });
 }
 
+const hasSub = ref(false)
 const activeID = ref('')
 const activeName = ref('')
 const curriculumId = ref('')
@@ -286,6 +293,19 @@ const filterOccupancy = (id) => {
               faculty: e.sat_sched_faculty
             }
             break;
+            case 'Sunday':
+              !e.sun_subj_code ? occupied.value = false : occupied.value = true
+              occupier.value = {
+                sched_id: e.sun_sched_id,
+                subj_id: e.sun_subj_id,
+                subj_code: e.sun_subj_code,
+                sec_name: e.sun_sec_name,
+                gradelvl_name: e.sun_gradelvl_name,
+                course_name: e.sun_course_name,
+                can_merge: e.sched_sun_mergeable,
+                faculty: e.sun_sched_faculty
+              }
+            break;
         }
       }
     })
@@ -298,10 +318,10 @@ const removeSubject = ref(false)
 const hasMergedClass = ref(false)
 const detectingMergedClass = ref(true)
 onMounted(async () => {
-  //if may subject na remove nalang dapat ang options to avoid
-  if (subjId.value) {
-    removeSubject.value = true
-    if (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].includes(timeDay.value)) {
+  // console.log(selectedList.value)
+
+
+    if (['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].includes(timeDay.value)) {
       getMergedClass(schedule.value.sched_id, timeDay.value).then((results) => {
         let hasResults = Object.keys(results).length > 0
         hasMergedClass.value = hasResults
@@ -310,9 +330,9 @@ onMounted(async () => {
     } else {
       detectingMergedClass.value = false
     }
-  } else {
-    activeID.value = subjId.value
-    mergeClass.value = mergeable.value == 1 ? 1 : 0
+
+    // activeID.value = subjId.value
+    // mergeClass.value = mergeable.value == 1 ? 1 : 0
 
     curriculumId.value = currId.value
     loading.value = true
@@ -322,7 +342,6 @@ onMounted(async () => {
 
       getScheduledFaculty().then((results) => {
         faculty.value = results
-
 
         getCurriculumSubject(curriculumId.value, launch.value.ln_quarter, launch.value.ln_gradelvl).then((results) => {
           curriculumSubject.value = results
@@ -353,141 +372,115 @@ onMounted(async () => {
 
           loading.value = false
           checking.value = false
-
+          buildingId.value = ''
+          classroomId.value = ''
 
         })
       })
     })
 
 
-    if (bid.value) {
-      buildingId.value = bid.value
-      filterClassroom()
-      classroomId.value = classrid.value
+    // if (bid.value) {
+    //   buildingId.value = bid.value
+    //   filterClassroom()
+    //   classroomId.value = classrid.value
 
-    } else {
-      buildingId.value = ''
-      classroomId.value = ''
-    }
-  }
-
-
+    // } else {
+    //   buildingId.value = ''
+    //   classroomId.value = ''
+    // }
+  
 })
 
-const assignSubject = (subj_id, subj_code, faculty_id, pass) => {
-  let msg = 'The faculty assigned for this subject has already a schedule for this time slot. These are the actions you can perform: \n\n- Change the assigned instructor for the subject. \n- Assign this subject to a different time slot'
-  let data = availability.value.filter((e) => {
-    if (
-      (e.occ_time === timeId.value) &&
-      (e.occ_day == timeDay.value) &&
-      (e.occ_faculty == faculty_id) &&
-      (pass != 1) // means ojt or practicum, should not overlap
-      // ((e.occ_subjid == subj_id))
-    ) {
-      return e
-    }
-  })
-  // console.log(forMerge.value)
-  // console.log(timeId.value)
-  // console.log(timeDay.value)
-  // console.log(subj_id)
-  // console.log(faculty_id)
-  // console.log(availability.value)
-  // data[0].occ_faculty === faculty_id && object.occ_day == 'tuesday'
-  switch (timeDay.value) {
-    case 'Monday':
-      if (Object.keys(data).length > 0 && !forMerge.value) {
-        // alert(msg)
-        Swal.fire({
-          title: "Notice",
-          text: msg,
-          icon: "question"
-        })
-      } else {
-        activeID.value = subj_id
-        activeName.value = subj_code
-        facultyId.value = faculty_id
-      }
-      break;
-    case 'Tuesday':
-      if (Object.keys(data).length > 0 && !forMerge.value) {
-        // alert(msg)
-        Swal.fire({
-          title: "Notice",
-          text: msg,
-          icon: "question"
-        })
-      } else {
-        activeID.value = subj_id
-        activeName.value = subj_code
-        facultyId.value = faculty_id
-      }
-      break;
-    case 'Wednesday':
-      if (Object.keys(data).length > 0 && !forMerge.value) {
-        // alert(msg)
-        Swal.fire({
-          title: "Notice",
-          text: msg,
-          icon: "question"
-        })
-      } else {
-        activeID.value = subj_id
-        activeName.value = subj_code
-        facultyId.value = faculty_id
-      }
-      break;
-    case 'Thursday':
-      if (Object.keys(data).length > 0 && !forMerge.value) {
-        // alert(msg)
-        Swal.fire({
-          title: "Notice",
-          text: msg,
-          icon: "question"
-        })
-      } else {
-        activeID.value = subj_id
-        activeName.value = subj_code
-        facultyId.value = faculty_id
-      }
-      break;
-    case 'Friday':
-      if (Object.keys(data).length > 0 && !forMerge.value) {
-        // alert(msg)
-        Swal.fire({
-          title: "Notice",
-          text: msg,
-          icon: "question"
-        })
-      } else {
-        activeID.value = subj_id
-        activeName.value = subj_code
-        facultyId.value = faculty_id
-      }
-      break;
-    case 'Saturday':
-      if (Object.keys(data).length > 0 && !forMerge.value) {
-        // alert(msg)
-        Swal.fire({
-          title: "Notice",
-          text: msg,
-          icon: "question"
-        })
-      } else {
-        activeID.value = subj_id
-        activeName.value = subj_code
-        facultyId.value = faculty_id
-      }
-      break;
-  }
+const assignSubject = (subj_id, subj_code, faculty_id, pass, extra) => {
+    const data = availability.value.filter(e =>
+        e.occ_time === timeId.value &&
+        e.occ_day === timeDay.value &&
+        e.occ_faculty === faculty_id &&
+        pass != 1 &&      // OJT/Practicum can overlap
+        extra != 2        // ROTC can overlap
+    );
 
-}
+    const capitalizeWords = (str) =>
+        str
+            ? str.toLowerCase().replace(/\b\w/g, c => c.toUpperCase())
+            : "";
+
+    if (data.length > 0 && !forMerge.value) {
+        const conflict = data[0];
+
+        Swal.fire({
+            icon: "warning",
+            title: "Schedule Conflict Detected",
+            width: 600,
+            confirmButtonText: "OK",
+            confirmButtonColor: "#198754",
+            html: `
+                <div class="text-start">
+
+                    <div class="alert alert-warning py-2 mb-3">
+                        <strong>Unable to assign this subject.</strong><br>
+                        The selected faculty member is already assigned to another class during this time slot.
+                    </div>
+
+                    <table class="table table-bordered table-sm align-middle mb-3">
+                        <tbody>
+                            <tr>
+                                <th style="width:35%">Program</th>
+                                <td>${conflict.prog_code}</td>
+                            </tr>
+                            <tr>
+                                <th>Grade Level</th>
+                                <td>${conflict.grad_name}</td>
+                            </tr>
+                            <tr>
+                                <th>Section</th>
+                                <td>${conflict.sec_name}</td>
+                            </tr>
+                            <tr>
+                                <th>Day</th>
+                                <td>${conflict.occ_day}</td>
+                            </tr>
+                            <tr>
+                                <th>Time</th>
+                                <td>${conflict.occ_time}</td>
+                            </tr>
+                            <tr>
+                                <th>Subject</th>
+                                <td>${conflict.subj_code}</td>
+                            </tr>
+                            <tr>
+                                <th>Faculty</th>
+                                <td>${capitalizeWords(conflict.emp_lastname)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="small text-muted">
+                        <strong>You may:</strong>
+                        <ul class="mb-0 ps-3 mt-2">
+                            <li>Select a different faculty member.</li>
+                            <li>Move this subject to another available time slot.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            `
+        });
+
+        return;
+    }
+
+    activeID.value = subj_id;
+    activeName.value = subj_code;
+    facultyId.value = faculty_id;
+};
 
 
 const setOthers = (value) => {
   // console.log(buildingId.value)
   // console.log(value)
-  // if online class is already set tas pinindot ulit
+  // if no room or online class is already set tas pinindot ulit
   if (buildingId.value == value) {
     buildingId.value = ''
   } else {
@@ -541,7 +534,7 @@ const mergeClassTo = (from) => {
                 > -->
                 <div class="tile-option neu-card-inner" :class="{ active: buildingId === 90 }" @click="setOthers(90)">
                   <i class="bi bi-laptop display-6 text-primary"></i>
-                  <p class="mb-0 fw-semibold">Online Class</p>
+                  <p class="mb-0 fw-semibold">No Room / Online Class</p>
                 </div>
               </div>
 
@@ -598,13 +591,19 @@ const mergeClassTo = (from) => {
       </div>
 
       <!-- RIGHT PANEL -->
-      <div class="col-md-8 overflow-auto neu-card d-flex justify-content-center align-items-center">
+      <div class="col-md-8 overflow-auto neu-card d-flex flex-column justify-content-center align-items-center">
 
         <!-- Step Info -->
         <div v-if="(!buildingId || !classroomId) && !loading" class="d-flex flex-column text-dim">
           <NeuLoader5 />
           <p class="fw-bold m-0">Select a building and classroom</p>
           <small>Your waiting dog will fetch the schedules for you.</small>
+        </div>
+
+        <div class="p-2 mt-3" v-if="(!buildingId || !classroomId) && !loading">
+          <button @click="assign('', '', '', '', true)" class="neu-btn neu-red p-2">
+          🗑️ Remove Subjects
+          </button>
         </div>
 
         <!-- <div v-if="(!buildingId || !classroomId) && loading" class="p-3 w-100 bg-danger" style="height: 200px;">
@@ -665,7 +664,7 @@ const mergeClassTo = (from) => {
                   </tr>
 
                   <tr v-for="subj in filteredSubject" :key="subj.subj_id"
-                    @click="assignSubject(subj.subj_id, subj.subj_code, subj.faculty_id, subj.subj_schedpass)"
+                    @click="assignSubject(subj.subj_id, subj.subj_code, subj.faculty_id, subj.subj_schedpass, subj.subj_extra)"
                     :class="activeID == subj.subj_id ? 'table-active' : ''" style="cursor:pointer;">
                     <td>
                       <p class="fw-bold mb-0">{{ subj.subj_code }}</p>
@@ -749,8 +748,8 @@ const mergeClassTo = (from) => {
   color: #fff !important;
 }
 
-.table-active{
+.table-active {
   background-color: rgb(196, 240, 222);
-  color:rgb(22, 21, 21)
+  color: rgb(22, 21, 21)
 }
 </style>

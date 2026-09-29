@@ -34,7 +34,7 @@ const classroomCount = ref(0)
 const searchValue = ref('')
 const showForm = ref(false)
 const userID = ref('')
-
+const filterById = ref(0)
 
 const building = ref([])
 const degree = ref([])
@@ -111,6 +111,33 @@ const booter = async () => {
 const showSched = (data) => {
     launchData.value = data
     sched.value = !sched.value
+}
+
+const filterBy = () => {
+    console.log(filterById.value)
+    launch.value = []
+    offset.value = 0
+    launchCount.value = 0
+    preLoading.value = true
+    if(filterById.value == 0){
+        getLaunch(limit.value, offset.value, null, 0).then((results) => {
+            launch.value = results.data
+            launchCount.value = results.count
+            preLoading.value = false
+        }).catch((err) => {
+            // console.log(err)
+        })
+       
+    }else{
+        
+         getLaunch(limit.value, offset.value, filterById.value, 1).then((results) => {
+            launch.value = results.data
+            launchCount.value = results.count
+            preLoading.value = false
+        }).catch((err) => {
+            // console.log(err)
+        })
+    }
 }
 
 const paginate = (mode) => {
@@ -242,13 +269,23 @@ onMounted(async () => {
             <SkeletonHeaderLoader :elementcount="2" v-if="preLoading"/>
             <div v-else class="p-3 d-flex gap-2 justify-content-between mb-3">
                 <div class="d-flex gap-2 w-50">
-                    <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
+                    <!-- <input type="text" class="neu-input" placeholder="Search Here..." aria-label="search"
                         v-model="searchValue" aria-describedby="searchaddon"
                         :disabled="preLoading ? true : false">
                     <button @click="search()" type="button" class="neu-btn neu-blue w-25" tabindex="-1"
                         :disabled="preLoading ? true : false">
                         <font-awesome-icon icon="fa-solid fa-magnifying-glass"/> Search
-                    </button>
+                    </button> -->
+                    <select class="neu-input neu-select" v-model="filterById" @change="filterBy()" :disabled="preLoading ? true : false">
+                        <option value="0">--All Courses--</option>
+                        <option
+                            v-for="c in course"
+                            :key="c.prog_id"
+                            :value="c.prog_id"
+                        >
+                            {{ c.prog_name }} — {{ c.prog_code }}
+                        </option>
+                    </select>
                 </div>
                 <div class="d-flex flex-wrap justify-content-end">
                     <button tabindex="-1" data-bs-toggle="modal" data-bs-target="#adddatamodal"
