@@ -4286,23 +4286,28 @@ class RegistrarController extends Controller
         
     }
 
-    public function getEnrollmentSchedule($curr, $prog, $grad, $cour, $sec, $lnid)
+    public function getEnrollmentSchedule($curr, $prog, $grad, $cour, $sec, $lnid, $mode, $empid)
     {
        try{
                 $schedule = DB::table('def_launch as lch')
                 ->leftJoin('def_launch_schedule as lcs', 'lch.ln_id', '=', 'lcs.sched_lnid') 
+                ->leftJoin('def_program as prog', 'lch.ln_course', '=', 'prog.prog_id') 
+                ->leftJoin('def_gradelvl as grad', 'lch.ln_gradelvl', '=', 'grad.grad_id') 
+                ->leftJoin('def_section as sec', 'lch.ln_section', '=', 'sec.sec_id') 
                 ->leftJoin('def_classroom as monroom', 'lcs.sched_mon_classrid', '=', 'monroom.classr_id') 
                 ->leftJoin('def_classroom as tueroom', 'lcs.sched_tue_classrid', '=', 'tueroom.classr_id') 
                 ->leftJoin('def_classroom as wedroom', 'lcs.sched_wed_classrid', '=', 'wedroom.classr_id') 
                 ->leftJoin('def_classroom as thursroom', 'lcs.sched_thurs_classrid', '=', 'thursroom.classr_id') 
                 ->leftJoin('def_classroom as friroom', 'lcs.sched_fri_classrid', '=', 'friroom.classr_id') 
                 ->leftJoin('def_classroom as satroom', 'lcs.sched_sat_classrid', '=', 'satroom.classr_id')
+                ->leftJoin('def_classroom as sunroom', 'lcs.sched_sun_classrid', '=', 'sunroom.classr_id')
                 ->leftJoin('sett_building as monbuil', 'lcs.sched_mon_bid', '=', 'monbuil.buil_id') 
                 ->leftJoin('sett_building as tuebuil', 'lcs.sched_tue_bid', '=', 'tuebuil.buil_id') 
                 ->leftJoin('sett_building as wedbuil', 'lcs.sched_wed_bid', '=', 'wedbuil.buil_id') 
                 ->leftJoin('sett_building as thursbuil', 'lcs.sched_thurs_bid', '=', 'thursbuil.buil_id') 
                 ->leftJoin('sett_building as fribuil', 'lcs.sched_fri_bid', '=', 'fribuil.buil_id') 
                 ->leftJoin('sett_building as satbuil', 'lcs.sched_sat_bid', '=', 'satbuil.buil_id') 
+                ->leftJoin('sett_building as sunbuil', 'lcs.sched_sun_bid', '=', 'sunbuil.buil_id') 
 
                 ->leftJoin('def_launch_faculty as monfaculty', function($join) {
                     $join->on('lcs.sched_lnid', '=', 'monfaculty.lf_lnid');
@@ -4376,14 +4381,43 @@ class RegistrarController extends Controller
                     $join->on('lcs.sched_time', '=', 'sat_sched_day.occ_time'); // this adds an AND condition 
                 })
 
-                ->where('lch.ln_course', '=',  $cour)
-                ->where('lch.ln_gradelvl', '=',  $grad)
-                ->where('lch.ln_curriculum', '=',  $curr)
-                ->where('lch.ln_id', '=',  $lnid)
+                ->leftJoin('def_launch_faculty as sunfaculty', function($join) {
+                    $join->on('lcs.sched_lnid', '=', 'sunfaculty.lf_lnid');
+                    $join->on('lcs.sched_sun', '=', 'sunfaculty.lf_subjid'); // this adds an AND condition 
+                })
+                ->leftJoin('def_employee as sunemp', 'sunfaculty.lf_empid', '=', 'sunemp.emp_id') 
+                ->leftJoin('def_launch_occupancy_faculty as sun_sched_day', function($join) {
+                    $join->on('sunfaculty.lf_lnid', '=', 'sun_sched_day.occ_lnid');
+                    $join->on('sunfaculty.lf_subjid', '=', 'sun_sched_day.occ_subjid');
+                    $join->on('sunfaculty.lf_empid', '=', 'sun_sched_day.occ_faculty');
+                    $join->on('lcs.sched_time', '=', 'sun_sched_day.occ_time'); // this adds an AND condition 
+                })
+
+                ->when($mode === 'faculty', function ($query) use ($empid) {
+                    $query->where(function ($q) use ($empid) {
+                        $q->where('monfaculty.lf_empid', $empid)
+                        ->orWhere('tuefaculty.lf_empid', $empid)
+                        ->orWhere('wedfaculty.lf_empid', $empid)
+                        ->orWhere('thursfaculty.lf_empid', $empid)
+                        ->orWhere('frifaculty.lf_empid', $empid)
+                        ->orWhere('satfaculty.lf_empid', $empid)
+                        ->orWhere('sunfaculty.lf_empid', $empid);
+                    });
+                })
+
+                ->when($mode === 'schedule', function ($query) use ($cour, $grad, $curr, $lnid) {
+                    $query->where('lch.ln_course', $cour)
+                        ->where('lch.ln_gradelvl', $grad)
+                        ->where('lch.ln_curriculum', $curr)
+                        ->where('lch.ln_id', $lnid);
+                })
 
                 ->select(  
                     'lch.*',
                     'lcs.*',
+                    'prog.prog_code',
+                    'grad.grad_name',
+                    'sec.sec_name',
                     'monroom.classr_id as mon_room_id',
                     'monroom.classr_name as mon_room_name',
                     'tueroom.classr_id as tue_room_id',
@@ -4396,6 +4430,8 @@ class RegistrarController extends Controller
                     'friroom.classr_name as fri_room_name',
                     'satroom.classr_id as sat_room_id',
                     'satroom.classr_name as sat_room_name',
+                    'sunroom.classr_id as sun_room_id',
+                    'sunroom.classr_name as sun_room_name',
                     'monbuil.buil_id as mon_buil_id',
                     'monbuil.buil_name as mon_buil_name',
                     'tuebuil.buil_id as tue_buil_id',
@@ -4408,12 +4444,15 @@ class RegistrarController extends Controller
                     'fribuil.buil_name as fri_buil_name',
                     'satbuil.buil_id as sat_buil_id',
                     'satbuil.buil_name as sat_buil_name',
+                    'sunbuil.buil_id as sun_buil_id',
+                    'sunbuil.buil_name as sun_buil_name',
                     'monfaculty.lf_empid as mon_faculty',
                     'tuefaculty.lf_empid as tue_faculty',
                     'wedfaculty.lf_empid as wed_faculty',
                     'thursfaculty.lf_empid as thurs_faculty',
                     'frifaculty.lf_empid as fri_faculty',
                     'satfaculty.lf_empid as sat_faculty',
+                    'sunfaculty.lf_empid as sun_faculty',
                     'monemp.emp_firstname as mon_faculty_firstname',
                     'monemp.emp_middlename as mon_faculty_middlename',
                     'monemp.emp_lastname as mon_faculty_lastname',
@@ -4438,6 +4477,10 @@ class RegistrarController extends Controller
                     'satemp.emp_middlename as sat_faculty_middlename',
                     'satemp.emp_lastname as sat_faculty_lastname',
                     'satemp.emp_suffixname as sat_faculty_suffixname',
+                    'sunemp.emp_firstname as sun_faculty_firstname',
+                    'sunemp.emp_middlename as sun_faculty_middlename',
+                    'sunemp.emp_lastname as sun_faculty_lastname',
+                    'sunemp.emp_suffixname as sun_faculty_suffixname',
                     // 'mon_sched_day.occ_day as occ_mon',
                     // 'tue_sched_day.occ_day as occ_tue',
                     // 'wed_sched_day.occ_day as occ_wed',
@@ -4455,6 +4498,7 @@ class RegistrarController extends Controller
                 ->orderBy('lcs.sched_thurs' ,'desc')
                 ->orderBy('lcs.sched_fri' ,'desc')
                 ->orderBy('lcs.sched_sat' ,'desc')
+                ->orderBy('lcs.sched_sun' ,'desc')
                 ->distinct()
                 ->get();
 
@@ -4468,11 +4512,15 @@ class RegistrarController extends Controller
                     'course' => $cour,
                 ];
         }
-        catch (Exception $ex) {
-            return $data = [
+        catch (\Exception $ex) {
+            return response()->json([
                 'status' => 500,
-            ];
-        }     
+                'message' => $ex->getMessage(),
+                'line' => $ex->getLine(),
+                'file' => $ex->getFile(),
+            ], 500);
+        }
+
     }
 
     public function getTotalEnrollees()

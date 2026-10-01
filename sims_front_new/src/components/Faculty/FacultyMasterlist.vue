@@ -177,7 +177,7 @@ const downloadExcel = () => {
 <template>
     <div>
         <div class="p-3 mb-4 border-bottom">
-            <h5 class=" text-uppercase fw-bold">Faculty Loads</h5>
+            <h5 class=" text-uppercase fw-bold">Faculty Student Masterlist</h5>
         </div>
 
         <!-- <div v-if="preLoading">

@@ -285,7 +285,7 @@ const time = ref([
         style:''
     },
     {
-        timeid: '10301100P',
+        timeid: '10300700P',
         timename: '10:30 - 11:00',
         daytime: 'PM',
         classname: 'p-1',

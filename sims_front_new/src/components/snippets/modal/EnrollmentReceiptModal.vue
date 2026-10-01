@@ -468,7 +468,7 @@ const printSheet = async () =>{
 const formType = ref(1)
 
 // Chat GPT Helper
-
+ 
 function timeToMinutes(raw) {
     // raw example: "0600A", "0130P"
     let hh = parseInt(raw.slice(0, 2), 10)

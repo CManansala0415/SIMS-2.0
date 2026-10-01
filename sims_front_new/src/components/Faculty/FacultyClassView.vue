@@ -122,8 +122,6 @@ onMounted(async () => {
                     // console.log(groupBySection)
                     groupedAssignmentSection.value = groupBySection
                     groupedAssignmentSubject.value = groupBySubject
-                    console.log(groupedAssignmentSection.value)
-                    console.log(groupedAssignmentSubject.value)
                     preLoading.value = false
                     emit('doneLoading', false)
                 })
@@ -156,13 +154,6 @@ onMounted(async () => {
 })
 
 
-// const switchPage = () =>{
-//   switch(switcher.value){
-//     case 0:
-
-//     break;
-//   }
-// }
 
 const scheduleData = ref([])
 const loadingSchedule = ref(false)
@@ -183,14 +174,29 @@ const subjectDetails = (status, index) => {
     let lnid = groupedAssignmentSection.value[index][0].ln_id
     // console.log(curr, prog, grad, cour, sec, lnid)
 
-    getEnrollmentSchedule(curr, prog, grad, cour, sec, lnid).then((results) => {
+    getEnrollmentSchedule(curr, prog, grad, cour, sec, lnid, 'schedule').then((results) => {
         scheduleData.value = results.data
         loadingSchedule.value = false
         // console.log(scheduleData.value)
+        // console.log(groupedAssignmentSection.value)
     })
 }
 
 // Chat GPT Helper
+ 
+function timeToMinutes(raw) {
+    // raw example: "0600A", "0130P"
+    let hh = parseInt(raw.slice(0, 2), 10)
+    const mm = parseInt(raw.slice(2, 4), 10)
+    const mer = raw.slice(4) // A or P
+
+    if (mer === "P" && hh !== 12) hh += 12
+    if (mer === "A" && hh === 12) hh = 0
+
+    return hh * 60 + mm
+}
+
+
 // Day mapping
 const dayMap = [
     { field: "sched_mon", label: "Monday", key: "mon", order: 1 },
@@ -252,7 +258,11 @@ function getScheduleGroupsForSubject(subjId) {
 
     if (!entries.length) return []
 
-    entries.sort((a, b) => a.dayOrder - b.dayOrder || a.rawStart.localeCompare(b.rawStart))
+    // entries.sort((a, b) => a.dayOrder - b.dayOrder || a.rawStart.localeCompare(b.rawStart))
+    entries.sort((a, b) =>
+        a.dayOrder - b.dayOrder ||
+        timeToMinutes(a.rawStart) - timeToMinutes(b.rawStart)
+    )
 
     const groups = []
     let cur = null
@@ -268,7 +278,8 @@ function getScheduleGroupsForSubject(subjId) {
             e.room === cur.room &&
             e.building === cur.building &&
             e.faculty === cur.faculty &&
-            e.rawStart === prev.rawEnd
+            // e.rawStart === prev.rawEnd
+            timeToMinutes(e.rawStart) === timeToMinutes(prev.rawEnd)
 
         if (canMerge) {
             cur.end = e.end
@@ -282,7 +293,7 @@ function getScheduleGroupsForSubject(subjId) {
 
     return groups
 }
-// Chat GPT Helper
+// Chat GPT HelperSubjects handled
 
 </script>
 <template>

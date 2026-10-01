@@ -35,6 +35,7 @@ import LibraryCardsView from '../components/Library/LibraryCardsView.vue';
 import FacultyClassView from '../components/Faculty/FacultyClassView.vue';
 import FacultyGradesView from '../components/Faculty/FacultyGradesView.vue';
 import FacultyMasterlist from '../components/Faculty/FacultyMasterlist.vue';
+import FacultyDashboard from '../components/Faculty/FacultyDashboard.vue';
 
 // Auth
 const Login = () => import("../components/Login.vue");
@@ -77,6 +78,9 @@ const routes = [
     { path: '/faculty-classes', name: 'faculty-classes', component: FacultyClassView },
     { path: '/faculty-grading-sheet', name: 'faculty-grading-sheet', component: FacultyGradesView },
     { path: '/faculty-student', name: 'faculty-student', component: FacultyMasterlist },
+    { path: '/faculty-dashboard', name: 'faculty-dashboard', component: FacultyDashboard },
+
+    
 ];
 
 const router = createRouter({

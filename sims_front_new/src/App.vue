@@ -104,6 +104,7 @@ const getUser = (data) => {
     "/faculty-classes": ["3", "1", "1"],
     "/faculty-student": ["3", "1", "2"],
     "/faculty-grading-sheet": ["3", "1", "3"],
+
   };
 
   const currentModule = moduleMap[path.value];
@@ -165,7 +166,7 @@ function getMetaForEntry(modulecode, accesscode, category) {
 
   // Academics (category 3)
   if (category === "3") {
-    if (modulecode === "1") return { link: "/faculty-classes", description: "Class" };
+    if (modulecode === "1") return { link: "/faculty-dashboard", description: "Class" };
     // Expand as needed:
     // if (modulecode === "1" && accesscode === "3") return { link: "/faculty-student", description: "Grades" };
     // if (modulecode === "1" && accesscode === "4") return { link: "/faculty-grading-sheet", description: "Masterlist" };
@@ -293,6 +294,7 @@ const linker = () => {
         "/faculty-classes",
         "/faculty-student",
         "/faculty-grading-sheet",
+        "/faculty-dashboard",
       ],
       action: () => switchItem(3, 1),
     },
@@ -832,6 +834,12 @@ const bgGradient = ref(`
                                 <p class="m-2">Faculty Assignments</p>
                               </router-link>
                             </li> -->
+                            <li>
+                              <router-link @click="checkPath('/faculty-dashboard')"
+                                to="/faculty-dashboard" class="dropdown-item" tabindex="-1">
+                                <p class="m-2">Faculty Dashboard</p>
+                              </router-link>
+                            </li>
                             <li>
                               <router-link @click="checkPath('/faculty-classes')" v-if="accessData[22].useracc_grant == 1"
                                 to="/faculty-classes" class="dropdown-item" tabindex="-1">

@@ -2494,11 +2494,11 @@ const updateArchiveDetails = async (data) => {
 }
 
 let getenrollmentschedule = {}
-const getEnrollmentSchedule = async (curr, prog, grad, cour, sec, lnid) => {
+const getEnrollmentSchedule = async (curr, prog, grad, cour, sec, lnid, mode, empid) => {
     try {
         await axios({
             method: "GET",
-            url: 'api/get-enrollment-schedule/' + curr + '/' + prog + '/' + grad + '/' + cour + '/' + sec + '/' + lnid,
+            url: 'api/get-enrollment-schedule/' + curr + '/' + prog + '/' + grad + '/' + cour + '/' + sec + '/' + lnid + '/' + mode + '/' + empid,
         }).then(async (results) => {
             // console.log(results.data)
             getenrollmentschedule = results.data

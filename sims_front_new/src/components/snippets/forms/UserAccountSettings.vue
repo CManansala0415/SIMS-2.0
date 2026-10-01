@@ -220,7 +220,7 @@ const accessData = async (data) => {
     accessKey.value = !accessKey.value
     accessModuleData.value = data
 }
- 
+  
 const passwordReset = () =>{
     let x = {
         email:'devclcst@gmail.com'
@@ -344,8 +344,8 @@ const passwordReset = () =>{
                                 required>
                         </div>
                         <div class="mb-3 d-flex flex-column align-items-start w-100">
-                            <label for="username" class="form-label">Email</label>
-                            <input type="email" class="neu-input" id="email" aria-describedby="email" v-model="email"
+                            <label for="username" class="form-label">Username</label>
+                            <input type="email" class="neu-input" id="email" aria-describedby="email" v-model="email" placeholder="initials@sims.clcst"
                                 required>
                         </div>
                         <div class="w-100">
@@ -373,10 +373,11 @@ const passwordReset = () =>{
                             :disabled="(saving || (password != confirmpassword || !password || !confirmpassword)) && addNew ? true : false">
                             <font-awesome-icon icon="fa-solid fa-gear"/> Register
                         </button>
+                        <button v-if="!addNew" class="neu-btn neu-red mt-2 p-2" @click="passwordReset()">Password Reset</button>
                     </form>
-                    <div class="mb-3 d-flex flex-column align-items-start w-100">
+                    <!-- <div class="mb-3 d-flex flex-column align-items-start w-100" v-if="accessModuleData">
                         <button class="neu-btn neu-green p-2" @click="passwordReset()">Password Reset</button>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <div class="form-group">
